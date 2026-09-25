@@ -1,0 +1,39 @@
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, Types } from 'mongoose';
+
+export type PaymentDocument = Payment & Document;
+
+@Schema({ timestamps: true })
+export class Payment {
+  @Prop({ type: Types.ObjectId, ref: 'Sale', required: true })
+  sale: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'Customer', required: true })
+  customer: Types.ObjectId;
+
+  @Prop({ required: true })
+  amount: number;
+
+  @Prop({ required: true })
+  paymentDate: Date;
+
+  @Prop({ required: true })
+  paymentMethod: string; // Cash, Bank Transfer, Card, Cheque, Online, Finance
+
+  @Prop()
+  referenceNumber: string;
+
+  @Prop()
+  bank: string;
+
+  @Prop({ unique: true, sparse: true })
+  receiptNumber: string;
+
+  @Prop()
+  notes: string;
+
+  @Prop({ default: 'Completed' })
+  status: string; // 'Completed', 'Reversed', 'Refunded'
+}
+
+export const PaymentSchema = SchemaFactory.createForClass(Payment);

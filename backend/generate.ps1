@@ -1,0 +1,22 @@
+
+npx nest g module auth
+npx nest g controller auth
+npx nest g service auth
+npx nest g module users
+npx nest g controller users
+npx nest g service users
+npx nest g module roles
+npx nest g controller roles
+npx nest g service roles
+npx nest g module permissions
+npx nest g controller permissions
+npx nest g service permissions
+npx nest g module branches
+npx nest g controller branches
+npx nest g service branches
+npx nest g module settings
+npx nest g controller settings
+npx nest g service settings
+npx nest g module audit-logs
+npx nest g controller audit-logs
+npx nest g service audit-logs
