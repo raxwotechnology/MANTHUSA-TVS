@@ -32,6 +32,16 @@ let Vehicle = class Vehicle {
     color;
     status;
     location;
+    year;
+    purchasePrice;
+    transportCost;
+    repairCost;
+    detailingCost;
+    totalInvestment;
+    sellingPrice;
+    minimumSellingPrice;
+    expectedProfit;
+    images;
 };
 exports.Vehicle = Vehicle;
 __decorate([
@@ -110,6 +120,46 @@ __decorate([
     (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Branch' }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Vehicle.prototype, "location", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], Vehicle.prototype, "year", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], Vehicle.prototype, "purchasePrice", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], Vehicle.prototype, "transportCost", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], Vehicle.prototype, "repairCost", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], Vehicle.prototype, "detailingCost", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], Vehicle.prototype, "totalInvestment", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], Vehicle.prototype, "sellingPrice", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], Vehicle.prototype, "minimumSellingPrice", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], Vehicle.prototype, "expectedProfit", void 0);
+__decorate([
+    (0, mongoose_1.Prop)([String]),
+    __metadata("design:type", Array)
+], Vehicle.prototype, "images", void 0);
 exports.Vehicle = Vehicle = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Vehicle);

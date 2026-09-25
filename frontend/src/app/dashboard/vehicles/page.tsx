@@ -233,11 +233,19 @@ export default function VehicleInventoryPage() {
     };
 
     try {
-      await fetch(getApiUrl('/vehicles'), {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { _id, ...payload } = item;
+      const res = await fetch(getApiUrl('/vehicles'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(item)
+        body: JSON.stringify(payload)
       });
+      if (res.ok) {
+        const savedData = await res.json();
+        setVehicles([savedData, ...vehicles]);
+        setShowAddModal(false);
+        return;
+      }
     } catch (err) {
       console.log('Post vehicle fallback');
     }

@@ -88,7 +88,7 @@ export default function CustomersPage() {
       await fetch(getApiUrl('/customers'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(item)
+        body: JSON.stringify((() => { const { _id, ...rest } = item; return rest; })())
       });
     } catch (err) {}
 

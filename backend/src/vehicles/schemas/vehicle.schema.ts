@@ -61,6 +61,37 @@ export class Vehicle {
 
   @Prop({ type: Types.ObjectId, ref: 'Branch' })
   location: Types.ObjectId;
+
+  // Added to match frontend payload
+  @Prop()
+  year: number;
+
+  @Prop()
+  purchasePrice: number;
+
+  @Prop()
+  transportCost: number;
+
+  @Prop()
+  repairCost: number;
+
+  @Prop()
+  detailingCost: number;
+
+  @Prop()
+  totalInvestment: number;
+
+  @Prop()
+  sellingPrice: number;
+
+  @Prop()
+  minimumSellingPrice: number;
+
+  @Prop()
+  expectedProfit: number;
+
+  @Prop([String])
+  images: string[];
 }
 
 export const VehicleSchema = SchemaFactory.createForClass(Vehicle);

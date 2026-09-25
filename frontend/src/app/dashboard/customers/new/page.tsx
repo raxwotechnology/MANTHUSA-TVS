@@ -24,7 +24,7 @@ export default function NewCustomerPage() {
       const res = await fetch('http://localhost:3001/customers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify((() => { const { _id, ...rest } = formData; return rest; })())
       });
       if (res.ok) {
         router.push('/dashboard/customers');

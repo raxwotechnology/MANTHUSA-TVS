@@ -117,7 +117,7 @@ export default function ReceiptsVouchersPage() {
       await fetch(getApiUrl('/cash-transactions'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newTx)
+        body: JSON.stringify((() => { const { _id, ...rest } = newTx; return rest; })())
       });
     } catch (err) {
       console.log('Post tx fallback');
