@@ -16,6 +16,9 @@ export default function TargetsPage() {
       achievementPct: 66.1
     }
   ]);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newFormData, setNewFormData] = useState({});
+
 
   return (
     <DashboardLayout>
@@ -25,7 +28,7 @@ export default function TargetsPage() {
           <p className="text-xs text-slate-500">Configure monthly vehicle count and revenue targets per executive and monitor achievement %</p>
         </div>
 
-        <button className="flex items-center gap-1.5 bg-emerald-600 text-white font-semibold text-xs px-4 py-2.5 rounded-lg">
+        <button className="flex items-center gap-1.5 bg-emerald-600 text-white font-semibold text-xs px-4 py-2.5 rounded-lg" onClick={() => setShowAddModal(true)}>
           <Plus className="w-4 h-4" />
           <span>+ Set Executive Target</span>
         </button>
@@ -66,6 +69,52 @@ export default function TargetsPage() {
           </tbody>
         </table>
       </div>
+    
+      {showAddModal && (
+        <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-xl max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-bold text-slate-900 mb-4">Add New Record</h3>
+            <div className="space-y-3">
+              
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">salesperson</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, salesperson: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">month</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, month: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">vehicleTarget</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, vehicleTarget: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">actualVehiclesSold</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, actualVehiclesSold: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">revenueTarget</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, revenueTarget: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">actualRevenue</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, actualRevenue: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">achievementPct</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, achievementPct: e.target.value})} />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 mt-6 pt-4 border-t">
+              <button onClick={() => setShowAddModal(false)} className="px-4 py-2 border rounded-lg text-slate-600 font-semibold text-xs">Cancel</button>
+              <button onClick={() => { setShowAddModal(false); setTargets([{_id: Date.now().toString(), ...newFormData} as any, ...targets]); }} className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold text-xs">Save</button>
+            </div>
+          </div>
+        </div>
+      )}
+    
     </DashboardLayout>
   );
 }
+
+

@@ -17,6 +17,9 @@ export default function TestDrivesPage() {
       feedback: 'Customer loved engine performance.'
     }
   ]);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newFormData, setNewFormData] = useState({});
+
 
   return (
     <DashboardLayout>
@@ -26,7 +29,7 @@ export default function TestDrivesPage() {
           <p className="text-xs text-slate-500">Book customer driving slots, verify license, and record post-drive feedback</p>
         </div>
 
-        <button className="flex items-center gap-1.5 bg-emerald-600 text-white font-semibold text-xs px-4 py-2.5 rounded-lg">
+        <button className="flex items-center gap-1.5 bg-emerald-600 text-white font-semibold text-xs px-4 py-2.5 rounded-lg" onClick={() => setShowAddModal(true)}>
           <Plus className="w-4 h-4" />
           <span>+ Schedule Test Drive</span>
         </button>
@@ -60,6 +63,56 @@ export default function TestDrivesPage() {
           </tbody>
         </table>
       </div>
+    
+      {showAddModal && (
+        <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-xl max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-bold text-slate-900 mb-4">Add New Record</h3>
+            <div className="space-y-3">
+              
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">testDriveId</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, testDriveId: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">customerName</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, customerName: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">vehicleName</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, vehicleName: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">date</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, date: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">timeSlot</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, timeSlot: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">drivingLicenseNo</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, drivingLicenseNo: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">status</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, status: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">feedback</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, feedback: e.target.value})} />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 mt-6 pt-4 border-t">
+              <button onClick={() => setShowAddModal(false)} className="px-4 py-2 border rounded-lg text-slate-600 font-semibold text-xs">Cancel</button>
+              <button onClick={() => { setShowAddModal(false); setDrives([{_id: Date.now().toString(), ...newFormData} as any, ...drives]); }} className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold text-xs">Save</button>
+            </div>
+          </div>
+        </div>
+      )}
+    
     </DashboardLayout>
   );
 }
+
+

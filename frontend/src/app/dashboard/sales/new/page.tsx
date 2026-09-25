@@ -1,4 +1,5 @@
 "use client";
+import { getApiUrl } from '@/lib/api';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -23,7 +24,7 @@ export default function NewSalePage() {
     e.preventDefault();
     const finalAmount = Number(formData.vehiclePrice) - Number(formData.discount) + Number(formData.additionalCharges);
     try {
-      const res = await fetch('http://localhost:3001/sales', {
+      const res = await fetch(getApiUrl('/sales'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...formData, finalAmount, balance: finalAmount, paidAmount: 0 })
@@ -90,3 +91,6 @@ export default function NewSalePage() {
     </div>
   );
 }
+
+
+

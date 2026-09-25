@@ -16,6 +16,9 @@ export default function ExpensesPage() {
       receiptNumber: 'VCH-881'
     }
   ]);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newFormData, setNewFormData] = useState({});
+
 
   return (
     <DashboardLayout>
@@ -25,7 +28,7 @@ export default function ExpensesPage() {
           <p className="text-xs text-slate-500">Track vehicle repairs, transport, fuel, advertising, electricity, rent, salaries and overheads</p>
         </div>
 
-        <button className="flex items-center gap-1.5 bg-rose-600 text-white font-semibold text-xs px-4 py-2.5 rounded-lg">
+        <button className="flex items-center gap-1.5 bg-rose-600 text-white font-semibold text-xs px-4 py-2.5 rounded-lg" onClick={() => setShowAddModal(true)}>
           <Plus className="w-4 h-4" />
           <span>+ Add Expense Record</span>
         </button>
@@ -57,6 +60,52 @@ export default function ExpensesPage() {
           </tbody>
         </table>
       </div>
+    
+      {showAddModal && (
+        <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-xl max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-bold text-slate-900 mb-4">Add New Record</h3>
+            <div className="space-y-3">
+              
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">expenseId</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, expenseId: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">category</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, category: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">amount</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, amount: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">date</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, date: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">description</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, description: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">paymentMethod</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, paymentMethod: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">receiptNumber</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, receiptNumber: e.target.value})} />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 mt-6 pt-4 border-t">
+              <button onClick={() => setShowAddModal(false)} className="px-4 py-2 border rounded-lg text-slate-600 font-semibold text-xs">Cancel</button>
+              <button onClick={() => { setShowAddModal(false); setExpenses([{_id: Date.now().toString(), ...newFormData} as any, ...expenses]); }} className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold text-xs">Save</button>
+            </div>
+          </div>
+        </div>
+      )}
+    
     </DashboardLayout>
   );
 }
+
+

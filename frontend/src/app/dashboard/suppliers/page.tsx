@@ -16,6 +16,9 @@ export default function SuppliersPage() {
       outstandingBalance: 4500000
     }
   ]);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newFormData, setNewFormData] = useState({});
+
 
   return (
     <DashboardLayout>
@@ -25,7 +28,7 @@ export default function SuppliersPage() {
           <p className="text-xs text-slate-500">Track supplier profiles, vehicle purchase history, payments, and ledger statement</p>
         </div>
 
-        <button className="flex items-center gap-1.5 bg-emerald-600 text-white font-semibold text-xs px-4 py-2.5 rounded-lg">
+        <button className="flex items-center gap-1.5 bg-emerald-600 text-white font-semibold text-xs px-4 py-2.5 rounded-lg" onClick={() => setShowAddModal(true)}>
           <Plus className="w-4 h-4" />
           <span>+ Add Supplier</span>
         </button>
@@ -57,6 +60,52 @@ export default function SuppliersPage() {
           </tbody>
         </table>
       </div>
+    
+      {showAddModal && (
+        <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-xl max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-bold text-slate-900 mb-4">Add New Record</h3>
+            <div className="space-y-3">
+              
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">supplierId</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, supplierId: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">supplierName</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, supplierName: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">supplierType</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, supplierType: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">contactPerson</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, contactPerson: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">phone</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, phone: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">email</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, email: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">outstandingBalance</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, outstandingBalance: e.target.value})} />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 mt-6 pt-4 border-t">
+              <button onClick={() => setShowAddModal(false)} className="px-4 py-2 border rounded-lg text-slate-600 font-semibold text-xs">Cancel</button>
+              <button onClick={() => { setShowAddModal(false); setSuppliers([{_id: Date.now().toString(), ...newFormData} as any, ...suppliers]); }} className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold text-xs">Save</button>
+            </div>
+          </div>
+        </div>
+      )}
+    
     </DashboardLayout>
   );
 }
+
+

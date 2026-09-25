@@ -30,14 +30,17 @@ import {
   Search,
   LogOut,
   ChevronDown,
-  Building2
+  Building2,
+  X
 } from 'lucide-react';
 
 interface SidebarProps {
   user: any;
+  mobileOpen?: boolean;
+  onCloseMobile?: () => void;
 }
 
-export function Sidebar({ user }: SidebarProps) {
+export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
@@ -49,8 +52,10 @@ export function Sidebar({ user }: SidebarProps) {
     router.push('/login');
   };
 
-  const toggleSubmenu = (key: string) => {
-    setOpenSubmenu(openSubmenu === key ? null : key);
+  const handleLinkClick = () => {
+    if (onCloseMobile) {
+      onCloseMobile();
+    }
   };
 
   const role = user?.role || 'Admin';
@@ -61,19 +66,45 @@ export function Sidebar({ user }: SidebarProps) {
   const userInitials = user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2) : 'VS';
 
   return (
-    <aside className="w-64 bg-[#0B132B] text-slate-300 flex flex-col h-screen sticky top-0 border-r border-slate-800 flex-shrink-0 z-30">
-      {/* Brand Logo Header */}
-      <div className="p-4 border-b border-slate-800/80 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold shadow-md shadow-emerald-900/30">
-          <Car className="w-6 h-6" />
+    <>
+      {/* Mobile Backdrop Overlay */}
+      {mobileOpen && (
+        <div
+          onClick={onCloseMobile}
+          className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-40 lg:hidden transition-opacity duration-300"
+        />
+      )}
+
+      {/* Sidebar Content */}
+      <aside
+        className={`fixed lg:sticky top-0 left-0 z-50 lg:z-30 w-64 bg-[#0B132B] text-slate-300 flex flex-col h-screen border-r border-slate-800 flex-shrink-0 transition-transform duration-300 ease-in-out ${
+          mobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'
+        }`}
+      >
+        {/* Brand Logo Header */}
+        <div className="p-4 border-b border-slate-800/80 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold shadow-md shadow-emerald-900/30">
+              <Car className="w-6 h-6" />
+            </div>
+            <div>
+              <h1 className="font-bold text-white text-base tracking-wide flex items-center gap-1">
+                Sales<span className="text-emerald-400">Plus</span>
+              </h1>
+              <p className="text-[10px] text-slate-400 uppercase tracking-wider font-medium">Vehicle Sales System</p>
+            </div>
+          </div>
+
+          {/* Close button for Mobile */}
+          <button
+            onClick={onCloseMobile}
+            className="p-1 text-slate-400 hover:text-white rounded-lg lg:hidden"
+            aria-label="Close sidebar"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
-        <div>
-          <h1 className="font-bold text-white text-base tracking-wide flex items-center gap-1">
-            Sales<span className="text-emerald-400">Plus</span>
-          </h1>
-          <p className="text-[10px] text-slate-400 uppercase tracking-wider font-medium">Vehicle Sales System</p>
-        </div>
-      </div>
+
 
       {/* Search Bar inside Sidebar */}
       <div className="p-3">
@@ -90,7 +121,8 @@ export function Sidebar({ user }: SidebarProps) {
       </div>
 
       {/* Navigation Links */}
-      <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-4 text-xs">
+      <nav onClick={handleLinkClick} className="flex-1 overflow-y-auto px-3 py-2 space-y-4 text-xs">
+
         {/* DASHBOARD */}
         <div>
           <Link
@@ -479,5 +511,7 @@ export function Sidebar({ user }: SidebarProps) {
         </div>
       </div>
     </aside>
+  </>
   );
 }
+

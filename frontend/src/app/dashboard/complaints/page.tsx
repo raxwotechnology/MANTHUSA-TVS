@@ -16,6 +16,9 @@ export default function ComplaintsPage() {
       status: 'In Progress'
     }
   ]);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newFormData, setNewFormData] = useState({});
+
 
   return (
     <DashboardLayout>
@@ -25,7 +28,7 @@ export default function ComplaintsPage() {
           <p className="text-xs text-slate-500">Log customer issues, assign technical staff, track resolution progress (Open -&gt; In Progress -&gt; Resolved -&gt; Closed)</p>
         </div>
 
-        <button className="flex items-center gap-1.5 bg-rose-600 text-white font-semibold text-xs px-4 py-2.5 rounded-lg">
+        <button className="flex items-center gap-1.5 bg-rose-600 text-white font-semibold text-xs px-4 py-2.5 rounded-lg" onClick={() => setShowAddModal(true)}>
           <Plus className="w-4 h-4" />
           <span>+ Log New Complaint</span>
         </button>
@@ -59,6 +62,52 @@ export default function ComplaintsPage() {
           </tbody>
         </table>
       </div>
+    
+      {showAddModal && (
+        <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-xl max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-bold text-slate-900 mb-4">Add New Record</h3>
+            <div className="space-y-3">
+              
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">complaintId</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, complaintId: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">customerName</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, customerName: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">vehicleName</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, vehicleName: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">type</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, type: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">priority</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, priority: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">assignedStaff</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, assignedStaff: e.target.value})} />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">status</label>
+                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, status: e.target.value})} />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 mt-6 pt-4 border-t">
+              <button onClick={() => setShowAddModal(false)} className="px-4 py-2 border rounded-lg text-slate-600 font-semibold text-xs">Cancel</button>
+              <button onClick={() => { setShowAddModal(false); setComplaints([{_id: Date.now().toString(), ...newFormData} as any, ...complaints]); }} className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold text-xs">Save</button>
+            </div>
+          </div>
+        </div>
+      )}
+    
     </DashboardLayout>
   );
 }
+
+

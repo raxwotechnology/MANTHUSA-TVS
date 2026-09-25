@@ -1,4 +1,5 @@
 "use client";
+import { getApiUrl } from '@/lib/api';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -21,10 +22,10 @@ export default function NewCustomerPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch('http://localhost:3001/customers', {
+      const res = await fetch(getApiUrl('/customers'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify((() => { const { _id, ...rest } = formData; return rest; })())
+        body: JSON.stringify((() => { const { _id, ...rest } = formData as any; return rest; })())
       });
       if (res.ok) {
         router.push('/dashboard/customers');
@@ -80,3 +81,6 @@ export default function NewCustomerPage() {
     </div>
   );
 }
+
+
+
