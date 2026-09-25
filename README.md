@@ -326,3 +326,5 @@ npm run build
 ## 📄 License
 
 This project is proprietary software developed for vehicle dealership management. All rights reserved.
+#   V e h i c l e - S a l e s  
+ 
