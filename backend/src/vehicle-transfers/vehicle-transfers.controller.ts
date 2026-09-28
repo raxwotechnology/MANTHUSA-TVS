@@ -1,7 +1,9 @@
 import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
 import { VehicleTransfersService } from './vehicle-transfers.service';
+import { Roles } from '../auth/roles.decorator';
 
 @Controller('vehicle-transfers')
+@Roles('Sales & Operations')
 export class VehicleTransfersController {
   constructor(private readonly service: VehicleTransfersService) {}
 

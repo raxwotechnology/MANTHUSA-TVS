@@ -5,6 +5,9 @@ export type ReservationDocument = Reservation & Document;
 
 @Schema({ timestamps: true })
 export class Reservation {
+  @Prop({ unique: true, sparse: true })
+  reservationId: string;
+
   @Prop({ type: Types.ObjectId, ref: 'Customer', required: true })
   customer: Types.ObjectId;
 
@@ -31,6 +34,12 @@ export class Reservation {
 
   @Prop()
   refundStatus: string; // 'Pending', 'Refunded', 'Not Applicable'
+
+  @Prop()
+  paymentMethod: string;
+
+  @Prop()
+  notes: string;
 }
 
 export const ReservationSchema = SchemaFactory.createForClass(Reservation);

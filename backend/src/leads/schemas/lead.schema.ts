@@ -5,11 +5,17 @@ export type LeadDocument = Lead & Document;
 
 @Schema({ timestamps: true })
 export class Lead {
+  @Prop({ unique: true, sparse: true })
+  leadId: string;
+
   @Prop({ type: Types.ObjectId, ref: 'Customer', required: true })
   customer: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'Vehicle' })
   interestedVehicle: Types.ObjectId;
+
+  @Prop()
+  interestedVehicleText: string;
 
   @Prop()
   source: string; // Facebook, Walk-in, Referral, etc.
@@ -22,6 +28,15 @@ export class Lead {
 
   @Prop()
   expectedPurchaseDate: Date;
+
+  @Prop()
+  inquiryType: string;
+
+  @Prop()
+  inquiryMessage: string;
+
+  @Prop()
+  preferredDate: Date;
 
   @Prop({ default: 'New' })
   status: string; // New, Contacted, Interested, Test Drive, Quotation, Reserved, Won/Lost

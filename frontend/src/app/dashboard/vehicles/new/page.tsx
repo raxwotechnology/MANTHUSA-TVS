@@ -1,5 +1,5 @@
 "use client";
-import { getApiUrl } from '@/lib/api';
+import { apiFetch } from '@/lib/api';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -22,7 +22,7 @@ export default function NewVehiclePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch(getApiUrl('/vehicles'), {
+      const res = await apiFetch('/vehicles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify((() => { const { _id, ...rest } = formData as any; return rest; })())
@@ -61,22 +61,22 @@ export default function NewVehiclePage() {
             <div className="grid grid-cols-6 gap-6">
               <div className="col-span-6 sm:col-span-3">
                 <label className="block text-sm font-medium text-gray-700">Stock Number</label>
-                <input required type="text" name="stockNumber" onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-black" />
+                <input required type="text" name="stockNumber" placeholder="e.g. STK-2026-001" onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-black placeholder:text-gray-400" />
               </div>
 
               <div className="col-span-6 sm:col-span-3">
                 <label className="block text-sm font-medium text-gray-700">Make</label>
-                <input required type="text" name="make" onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-black" />
+                <input required type="text" name="make" placeholder="e.g. Toyota" onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-black placeholder:text-gray-400" />
               </div>
 
               <div className="col-span-6 sm:col-span-3">
                 <label className="block text-sm font-medium text-gray-700">Model</label>
-                <input required type="text" name="model" onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-black" />
+                <input required type="text" name="model" placeholder="e.g. Axio WxB" onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-black placeholder:text-gray-400" />
               </div>
 
               <div className="col-span-6 sm:col-span-3">
                 <label className="block text-sm font-medium text-gray-700">Year</label>
-                <input required type="number" name="manufacturingYear" onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-black" />
+                <input required type="number" name="manufacturingYear" placeholder="e.g. 2024" onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-black placeholder:text-gray-400" />
               </div>
             </div>
 

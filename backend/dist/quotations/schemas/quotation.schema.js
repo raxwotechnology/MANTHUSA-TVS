@@ -23,6 +23,7 @@ let Quotation = class Quotation {
     insuranceFee;
     otherCharges;
     totalAmount;
+    advancePayment;
     validUntil;
 };
 exports.Quotation = Quotation;
@@ -66,6 +67,10 @@ __decorate([
     (0, mongoose_1.Prop)({ default: 0 }),
     __metadata("design:type", Number)
 ], Quotation.prototype, "totalAmount", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: 0 }),
+    __metadata("design:type", Number)
+], Quotation.prototype, "advancePayment", void 0);
 __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", Date)

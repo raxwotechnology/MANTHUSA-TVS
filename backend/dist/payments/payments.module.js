@@ -10,11 +10,21 @@ exports.PaymentsModule = void 0;
 const common_1 = require("@nestjs/common");
 const payments_controller_1 = require("./payments.controller");
 const payments_service_1 = require("./payments.service");
+const mongoose_1 = require("@nestjs/mongoose");
+const payment_schema_1 = require("./schemas/payment.schema");
+const sale_schema_1 = require("../sales/schemas/sale.schema");
+const cash_transaction_schema_1 = require("../cash-transactions/schemas/cash-transaction.schema");
+const notifications_module_1 = require("../notifications/notifications.module");
 let PaymentsModule = class PaymentsModule {
 };
 exports.PaymentsModule = PaymentsModule;
 exports.PaymentsModule = PaymentsModule = __decorate([
     (0, common_1.Module)({
+        imports: [notifications_module_1.NotificationsModule, mongoose_1.MongooseModule.forFeature([
+                { name: 'Payment', schema: payment_schema_1.PaymentSchema },
+                { name: 'Sale', schema: sale_schema_1.SaleSchema },
+                { name: 'CashTransaction', schema: cash_transaction_schema_1.CashTransactionSchema },
+            ])],
         controllers: [payments_controller_1.PaymentsController],
         providers: [payments_service_1.PaymentsService]
     })

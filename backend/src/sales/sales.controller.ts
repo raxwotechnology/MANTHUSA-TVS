@@ -1,13 +1,15 @@
-import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, Req } from '@nestjs/common';
 import { SalesService } from './sales.service';
+import { Roles } from '../auth/roles.decorator';
 
 @Controller('sales')
+@Roles('Sales & Operations')
 export class SalesController {
   constructor(private readonly salesService: SalesService) {}
 
   @Post()
-  create(@Body() createSaleDto: any) {
-    return this.salesService.create(createSaleDto);
+  create(@Body() createSaleDto: any, @Req() request: any) {
+    return this.salesService.create({ ...createSaleDto, salesperson: request.user.sub });
   }
 
   @Get()

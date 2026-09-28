@@ -12,13 +12,19 @@ const mongoose_1 = require("@nestjs/mongoose");
 const vehicle_transfers_service_1 = require("./vehicle-transfers.service");
 const vehicle_transfers_controller_1 = require("./vehicle-transfers.controller");
 const vehicle_transfer_schema_1 = require("./schemas/vehicle-transfer.schema");
+const vehicle_schema_1 = require("../vehicles/schemas/vehicle.schema");
+const branch_schema_1 = require("../branches/schemas/branch.schema");
 let VehicleTransfersModule = class VehicleTransfersModule {
 };
 exports.VehicleTransfersModule = VehicleTransfersModule;
 exports.VehicleTransfersModule = VehicleTransfersModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            mongoose_1.MongooseModule.forFeature([{ name: 'VehicleTransfer', schema: vehicle_transfer_schema_1.VehicleTransferSchema }]),
+            mongoose_1.MongooseModule.forFeature([
+                { name: 'VehicleTransfer', schema: vehicle_transfer_schema_1.VehicleTransferSchema },
+                { name: 'Vehicle', schema: vehicle_schema_1.VehicleSchema },
+                { name: 'Branch', schema: branch_schema_1.BranchSchema },
+            ]),
         ],
         providers: [vehicle_transfers_service_1.VehicleTransfersService],
         controllers: [vehicle_transfers_controller_1.VehicleTransfersController],

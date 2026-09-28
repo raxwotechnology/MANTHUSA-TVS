@@ -1,11 +1,15 @@
 import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
 import { VehicleValuationsService } from './vehicle-valuations.service';
+import { Roles } from '../auth/roles.decorator';
+import { Public } from '../auth/public.decorator';
 
 @Controller('vehicle-valuations')
+@Roles('Sales & Operations')
 export class VehicleValuationsController {
   constructor(private readonly service: VehicleValuationsService) {}
 
   @Post()
+  @Public()
   create(@Body() createDto: any) {
     return this.service.create(createDto);
   }

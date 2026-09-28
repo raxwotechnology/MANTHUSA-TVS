@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SupplierSchema = exports.Supplier = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 let Supplier = class Supplier {
+    supplierId;
     name;
     supplierType;
     contactPerson;
@@ -22,6 +23,10 @@ let Supplier = class Supplier {
     outstandingBalance;
 };
 exports.Supplier = Supplier;
+__decorate([
+    (0, mongoose_1.Prop)({ unique: true, sparse: true }),
+    __metadata("design:type", String)
+], Supplier.prototype, "supplierId", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)

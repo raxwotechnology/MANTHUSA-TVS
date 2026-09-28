@@ -1,5 +1,5 @@
 "use client";
-import { getApiUrl } from '@/lib/api';
+import { apiFetch } from '@/lib/api';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -22,7 +22,7 @@ export default function NewCustomerPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch(getApiUrl('/customers'), {
+      const res = await apiFetch('/customers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify((() => { const { _id, ...rest } = formData as any; return rest; })())
@@ -57,19 +57,19 @@ export default function NewCustomerPage() {
             <div className="grid grid-cols-6 gap-6">
               <div className="col-span-6 sm:col-span-3">
                 <label className="block text-sm font-medium text-gray-700">Full Name</label>
-                <input required type="text" name="fullName" onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-black" />
+                <input required type="text" name="fullName" placeholder="e.g. Kasun Kalhara" onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-black placeholder:text-gray-400" />
               </div>
               <div className="col-span-6 sm:col-span-3">
                 <label className="block text-sm font-medium text-gray-700">Phone</label>
-                <input required type="text" name="phone" onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-black" />
+                <input required type="text" name="phone" placeholder="e.g. +94 77 123 4567" onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-black placeholder:text-gray-400" />
               </div>
               <div className="col-span-6 sm:col-span-3">
                 <label className="block text-sm font-medium text-gray-700">Email</label>
-                <input type="email" name="email" onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-black" />
+                <input type="email" name="email" placeholder="e.g. kasun@example.com" onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-black placeholder:text-gray-400" />
               </div>
               <div className="col-span-6 sm:col-span-3">
-                <label className="block text-sm font-medium text-gray-700">NIC/Passport</label>
-                <input type="text" name="nicOrPassport" onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-black" />
+                <label className="block text-sm font-medium text-gray-700">NIC / Passport</label>
+                <input type="text" name="nicOrPassport" placeholder="e.g. 199212345678 / 921234567V" onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-black placeholder:text-gray-400" />
               </div>
             </div>
             <div className="mt-6">

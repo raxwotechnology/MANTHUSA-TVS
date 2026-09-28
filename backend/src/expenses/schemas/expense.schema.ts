@@ -5,6 +5,9 @@ export type ExpenseDocument = Expense & Document;
 
 @Schema({ timestamps: true })
 export class Expense {
+  @Prop({ unique: true, sparse: true })
+  expenseId: string;
+
   @Prop({ type: Types.ObjectId, ref: 'ExpenseCategory', required: true })
   category: Types.ObjectId;
 
@@ -23,11 +26,17 @@ export class Expense {
   @Prop({ type: Types.ObjectId, ref: 'Supplier' })
   supplier: Types.ObjectId;
 
+  @Prop({ type: Types.ObjectId, ref: 'Branch' })
+  branch: Types.ObjectId;
+
   @Prop()
   paymentMethod: string;
 
   @Prop()
   receiptUrl: string;
+
+  @Prop()
+  receiptNumber: string;
 }
 
 export const ExpenseSchema = SchemaFactory.createForClass(Expense);

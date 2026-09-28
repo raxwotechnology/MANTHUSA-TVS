@@ -7,6 +7,7 @@ export declare class VehiclePurchase {
     purchasePrice: number;
     additionalCosts: number;
     paymentStatus: string;
+    paidAmount: number;
 }
 export declare const VehiclePurchaseSchema: import("mongoose").Schema<VehiclePurchase, import("mongoose").Model<VehiclePurchase, any, any, any, any, any, VehiclePurchase>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, VehiclePurchase, Document<unknown, {}, VehiclePurchase, {
     id: string;
@@ -63,6 +64,15 @@ export declare const VehiclePurchaseSchema: import("mongoose").Schema<VehiclePur
         id: string;
     }>> | undefined;
     paymentStatus?: import("mongoose").SchemaDefinitionProperty<string, VehiclePurchase, Document<unknown, {}, VehiclePurchase, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<VehiclePurchase & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    paidAmount?: import("mongoose").SchemaDefinitionProperty<number, VehiclePurchase, Document<unknown, {}, VehiclePurchase, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<VehiclePurchase & {
         _id: Types.ObjectId;

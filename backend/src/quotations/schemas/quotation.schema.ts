@@ -35,6 +35,9 @@ export class Quotation {
   @Prop({ default: 0 })
   totalAmount: number;
 
+  @Prop({ default: 0 })
+  advancePayment: number;
+
   @Prop()
   validUntil: Date;
 }

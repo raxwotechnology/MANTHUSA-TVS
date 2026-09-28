@@ -19,6 +19,8 @@ let CashTransaction = class CashTransaction {
     source;
     referenceId;
     description;
+    paymentMethod;
+    referenceNumber;
 };
 exports.CashTransaction = CashTransaction;
 __decorate([
@@ -45,6 +47,14 @@ __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], CashTransaction.prototype, "description", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], CashTransaction.prototype, "paymentMethod", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], CashTransaction.prototype, "referenceNumber", void 0);
 exports.CashTransaction = CashTransaction = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], CashTransaction);

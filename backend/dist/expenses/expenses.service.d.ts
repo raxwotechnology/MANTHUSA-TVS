@@ -2,7 +2,9 @@ import { Model } from 'mongoose';
 import { ExpenseDocument } from './schemas/expense.schema';
 export declare class ExpensesService {
     private expenseModel;
-    constructor(expenseModel: Model<ExpenseDocument>);
+    private categoryModel;
+    private cashModel;
+    constructor(expenseModel: Model<ExpenseDocument>, categoryModel: Model<any>, cashModel: Model<any>);
     create(createExpenseDto: any): Promise<ExpenseDocument>;
     findAll(): Promise<ExpenseDocument[]>;
     findOne(id: string): Promise<ExpenseDocument>;

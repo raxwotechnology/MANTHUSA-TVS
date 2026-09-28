@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CashTransactionsController = void 0;
 const common_1 = require("@nestjs/common");
 const cash_transactions_service_1 = require("./cash-transactions.service");
+const roles_decorator_1 = require("../auth/roles.decorator");
 let CashTransactionsController = class CashTransactionsController {
     cashTxService;
     constructor(cashTxService) {
@@ -53,6 +54,7 @@ __decorate([
 ], CashTransactionsController.prototype, "findOne", null);
 exports.CashTransactionsController = CashTransactionsController = __decorate([
     (0, common_1.Controller)('cash-transactions'),
+    (0, roles_decorator_1.Roles)('Accountant / Finance Staff'),
     __metadata("design:paramtypes", [cash_transactions_service_1.CashTransactionsService])
 ], CashTransactionsController);
 //# sourceMappingURL=cash-transactions.controller.js.map

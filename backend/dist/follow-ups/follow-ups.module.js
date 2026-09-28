@@ -10,11 +10,14 @@ exports.FollowUpsModule = void 0;
 const common_1 = require("@nestjs/common");
 const follow_ups_controller_1 = require("./follow-ups.controller");
 const follow_ups_service_1 = require("./follow-ups.service");
+const mongoose_1 = require("@nestjs/mongoose");
+const follow_up_schema_1 = require("./schemas/follow-up.schema");
 let FollowUpsModule = class FollowUpsModule {
 };
 exports.FollowUpsModule = FollowUpsModule;
 exports.FollowUpsModule = FollowUpsModule = __decorate([
     (0, common_1.Module)({
+        imports: [mongoose_1.MongooseModule.forFeature([{ name: 'FollowUp', schema: follow_up_schema_1.FollowUpSchema }])],
         controllers: [follow_ups_controller_1.FollowUpsController],
         providers: [follow_ups_service_1.FollowUpsService]
     })

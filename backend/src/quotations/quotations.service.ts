@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { QuotationDocument } from './schemas/quotation.schema';
@@ -10,7 +10,19 @@ export class QuotationsService {
   ) {}
 
   async create(createQuotationDto: any): Promise<QuotationDocument> {
-    const createdQuotation = new this.quotationModel(createQuotationDto);
+    if (!createQuotationDto.customer || !createQuotationDto.vehicle) throw new BadRequestException('Customer and vehicle are required.');
+    const vehiclePrice = Number(createQuotationDto.vehiclePrice || 0);
+    const discount = Number(createQuotationDto.discount || 0);
+    const registrationFee = Number(createQuotationDto.registrationFee || 0);
+    const insuranceFee = Number(createQuotationDto.insuranceFee || 0);
+    const otherCharges = Number(createQuotationDto.otherCharges || createQuotationDto.additionalCharges || 0);
+    if (vehiclePrice <= 0 || discount < 0 || discount >= vehiclePrice) throw new BadRequestException('Quotation pricing is invalid.');
+    const createdQuotation = new this.quotationModel({
+      ...createQuotationDto,
+      quotationNumber: createQuotationDto.quotationNumber || `QT-${Date.now()}`,
+      vehiclePrice, discount, registrationFee, insuranceFee, otherCharges,
+      totalAmount: vehiclePrice - discount + registrationFee + insuranceFee + otherCharges,
+    });
     return createdQuotation.save();
   }
 

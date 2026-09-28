@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.VehicleTransfersController = void 0;
 const common_1 = require("@nestjs/common");
 const vehicle_transfers_service_1 = require("./vehicle-transfers.service");
+const roles_decorator_1 = require("../auth/roles.decorator");
 let VehicleTransfersController = class VehicleTransfersController {
     service;
     constructor(service) {
@@ -74,6 +75,7 @@ __decorate([
 ], VehicleTransfersController.prototype, "remove", null);
 exports.VehicleTransfersController = VehicleTransfersController = __decorate([
     (0, common_1.Controller)('vehicle-transfers'),
+    (0, roles_decorator_1.Roles)('Sales & Operations'),
     __metadata("design:paramtypes", [vehicle_transfers_service_1.VehicleTransfersService])
 ], VehicleTransfersController);
 //# sourceMappingURL=vehicle-transfers.controller.js.map

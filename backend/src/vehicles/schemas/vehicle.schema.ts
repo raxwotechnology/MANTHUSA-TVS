@@ -62,6 +62,9 @@ export class Vehicle {
   @Prop({ type: Types.ObjectId, ref: 'Branch' })
   location: Types.ObjectId;
 
+  @Prop({ type: Types.ObjectId, ref: 'Branch' })
+  branch: Types.ObjectId;
+
   // Added to match frontend payload
   @Prop()
   year: number;

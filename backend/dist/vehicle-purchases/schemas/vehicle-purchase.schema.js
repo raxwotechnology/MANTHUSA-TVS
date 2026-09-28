@@ -19,6 +19,7 @@ let VehiclePurchase = class VehiclePurchase {
     purchasePrice;
     additionalCosts;
     paymentStatus;
+    paidAmount;
 };
 exports.VehiclePurchase = VehiclePurchase;
 __decorate([
@@ -45,6 +46,10 @@ __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], VehiclePurchase.prototype, "paymentStatus", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: 0 }),
+    __metadata("design:type", Number)
+], VehiclePurchase.prototype, "paidAmount", void 0);
 exports.VehiclePurchase = VehiclePurchase = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], VehiclePurchase);

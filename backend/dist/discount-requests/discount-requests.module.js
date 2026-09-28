@@ -10,11 +10,20 @@ exports.DiscountRequestsModule = void 0;
 const common_1 = require("@nestjs/common");
 const discount_requests_controller_1 = require("./discount-requests.controller");
 const discount_requests_service_1 = require("./discount-requests.service");
+const mongoose_1 = require("@nestjs/mongoose");
+const discount_request_schema_1 = require("./schemas/discount-request.schema");
+const quotation_schema_1 = require("../quotations/schemas/quotation.schema");
+const vehicle_schema_1 = require("../vehicles/schemas/vehicle.schema");
 let DiscountRequestsModule = class DiscountRequestsModule {
 };
 exports.DiscountRequestsModule = DiscountRequestsModule;
 exports.DiscountRequestsModule = DiscountRequestsModule = __decorate([
     (0, common_1.Module)({
+        imports: [mongoose_1.MongooseModule.forFeature([
+                { name: 'DiscountRequest', schema: discount_request_schema_1.DiscountRequestSchema },
+                { name: 'Quotation', schema: quotation_schema_1.QuotationSchema },
+                { name: 'Vehicle', schema: vehicle_schema_1.VehicleSchema },
+            ])],
         controllers: [discount_requests_controller_1.DiscountRequestsController],
         providers: [discount_requests_service_1.DiscountRequestsService]
     })

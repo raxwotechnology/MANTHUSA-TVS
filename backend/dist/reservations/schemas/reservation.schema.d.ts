@@ -1,6 +1,7 @@
 import { Document, Types } from 'mongoose';
 export type ReservationDocument = Reservation & Document;
 export declare class Reservation {
+    reservationId: string;
     customer: Types.ObjectId;
     vehicle: Types.ObjectId;
     salesperson: Types.ObjectId;
@@ -10,6 +11,8 @@ export declare class Reservation {
     status: string;
     cancellationReason: string;
     refundStatus: string;
+    paymentMethod: string;
+    notes: string;
 }
 export declare const ReservationSchema: import("mongoose").Schema<Reservation, import("mongoose").Model<Reservation, any, any, any, any, any, Reservation>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Reservation, Document<unknown, {}, Reservation, {
     id: string;
@@ -20,6 +23,15 @@ export declare const ReservationSchema: import("mongoose").Schema<Reservation, i
 }, "id"> & import("mongoose").HydratedDocumentOverrides<{
     id: string;
 }>, {
+    reservationId?: import("mongoose").SchemaDefinitionProperty<string, Reservation, Document<unknown, {}, Reservation, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Reservation & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
     customer?: import("mongoose").SchemaDefinitionProperty<Types.ObjectId, Reservation, Document<unknown, {}, Reservation, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Reservation & {
@@ -93,6 +105,24 @@ export declare const ReservationSchema: import("mongoose").Schema<Reservation, i
         id: string;
     }>> | undefined;
     refundStatus?: import("mongoose").SchemaDefinitionProperty<string, Reservation, Document<unknown, {}, Reservation, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Reservation & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    paymentMethod?: import("mongoose").SchemaDefinitionProperty<string, Reservation, Document<unknown, {}, Reservation, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Reservation & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    notes?: import("mongoose").SchemaDefinitionProperty<string, Reservation, Document<unknown, {}, Reservation, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Reservation & {
         _id: Types.ObjectId;

@@ -1,7 +1,9 @@
 import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
 import { CustomersService } from './customers.service';
+import { Roles } from '../auth/roles.decorator';
 
 @Controller('customers')
+@Roles('Sales & Operations')
 export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
 
@@ -19,6 +21,9 @@ export class CustomersController {
   findOne(@Param('id') id: string) {
     return this.customersService.findOne(id);
   }
+
+  @Get(':id/timeline')
+  timeline(@Param('id') id: string) { return this.customersService.timeline(id); }
 
   @Put(':id')
   update(@Param('id') id: string, @Body() updateCustomerDto: any) {

@@ -1,6 +1,7 @@
 import { Document } from 'mongoose';
 export type SupplierDocument = Supplier & Document;
 export declare class Supplier {
+    supplierId: string;
     name: string;
     supplierType: string;
     contactPerson: string;
@@ -19,6 +20,15 @@ export declare const SupplierSchema: import("mongoose").Schema<Supplier, import(
 }, "id"> & import("mongoose").HydratedDocumentOverrides<{
     id: string;
 }>, {
+    supplierId?: import("mongoose").SchemaDefinitionProperty<string, Supplier, Document<unknown, {}, Supplier, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Supplier & {
+        _id: import("mongoose").Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
     name?: import("mongoose").SchemaDefinitionProperty<string, Supplier, Document<unknown, {}, Supplier, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Supplier & {

@@ -22,7 +22,21 @@ let QuotationsService = class QuotationsService {
         this.quotationModel = quotationModel;
     }
     async create(createQuotationDto) {
-        const createdQuotation = new this.quotationModel(createQuotationDto);
+        if (!createQuotationDto.customer || !createQuotationDto.vehicle)
+            throw new common_1.BadRequestException('Customer and vehicle are required.');
+        const vehiclePrice = Number(createQuotationDto.vehiclePrice || 0);
+        const discount = Number(createQuotationDto.discount || 0);
+        const registrationFee = Number(createQuotationDto.registrationFee || 0);
+        const insuranceFee = Number(createQuotationDto.insuranceFee || 0);
+        const otherCharges = Number(createQuotationDto.otherCharges || createQuotationDto.additionalCharges || 0);
+        if (vehiclePrice <= 0 || discount < 0 || discount >= vehiclePrice)
+            throw new common_1.BadRequestException('Quotation pricing is invalid.');
+        const createdQuotation = new this.quotationModel({
+            ...createQuotationDto,
+            quotationNumber: createQuotationDto.quotationNumber || `QT-${Date.now()}`,
+            vehiclePrice, discount, registrationFee, insuranceFee, otherCharges,
+            totalAmount: vehiclePrice - discount + registrationFee + insuranceFee + otherCharges,
+        });
         return createdQuotation.save();
     }
     async findAll() {

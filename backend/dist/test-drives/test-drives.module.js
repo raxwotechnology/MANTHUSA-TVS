@@ -10,11 +10,14 @@ exports.TestDrivesModule = void 0;
 const common_1 = require("@nestjs/common");
 const test_drives_controller_1 = require("./test-drives.controller");
 const test_drives_service_1 = require("./test-drives.service");
+const mongoose_1 = require("@nestjs/mongoose");
+const test_drive_schema_1 = require("./schemas/test-drive.schema");
 let TestDrivesModule = class TestDrivesModule {
 };
 exports.TestDrivesModule = TestDrivesModule;
 exports.TestDrivesModule = TestDrivesModule = __decorate([
     (0, common_1.Module)({
+        imports: [mongoose_1.MongooseModule.forFeature([{ name: 'TestDrive', schema: test_drive_schema_1.TestDriveSchema }])],
         controllers: [test_drives_controller_1.TestDrivesController],
         providers: [test_drives_service_1.TestDrivesService]
     })

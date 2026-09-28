@@ -9,12 +9,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BranchesModule = void 0;
 const common_1 = require("@nestjs/common");
 const branches_service_1 = require("./branches.service");
+const mongoose_1 = require("@nestjs/mongoose");
+const branch_schema_1 = require("./schemas/branch.schema");
 const branches_controller_1 = require("./branches.controller");
 let BranchesModule = class BranchesModule {
 };
 exports.BranchesModule = BranchesModule;
 exports.BranchesModule = BranchesModule = __decorate([
     (0, common_1.Module)({
+        imports: [mongoose_1.MongooseModule.forFeature([{ name: 'Branch', schema: branch_schema_1.BranchSchema }])],
         providers: [branches_service_1.BranchesService],
         controllers: [branches_controller_1.BranchesController]
     })

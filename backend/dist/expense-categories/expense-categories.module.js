@@ -10,11 +10,14 @@ exports.ExpenseCategoriesModule = void 0;
 const common_1 = require("@nestjs/common");
 const expense_categories_controller_1 = require("./expense-categories.controller");
 const expense_categories_service_1 = require("./expense-categories.service");
+const mongoose_1 = require("@nestjs/mongoose");
+const expense_category_schema_1 = require("./schemas/expense-category.schema");
 let ExpenseCategoriesModule = class ExpenseCategoriesModule {
 };
 exports.ExpenseCategoriesModule = ExpenseCategoriesModule;
 exports.ExpenseCategoriesModule = ExpenseCategoriesModule = __decorate([
     (0, common_1.Module)({
+        imports: [mongoose_1.MongooseModule.forFeature([{ name: 'ExpenseCategory', schema: expense_category_schema_1.ExpenseCategorySchema }])],
         controllers: [expense_categories_controller_1.ExpenseCategoriesController],
         providers: [expense_categories_service_1.ExpenseCategoriesService]
     })

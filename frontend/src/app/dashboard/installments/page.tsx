@@ -1,113 +1,27 @@
-"use client";
-import React, { useState } from 'react';
+'use client';
+import { useEffect, useState, FormEvent } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { CreditCard, Plus } from 'lucide-react';
+import { apiFetch } from '@/lib/api';
 
 export default function InstallmentsPage() {
-  const [installments, setInstallments] = useState([
-    {
-      _id: '1',
-      customerName: 'Kamal Gunaratne',
-      financeCompany: 'Central Finance PLC',
-      loanAmount: 8000000,
-      downPayment: 5500000,
-      periodMonths: 60,
-      monthlyInstallment: 185000,
-      status: 'Active'
-    }
-  ]);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [newFormData, setNewFormData] = useState({});
-
-
-  return (
-    <DashboardLayout>
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-extrabold text-slate-900">Installments & Vehicle Finance</h1>
-          <p className="text-xs text-slate-500">Track leasing agreements, down payments, interest rates and monthly installment due dates</p>
-        </div>
-
-        <button className="flex items-center gap-1.5 bg-emerald-600 text-white font-semibold text-xs px-4 py-2.5 rounded-lg" onClick={() => setShowAddModal(true)}>
-          <Plus className="w-4 h-4" />
-          <span>+ Add Finance Plan</span>
-        </button>
-      </div>
-
-      <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
-        <table className="w-full text-xs text-left">
-          <thead>
-            <tr className="bg-slate-50 border-b text-slate-700 font-semibold">
-              <th className="py-3 px-4">Customer</th>
-              <th className="py-3 px-4">Finance Company</th>
-              <th className="py-3 px-4">Loan Amount</th>
-              <th className="py-3 px-4">Down Payment</th>
-              <th className="py-3 px-4">Loan Period</th>
-              <th className="py-3 px-4">Monthly Installment</th>
-              <th className="py-3 px-4">Status</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {installments.map((i) => (
-              <tr key={i._id} className="hover:bg-slate-50">
-                <td className="py-3 px-4 font-bold text-slate-900">{i.customerName}</td>
-                <td className="py-3 px-4 font-bold text-blue-700">{i.financeCompany}</td>
-                <td className="py-3 px-4 text-slate-700 font-medium">LKR {i.loanAmount.toLocaleString()}</td>
-                <td className="py-3 px-4 text-slate-600">LKR {i.downPayment.toLocaleString()}</td>
-                <td className="py-3 px-4 text-slate-500">{i.periodMonths} Months</td>
-                <td className="py-3 px-4 font-extrabold text-emerald-600">LKR {i.monthlyInstallment.toLocaleString()}/mo</td>
-                <td className="py-3 px-4"><span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">{i.status}</span></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    
-      {showAddModal && (
-        <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-xl max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-bold text-slate-900 mb-4">Add New Record</h3>
-            <div className="space-y-3">
-              
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">customerName</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, customerName: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">financeCompany</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, financeCompany: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">loanAmount</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, loanAmount: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">downPayment</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, downPayment: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">periodMonths</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, periodMonths: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">monthlyInstallment</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, monthlyInstallment: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">status</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, status: e.target.value})} />
-              </div>
-            </div>
-            <div className="flex justify-end gap-2 mt-6 pt-4 border-t">
-              <button onClick={() => setShowAddModal(false)} className="px-4 py-2 border rounded-lg text-slate-600 font-semibold text-xs">Cancel</button>
-              <button onClick={() => { setShowAddModal(false); setInstallments([{_id: Date.now().toString(), ...newFormData} as any, ...installments]); }} className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold text-xs">Save</button>
-            </div>
-          </div>
-        </div>
-      )}
-    
-    </DashboardLayout>
-  );
+  const [agreements, setAgreements] = useState<any[]>([]);
+  const [sales, setSales] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [schedule, setSchedule] = useState<any[]>([]);
+  const [activeAgreement, setActiveAgreement] = useState<any>(null);
+  const [open, setOpen] = useState(false);
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [form, setForm] = useState({ sale: '', customer: '', financeCompany: '', loanAmount: '', downPayment: '0', interestRate: '0', loanPeriodMonths: '', monthlyInstallment: '', startDate: '' });
+  const load = async () => { const response = await apiFetch('/installments/agreements'); if (!response.ok) throw new Error('Could not load finance agreements.'); setAgreements(await response.json()); };
+  useEffect(() => { load().catch((e) => setError(e.message)); Promise.all([apiFetch('/sales'), apiFetch('/customers')]).then(async ([s, c]) => { if (!s.ok || !c.ok) throw new Error('Could not load sales and customers.'); setSales(await s.json()); setCustomers(await c.json()); }).catch((e) => setError(e.message)); }, []);
+  const create = async (e: FormEvent) => { e.preventDefault(); setBusy(true); setError(''); try { const response = await apiFetch('/installments/agreements', { method: 'POST', body: JSON.stringify({ ...form, loanAmount: Number(form.loanAmount), downPayment: Number(form.downPayment), interestRate: Number(form.interestRate), loanPeriodMonths: Number(form.loanPeriodMonths), monthlyInstallment: form.monthlyInstallment ? Number(form.monthlyInstallment) : undefined }) }); if (!response.ok) { const body = await response.json().catch(() => ({})); throw new Error(body.message || 'Could not create finance agreement.'); } await load(); setOpen(false); } catch (e) { setError(e instanceof Error ? e.message : 'Could not create finance agreement.'); } finally { setBusy(false); } };
+  const openSchedule = async (agreement: any) => { setError(''); const response = await apiFetch(`/installments/agreements/${agreement._id}/schedule`); if (!response.ok) { setError('Could not load installment schedule.'); return; } setSchedule(await response.json()); setActiveAgreement(agreement); };
+  const markPaid = async (row: any) => { const response = await apiFetch(`/installments/${row._id}/paid`, { method: 'PATCH', body: JSON.stringify({ paidDate: new Date().toISOString() }) }); if (!response.ok) { const body = await response.json().catch(() => ({})); setError(body.message || 'Could not record installment payment.'); return; } if (activeAgreement) await openSchedule(activeAgreement); };
+  return <DashboardLayout><div className="mb-6 flex items-center justify-between"><div><h1 className="text-2xl font-extrabold">Installments & Finance</h1><p className="text-xs text-slate-500">Finance agreements, monthly schedules and payment collection</p></div><button onClick={() => setOpen(true)} className="rounded-lg bg-emerald-600 px-4 py-2.5 text-xs font-semibold text-white">+ Add Finance Plan</button></div>
+    {error && <div role="alert" className="mb-4 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">{error}</div>}
+    <div className="overflow-x-auto rounded-2xl border bg-white p-4"><table className="w-full text-left text-xs"><thead><tr className="border-b bg-slate-50">{['Customer','Invoice','Finance company','Loan','Down payment','Term','Monthly installment','Schedule'].map((x)=><th key={x} className="px-3 py-3">{x}</th>)}</tr></thead><tbody className="divide-y">{agreements.map((a)=><tr key={a._id}><td className="px-3 py-3 font-semibold">{a.customer?.fullName || '—'}</td><td className="px-3 py-3">{a.sale?.invoiceNumber}</td><td className="px-3 py-3">{a.financeCompany}</td><td className="px-3 py-3">LKR {Number(a.loanAmount||0).toLocaleString()}</td><td className="px-3 py-3">LKR {Number(a.downPayment||0).toLocaleString()}</td><td className="px-3 py-3">{a.loanPeriodMonths} months</td><td className="px-3 py-3">LKR {Number(a.monthlyInstallment||0).toLocaleString()}</td><td className="px-3 py-3"><button onClick={()=>openSchedule(a)} className="rounded border px-3 py-1.5">View schedule</button></td></tr>)}{!agreements.length&&<tr><td colSpan={8} className="py-8 text-center text-slate-500">No finance agreements found.</td></tr>}</tbody></table></div>
+    {activeAgreement && <div className="mt-6 overflow-x-auto rounded-2xl border bg-white p-4"><div className="mb-3 flex justify-between"><h2 className="font-bold">Installment Schedule · {activeAgreement.financeCompany}</h2><button onClick={()=>setActiveAgreement(null)} className="text-sm text-slate-500">Close</button></div><table className="w-full text-left text-xs"><thead><tr className="border-b bg-slate-50"><th className="p-2">#</th><th className="p-2">Due date</th><th className="p-2">Amount</th><th className="p-2">Status</th><th className="p-2">Action</th></tr></thead><tbody>{schedule.map((item)=><tr key={item._id} className="border-b"><td className="p-2">{item.installmentNumber}</td><td className="p-2">{new Date(item.dueDate).toLocaleDateString()}</td><td className="p-2">LKR {Number(item.amount).toLocaleString()}</td><td className="p-2">{item.status}</td><td className="p-2">{item.status !== 'Paid' && <button onClick={()=>markPaid(item)} className="rounded bg-emerald-600 px-3 py-1.5 text-white">Record payment</button>}</td></tr>)}</tbody></table></div>}
+    {open && <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4"><form onSubmit={create} className="max-h-[90vh] w-full max-w-2xl space-y-3 overflow-y-auto rounded-2xl bg-white p-6"><h2 className="text-lg font-bold">Create Finance Agreement</h2><div className="grid gap-3 sm:grid-cols-2"><label className="text-xs">Sale invoice<select required value={form.sale} onChange={(e)=>{ const sale=sales.find((x)=>x._id===e.target.value); setForm({...form,sale:e.target.value,customer:sale?.customer?._id || ''}); }} className="mt-1 w-full rounded border p-2"><option value="">Select sale</option>{sales.map((s)=><option key={s._id} value={s._id}>{s.invoiceNumber} · {s.customer?.fullName} · balance LKR {Number(s.balance||0).toLocaleString()}</option>)}</select></label><label className="text-xs">Customer<select required value={form.customer} onChange={(e)=>setForm({...form,customer:e.target.value})} className="mt-1 w-full rounded border p-2"><option value="">Select customer</option>{customers.map((c)=><option key={c._id} value={c._id}>{c.fullName} · {c.phone}</option>)}</select></label>{([['financeCompany','Finance company','text'],['loanAmount','Finance principal (LKR)','number'],['downPayment','Down payment (LKR)','number'],['interestRate','Annual interest (%)','number'],['loanPeriodMonths','Loan term (months)','number'],['monthlyInstallment','Monthly amount override (optional)','number'],['startDate','First due date','date']] as const).map(([key,label,type])=><label key={key} className="text-xs">{label}<input required={key!=='monthlyInstallment'} type={type} min={type==='number'?0:undefined} value={form[key]} onChange={(e)=>setForm({...form,[key]:e.target.value})} className="mt-1 w-full rounded border p-2" /></label>)}</div><div className="flex justify-end gap-2 border-t pt-4"><button type="button" onClick={()=>setOpen(false)} className="rounded border px-4 py-2 text-xs">Cancel</button><button disabled={busy} className="rounded bg-emerald-600 px-4 py-2 text-xs text-white">{busy?'Saving…':'Create schedule'}</button></div></form></div>}
+  </DashboardLayout>;
 }
-
-

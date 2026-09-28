@@ -11,6 +11,7 @@ import {
   TrendingUp,
   Users,
   UserCheck,
+  CheckCircle2,
   Calendar,
   PhoneCall,
   FileText,
@@ -288,6 +289,9 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
                 <FileText className="w-4 h-4" />
                 <span>Quotations & Discounts</span>
               </Link>
+              <Link href="/dashboard/discount-approvals" className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${pathname === '/dashboard/discount-approvals' ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold' : 'hover:bg-slate-800/60 text-slate-300'}`}>
+                <CheckCircle2 className="w-4 h-4" /><span>Discount Approvals</span>
+              </Link>
 
               <Link
                 href="/dashboard/reservations"
@@ -324,6 +328,9 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
                 <Car className="w-4 h-4" />
                 <span>Vehicle Handover</span>
               </Link>
+              <Link href="/dashboard/documents" className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${pathname === '/dashboard/documents' ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold' : 'hover:bg-slate-800/60 text-slate-300'}`}>
+                <FileText className="w-4 h-4" /><span>Documents</span>
+              </Link>
             </div>
           </div>
         )}
@@ -359,6 +366,10 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
                 <span>Installments & Finance</span>
               </Link>
 
+              <Link href="/dashboard/refunds" className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${pathname === '/dashboard/refunds' ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold' : 'hover:bg-slate-800/60 text-slate-300'}`}>
+                <Receipt className="w-4 h-4" /><span>Refunds</span>
+              </Link>
+
               <Link
                 href="/dashboard/expenses"
                 className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
@@ -370,6 +381,12 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
                 <PieChart className="w-4 h-4" />
                 <span>Expenses Ledger</span>
               </Link>
+              <Link href="/dashboard/supplier-payments" className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${pathname === '/dashboard/supplier-payments' ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold' : 'hover:bg-slate-800/60 text-slate-300'}`}>
+                <Building2 className="w-4 h-4" /><span>Supplier Payments</span>
+              </Link>
+              {!isSales && <Link href="/dashboard/documents" className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${pathname === '/dashboard/documents' ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold' : 'hover:bg-slate-800/60 text-slate-300'}`}>
+                <FileText className="w-4 h-4" /><span>Documents</span>
+              </Link>}
             </div>
           </div>
         )}
@@ -514,4 +531,3 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
   </>
   );
 }
-

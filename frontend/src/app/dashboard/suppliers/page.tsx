@@ -1,23 +1,33 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Building2, Plus, Phone, Mail, FileText } from 'lucide-react';
+import { apiFetch } from '@/lib/api';
 
 export default function SuppliersPage() {
-  const [suppliers, setSuppliers] = useState([
-    {
-      _id: '1',
-      supplierId: 'SUP-001',
-      supplierName: 'Lanka Auto Importers Pvt Ltd',
-      supplierType: 'Importer',
-      contactPerson: 'Sunil Shantha',
-      phone: '0115566778',
-      email: 'info@lankaautoimport.lk',
-      outstandingBalance: 4500000
-    }
-  ]);
+  const [suppliers, setSuppliers] = useState<any[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newFormData, setNewFormData] = useState({});
+
+  const loadSuppliers = async () => {
+    const response = await apiFetch('/suppliers');
+    if (!response.ok) throw new Error('Could not load suppliers.');
+    const data = await response.json();
+    setSuppliers(data.map((item: any) => ({ ...item, supplierName: item.name })));
+  };
+
+  useEffect(() => { loadSuppliers().catch((error) => window.alert(error.message)); }, []);
+
+  const saveSupplier = async () => {
+    const form = newFormData as any;
+    try {
+      const response = await apiFetch('/suppliers', { method: 'POST', body: JSON.stringify({ supplierId: form.supplierId, name: form.supplierName, supplierType: form.supplierType, contactPerson: form.contactPerson, phone: form.phone, email: form.email }) });
+      if (!response.ok) throw new Error('Supplier name and phone are required.');
+      const saved = await response.json();
+      setSuppliers((current) => [{ ...saved, supplierName: saved.name }, ...current]);
+      setShowAddModal(false); setNewFormData({});
+    } catch (error) { window.alert(error instanceof Error ? error.message : 'Could not save supplier.'); }
+  };
 
 
   return (
@@ -63,42 +73,42 @@ export default function SuppliersPage() {
     
       {showAddModal && (
         <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-xl max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-bold text-slate-900 mb-4">Add New Record</h3>
+          <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-xl max-h-[90vh] overflow-y-auto text-slate-900">
+            <h3 className="text-lg font-bold text-slate-900 mb-4">Add New Supplier Record</h3>
             <div className="space-y-3">
               
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">supplierId</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, supplierId: e.target.value})} />
+                <label className="block text-xs font-bold text-slate-700 mb-1">Supplier ID</label>
+                <input type="text" placeholder="e.g. SUP-2026-001" className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, supplierId: e.target.value})} />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">supplierName</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, supplierName: e.target.value})} />
+                <label className="block text-xs font-bold text-slate-700 mb-1">Supplier Name</label>
+                <input type="text" placeholder="e.g. Tokyo Trading Auto Co." className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, supplierName: e.target.value})} />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">supplierType</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, supplierType: e.target.value})} />
+                <label className="block text-xs font-bold text-slate-700 mb-1">Supplier Type</label>
+                <input type="text" placeholder="e.g. Japanese Auction / Local Dealer" className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, supplierType: e.target.value})} />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">contactPerson</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, contactPerson: e.target.value})} />
+                <label className="block text-xs font-bold text-slate-700 mb-1">Contact Person</label>
+                <input type="text" placeholder="e.g. Kenji Tanaka / Sunera Fernando" className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, contactPerson: e.target.value})} />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">phone</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, phone: e.target.value})} />
+                <label className="block text-xs font-bold text-slate-700 mb-1">Phone Number</label>
+                <input type="text" placeholder="e.g. +94 77 123 4567" className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, phone: e.target.value})} />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">email</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, email: e.target.value})} />
+                <label className="block text-xs font-bold text-slate-700 mb-1">Email Address</label>
+                <input type="email" placeholder="e.g. info@tokyotrading.jp" className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, email: e.target.value})} />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">outstandingBalance</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, outstandingBalance: e.target.value})} />
+                <label className="block text-xs font-bold text-slate-700 mb-1">Outstanding Balance (LKR)</label>
+                <input type="number" placeholder="e.g. 1,500,000" className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, outstandingBalance: e.target.value})} />
               </div>
             </div>
             <div className="flex justify-end gap-2 mt-6 pt-4 border-t">
               <button onClick={() => setShowAddModal(false)} className="px-4 py-2 border rounded-lg text-slate-600 font-semibold text-xs">Cancel</button>
-              <button onClick={() => { setShowAddModal(false); setSuppliers([{_id: Date.now().toString(), ...newFormData} as any, ...suppliers]); }} className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold text-xs">Save</button>
+              <button onClick={saveSupplier} className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold text-xs">Save Supplier</button>
             </div>
           </div>
         </div>
@@ -107,5 +117,3 @@ export default function SuppliersPage() {
     </DashboardLayout>
   );
 }
-
-

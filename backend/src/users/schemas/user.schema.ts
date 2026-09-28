@@ -22,6 +22,21 @@ export class User {
 
   @Prop({ default: true })
   isActive: boolean;
+
+  @Prop({ default: true })
+  emailVerified: boolean;
+
+  @Prop()
+  passwordResetTokenHash: string;
+
+  @Prop()
+  passwordResetExpiresAt: Date;
+
+  @Prop()
+  emailVerificationTokenHash: string;
+
+  @Prop()
+  emailVerificationExpiresAt: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

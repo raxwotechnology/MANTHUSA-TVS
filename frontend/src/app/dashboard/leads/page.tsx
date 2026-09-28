@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { UserCheck, Plus, Search, PhoneCall, Calendar, Tag, CheckCircle2, Clock, X } from 'lucide-react';
+import { apiFetch } from '@/lib/api';
 
 interface Lead {
   _id: string;
@@ -12,37 +13,25 @@ interface Lead {
   budget: number;
   status: string;
   priority: string;
+  customer?: { _id: string };
+  interestedVehicleId?: string;
+  inquiryType?: string;
+  inquiryMessage?: string;
+  preferredDate?: string;
 }
 
 export default function LeadsPage() {
-  const [leads, setLeads] = useState<Lead[]>([
-    {
-      _id: '1',
-      leadId: 'LEAD-001',
-      customerName: 'Kamal Gunaratne',
-      interestedVehicle: 'Toyota Premio F EX 2019',
-      source: 'Website',
-      budget: 13500000,
-      status: 'Quotation',
-      priority: 'High'
-    },
-    {
-      _id: '2',
-      leadId: 'LEAD-002',
-      customerName: 'Saman Wijesinghe',
-      interestedVehicle: 'Honda Vezel Z Sensing 2018',
-      source: 'Facebook',
-      budget: 10500000,
-      status: 'Test Drive',
-      priority: 'Medium'
-    }
-  ]);
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [error, setError] = useState('');
 
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [followUp, setFollowUp] = useState({ followUpDate: '', followUpTime: '', type: 'Phone', notes: '' });
 
   const [newLead, setNewLead] = useState({
     customerName: '',
+    customerPhone: '',
     interestedVehicle: 'Toyota Premio',
     source: 'Website',
     budget: 12000000,
@@ -50,15 +39,87 @@ export default function LeadsPage() {
     priority: 'Medium'
   });
 
-  const handleAddLead = (e: React.FormEvent) => {
+  const loadLeads = async () => {
+    try {
+      const response = await apiFetch('/leads');
+      if (!response.ok) throw new Error('Could not load leads.');
+      const data = await response.json();
+      setLeads(data.map((lead: any) => ({
+        ...lead,
+        customerName: lead.customer?.fullName || lead.customerName || 'Customer',
+        interestedVehicleId: typeof lead.interestedVehicle === 'object' ? lead.interestedVehicle?._id : undefined,
+        interestedVehicle: lead.interestedVehicleText || (typeof lead.interestedVehicle === 'object' ? `${lead.interestedVehicle?.make || ''} ${lead.interestedVehicle?.model || ''}`.trim() : (lead.interestedVehicle || '—')),
+        budget: Number(lead.budget || 0),
+      })));
+      setError('');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not load leads.');
+    }
+  };
+
+  React.useEffect(() => { void loadLeads(); }, []);
+
+  const handleAddLead = async (e: React.FormEvent) => {
     e.preventDefault();
-    const item: Lead = {
-      _id: Date.now().toString(),
-      leadId: `LEAD-00${leads.length + 1}`,
-      ...newLead
-    };
-    setLeads([item, ...leads]);
-    setShowAddModal(false);
+    setError('');
+    try {
+      const customerResponse = await apiFetch('/customers', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fullName: newLead.customerName, phone: newLead.customerPhone, customerType: 'Individual' }),
+      });
+      if (!customerResponse.ok) throw new Error('Could not save customer. Check the customer details and try again.');
+      const customer = await customerResponse.json();
+      const response = await apiFetch('/leads', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customer: customer._id, interestedVehicleText: newLead.interestedVehicle, source: newLead.source, budget: newLead.budget, status: newLead.status, priority: newLead.priority }),
+      });
+      if (!response.ok) throw new Error('Customer was saved, but lead creation failed.');
+      await loadLeads();
+      setShowAddModal(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not save lead.');
+    }
+  };
+
+  const saveFollowUp = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!selectedLead?.customer?._id) { setError('This lead has no linked customer record.'); return; }
+    try {
+      let response: Response;
+      if (followUp.type === 'Test Drive') {
+        if (!selectedLead.interestedVehicleId) throw new Error('This lead has no linked vehicle for a test drive.');
+        const token = window.localStorage.getItem('token') || '';
+        const encodedPayload = token.split('.')[1]?.replace(/-/g, '+').replace(/_/g, '/');
+        const claims = encodedPayload ? JSON.parse(window.atob(encodedPayload)) : {};
+        if (!claims.sub) throw new Error('Could not identify the signed-in salesperson.');
+        response = await apiFetch('/test-drives', { method: 'POST', body: JSON.stringify({ customer: selectedLead.customer._id, vehicle: selectedLead.interestedVehicleId, salesperson: claims.sub, date: followUp.followUpDate, startTime: followUp.followUpTime, status: 'Scheduled', feedback: `Website request: ${selectedLead.inquiryMessage || ''}` }) });
+      } else response = await apiFetch('/follow-ups', {
+        method: 'POST',
+        body: JSON.stringify({ ...followUp, customer: selectedLead.customer._id, lead: selectedLead._id, status: 'Scheduled' }),
+      });
+      if (!response.ok) throw new Error((await response.json()).message || 'Could not save the follow-up.');
+      setSelectedLead(null);
+      setFollowUp({ followUpDate: '', followUpTime: '', type: 'Phone', notes: '' });
+      setError('');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not save the follow-up.');
+    }
+  };
+
+  const convertToReservation = async (lead: Lead) => {
+    if (!lead.customer?._id || !lead.interestedVehicleId) { setError('This lead needs a linked customer and vehicle before it can be reserved.'); return; }
+    if (!window.confirm(`Reserve ${lead.interestedVehicle} for ${lead.customerName}? This will mark the vehicle Reserved.`)) return;
+    const depositText = window.prompt('Reservation deposit (LKR)', '0');
+    if (depositText === null) return;
+    const deposit = Number(depositText);
+    if (!Number.isFinite(deposit) || deposit < 0) { setError('Enter a valid non-negative deposit amount.'); return; }
+    const expiryDate = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+    try {
+      const response = await apiFetch('/reservations', { method: 'POST', body: JSON.stringify({ customer: lead.customer._id, vehicle: lead.interestedVehicleId, reservationDeposit: deposit, expiryDate, notes: `Converted from lead ${lead.leadId}` }) });
+      if (!response.ok) throw new Error((await response.json()).message || 'Could not convert lead to reservation.');
+      await apiFetch(`/leads/${lead._id}`, { method: 'PUT', body: JSON.stringify({ status: 'Reserved' }) });
+      await loadLeads(); setError('');
+    } catch (err) { setError(err instanceof Error ? err.message : 'Could not create reservation.'); }
   };
 
   const getStatusBadge = (status: string) => {
@@ -88,6 +149,8 @@ export default function LeadsPage() {
         </button>
       </div>
 
+      {error && <div role="alert" className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
+
       {/* Leads Table */}
       <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs">
         <div className="overflow-x-auto">
@@ -105,6 +168,7 @@ export default function LeadsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
+              {leads.length === 0 && <tr><td className="p-6 text-center text-slate-500" colSpan={8}>No leads found.</td></tr>}
               {leads.map((l) => (
                 <tr key={l._id} className="hover:bg-slate-50/80">
                   <td className="py-3 px-4 font-bold text-slate-900">{l.leadId}</td>
@@ -115,7 +179,7 @@ export default function LeadsPage() {
                   <td className="py-3 px-4 font-semibold text-rose-600">{l.priority}</td>
                   <td className="py-3 px-4">{getStatusBadge(l.status)}</td>
                   <td className="py-3 px-4 text-center">
-                    <button className="px-3 py-1 bg-blue-50 text-blue-700 font-semibold text-[11px] rounded-lg border border-blue-200">Log Follow-up</button>
+                    <div className="flex justify-center gap-1"><button onClick={() => { setFollowUp({ followUpDate: l.preferredDate?.slice(0, 10) || '', followUpTime: '', type: l.inquiryType === 'Test Drive' ? 'Test Drive' : 'Phone', notes: l.inquiryType === 'Test Drive' ? `Public test drive request: ${l.inquiryMessage || ''}` : '' }); setSelectedLead(l); }} className="px-2 py-1 bg-blue-50 text-blue-700 font-semibold text-[11px] rounded-lg border border-blue-200">Follow-up / test drive</button>{l.interestedVehicleId && l.status !== 'Reserved' && <button onClick={() => void convertToReservation(l)} className="px-2 py-1 bg-emerald-50 text-emerald-700 font-semibold text-[11px] rounded-lg border border-emerald-200">Reserve</button>}</div>
                   </td>
                 </tr>
               ))}
@@ -137,6 +201,10 @@ export default function LeadsPage() {
               <div>
                 <label className="block font-semibold mb-1">Customer Name</label>
                 <input type="text" required value={newLead.customerName} onChange={(e) => setNewLead({ ...newLead, customerName: e.target.value })} className="w-full p-2 border rounded-lg bg-slate-50" />
+              </div>
+              <div>
+                <label className="block font-semibold mb-1">Customer Phone</label>
+                <input type="tel" required value={newLead.customerPhone} onChange={(e) => setNewLead({ ...newLead, customerPhone: e.target.value })} className="w-full p-2 border rounded-lg bg-slate-50" />
               </div>
               <div>
                 <label className="block font-semibold mb-1">Interested Vehicle</label>
@@ -170,6 +238,17 @@ export default function LeadsPage() {
           </div>
         </div>
       )}
+
+      {selectedLead && <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4">
+        <form onSubmit={saveFollowUp} className="w-full max-w-md space-y-3 rounded-2xl bg-white p-6 shadow-xl">
+          <div className="flex items-center justify-between"><h3 className="font-bold">Follow up with {selectedLead.customerName}</h3><button type="button" onClick={() => setSelectedLead(null)}><X className="h-5 w-5" /></button></div>
+          <label className="block text-xs font-semibold">Date<input required type="date" value={followUp.followUpDate} onChange={(e) => setFollowUp({ ...followUp, followUpDate: e.target.value })} className="mt-1 w-full rounded-lg border p-2" /></label>
+          <label className="block text-xs font-semibold">Time<input type="time" value={followUp.followUpTime} onChange={(e) => setFollowUp({ ...followUp, followUpTime: e.target.value })} className="mt-1 w-full rounded-lg border p-2" /></label>
+          <label className="block text-xs font-semibold">Type<select value={followUp.type} onChange={(e) => setFollowUp({ ...followUp, type: e.target.value })} className="mt-1 w-full rounded-lg border p-2"><option>Phone</option><option>WhatsApp</option><option>Email</option><option>Meeting</option><option>Test Drive</option></select></label>
+          <label className="block text-xs font-semibold">Notes<textarea value={followUp.notes} onChange={(e) => setFollowUp({ ...followUp, notes: e.target.value })} className="mt-1 w-full rounded-lg border p-2" /></label>
+          <button className="w-full rounded-lg bg-blue-600 p-2 font-semibold text-white">{followUp.type === 'Test Drive' ? 'Confirm Test Drive Appointment' : 'Save Follow-up'}</button>
+        </form>
+      </div>}
     </DashboardLayout>
   );
 }

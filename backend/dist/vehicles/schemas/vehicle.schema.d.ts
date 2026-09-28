@@ -20,6 +20,7 @@ export declare class Vehicle {
     color: string;
     status: string;
     location: Types.ObjectId;
+    branch: Types.ObjectId;
     year: number;
     purchasePrice: number;
     transportCost: number;
@@ -203,6 +204,15 @@ export declare const VehicleSchema: import("mongoose").Schema<Vehicle, import("m
         id: string;
     }>> | undefined;
     location?: import("mongoose").SchemaDefinitionProperty<Types.ObjectId, Vehicle, Document<unknown, {}, Vehicle, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Vehicle & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    branch?: import("mongoose").SchemaDefinitionProperty<Types.ObjectId, Vehicle, Document<unknown, {}, Vehicle, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Vehicle & {
         _id: Types.ObjectId;

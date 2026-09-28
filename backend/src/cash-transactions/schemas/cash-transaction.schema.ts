@@ -22,6 +22,12 @@ export class CashTransaction {
 
   @Prop()
   description: string;
+
+  @Prop()
+  paymentMethod: string;
+
+  @Prop()
+  referenceNumber: string;
 }
 
 export const CashTransactionSchema = SchemaFactory.createForClass(CashTransaction);

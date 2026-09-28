@@ -1,7 +1,9 @@
 import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { CashTransactionsService } from './cash-transactions.service';
+import { Roles } from '../auth/roles.decorator';
 
 @Controller('cash-transactions')
+@Roles('Accountant / Finance Staff')
 export class CashTransactionsController {
   constructor(private readonly cashTxService: CashTransactionsService) {}
 

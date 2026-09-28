@@ -19,6 +19,11 @@ let User = class User {
     role;
     branch;
     isActive;
+    emailVerified;
+    passwordResetTokenHash;
+    passwordResetExpiresAt;
+    emailVerificationTokenHash;
+    emailVerificationExpiresAt;
 };
 exports.User = User;
 __decorate([
@@ -45,6 +50,26 @@ __decorate([
     (0, mongoose_1.Prop)({ default: true }),
     __metadata("design:type", Boolean)
 ], User.prototype, "isActive", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: true }),
+    __metadata("design:type", Boolean)
+], User.prototype, "emailVerified", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], User.prototype, "passwordResetTokenHash", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Date)
+], User.prototype, "passwordResetExpiresAt", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], User.prototype, "emailVerificationTokenHash", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Date)
+], User.prototype, "emailVerificationExpiresAt", void 0);
 exports.User = User = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], User);

@@ -13,16 +13,25 @@ exports.LeadSchema = exports.Lead = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 let Lead = class Lead {
+    leadId;
     customer;
     interestedVehicle;
+    interestedVehicleText;
     source;
     assignedStaff;
     budget;
     expectedPurchaseDate;
+    inquiryType;
+    inquiryMessage;
+    preferredDate;
     status;
     priority;
 };
 exports.Lead = Lead;
+__decorate([
+    (0, mongoose_1.Prop)({ unique: true, sparse: true }),
+    __metadata("design:type", String)
+], Lead.prototype, "leadId", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Customer', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
@@ -31,6 +40,10 @@ __decorate([
     (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Vehicle' }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Lead.prototype, "interestedVehicle", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Lead.prototype, "interestedVehicleText", void 0);
 __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
@@ -47,6 +60,18 @@ __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", Date)
 ], Lead.prototype, "expectedPurchaseDate", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Lead.prototype, "inquiryType", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Lead.prototype, "inquiryMessage", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Date)
+], Lead.prototype, "preferredDate", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ default: 'New' }),
     __metadata("design:type", String)

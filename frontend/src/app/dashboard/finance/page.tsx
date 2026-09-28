@@ -28,37 +28,12 @@ interface Transaction {
   description: string;
 }
 
-import { getApiUrl } from '@/lib/api';
+import { apiFetch } from '@/lib/api';
 
 export default function ReceiptsVouchersPage() {
   const [activeTab, setActiveTab] = useState<'OUT' | 'IN'>('OUT');
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [newFormData, setNewFormData] = useState({});
 
-  const [transactions, setTransactions] = useState<Transaction[]>([
-    {
-      _id: '1',
-      transactionId: 'CTX-001',
-      transactionType: 'IN',
-      category: 'Customer Payment',
-      amount: 9915000,
-      transactionDate: '2026-09-24',
-      paymentMethod: 'Bank Transfer',
-      referenceNumber: 'RCP-001',
-      description: 'Full payment received for Nissan X-Trail sale (INV-2026-001)'
-    },
-    {
-      _id: '2',
-      transactionId: 'CTX-002',
-      transactionType: 'OUT',
-      category: 'Vehicle Repair',
-      amount: 120000,
-      transactionDate: '2026-09-24',
-      paymentMethod: 'Cash',
-      referenceNumber: 'VCH-881',
-      description: 'Paid for Honda Vezel detailing & repair'
-    }
-  ]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterCategory, setFilterCategory] = useState('ALL');
@@ -78,10 +53,10 @@ export default function ReceiptsVouchersPage() {
   useEffect(() => {
     const fetchTxs = async () => {
       try {
-        const res = await fetch(getApiUrl('/cash-transactions'));
+        const res = await apiFetch('/cash-transactions');
         if (res.ok) {
           const data = await res.json();
-          if (data && data.length > 0) setTransactions(data);
+          setTransactions(data.map((tx: any) => ({ ...tx, category: tx.source })));
         }
       } catch (err) {
         console.error('Failed to fetch cash transactions', err);
@@ -104,30 +79,19 @@ export default function ReceiptsVouchersPage() {
 
   const handleCreateTx = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newTx: Transaction = {
-      _id: Date.now().toString(),
-      transactionId: `CTX-${Math.floor(100 + Math.random() * 900)}`,
-      transactionType: modalType,
-      category: formData.category,
-      amount: parseFloat(formData.amount) || 0,
-      transactionDate: new Date().toISOString().split('T')[0],
-      paymentMethod: formData.paymentMethod,
-      referenceNumber: formData.referenceNumber,
-      description: formData.description
-    };
-
     try {
-      await fetch(getApiUrl('/cash-transactions'), {
+      const response = await apiFetch('/cash-transactions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify((() => { const { _id, ...rest } = newTx; return rest; })())
+        body: JSON.stringify({ transactionType: modalType, source: formData.category, amount: parseFloat(formData.amount) || 0, transactionDate: new Date().toISOString(), paymentMethod: formData.paymentMethod, referenceNumber: formData.referenceNumber, description: formData.description })
       });
+      if (!response.ok) throw new Error('Could not save cash transaction. Check the amount and try again.');
+      const saved = await response.json();
+      setTransactions((current) => [{ ...saved, category: saved.source }, ...current]);
+      setShowModal(false);
     } catch (err) {
-      console.log('Post tx fallback');
+      window.alert(err instanceof Error ? err.message : 'Cannot connect to server.');
     }
-
-    setTransactions([newTx, ...transactions]);
-    setShowModal(false);
   };
 
   const filteredTxs = transactions.filter((tx) => {
@@ -393,58 +357,11 @@ export default function ReceiptsVouchersPage() {
                 <button
                   type="submit"
                   className="px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-xs"
-                 onClick={() => setShowAddModal(true)}>
+                >
                   Save {modalType === 'IN' ? 'Receipt' : 'Voucher'}
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
-    
-      {showAddModal && (
-        <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-xl max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-bold text-slate-900 mb-4">Add New Record</h3>
-            <div className="space-y-3">
-              
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">transactionId</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, transactionId: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">transactionType</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, transactionType: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">category</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, category: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">amount</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, amount: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">transactionDate</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, transactionDate: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">paymentMethod</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, paymentMethod: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">referenceNumber</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, referenceNumber: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">description</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, description: e.target.value})} />
-              </div>
-            </div>
-            <div className="flex justify-end gap-2 mt-6 pt-4 border-t">
-              <button onClick={() => setShowAddModal(false)} className="px-4 py-2 border rounded-lg text-slate-600 font-semibold text-xs">Cancel</button>
-              <button onClick={() => { setShowAddModal(false); setTransactions([{_id: Date.now().toString(), ...newFormData} as any, ...transactions]); }} className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold text-xs">Save</button>
-            </div>
           </div>
         </div>
       )}

@@ -16,17 +16,37 @@ exports.LeadsService = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
+const notifications_service_1 = require("../notifications/notifications.service");
 let LeadsService = class LeadsService {
     leadModel;
-    constructor(leadModel) {
+    customerModel;
+    notifications;
+    constructor(leadModel, customerModel, notifications) {
         this.leadModel = leadModel;
+        this.customerModel = customerModel;
+        this.notifications = notifications;
     }
     async create(createLeadDto) {
-        const createdLead = new this.leadModel(createLeadDto);
-        return createdLead.save();
+        const leadId = createLeadDto.leadId || `LEAD-${Date.now()}`;
+        const createdLead = new this.leadModel({ ...createLeadDto, leadId });
+        const saved = await createdLead.save();
+        await this.notifications.create({ title: 'New lead received', message: `A new lead ${leadId} was created.`, channel: 'in-app', entityType: 'Lead', entityId: String(saved._id) }).catch(() => undefined);
+        return saved;
+    }
+    async createPublicInquiry(input) {
+        const fullName = String(input.fullName || '').trim();
+        const phone = String(input.phone || '').trim();
+        if (fullName.length < 2 || phone.replace(/\D/g, '').length < 7 || !input.vehicle) {
+            throw new common_1.BadRequestException('Name, valid phone number and vehicle are required.');
+        }
+        const vehicleId = String(input.vehicle);
+        let customer = await this.customerModel.findOne({ phone }).exec();
+        if (!customer)
+            customer = await new this.customerModel({ fullName, phone, email: input.email, customerType: 'Individual' }).save();
+        return this.create({ customer: customer._id, interestedVehicle: vehicleId, source: 'Website', status: 'New', priority: 'Medium', inquiryType: String(input.inquiryType || 'Details').slice(0, 40), inquiryMessage: String(input.message || '').slice(0, 1000), preferredDate: input.preferredDate || undefined });
     }
     async findAll() {
-        return this.leadModel.find().populate('customer').sort({ createdAt: -1 }).exec();
+        return this.leadModel.find().populate('customer').populate('interestedVehicle', 'stockNumber make model year sellingPrice status').sort({ createdAt: -1 }).exec();
     }
     async findOne(id) {
         const lead = await this.leadModel.findById(id).populate('customer').exec();
@@ -54,6 +74,9 @@ exports.LeadsService = LeadsService;
 exports.LeadsService = LeadsService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)('Lead')),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __param(1, (0, mongoose_1.InjectModel)('Customer')),
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        mongoose_2.Model,
+        notifications_service_1.NotificationsService])
 ], LeadsService);
 //# sourceMappingURL=leads.service.js.map

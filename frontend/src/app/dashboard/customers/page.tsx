@@ -16,39 +16,22 @@ interface Customer {
   customerType: string;
 }
 
-import { getApiUrl } from '@/lib/api';
+import { apiFetch } from '@/lib/api';
 
 export default function CustomersPage() {
-  const [customers, setCustomers] = useState<Customer[]>([
-    {
-      _id: '1',
-      customerId: 'CUST-001',
-      fullName: 'Kamal Gunaratne',
-      nicPassport: '841920391V',
-      phone: '0779988776',
-      email: 'kamal.g@gmail.com',
-      address: 'No 14, Rajagiriya Road',
-      city: 'Colombo',
-      occupation: 'Software Engineer',
-      customerType: 'Individual'
-    },
-    {
-      _id: '2',
-      customerId: 'CUST-002',
-      fullName: 'Blue Star Logistics Ltd',
-      nicPassport: 'PV-991823',
-      phone: '0114433221',
-      email: 'contact@bluestarlogistics.com',
-      address: 'No 80, D.R. Wijewardena Mawatha',
-      city: 'Colombo',
-      occupation: 'Logistics',
-      customerType: 'Corporate'
-    }
-  ]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedTimelineCustomer, setSelectedTimelineCustomer] = useState<Customer | null>(null);
+  const [timeline, setTimeline] = useState<any[]>([]);
+  const [timelineError, setTimelineError] = useState('');
+
+  const openTimeline = async (customer: Customer) => {
+    setSelectedTimelineCustomer(customer); setTimeline([]); setTimelineError('');
+    try { const response = await apiFetch(`/customers/${customer._id}/timeline`); if (!response.ok) throw new Error('Could not load customer activity.'); setTimeline(await response.json()); }
+    catch (error) { setTimelineError(error instanceof Error ? error.message : 'Could not load customer activity.'); }
+  };
 
   const [newCust, setNewCust] = useState({
     fullName: '',
@@ -64,10 +47,10 @@ export default function CustomersPage() {
   useEffect(() => {
     const fetchCust = async () => {
       try {
-        const res = await fetch(getApiUrl('/customers'));
+        const res = await apiFetch('/customers');
         if (res.ok) {
           const data = await res.json();
-          if (data && data.length > 0) setCustomers(data);
+          setCustomers(data.map((customer: any) => ({ ...customer, nicPassport: customer.nicOrPassport || customer.nicPassport || '' })));
         }
       } catch (err) {
         console.error('Failed to fetch customers', err);
@@ -78,22 +61,20 @@ export default function CustomersPage() {
 
   const handleAddCust = async (e: React.FormEvent) => {
     e.preventDefault();
-    const item: Customer = {
-      _id: Date.now().toString(),
-      customerId: `CUST-00${customers.length + 1}`,
-      ...newCust
-    };
-
     try {
-      await fetch(getApiUrl('/customers'), {
+      const response = await apiFetch('/customers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify((() => { const { _id, ...rest } = item; return rest; })())
+        body: JSON.stringify({ ...newCust, nicOrPassport: newCust.nicPassport })
       });
-    } catch (err) {}
-
-    setCustomers([item, ...customers]);
-    setShowAddModal(false);
+      if (!response.ok) throw new Error('Could not save customer. Check the details and try again.');
+      const saved = await response.json();
+      setCustomers((current) => [saved, ...current]);
+      setShowAddModal(false);
+      setNewCust({ fullName: '', nicPassport: '', phone: '', email: '', address: '', city: 'Colombo', occupation: '', customerType: 'Individual' });
+    } catch (err) {
+      window.alert(err instanceof Error ? err.message : 'Could not connect to the server.');
+    }
   };
 
   const filtered = customers.filter(
@@ -165,7 +146,7 @@ export default function CustomersPage() {
                   <td className="py-3 px-4 text-slate-600">{c.city}</td>
                   <td className="py-3 px-4 text-center">
                     <button
-                      onClick={() => setSelectedTimelineCustomer(c)}
+                      onClick={() => openTimeline(c)}
                       className="px-3 py-1.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-semibold text-[11px] rounded-lg border border-emerald-200 transition-colors"
                     >
                       View Timeline →
@@ -190,12 +171,12 @@ export default function CustomersPage() {
             <form onSubmit={handleAddCust} className="space-y-3 text-xs">
               <div>
                 <label className="block font-semibold mb-1">Full Name</label>
-                <input type="text" required value={newCust.fullName} onChange={(e) => setNewCust({ ...newCust, fullName: e.target.value })} className="w-full p-2 border rounded-lg bg-slate-50" />
+                <input type="text" required placeholder="e.g. Nimal Perera" value={newCust.fullName} onChange={(e) => setNewCust({ ...newCust, fullName: e.target.value })} className="w-full p-2 border rounded-lg bg-slate-50 placeholder:text-slate-400" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block font-semibold mb-1">NIC / Passport / Reg #</label>
-                  <input type="text" required value={newCust.nicPassport} onChange={(e) => setNewCust({ ...newCust, nicPassport: e.target.value })} className="w-full p-2 border rounded-lg bg-slate-50" />
+                  <input type="text" required placeholder="e.g. 198512345678 / 851234567V" value={newCust.nicPassport} onChange={(e) => setNewCust({ ...newCust, nicPassport: e.target.value })} className="w-full p-2 border rounded-lg bg-slate-50 placeholder:text-slate-400" />
                 </div>
                 <div>
                   <label className="block font-semibold mb-1">Customer Type</label>
@@ -210,16 +191,16 @@ export default function CustomersPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block font-semibold mb-1">Phone Number</label>
-                  <input type="text" required value={newCust.phone} onChange={(e) => setNewCust({ ...newCust, phone: e.target.value })} className="w-full p-2 border rounded-lg bg-slate-50" />
+                  <input type="text" required placeholder="e.g. +94 71 890 1234" value={newCust.phone} onChange={(e) => setNewCust({ ...newCust, phone: e.target.value })} className="w-full p-2 border rounded-lg bg-slate-50 placeholder:text-slate-400" />
                 </div>
                 <div>
                   <label className="block font-semibold mb-1">Email</label>
-                  <input type="email" value={newCust.email} onChange={(e) => setNewCust({ ...newCust, email: e.target.value })} className="w-full p-2 border rounded-lg bg-slate-50" />
+                  <input type="email" placeholder="e.g. nimal.p@gmail.com" value={newCust.email} onChange={(e) => setNewCust({ ...newCust, email: e.target.value })} className="w-full p-2 border rounded-lg bg-slate-50 placeholder:text-slate-400" />
                 </div>
               </div>
               <div>
                 <label className="block font-semibold mb-1">Address & City</label>
-                <input type="text" value={newCust.address} onChange={(e) => setNewCust({ ...newCust, address: e.target.value })} className="w-full p-2 border rounded-lg bg-slate-50" />
+                <input type="text" placeholder="e.g. No. 12, Kandy Road, Kiribathgoda" value={newCust.address} onChange={(e) => setNewCust({ ...newCust, address: e.target.value })} className="w-full p-2 border rounded-lg bg-slate-50 placeholder:text-slate-400" />
               </div>
 
               <div className="flex justify-end gap-2 pt-3 border-t">
@@ -243,33 +224,8 @@ export default function CustomersPage() {
               <button onClick={() => setSelectedTimelineCustomer(null)} className="text-slate-400 hover:text-slate-600"><X className="w-5 h-5" /></button>
             </div>
 
-            <div className="space-y-3 relative before:absolute before:inset-0 before:left-3.5 before:w-0.5 before:bg-emerald-200 text-xs">
-              <div className="relative pl-8">
-                <div className="absolute left-0 top-1 w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-[10px]">1</div>
-                <p className="font-bold text-slate-900">Inquiry Received</p>
-                <p className="text-slate-500 text-[11px]">Website inquiry for Toyota Premio F EX Package</p>
-              </div>
-              <div className="relative pl-8">
-                <div className="absolute left-0 top-1 w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-[10px]">2</div>
-                <p className="font-bold text-slate-900">Lead & Follow-up</p>
-                <p className="text-slate-500 text-[11px]">WhatsApp follow-up scheduled by Kasun Fernando</p>
-              </div>
-              <div className="relative pl-8">
-                <div className="absolute left-0 top-1 w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-[10px]">3</div>
-                <p className="font-bold text-slate-900">Test Drive Completed</p>
-                <p className="text-slate-500 text-[11px]">Completed 30-min drive. Feedback: Loved performance.</p>
-              </div>
-              <div className="relative pl-8">
-                <div className="absolute left-0 top-1 w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-[10px]">4</div>
-                <p className="font-bold text-slate-900">Quotation Issued</p>
-                <p className="text-slate-500 text-[11px]">QT-2026-001 issued for LKR 13,425,000</p>
-              </div>
-              <div className="relative pl-8">
-                <div className="absolute left-0 top-1 w-7 h-7 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center font-bold text-[10px]">5</div>
-                <p className="font-bold text-slate-500">Reservation & Payment</p>
-                <p className="text-slate-400 text-[11px]">Pending deposit confirmation</p>
-              </div>
-            </div>
+            {timelineError && <p role="alert" className="mb-3 text-xs text-rose-600">{timelineError}</p>}
+            <div className="max-h-[55vh] space-y-3 overflow-y-auto text-xs">{timeline.map((event, index) => <div key={event.id} className="relative border-l-2 border-emerald-200 pb-2 pl-5"><span className="absolute -left-[7px] top-1 h-3 w-3 rounded-full bg-emerald-500"/><p className="font-bold text-slate-900">{event.type}</p><p className="text-slate-600">{event.detail || 'Activity recorded'}</p><p className="mt-1 text-[10px] text-slate-400">{event.date && new Date(event.date).toLocaleString()}</p></div>)}{timeline.length===0&&!timelineError&&<p className="py-5 text-center text-slate-500">No customer activity recorded yet.</p>}</div>
 
             <div className="mt-6 pt-3 border-t flex justify-end">
               <button onClick={() => setSelectedTimelineCustomer(null)} className="px-4 py-2 bg-slate-900 text-white rounded-lg font-semibold text-xs">Close Timeline</button>

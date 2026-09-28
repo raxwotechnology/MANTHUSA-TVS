@@ -44,17 +44,19 @@ async function seed() {
     await mongoose_1.default.connect(MONGO_URI);
     console.log('Connected to MongoDB!');
     const db = mongoose_1.default.connection;
-    await db.dropDatabase();
-    console.log('Dropped database.');
+    const existingCollections = await db.db.listCollections().toArray();
+    for (const collection of existingCollections) {
+        if (await db.db.collection(collection.name).estimatedDocumentCount()) {
+            throw new Error(`Database already contains data (${collection.name}); seed only an empty development database.`);
+        }
+    }
     const rolesCol = db.collection('roles');
-    const adminRoleRes = await rolesCol.insertOne({ name: 'Admin', description: 'Full system control', createdAt: new Date(), updatedAt: new Date() });
+    const adminRoleRes = await rolesCol.insertOne({ name: 'Admin / Owner', description: 'Full system control', createdAt: new Date(), updatedAt: new Date() });
     const salesRoleRes = await rolesCol.insertOne({ name: 'Sales & Operations', description: 'Daily sales, CRM, and vehicle operations', createdAt: new Date(), updatedAt: new Date() });
     const accountantRoleRes = await rolesCol.insertOne({ name: 'Accountant / Finance Staff', description: 'Financial operations, payments, cash flow', createdAt: new Date(), updatedAt: new Date() });
     const adminPass = await bcrypt.hash('admin123', 10);
-    const managerPass = await bcrypt.hash('manager123', 10);
     const exPass = await bcrypt.hash('ex123', 10);
     const accPass = await bcrypt.hash('accountant123', 10);
-    const managPass = await bcrypt.hash('manag123', 10);
     const usersCol = db.collection('users');
     await usersCol.insertMany([
         {
@@ -63,15 +65,6 @@ async function seed() {
             passwordHash: adminPass,
             role: adminRoleRes.insertedId,
             phone: '0771234567',
-            createdAt: new Date(),
-            updatedAt: new Date()
-        },
-        {
-            name: 'Nimal Perera',
-            email: 'manager@salesplus.com',
-            passwordHash: managerPass,
-            role: adminRoleRes.insertedId,
-            phone: '0772345678',
             createdAt: new Date(),
             updatedAt: new Date()
         },
@@ -90,15 +83,6 @@ async function seed() {
             passwordHash: accPass,
             role: accountantRoleRes.insertedId,
             phone: '0774567890',
-            createdAt: new Date(),
-            updatedAt: new Date()
-        },
-        {
-            name: 'Ruwan Jayasinghe',
-            email: 'manager2@salesplus.com',
-            passwordHash: managPass,
-            role: salesRoleRes.insertedId,
-            phone: '0775678901',
             createdAt: new Date(),
             updatedAt: new Date()
         }

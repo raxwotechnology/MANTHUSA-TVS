@@ -11,6 +11,7 @@ export declare class Quotation {
     insuranceFee: number;
     otherCharges: number;
     totalAmount: number;
+    advancePayment: number;
     validUntil: Date;
 }
 export declare const QuotationSchema: import("mongoose").Schema<Quotation, import("mongoose").Model<Quotation, any, any, any, any, any, Quotation>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Quotation, Document<unknown, {}, Quotation, {
@@ -104,6 +105,15 @@ export declare const QuotationSchema: import("mongoose").Schema<Quotation, impor
         id: string;
     }>> | undefined;
     totalAmount?: import("mongoose").SchemaDefinitionProperty<number, Quotation, Document<unknown, {}, Quotation, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Quotation & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    advancePayment?: import("mongoose").SchemaDefinitionProperty<number, Quotation, Document<unknown, {}, Quotation, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Quotation & {
         _id: Types.ObjectId;

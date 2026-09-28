@@ -22,6 +22,7 @@ let VehicleValuationsService = class VehicleValuationsService {
         this.valuationModel = valuationModel;
     }
     async create(createDto) {
+        createDto.valuationId = createDto.valuationId || `VAL-${Date.now()}`;
         const created = new this.valuationModel(createDto);
         return created.save();
     }

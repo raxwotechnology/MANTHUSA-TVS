@@ -1,13 +1,28 @@
-import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, Req, HttpException, HttpStatus } from '@nestjs/common';
 import { LeadsService } from './leads.service';
+import { Roles } from '../auth/roles.decorator';
+import { Public } from '../auth/public.decorator';
 
 @Controller('leads')
+@Roles('Sales & Operations')
 export class LeadsController {
+  private readonly publicAttempts = new Map<string, number[]>();
   constructor(private readonly leadsService: LeadsService) {}
 
   @Post()
   create(@Body() createLeadDto: any) {
     return this.leadsService.create(createLeadDto);
+  }
+
+  @Post('public')
+  @Public()
+  createPublic(@Body() body: any, @Req() req: any) {
+    const key = `${req.ip || 'unknown'}:${String(body.phone || '').slice(0, 40)}`;
+    const now = Date.now();
+    const recent = (this.publicAttempts.get(key) || []).filter((timestamp) => now - timestamp < 600_000);
+    if (recent.length >= 3) throw new HttpException('Too many website enquiries from this phone. Please try again later.', HttpStatus.TOO_MANY_REQUESTS);
+    recent.push(now); this.publicAttempts.set(key, recent);
+    return this.leadsService.createPublicInquiry(body);
   }
 
   @Get()

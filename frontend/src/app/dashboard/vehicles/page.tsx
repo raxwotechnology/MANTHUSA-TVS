@@ -44,111 +44,12 @@ interface Vehicle {
   images: string[];
 }
 
-import { getApiUrl } from '@/lib/api';
+import { apiFetch } from '@/lib/api';
 
 export default function VehicleInventoryPage() {
-  const [vehicles, setVehicles] = useState<Vehicle[]>([
-    {
-      _id: '1',
-      stockNumber: 'STK-2026-001',
-      registrationNumber: 'CAB-8912',
-      make: 'Toyota',
-      model: 'Premio',
-      variant: 'F EX Package',
-      year: 2019,
-      fuelType: 'Petrol',
-      transmission: 'Automatic',
-      engineCapacity: 1500,
-      chassisNumber: 'NZT260-3184920',
-      mileage: 45000,
-      color: 'Pearl White',
-      purchasePrice: 11500000,
-      transportCost: 45000,
-      repairCost: 85000,
-      detailingCost: 25000,
-      totalInvestment: 11760000,
-      sellingPrice: 13500000,
-      minimumSellingPrice: 13200000,
-      expectedProfit: 1740000,
-      status: 'Available',
-      images: ['https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=1000']
-    },
-    {
-      _id: '2',
-      stockNumber: 'STK-2026-002',
-      registrationNumber: 'CBH-4412',
-      make: 'Honda',
-      model: 'Vezel',
-      variant: 'Z Sensing',
-      year: 2018,
-      fuelType: 'Hybrid',
-      transmission: 'Automatic',
-      engineCapacity: 1500,
-      chassisNumber: 'RU3-1304921',
-      mileage: 58000,
-      color: 'Black Metallic',
-      purchasePrice: 9200000,
-      transportCost: 35000,
-      repairCost: 120000,
-      detailingCost: 30000,
-      totalInvestment: 9385000,
-      sellingPrice: 10800000,
-      minimumSellingPrice: 10500000,
-      expectedProfit: 1415000,
-      status: 'Available',
-      images: ['https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=1000']
-    },
-    {
-      _id: '3',
-      stockNumber: 'STK-2026-003',
-      registrationNumber: 'CBA-1102',
-      make: 'Mercedes-Benz',
-      model: 'C-Class',
-      variant: 'C200 AMG Line',
-      year: 2021,
-      fuelType: 'Petrol',
-      transmission: 'Automatic 9G-Tronic',
-      engineCapacity: 1500,
-      chassisNumber: 'WDD2050772R1829',
-      mileage: 28000,
-      color: 'Obsidian Black',
-      purchasePrice: 24000000,
-      transportCost: 0,
-      repairCost: 150000,
-      detailingCost: 50000,
-      totalInvestment: 24200000,
-      sellingPrice: 28500000,
-      minimumSellingPrice: 28000000,
-      expectedProfit: 4300000,
-      status: 'Reserved',
-      images: ['https://images.unsplash.com/photo-1617814076367-b759c7d7e738?q=80&w=1000']
-    },
-    {
-      _id: '4',
-      stockNumber: 'STK-2026-004',
-      registrationNumber: 'WP KY-8899',
-      make: 'Nissan',
-      model: 'X-Trail',
-      variant: '20X Hybrid',
-      year: 2017,
-      fuelType: 'Hybrid',
-      transmission: 'CVT',
-      engineCapacity: 2000,
-      chassisNumber: 'HNT32-029481',
-      mileage: 72000,
-      color: 'Red Metallic',
-      purchasePrice: 8500000,
-      transportCost: 0,
-      repairCost: 200000,
-      detailingCost: 0,
-      totalInvestment: 8700000,
-      sellingPrice: 9950000,
-      minimumSellingPrice: 9800000,
-      expectedProfit: 1250000,
-      status: 'Sold',
-      images: ['https://images.unsplash.com/photo-1549399542-7e3f8b79c341?q=80&w=1000']
-    }
-  ]);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [apiError, setApiError] = useState('');
+
 
   const [activeTab, setActiveTab] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
@@ -184,13 +85,16 @@ export default function VehicleInventoryPage() {
   useEffect(() => {
     const fetchVehicles = async () => {
       try {
-        const res = await fetch(getApiUrl('/vehicles'));
+        const res = await apiFetch('/vehicles');
         if (res.ok) {
           const data = await res.json();
-          if (data && data.length > 0) setVehicles(data);
+          setVehicles(data);
+          setApiError('');
+        } else {
+          setApiError('Could not load inventory from the server.');
         }
-      } catch (err) {
-        console.error('Failed to fetch vehicles', err);
+      } catch {
+        setApiError('Cannot connect to the server. Inventory is unavailable.');
       }
     };
     fetchVehicles();
@@ -235,7 +139,7 @@ export default function VehicleInventoryPage() {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { _id, ...payload } = item;
-      const res = await fetch(getApiUrl('/vehicles'), {
+      const res = await apiFetch('/vehicles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -244,14 +148,16 @@ export default function VehicleInventoryPage() {
         const savedData = await res.json();
         setVehicles([savedData, ...vehicles]);
         setShowAddModal(false);
+        setApiError('');
         return;
       }
-    } catch (err) {
-      console.log('Post vehicle fallback');
+      const details = await res.json().catch(() => ({}));
+      setApiError(details.message || 'Could not save vehicle. Check required fields and try again.');
+      return;
+    } catch {
+      setApiError('Cannot connect to the server. Vehicle was not saved.');
+      return;
     }
-
-    setVehicles([item, ...vehicles]);
-    setShowAddModal(false);
   };
 
   const filteredVehicles = vehicles.filter((v) => {
@@ -298,13 +204,19 @@ export default function VehicleInventoryPage() {
         </div>
 
         <button
-          onClick={() => setShowAddModal(true)}
+          onClick={() => {
+            const nextNumber = String(vehicles.length + 1).padStart(3, '0');
+            setNewVehicle((current) => ({ ...current, stockNumber: `STK-${new Date().getFullYear()}-${nextNumber}` }));
+            setShowAddModal(true);
+          }}
           className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2.5 rounded-lg shadow-xs transition-colors"
         >
           <Plus className="w-4 h-4" />
           <span>+ Add New Vehicle</span>
         </button>
       </div>
+
+      {apiError && <div role="alert" className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{apiError}</div>}
 
       {/* Stats Summary & Tab Bar */}
       <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs mb-6">

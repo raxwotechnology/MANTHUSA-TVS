@@ -13,16 +13,23 @@ exports.ExpenseSchema = exports.Expense = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 let Expense = class Expense {
+    expenseId;
     category;
     amount;
     expenseDate;
     description;
     vehicle;
     supplier;
+    branch;
     paymentMethod;
     receiptUrl;
+    receiptNumber;
 };
 exports.Expense = Expense;
+__decorate([
+    (0, mongoose_1.Prop)({ unique: true, sparse: true }),
+    __metadata("design:type", String)
+], Expense.prototype, "expenseId", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'ExpenseCategory', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
@@ -48,6 +55,10 @@ __decorate([
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Expense.prototype, "supplier", void 0);
 __decorate([
+    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Branch' }),
+    __metadata("design:type", mongoose_2.Types.ObjectId)
+], Expense.prototype, "branch", void 0);
+__decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Expense.prototype, "paymentMethod", void 0);
@@ -55,6 +66,10 @@ __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Expense.prototype, "receiptUrl", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Expense.prototype, "receiptNumber", void 0);
 exports.Expense = Expense = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Expense);

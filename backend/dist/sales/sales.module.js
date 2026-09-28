@@ -12,13 +12,20 @@ const mongoose_1 = require("@nestjs/mongoose");
 const sales_controller_1 = require("./sales.controller");
 const sales_service_1 = require("./sales.service");
 const sale_schema_1 = require("./schemas/sale.schema");
+const vehicle_schema_1 = require("../vehicles/schemas/vehicle.schema");
+const notifications_module_1 = require("../notifications/notifications.module");
+const reservation_schema_1 = require("../reservations/schemas/reservation.schema");
 let SalesModule = class SalesModule {
 };
 exports.SalesModule = SalesModule;
 exports.SalesModule = SalesModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            mongoose_1.MongooseModule.forFeature([{ name: 'Sale', schema: sale_schema_1.SaleSchema }])
+            notifications_module_1.NotificationsModule, mongoose_1.MongooseModule.forFeature([
+                { name: 'Sale', schema: sale_schema_1.SaleSchema },
+                { name: 'Vehicle', schema: vehicle_schema_1.VehicleSchema },
+                { name: 'Reservation', schema: reservation_schema_1.ReservationSchema },
+            ])
         ],
         controllers: [sales_controller_1.SalesController],
         providers: [sales_service_1.SalesService]

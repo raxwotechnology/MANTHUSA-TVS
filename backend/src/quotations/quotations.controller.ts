@@ -1,7 +1,9 @@
 import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
 import { QuotationsService } from './quotations.service';
+import { Roles } from '../auth/roles.decorator';
 
 @Controller('quotations')
+@Roles('Sales & Operations')
 export class QuotationsController {
   constructor(private readonly quotationsService: QuotationsService) {}
 

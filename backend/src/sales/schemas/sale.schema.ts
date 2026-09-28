@@ -17,6 +17,9 @@ export class Sale {
   @Prop({ type: Types.ObjectId, ref: 'User' })
   salesperson: Types.ObjectId;
 
+  @Prop({ type: Types.ObjectId, ref: 'Branch' })
+  branch: Types.ObjectId;
+
   @Prop({ default: 0 })
   vehiclePrice: number;
 

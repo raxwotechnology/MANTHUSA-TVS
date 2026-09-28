@@ -1,5 +1,5 @@
 "use client";
-import { getApiUrl } from '@/lib/api';
+import { apiFetch } from '@/lib/api';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -21,7 +21,7 @@ export default function NewExpensePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch(getApiUrl('/cash-transactions'), {
+      const res = await apiFetch('/cash-transactions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify((() => { const { _id, ...rest } = formData as any; return rest; })())

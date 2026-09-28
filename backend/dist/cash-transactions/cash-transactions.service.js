@@ -22,7 +22,10 @@ let CashTransactionsService = class CashTransactionsService {
         this.cashTxModel = cashTxModel;
     }
     async create(createTxDto) {
-        const createdTx = new this.cashTxModel(createTxDto);
+        const amount = Number(createTxDto.amount);
+        if (!['IN', 'OUT'].includes(createTxDto.transactionType) || !Number.isFinite(amount) || amount <= 0 || !createTxDto.source)
+            throw new common_1.BadRequestException('Cash flow type, source and a positive amount are required.');
+        const createdTx = new this.cashTxModel({ ...createTxDto, amount, transactionDate: createTxDto.transactionDate || new Date() });
         return createdTx.save();
     }
     async findAll() {

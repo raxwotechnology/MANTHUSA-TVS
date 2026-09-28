@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ExpenseDocument } from './schemas/expense.schema';
@@ -6,12 +6,21 @@ import { ExpenseDocument } from './schemas/expense.schema';
 @Injectable()
 export class ExpensesService {
   constructor(
-    @InjectModel('Expense') private expenseModel: Model<ExpenseDocument>
+    @InjectModel('Expense') private expenseModel: Model<ExpenseDocument>,
+    @InjectModel('ExpenseCategory') private categoryModel: Model<any>,
+    @InjectModel('CashTransaction') private cashModel: Model<any>,
   ) {}
 
   async create(createExpenseDto: any): Promise<ExpenseDocument> {
-    const createdExpense = new this.expenseModel(createExpenseDto);
-    return createdExpense.save();
+    const amount = Number(createExpenseDto.amount);
+    if (!Number.isFinite(amount) || amount <= 0 || !createExpenseDto.expenseDate) throw new BadRequestException('A positive amount and expense date are required.');
+    let category = createExpenseDto.category;
+    if (typeof category === 'string' && !/^[a-f\d]{24}$/i.test(category)) {
+      category = (await this.categoryModel.findOneAndUpdate({ name: category.trim() }, { $setOnInsert: { name: category.trim() } }, { upsert: true, new: true }))._id;
+    }
+    const createdExpense = await new this.expenseModel({ ...createExpenseDto, category, amount, expenseId: createExpenseDto.expenseId || `EXP-${Date.now()}` }).save();
+    await new this.cashModel({ transactionType: 'OUT', amount, transactionDate: createdExpense.expenseDate, source: 'Expense', referenceId: createdExpense._id, description: createdExpense.description || 'Business expense' }).save();
+    return createdExpense;
   }
 
   async findAll(): Promise<ExpenseDocument[]> {

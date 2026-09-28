@@ -1,7 +1,8 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Bell, Search, LogOut, Menu, User, Globe, ChevronDown } from 'lucide-react';
+import { apiFetch } from '@/lib/api';
 
 interface TopbarProps {
   user: any;
@@ -14,6 +15,22 @@ export function Topbar({ user, onToggleSidebar }: TopbarProps) {
   const [selectedBranch, setSelectedBranch] = useState('Colombo Head Office');
   const [showNotifications, setShowNotifications] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!showNotifications) return;
+    apiFetch('/notifications').then(async (response) => {
+      if (response.ok) setNotifications(await response.json());
+    }).catch(() => setNotifications([]));
+  }, [showNotifications]);
+
+  const markNotificationRead = async (notification: any) => {
+    if (!notification.isRead) {
+      const response = await apiFetch(`/notifications/${notification._id}/read`, { method: 'PATCH' });
+      if (!response.ok) return;
+      setNotifications((current) => current.map((item) => item._id === notification._id ? { ...item, isRead: true } : item));
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -24,7 +41,7 @@ export function Topbar({ user, onToggleSidebar }: TopbarProps) {
   const handleGlobalSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/dashboard/vehicles?search=${encodeURIComponent(searchQuery.trim())}`);
+      router.push(`/dashboard/search?q=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
 
@@ -128,29 +145,16 @@ export function Topbar({ user, onToggleSidebar }: TopbarProps) {
             className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg relative"
           >
             <Bell className="w-5 h-5" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full ring-2 ring-white" />
+            {notifications.some((item) => !item.isRead) && <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full ring-2 ring-white" />}
           </button>
 
           {showNotifications && (
             <div className="absolute right-0 mt-2 w-72 sm:w-80 bg-white rounded-xl shadow-lg border border-gray-100 p-3 z-50 text-xs">
               <div className="flex items-center justify-between border-b pb-2 mb-2">
                 <span className="font-bold text-gray-800">Notifications</span>
-                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded-full">3 New</span>
+                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded-full">{notifications.filter((item) => !item.isRead).length} New</span>
               </div>
-              <div className="space-y-2">
-                <div className="p-2 bg-blue-50 rounded-lg">
-                  <p className="font-medium text-blue-900">New Lead Received</p>
-                  <p className="text-[11px] text-blue-700">Kamal Gunaratne inquired about Toyota Premio.</p>
-                </div>
-                <div className="p-2 bg-amber-50 rounded-lg">
-                  <p className="font-medium text-amber-900">Discount Request Pending</p>
-                  <p className="text-[11px] text-amber-700">LKR 100,000 discount request awaiting approval.</p>
-                </div>
-                <div className="p-2 bg-emerald-50 rounded-lg">
-                  <p className="font-medium text-emerald-900">Reservation Deposit Received</p>
-                  <p className="text-[11px] text-emerald-700">LKR 500,000 deposited for Mercedes C200.</p>
-                </div>
-              </div>
+              <div className="max-h-80 space-y-2 overflow-y-auto">{notifications.map((item) => <button key={item._id} onClick={() => markNotificationRead(item)} className={`block w-full rounded-lg p-2 text-left ${item.isRead ? 'bg-slate-50' : 'bg-blue-50'}`}><p className="font-medium text-slate-900">{item.title}</p><p className="text-[11px] text-slate-600">{item.message}</p><p className="mt-1 text-[10px] text-slate-400">{item.createdAt && new Date(item.createdAt).toLocaleString()}</p></button>)}{notifications.length === 0 && <p className="p-3 text-slate-500">No notifications.</p>}</div>
             </div>
           )}
         </div>
@@ -177,4 +181,3 @@ export function Topbar({ user, onToggleSidebar }: TopbarProps) {
     </header>
   );
 }
-

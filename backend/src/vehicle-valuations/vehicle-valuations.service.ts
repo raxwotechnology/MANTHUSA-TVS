@@ -10,6 +10,7 @@ export class VehicleValuationsService {
   ) {}
 
   async create(createDto: any): Promise<VehicleValuationDocument> {
+    createDto.valuationId = createDto.valuationId || `VAL-${Date.now()}`;
     const created = new this.valuationModel(createDto);
     return created.save();
   }

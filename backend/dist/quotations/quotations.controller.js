@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.QuotationsController = void 0;
 const common_1 = require("@nestjs/common");
 const quotations_service_1 = require("./quotations.service");
+const roles_decorator_1 = require("../auth/roles.decorator");
 let QuotationsController = class QuotationsController {
     quotationsService;
     constructor(quotationsService) {
@@ -74,6 +75,7 @@ __decorate([
 ], QuotationsController.prototype, "remove", null);
 exports.QuotationsController = QuotationsController = __decorate([
     (0, common_1.Controller)('quotations'),
+    (0, roles_decorator_1.Roles)('Sales & Operations'),
     __metadata("design:paramtypes", [quotations_service_1.QuotationsService])
 ], QuotationsController);
 //# sourceMappingURL=quotations.controller.js.map

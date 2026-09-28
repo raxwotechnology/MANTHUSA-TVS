@@ -10,11 +10,18 @@ exports.VehicleInspectionsModule = void 0;
 const common_1 = require("@nestjs/common");
 const vehicle_inspections_controller_1 = require("./vehicle-inspections.controller");
 const vehicle_inspections_service_1 = require("./vehicle-inspections.service");
+const mongoose_1 = require("@nestjs/mongoose");
+const vehicle_inspection_schema_1 = require("./schemas/vehicle-inspection.schema");
+const vehicle_schema_1 = require("../vehicles/schemas/vehicle.schema");
 let VehicleInspectionsModule = class VehicleInspectionsModule {
 };
 exports.VehicleInspectionsModule = VehicleInspectionsModule;
 exports.VehicleInspectionsModule = VehicleInspectionsModule = __decorate([
     (0, common_1.Module)({
+        imports: [mongoose_1.MongooseModule.forFeature([
+                { name: 'VehicleInspection', schema: vehicle_inspection_schema_1.VehicleInspectionSchema },
+                { name: 'Vehicle', schema: vehicle_schema_1.VehicleSchema },
+            ])],
         controllers: [vehicle_inspections_controller_1.VehicleInspectionsController],
         providers: [vehicle_inspections_service_1.VehicleInspectionsService]
     })

@@ -10,11 +10,14 @@ exports.AfterSalesModule = void 0;
 const common_1 = require("@nestjs/common");
 const after_sales_controller_1 = require("./after-sales.controller");
 const after_sales_service_1 = require("./after-sales.service");
+const mongoose_1 = require("@nestjs/mongoose");
+const after_sales_schema_1 = require("./schemas/after-sales.schema");
 let AfterSalesModule = class AfterSalesModule {
 };
 exports.AfterSalesModule = AfterSalesModule;
 exports.AfterSalesModule = AfterSalesModule = __decorate([
     (0, common_1.Module)({
+        imports: [mongoose_1.MongooseModule.forFeature([{ name: 'AfterSales', schema: after_sales_schema_1.AfterSalesSchema }])],
         controllers: [after_sales_controller_1.AfterSalesController],
         providers: [after_sales_service_1.AfterSalesService]
     })

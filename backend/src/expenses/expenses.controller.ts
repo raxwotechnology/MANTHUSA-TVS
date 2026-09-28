@@ -1,7 +1,9 @@
 import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
 import { ExpensesService } from './expenses.service';
+import { Roles } from '../auth/roles.decorator';
 
 @Controller('expenses')
+@Roles('Accountant / Finance Staff')
 export class ExpensesController {
   constructor(private readonly expensesService: ExpensesService) {}
 

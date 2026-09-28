@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DashboardController = void 0;
 const common_1 = require("@nestjs/common");
 const dashboard_service_1 = require("./dashboard.service");
+const roles_decorator_1 = require("../auth/roles.decorator");
 let DashboardController = class DashboardController {
     dashboardService;
     constructor(dashboardService) {
@@ -29,7 +30,8 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], DashboardController.prototype, "getStats", null);
 exports.DashboardController = DashboardController = __decorate([
-    (0, common_1.Controller)('dashboard-api'),
+    (0, common_1.Controller)('dashboard'),
+    (0, roles_decorator_1.Roles)('Sales & Operations', 'Accountant / Finance Staff'),
     __metadata("design:paramtypes", [dashboard_service_1.DashboardService])
 ], DashboardController);
 //# sourceMappingURL=dashboard.controller.js.map

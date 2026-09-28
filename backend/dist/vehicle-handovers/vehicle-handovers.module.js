@@ -10,11 +10,18 @@ exports.VehicleHandoversModule = void 0;
 const common_1 = require("@nestjs/common");
 const vehicle_handovers_controller_1 = require("./vehicle-handovers.controller");
 const vehicle_handovers_service_1 = require("./vehicle-handovers.service");
+const mongoose_1 = require("@nestjs/mongoose");
+const vehicle_handover_schema_1 = require("./schemas/vehicle-handover.schema");
+const sale_schema_1 = require("../sales/schemas/sale.schema");
 let VehicleHandoversModule = class VehicleHandoversModule {
 };
 exports.VehicleHandoversModule = VehicleHandoversModule;
 exports.VehicleHandoversModule = VehicleHandoversModule = __decorate([
     (0, common_1.Module)({
+        imports: [mongoose_1.MongooseModule.forFeature([
+                { name: 'VehicleHandover', schema: vehicle_handover_schema_1.VehicleHandoverSchema },
+                { name: 'Sale', schema: sale_schema_1.SaleSchema },
+            ])],
         controllers: [vehicle_handovers_controller_1.VehicleHandoversController],
         providers: [vehicle_handovers_service_1.VehicleHandoversService]
     })

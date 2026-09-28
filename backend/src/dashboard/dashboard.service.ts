@@ -20,7 +20,7 @@ export class DashboardService {
     const reservedVehicles = await this.vehicleModel.countDocuments({ status: 'Reserved' });
     const soldVehicles = await this.vehicleModel.countDocuments({ status: 'Sold' });
     const totalCustomers = await this.customerModel.countDocuments();
-    const newLeads = await this.leadModel.countDocuments();
+    const newLeads = await this.leadModel.countDocuments({ status: 'New' });
 
     // Sales calculation
     const startOfToday = new Date();
@@ -30,15 +30,16 @@ export class DashboardService {
     startOfMonth.setDate(1);
     startOfMonth.setHours(0, 0, 0, 0);
 
-    const todaySalesDocs = await this.saleModel.find({ saleDate: { $gte: startOfToday } });
+    const validSale = { status: { $nin: ['Cancelled', 'Refunded'] } };
+    const todaySalesDocs = await this.saleModel.find({ ...validSale, saleDate: { $gte: startOfToday } });
     const todaySales = todaySalesDocs.length;
 
-    const monthlySalesDocs = await this.saleModel.find({ saleDate: { $gte: startOfMonth } });
+    const monthlySalesDocs = await this.saleModel.find({ ...validSale, saleDate: { $gte: startOfMonth } });
     const monthlySales = monthlySalesDocs.length;
     const monthlyRevenue = monthlySalesDocs.reduce((sum, s) => sum + (s.finalAmount || 0), 0);
 
     // Outstanding customer payments
-    const allSales = await this.saleModel.find();
+    const allSales = await this.saleModel.find(validSale);
     const outstandingCustomerPayments = allSales.reduce((sum, s) => sum + ((s.finalAmount || 0) - (s.paidAmount || 0)), 0);
 
     // Supplier outstanding

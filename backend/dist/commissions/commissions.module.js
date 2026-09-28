@@ -10,11 +10,18 @@ exports.CommissionsModule = void 0;
 const common_1 = require("@nestjs/common");
 const commissions_controller_1 = require("./commissions.controller");
 const commissions_service_1 = require("./commissions.service");
+const mongoose_1 = require("@nestjs/mongoose");
+const commission_schema_1 = require("./schemas/commission.schema");
+const sale_schema_1 = require("../sales/schemas/sale.schema");
 let CommissionsModule = class CommissionsModule {
 };
 exports.CommissionsModule = CommissionsModule;
 exports.CommissionsModule = CommissionsModule = __decorate([
     (0, common_1.Module)({
+        imports: [mongoose_1.MongooseModule.forFeature([
+                { name: 'Commission', schema: commission_schema_1.CommissionSchema },
+                { name: 'Sale', schema: sale_schema_1.SaleSchema },
+            ])],
         controllers: [commissions_controller_1.CommissionsController],
         providers: [commissions_service_1.CommissionsService]
     })

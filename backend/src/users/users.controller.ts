@@ -1,7 +1,9 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { Roles } from '../auth/roles.decorator';
 
 @Controller('users')
+@Roles('Admin / Owner')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -11,6 +13,7 @@ export class UsersController {
   }
 
   @Get()
+  @Roles('Admin / Owner', 'Sales & Operations', 'Accountant / Finance Staff')
   findAll() {
     return this.usersService.findAll();
   }

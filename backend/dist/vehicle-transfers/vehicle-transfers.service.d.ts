@@ -2,7 +2,8 @@ import { Model } from 'mongoose';
 import { VehicleTransferDocument } from './schemas/vehicle-transfer.schema';
 export declare class VehicleTransfersService {
     private transferModel;
-    constructor(transferModel: Model<VehicleTransferDocument>);
+    private vehicleModel;
+    constructor(transferModel: Model<VehicleTransferDocument>, vehicleModel: Model<any>);
     create(createDto: any): Promise<VehicleTransferDocument>;
     findAll(): Promise<VehicleTransferDocument[]>;
     findOne(id: string): Promise<VehicleTransferDocument>;

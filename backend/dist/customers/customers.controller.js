@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CustomersController = void 0;
 const common_1 = require("@nestjs/common");
 const customers_service_1 = require("./customers.service");
+const roles_decorator_1 = require("../auth/roles.decorator");
 let CustomersController = class CustomersController {
     customersService;
     constructor(customersService) {
@@ -29,6 +30,7 @@ let CustomersController = class CustomersController {
     findOne(id) {
         return this.customersService.findOne(id);
     }
+    timeline(id) { return this.customersService.timeline(id); }
     update(id, updateCustomerDto) {
         return this.customersService.update(id, updateCustomerDto);
     }
@@ -58,6 +60,13 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], CustomersController.prototype, "findOne", null);
 __decorate([
+    (0, common_1.Get)(':id/timeline'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], CustomersController.prototype, "timeline", null);
+__decorate([
     (0, common_1.Put)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
@@ -74,6 +83,7 @@ __decorate([
 ], CustomersController.prototype, "remove", null);
 exports.CustomersController = CustomersController = __decorate([
     (0, common_1.Controller)('customers'),
+    (0, roles_decorator_1.Roles)('Sales & Operations'),
     __metadata("design:paramtypes", [customers_service_1.CustomersService])
 ], CustomersController);
 //# sourceMappingURL=customers.controller.js.map

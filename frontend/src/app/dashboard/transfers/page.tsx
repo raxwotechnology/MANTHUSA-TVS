@@ -1,24 +1,36 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { ArrowLeftRight, Plus } from 'lucide-react';
+import { apiFetch } from '@/lib/api';
 
 export default function TransfersPage() {
-  const [transfers, setTransfers] = useState([
-    {
-      _id: '1',
-      transferId: 'TRF-001',
-      vehicleName: 'Toyota Raize Z Turbo 2020',
-      fromBranch: 'Colombo Head Office',
-      toBranch: 'Kandy Branch',
-      date: '2026-09-24',
-      driver: 'Mahesh Kumara',
-      transportCost: 35000,
-      status: 'In Transit'
-    }
-  ]);
+  const [transfers, setTransfers] = useState<any[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newFormData, setNewFormData] = useState({});
+
+  const loadTransfers = async () => {
+    const response = await apiFetch('/vehicle-transfers');
+    if (!response.ok) throw new Error('Could not load transfers.');
+    const rows = await response.json();
+    setTransfers(rows.map((row: any) => ({ ...row, vehicleName: `${row.vehicle?.make || ''} ${row.vehicle?.model || ''} ${row.vehicle?.year || ''}`.trim(), fromBranch: row.fromBranch?.name || '', toBranch: row.toBranch?.name || '', date: row.transferDate, driver: row.driverName })));
+  };
+  useEffect(() => { loadTransfers().catch((error) => window.alert(error.message)); }, []);
+  const saveTransfer = async () => {
+    const form = newFormData as any;
+    try {
+      const [vehicleResponse, branchResponse] = await Promise.all([apiFetch('/vehicles'), apiFetch('/branches')]);
+      if (!vehicleResponse.ok || !branchResponse.ok) throw new Error('Could not load vehicle/branch options.');
+      const [vehicles, branches] = await Promise.all([vehicleResponse.json(), branchResponse.json()]);
+      const vehicle = vehicles.find((row: any) => `${row.make} ${row.model}`.toLowerCase() === String(form.vehicleName || '').trim().toLowerCase());
+      const from = branches.find((row: any) => row.name.toLowerCase() === String(form.fromBranch || '').trim().toLowerCase());
+      const to = branches.find((row: any) => row.name.toLowerCase() === String(form.toBranch || '').trim().toLowerCase());
+      if (!vehicle || !from || !to) throw new Error('Enter an exact vehicle and branch name from the system.');
+      const response = await apiFetch('/vehicle-transfers', { method: 'POST', body: JSON.stringify({ transferId: form.transferId, vehicle: vehicle._id, fromBranch: from._id, toBranch: to._id, transferDate: form.date, driverName: form.driver, transportCost: Number(form.transportCost || 0), status: 'Pending' }) });
+      if (!response.ok) throw new Error('Could not save branch transfer.');
+      await loadTransfers(); setShowAddModal(false); setNewFormData({});
+    } catch (error) { window.alert(error instanceof Error ? error.message : 'Could not save transfer.'); }
+  };
 
 
   return (
@@ -105,7 +117,7 @@ export default function TransfersPage() {
             </div>
             <div className="flex justify-end gap-2 mt-6 pt-4 border-t">
               <button onClick={() => setShowAddModal(false)} className="px-4 py-2 border rounded-lg text-slate-600 font-semibold text-xs">Cancel</button>
-              <button onClick={() => { setShowAddModal(false); setTransfers([{_id: Date.now().toString(), ...newFormData} as any, ...transfers]); }} className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold text-xs">Save</button>
+              <button onClick={saveTransfer} className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold text-xs">Save</button>
             </div>
           </div>
         </div>

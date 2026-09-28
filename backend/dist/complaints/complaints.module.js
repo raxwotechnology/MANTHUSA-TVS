@@ -10,11 +10,14 @@ exports.ComplaintsModule = void 0;
 const common_1 = require("@nestjs/common");
 const complaints_controller_1 = require("./complaints.controller");
 const complaints_service_1 = require("./complaints.service");
+const mongoose_1 = require("@nestjs/mongoose");
+const complaint_schema_1 = require("./schemas/complaint.schema");
 let ComplaintsModule = class ComplaintsModule {
 };
 exports.ComplaintsModule = ComplaintsModule;
 exports.ComplaintsModule = ComplaintsModule = __decorate([
     (0, common_1.Module)({
+        imports: [mongoose_1.MongooseModule.forFeature([{ name: 'Complaint', schema: complaint_schema_1.ComplaintSchema }])],
         controllers: [complaints_controller_1.ComplaintsController],
         providers: [complaints_service_1.ComplaintsService]
     })

@@ -15,13 +15,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SalesController = void 0;
 const common_1 = require("@nestjs/common");
 const sales_service_1 = require("./sales.service");
+const roles_decorator_1 = require("../auth/roles.decorator");
 let SalesController = class SalesController {
     salesService;
     constructor(salesService) {
         this.salesService = salesService;
     }
-    create(createSaleDto) {
-        return this.salesService.create(createSaleDto);
+    create(createSaleDto, request) {
+        return this.salesService.create({ ...createSaleDto, salesperson: request.user.sub });
     }
     findAll() {
         return this.salesService.findAll();
@@ -40,8 +41,9 @@ exports.SalesController = SalesController;
 __decorate([
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "create", null);
 __decorate([
@@ -74,6 +76,7 @@ __decorate([
 ], SalesController.prototype, "remove", null);
 exports.SalesController = SalesController = __decorate([
     (0, common_1.Controller)('sales'),
+    (0, roles_decorator_1.Roles)('Sales & Operations'),
     __metadata("design:paramtypes", [sales_service_1.SalesService])
 ], SalesController);
 //# sourceMappingURL=sales.controller.js.map

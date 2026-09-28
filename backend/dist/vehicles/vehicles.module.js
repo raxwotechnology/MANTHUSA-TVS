@@ -11,6 +11,7 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const vehicles_controller_1 = require("./vehicles.controller");
 const vehicles_service_1 = require("./vehicles.service");
+const public_vehicles_controller_1 = require("./public-vehicles.controller");
 const vehicle_schema_1 = require("./schemas/vehicle.schema");
 let VehiclesModule = class VehiclesModule {
 };
@@ -20,7 +21,7 @@ exports.VehiclesModule = VehiclesModule = __decorate([
         imports: [
             mongoose_1.MongooseModule.forFeature([{ name: 'Vehicle', schema: vehicle_schema_1.VehicleSchema }])
         ],
-        controllers: [vehicles_controller_1.VehiclesController],
+        controllers: [vehicles_controller_1.VehiclesController, public_vehicles_controller_1.PublicVehiclesController],
         providers: [vehicles_service_1.VehiclesService]
     })
 ], VehiclesModule);

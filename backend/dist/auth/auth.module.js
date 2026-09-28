@@ -14,6 +14,10 @@ const jwt_1 = require("@nestjs/jwt");
 const mongoose_1 = require("@nestjs/mongoose");
 const user_schema_1 = require("../users/schemas/user.schema");
 const role_schema_1 = require("../roles/schemas/role.schema");
+const config_1 = require("@nestjs/config");
+const core_1 = require("@nestjs/core");
+const jwt_auth_guard_1 = require("./jwt-auth.guard");
+const roles_guard_1 = require("./roles.guard");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -24,14 +28,24 @@ exports.AuthModule = AuthModule = __decorate([
                 { name: 'User', schema: user_schema_1.UserSchema },
                 { name: 'Role', schema: role_schema_1.RoleSchema }
             ]),
-            jwt_1.JwtModule.register({
+            jwt_1.JwtModule.registerAsync({
                 global: true,
-                secret: 'SECRET_KEY_FOR_JWT_VSMS_123!@#',
-                signOptions: { expiresIn: '1d' },
+                imports: [config_1.ConfigModule],
+                inject: [config_1.ConfigService],
+                useFactory: (config) => {
+                    const secret = config.get('JWT_SECRET');
+                    if (!secret)
+                        throw new Error('JWT_SECRET must be configured before starting the API.');
+                    return { secret, signOptions: { expiresIn: '1d' } };
+                },
             }),
         ],
         controllers: [auth_controller_1.AuthController],
-        providers: [auth_service_1.AuthService]
+        providers: [
+            auth_service_1.AuthService,
+            { provide: core_1.APP_GUARD, useClass: jwt_auth_guard_1.JwtAuthGuard },
+            { provide: core_1.APP_GUARD, useClass: roles_guard_1.RolesGuard },
+        ]
     })
 ], AuthModule);
 //# sourceMappingURL=auth.module.js.map

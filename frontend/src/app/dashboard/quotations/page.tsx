@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { FileText, Plus, Printer, Download, CheckCircle2, XCircle, Clock, X } from 'lucide-react';
+import { apiFetch } from '@/lib/api';
 
 interface Quotation {
   _id: string;
@@ -18,26 +19,35 @@ interface Quotation {
 }
 
 export default function QuotationsPage() {
-  const [quotations, setQuotations] = useState<Quotation[]>([
-    {
-      _id: '1',
-      quotationNumber: 'QT-2026-001',
-      customerName: 'Kamal Gunaratne',
-      vehicleName: 'Toyota Premio F EX Package 2019',
-      vehiclePrice: 13500000,
-      discount: 100000,
-      additionalCharges: 25000,
-      totalAmount: 13425000,
-      advancePayment: 500000,
-      balanceAmount: 12925000,
-      status: 'Active'
-    }
-  ]);
+  const [quotations, setQuotations] = useState<Quotation[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newFormData, setNewFormData] = useState({});
 
 
   const [selectedPdfQuote, setSelectedPdfQuote] = useState<Quotation | null>(null);
+
+  const loadQuotations = async () => {
+    const response = await apiFetch('/quotations');
+    if (!response.ok) throw new Error('Could not load quotations.');
+    const data = await response.json();
+    setQuotations(data.map((quote: any) => ({ ...quote, customerName: quote.customer?.fullName || '', vehicleName: `${quote.vehicle?.make || ''} ${quote.vehicle?.model || ''} ${quote.vehicle?.year || ''}`.trim(), additionalCharges: Number(quote.registrationFee || 0) + Number(quote.insuranceFee || 0) + Number(quote.otherCharges || 0), balanceAmount: Number(quote.totalAmount || 0) - Number(quote.advancePayment || 0), status: quote.status || 'Active' })));
+  };
+  useEffect(() => { loadQuotations().catch((error) => window.alert(error.message)); }, []);
+
+  const saveQuotation = async () => {
+    const form = newFormData as any;
+    try {
+      const [customerResponse, vehicleResponse] = await Promise.all([apiFetch('/customers'), apiFetch('/vehicles')]);
+      if (!customerResponse.ok || !vehicleResponse.ok) throw new Error('Could not load quotation options.');
+      const [customers, vehicles] = await Promise.all([customerResponse.json(), vehicleResponse.json()]);
+      const customer = customers.find((row: any) => row.fullName?.toLowerCase() === String(form.customerName || '').trim().toLowerCase());
+      const vehicle = vehicles.find((row: any) => `${row.make} ${row.model}`.toLowerCase() === String(form.vehicleName || '').trim().toLowerCase());
+      if (!customer || !vehicle) throw new Error('Enter an exact customer name and vehicle make/model from the system.');
+      const response = await apiFetch('/quotations', { method: 'POST', body: JSON.stringify({ customer: customer._id, vehicle: vehicle._id, vehiclePrice: Number(form.vehiclePrice || vehicle.sellingPrice), discount: Number(form.discount || 0), otherCharges: Number(form.additionalCharges || 0), advancePayment: Number(form.advancePayment || 0), validUntil: form.validUntil || new Date(Date.now() + 7 * 86400000).toISOString() }) });
+      if (!response.ok) throw new Error('Could not save quotation.');
+      await loadQuotations(); setShowAddModal(false); setNewFormData({});
+    } catch (error) { window.alert(error instanceof Error ? error.message : 'Could not save quotation.'); }
+  };
 
   const formatLKR = (val: number) => {
     return 'LKR ' + (val || 0).toLocaleString('en-LK');
@@ -193,7 +203,7 @@ export default function QuotationsPage() {
             </div>
             <div className="flex justify-end gap-2 mt-6 pt-4 border-t">
               <button onClick={() => setShowAddModal(false)} className="px-4 py-2 border rounded-lg text-slate-600 font-semibold text-xs">Cancel</button>
-              <button onClick={() => { setShowAddModal(false); setQuotations([{_id: Date.now().toString(), ...newFormData} as any, ...quotations]); }} className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold text-xs">Save</button>
+              <button onClick={saveQuotation} className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold text-xs">Save</button>
             </div>
           </div>
         </div>

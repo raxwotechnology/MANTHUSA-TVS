@@ -17,6 +17,7 @@ let Sale = class Sale {
     customer;
     vehicle;
     salesperson;
+    branch;
     vehiclePrice;
     discount;
     additionalCharges;
@@ -43,6 +44,10 @@ __decorate([
     (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'User' }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Sale.prototype, "salesperson", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Branch' }),
+    __metadata("design:type", mongoose_2.Types.ObjectId)
+], Sale.prototype, "branch", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ default: 0 }),
     __metadata("design:type", Number)

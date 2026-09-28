@@ -40,6 +40,8 @@ import { DashboardModule } from './dashboard/dashboard.module';
 
 import { VehicleTransfersModule } from './vehicle-transfers/vehicle-transfers.module';
 import { VehicleValuationsModule } from './vehicle-valuations/vehicle-valuations.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { DocumentsModule } from './documents/documents.module';
 
 @Module({
   imports: [
@@ -63,6 +65,8 @@ import { VehicleValuationsModule } from './vehicle-valuations/vehicle-valuations
     VehiclePurchasesModule,
     VehicleTransfersModule,
     VehicleValuationsModule,
+    NotificationsModule,
+    DocumentsModule,
     SuppliersModule,
     SupplierPaymentsModule,
     CustomersModule,

@@ -10,11 +10,15 @@ exports.SalesTargetsModule = void 0;
 const common_1 = require("@nestjs/common");
 const sales_targets_controller_1 = require("./sales-targets.controller");
 const sales_targets_service_1 = require("./sales-targets.service");
+const mongoose_1 = require("@nestjs/mongoose");
+const sales_target_schema_1 = require("./schemas/sales-target.schema");
+const sale_schema_1 = require("../sales/schemas/sale.schema");
 let SalesTargetsModule = class SalesTargetsModule {
 };
 exports.SalesTargetsModule = SalesTargetsModule;
 exports.SalesTargetsModule = SalesTargetsModule = __decorate([
     (0, common_1.Module)({
+        imports: [mongoose_1.MongooseModule.forFeature([{ name: 'SalesTarget', schema: sales_target_schema_1.SalesTargetSchema }, { name: 'Sale', schema: sale_schema_1.SaleSchema }])],
         controllers: [sales_targets_controller_1.SalesTargetsController],
         providers: [sales_targets_service_1.SalesTargetsService]
     })

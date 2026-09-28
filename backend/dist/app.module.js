@@ -48,6 +48,8 @@ const reports_module_1 = require("./reports/reports.module");
 const dashboard_module_1 = require("./dashboard/dashboard.module");
 const vehicle_transfers_module_1 = require("./vehicle-transfers/vehicle-transfers.module");
 const vehicle_valuations_module_1 = require("./vehicle-valuations/vehicle-valuations.module");
+const notifications_module_1 = require("./notifications/notifications.module");
+const documents_module_1 = require("./documents/documents.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -74,6 +76,8 @@ exports.AppModule = AppModule = __decorate([
             vehicle_purchases_module_1.VehiclePurchasesModule,
             vehicle_transfers_module_1.VehicleTransfersModule,
             vehicle_valuations_module_1.VehicleValuationsModule,
+            notifications_module_1.NotificationsModule,
+            documents_module_1.DocumentsModule,
             suppliers_module_1.SuppliersModule,
             supplier_payments_module_1.SupplierPaymentsModule,
             customers_module_1.CustomersModule,

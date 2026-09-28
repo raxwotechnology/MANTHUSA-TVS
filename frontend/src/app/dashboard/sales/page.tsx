@@ -1,5 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { apiFetch } from '@/lib/api';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { DollarSign, Plus, Printer, CheckCircle2, FileText, Search, X } from 'lucide-react';
 
@@ -16,24 +18,25 @@ interface Sale {
 }
 
 export default function SalesPage() {
-  const [sales, setSales] = useState<Sale[]>([
-    {
-      _id: '1',
-      invoiceNumber: 'INV-2026-001',
-      customerName: 'Blue Star Logistics Ltd',
-      vehicleName: 'Nissan X-Trail 20X Hybrid 2017',
-      finalAmount: 9915000,
-      paidAmount: 9915000,
-      balance: 0,
-      saleStatus: 'Completed',
-      saleDate: '2026-09-24'
-    }
-  ]);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [newFormData, setNewFormData] = useState({});
+  const [sales, setSales] = useState<Sale[]>([]);
+  const router = useRouter();
 
 
   const [selectedInvoice, setSelectedInvoice] = useState<Sale | null>(null);
+
+  useEffect(() => {
+    apiFetch('/sales').then(async (response) => {
+      if (!response.ok) throw new Error('Could not load sales.');
+      const data = await response.json();
+      setSales(data.map((sale: any) => ({
+        _id: sale._id, invoiceNumber: sale.invoiceNumber,
+        customerName: sale.customer?.fullName || '—',
+        vehicleName: [sale.vehicle?.make, sale.vehicle?.model, sale.vehicle?.year].filter(Boolean).join(' '),
+        finalAmount: Number(sale.finalAmount || 0), paidAmount: Number(sale.paidAmount || 0),
+        balance: Number(sale.balance || 0), saleStatus: sale.status, saleDate: sale.saleDate,
+      })));
+    }).catch((error) => window.alert(error.message));
+  }, []);
 
   const formatLKR = (val: number) => {
     return 'LKR ' + (val || 0).toLocaleString('en-LK');
@@ -47,7 +50,7 @@ export default function SalesPage() {
           <p className="text-xs text-slate-500">Record final deal confirmations, track paid balances, and print official invoices</p>
         </div>
 
-        <button className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2.5 rounded-lg shadow-xs" onClick={() => setShowAddModal(true)}>
+        <button className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2.5 rounded-lg shadow-xs" onClick={() => router.push('/dashboard/sales/new')}>
           <Plus className="w-4 h-4" />
           <span>+ Create Sale Invoice</span>
         </button>
@@ -121,53 +124,6 @@ export default function SalesPage() {
                 <Printer className="w-4 h-4" />
                 <span>Print Invoice</span>
               </button>
-            </div>
-          </div>
-        </div>
-      )}
-    
-      {showAddModal && (
-        <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-xl max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-bold text-slate-900 mb-4">Add New Record</h3>
-            <div className="space-y-3">
-              
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">invoiceNumber</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, invoiceNumber: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">customerName</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, customerName: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">vehicleName</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, vehicleName: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">finalAmount</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, finalAmount: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">paidAmount</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, paidAmount: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">balance</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, balance: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">saleStatus</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, saleStatus: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">saleDate</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, saleDate: e.target.value})} />
-              </div>
-            </div>
-            <div className="flex justify-end gap-2 mt-6 pt-4 border-t">
-              <button onClick={() => setShowAddModal(false)} className="px-4 py-2 border rounded-lg text-slate-600 font-semibold text-xs">Cancel</button>
-              <button onClick={() => { setShowAddModal(false); setSales([{_id: Date.now().toString(), ...newFormData} as any, ...sales]); }} className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold text-xs">Save</button>
             </div>
           </div>
         </div>

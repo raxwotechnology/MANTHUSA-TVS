@@ -18,6 +18,10 @@ export class VehiclesService {
     return this.vehicleModel.find().exec();
   }
 
+  findPublicListings() {
+    return this.vehicleModel.find({ status: 'Available' }).select('make model variant year manufacturingYear registeredYear vehicleType condition fuelType transmission driveType engineCapacity mileage color sellingPrice images status').sort({ createdAt: -1 }).lean().exec();
+  }
+
   async findOne(id: string): Promise<VehicleDocument> {
     const vehicle = await this.vehicleModel.findById(id).exec();
     if (!vehicle) {

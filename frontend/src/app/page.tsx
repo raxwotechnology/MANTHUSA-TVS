@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   Car,
@@ -15,74 +15,40 @@ import {
   TrendingUp,
   X
 } from 'lucide-react';
-import { getApiUrl } from '@/lib/api';
+import { apiFetch } from '@/lib/api';
 
 export default function PublicVehicleWebsite() {
-  const [vehicles] = useState([
-    {
-      id: '1',
-      make: 'Toyota',
-      model: 'Premio',
-      variant: 'F EX Package',
-      year: 2019,
-      fuelType: 'Petrol',
-      transmission: 'Automatic',
-      mileage: '45,000 km',
-      color: 'Pearl White',
-      price: 13500000,
-      image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=1000',
-      status: 'Available'
-    },
-    {
-      id: '2',
-      make: 'Honda',
-      model: 'Vezel',
-      variant: 'Z Sensing',
-      year: 2018,
-      fuelType: 'Hybrid',
-      transmission: 'Automatic',
-      mileage: '58,000 km',
-      color: 'Black Metallic',
-      price: 10800000,
-      image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=1000',
-      status: 'Available'
-    },
-    {
-      id: '3',
-      make: 'Mercedes-Benz',
-      model: 'C-Class',
-      variant: 'C200 AMG Line',
-      year: 2021,
-      fuelType: 'Petrol',
-      transmission: 'Automatic 9G-Tronic',
-      mileage: '28,000 km',
-      color: 'Obsidian Black',
-      price: 28500000,
-      image: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?q=80&w=1000',
-      status: 'Reserved'
-    },
-    {
-      id: '4',
-      make: 'Toyota',
-      model: 'Raize',
-      variant: 'Z Turbo',
-      year: 2020,
-      fuelType: 'Petrol',
-      transmission: 'CVT',
-      mileage: '32,000 km',
-      color: 'Turquoise Black',
-      price: 9400000,
-      image: 'https://images.unsplash.com/photo-1541348263662-e082662d82da?q=80&w=1000',
-      status: 'Available'
-    }
-  ]);
+  const [vehicles, setVehicles] = useState<any[]>([]);
+  const [vehicleLoadError, setVehicleLoadError] = useState('');
 
+  useEffect(() => {
+    apiFetch('/public/vehicles').then(async (response) => {
+      if (!response.ok) throw new Error('Vehicle listings are temporarily unavailable.');
+      const data = await response.json();
+      setVehicles(data.map((vehicle: any) => ({
+        ...vehicle,
+        id: vehicle._id,
+        price: vehicle.sellingPrice,
+        image: vehicle.images?.[0] || '',
+        mileage: `${Number(vehicle.mileage || 0).toLocaleString()} km`,
+      })));
+    }).catch((error) => setVehicleLoadError(error instanceof Error ? error.message : 'Vehicle listings are temporarily unavailable.'));
+  }, []);
   const [selectedMake, setSelectedMake] = useState('ALL');
   const [selectedFuel, setSelectedFuel] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
 
   const [showTradeInModal, setShowTradeInModal] = useState(false);
   const [tradeInSuccess, setTradeInSuccess] = useState(false);
+  const [tradeInError, setTradeInError] = useState('');
+  const [interestVehicle, setInterestVehicle] = useState<any>(null);
+  const [interestType, setInterestType] = useState('Details');
+  const [interestName, setInterestName] = useState('');
+  const [interestPhone, setInterestPhone] = useState('');
+  const [interestDate, setInterestDate] = useState('');
+  const [interestMessage, setInterestMessage] = useState('');
+  const [interestError, setInterestError] = useState('');
+  const [interestSuccess, setInterestSuccess] = useState(false);
 
   const [tradeInForm, setTradeInForm] = useState({
     name: '',
@@ -97,7 +63,7 @@ export default function PublicVehicleWebsite() {
   const handleTradeInSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await fetch(getApiUrl('/vehicle-valuations'), {
+      const response = await apiFetch('/vehicle-valuations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -112,13 +78,25 @@ export default function PublicVehicleWebsite() {
           status: 'Pending'
         })
       });
-    } catch (err) {}
-
-    setTradeInSuccess(true);
+      if (!response.ok) throw new Error('Could not submit the valuation request. Please review the details.');
+      setTradeInSuccess(true);
+      setTradeInError('');
+    } catch (err) {
+      setTradeInError(err instanceof Error ? err.message : 'Cannot connect to the server.');
+    }
     setTimeout(() => {
       setTradeInSuccess(false);
       setShowTradeInModal(false);
     }, 2500);
+  };
+
+  const submitInterest = async (e: React.FormEvent) => {
+    e.preventDefault(); setInterestError('');
+    try {
+      const response = await apiFetch('/leads/public', { method: 'POST', body: JSON.stringify({ fullName: interestName, phone: interestPhone, vehicle: interestVehicle?._id, inquiryType: interestType, preferredDate: interestDate || undefined, message: interestMessage }) });
+      if (!response.ok) { const data = await response.json().catch(() => ({})); throw new Error(data.message || 'Could not send your enquiry.'); }
+      setInterestSuccess(true);
+    } catch (error) { setInterestError(error instanceof Error ? error.message : 'Could not send your enquiry.'); }
   };
 
   const filteredVehicles = vehicles.filter((v) => {
@@ -243,7 +221,7 @@ export default function PublicVehicleWebsite() {
             <p className="text-xs text-slate-400">All vehicles undergo 120-point mechanical & document verification</p>
           </div>
           <span className="text-xs font-semibold text-emerald-400 bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-800">
-            {filteredVehicles.length} Vehicles Available
+            {vehicleLoadError || `${filteredVehicles.length} Vehicles Available`}
           </span>
         </div>
 
@@ -251,11 +229,11 @@ export default function PublicVehicleWebsite() {
           {filteredVehicles.map((v) => (
             <div key={v.id} className="bg-[#131F3F] rounded-2xl overflow-hidden border border-slate-800 hover:border-slate-700 transition-all flex flex-col group shadow-xl">
               <div className="relative h-48 overflow-hidden bg-slate-950">
-                <img
-                  src={v.image}
+                {v.image ? <img
+                  src={v.image || '/vehicle-placeholder.png'}
                   alt={v.model}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
+                /> : <div className="w-full h-full flex items-center justify-center text-slate-600"><Car className="w-14 h-14" /></div>}
                 <div className="absolute top-3 left-3">
                   <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
                     v.status === 'Available' ? 'bg-emerald-500 text-slate-950' : 'bg-amber-500 text-slate-950'
@@ -302,6 +280,7 @@ export default function PublicVehicleWebsite() {
                       <span>Call Sales</span>
                     </button>
                   </div>
+                  <button onClick={() => { setInterestVehicle(v); setInterestType('Details'); setInterestSuccess(false); setInterestError(''); }} className="mt-2 w-full rounded-xl border border-emerald-500/40 bg-emerald-500/10 py-2.5 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20">Request details / test drive / reservation</button>
                 </div>
               </div>
             </div>
@@ -326,6 +305,7 @@ export default function PublicVehicleWebsite() {
               </div>
             ) : (
               <form onSubmit={handleTradeInSubmit} className="space-y-3 text-xs">
+                {tradeInError && <p role="alert" className="text-rose-400">{tradeInError}</p>}
                 <div>
                   <label className="block font-semibold text-slate-300 mb-1">Your Full Name</label>
                   <input type="text" required value={tradeInForm.name} onChange={(e) => setTradeInForm({ ...tradeInForm, name: e.target.value })} className="w-full p-2.5 bg-[#0B132B] border border-slate-700 rounded-xl text-white" />
@@ -358,6 +338,8 @@ export default function PublicVehicleWebsite() {
           </div>
         </div>
       )}
+
+      {interestVehicle && <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4"><div className="w-full max-w-md rounded-2xl border border-slate-700 bg-[#131F3F] p-6"><div className="mb-4 flex items-center justify-between border-b border-slate-700 pb-3"><div><h3 className="font-bold">Enquire about {interestVehicle.make} {interestVehicle.model}</h3><p className="text-xs text-slate-400">Our sales team will follow up with you.</p></div><button onClick={()=>setInterestVehicle(null)} aria-label="Close"><X className="h-5 w-5" /></button></div>{interestSuccess?<div className="py-8 text-center"><CheckCircle2 className="mx-auto mb-2 h-10 w-10 text-emerald-400"/><p className="font-bold">Enquiry sent</p><p className="text-xs text-slate-400">The dealership will contact you.</p><button onClick={()=>setInterestVehicle(null)} className="mt-4 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-bold">Close</button></div>:<form onSubmit={submitInterest} className="space-y-3 text-xs">{interestError&&<p role="alert" className="text-rose-400">{interestError}</p>}<label className="block">Request<select value={interestType} onChange={(e)=>setInterestType(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-700 bg-[#0B132B] p-2.5"><option>Details</option><option>Test Drive</option><option>Reservation Request</option></select></label><label className="block">Full name<input required value={interestName} onChange={(e)=>setInterestName(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-700 bg-[#0B132B] p-2.5"/></label><label className="block">Phone<input required type="tel" value={interestPhone} onChange={(e)=>setInterestPhone(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-700 bg-[#0B132B] p-2.5"/></label>{interestType==='Test Drive'&&<label className="block">Preferred date and time<input required type="datetime-local" value={interestDate} onChange={(e)=>setInterestDate(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-700 bg-[#0B132B] p-2.5"/></label>}<label className="block">Message<textarea value={interestMessage} onChange={(e)=>setInterestMessage(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-700 bg-[#0B132B] p-2.5"/></label><button className="w-full rounded-lg bg-emerald-600 px-4 py-2.5 font-bold">Send enquiry</button></form>}</div></div>}
 
       {/* Footer */}
       <footer className="mt-auto border-t border-slate-800 bg-[#0B132B] py-8 px-4 text-center text-xs text-slate-500">

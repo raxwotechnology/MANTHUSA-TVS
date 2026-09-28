@@ -22,6 +22,9 @@ export class VehiclePurchase {
 
   @Prop()
   paymentStatus: string;
+
+  @Prop({ default: 0 })
+  paidAmount: number;
 }
 
 export const VehiclePurchaseSchema = SchemaFactory.createForClass(VehiclePurchase);

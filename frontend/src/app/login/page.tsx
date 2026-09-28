@@ -1,180 +1,63 @@
 "use client";
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Car, Lock, Mail, ArrowRight, ShieldCheck, User, CheckCircle2 } from 'lucide-react';
+import { Car, Lock, Mail, ArrowRight } from 'lucide-react';
 import { getApiUrl } from '@/lib/api';
 
 export default function LoginPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState('admin@salesplus.com');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [token, setToken] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [mode, setMode] = useState<'login' | 'request-reset' | 'reset' | 'request-verification' | 'verify'>('login');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
 
-  const executeLogin = async (loginEmail: string, loginPass: string) => {
-    setLoading(true);
-    setError('');
-
+  const login = async (event: React.FormEvent) => {
+    event.preventDefault(); setLoading(true); setError('');
     try {
-      const res = await fetch(getApiUrl('/auth/login'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: loginEmail, password: loginPass })
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        localStorage.setItem('token', data.access_token || 'mock-token');
-        localStorage.setItem('user', JSON.stringify(data.user || { name: 'User', email: loginEmail, role: 'Admin' }));
-        window.location.href = '/dashboard';
-        return;
-      } else {
-        const errData = await res.json().catch(() => ({}));
-        setError(errData.message || 'Invalid credentials');
-      }
-    } catch (err) {
-      console.log('Backend fetch failed, using fallback auth');
-    }
-
-    // Client fallback if backend is unreachable or CORS blocked
-    let role = 'Admin / Owner';
-    let name = 'Saman Kumara';
-
-    if (loginEmail.includes('executive')) {
-      role = 'Sales & Operations';
-      name = 'Kasun Fernando';
-    } else if (loginEmail.includes('accountant')) {
-      role = 'Accountant / Finance Staff';
-      name = 'Dilini Silva';
-    } else if (loginEmail.includes('manager2')) {
-      role = 'Sales & Operations';
-      name = 'Ruwan Jayasinghe';
-    } else if (loginEmail.includes('manager')) {
-      role = 'Admin / Owner';
-      name = 'Nimal Perera';
-    }
-
-    localStorage.setItem('token', 'valid-jwt-token');
-    localStorage.setItem('user', JSON.stringify({ name, email: loginEmail, role }));
-    window.location.href = '/dashboard';
-    setLoading(false);
+      const response = await fetch(getApiUrl('/auth/login'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.message || 'Invalid credentials');
+      if (!result.access_token || !result.user) throw new Error('The server returned an invalid login response.');
+      localStorage.setItem('token', result.access_token); localStorage.setItem('user', JSON.stringify(result.user)); window.location.href = '/dashboard';
+    } catch (err) { setError(err instanceof Error ? err.message : 'Cannot connect to the server.'); }
+    finally { setLoading(false); }
   };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    executeLogin(email, password);
+  const recover = async (event: React.FormEvent) => {
+    event.preventDefault(); setLoading(true); setError(''); setMessage('');
+    try {
+      const requesting = mode === 'request-reset' || mode === 'request-verification';
+      const verifying = mode === 'request-verification' || mode === 'verify';
+      const endpoint = verifying ? (requesting ? '/auth/request-email-verification' : '/auth/verify-email') : (requesting ? '/auth/forgot-password' : '/auth/reset-password');
+      const body = requesting ? { email } : (verifying ? { token } : { token, password: newPassword });
+      const response = await fetch(getApiUrl(endpoint), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.message || 'Could not process the request.');
+      setMessage(result.message || 'Request completed.');
+      if (requesting) setMode(verifying ? 'verify' : 'reset'); else { setMode('login'); setToken(''); setNewPassword(''); }
+    } catch (err) { setError(err instanceof Error ? err.message : 'Could not process the request.'); }
+    finally { setLoading(false); }
   };
 
-  const setPresetUser = (e: string, p: string) => {
-    setEmail(e);
-    setPassword(p);
-    executeLogin(e, p);
-  };
+  const goToLogin = () => { setMode('login'); setError(''); setMessage(''); };
 
-  return (
-    <div className="min-h-screen bg-[#0B132B] flex flex-col justify-center py-12 sm:px-6 lg:px-8 text-slate-100">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <div className="w-14 h-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center mx-auto mb-4 shadow-xl shadow-emerald-900/40">
-          <Car className="w-8 h-8" />
-        </div>
-        <h2 className="text-2xl font-extrabold tracking-tight text-white">
-          Sales<span className="text-emerald-400">Plus</span> VSMS
-        </h2>
-        <p className="mt-1 text-xs text-slate-400">Vehicle Sales Management System Staff Portal</p>
-      </div>
-
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-[#131F3F] py-8 px-4 shadow-2xl border border-slate-800 sm:rounded-2xl sm:px-10">
-          {error && (
-            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-xs rounded-xl font-medium">
-              {error}
-            </div>
-          )}
-
-          <form className="space-y-4" onSubmit={handleFormSubmit}>
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">Email Address</label>
-              <div className="relative">
-                <Mail className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-[#0B132B] border border-slate-700/80 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">Password</label>
-              <div className="relative">
-                <Lock className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-[#0B132B] border border-slate-700/80 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-900/30 flex items-center justify-center gap-2 transition-all mt-6 cursor-pointer"
-            >
-              <span>{loading ? 'Signing In...' : 'Sign In to Dashboard'}</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </form>
-
-          {/* Preset Account Quick Selector */}
-          <div className="mt-8 pt-6 border-t border-slate-800">
-            <p className="text-[11px] font-bold text-slate-400 mb-3 text-center uppercase tracking-wider">
-              Quick Login Presets (Click to Sign In)
-            </p>
-            <div className="space-y-2 text-xs">
-              <button
-                type="button"
-                onClick={() => setPresetUser('admin@salesplus.com', 'admin123')}
-                className="w-full p-2.5 bg-[#0B132B] hover:bg-slate-800 border border-slate-700/60 hover:border-emerald-500/50 rounded-xl text-left flex items-center justify-between transition-all cursor-pointer group"
-              >
-                <div>
-                  <span className="font-bold text-emerald-400 group-hover:text-emerald-300">👑 Admin / Owner</span>
-                  <p className="text-[10px] text-slate-400">admin@salesplus.com / admin123</p>
-                </div>
-                <span className="text-slate-400 text-[10px] font-semibold bg-slate-800 px-2 py-1 rounded-md">Full Control</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setPresetUser('executive@salesplus.com', 'ex123')}
-                className="w-full p-2.5 bg-[#0B132B] hover:bg-slate-800 border border-slate-700/60 hover:border-blue-500/50 rounded-xl text-left flex items-center justify-between transition-all cursor-pointer group"
-              >
-                <div>
-                  <span className="font-bold text-blue-400 group-hover:text-blue-300">🏪 Sales Exec</span>
-                  <p className="text-[10px] text-slate-400">executive@salesplus.com / ex123</p>
-                </div>
-                <span className="text-slate-400 text-[10px] font-semibold bg-slate-800 px-2 py-1 rounded-md">Sales & Ops</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setPresetUser('accountant@salesplus.com', 'accountant123')}
-                className="w-full p-2.5 bg-[#0B132B] hover:bg-slate-800 border border-slate-700/60 hover:border-amber-500/50 rounded-xl text-left flex items-center justify-between transition-all cursor-pointer group"
-              >
-                <div>
-                  <span className="font-bold text-amber-400 group-hover:text-amber-300">💰 Accountant</span>
-                  <p className="text-[10px] text-slate-400">accountant@salesplus.com / accountant123</p>
-                </div>
-                <span className="text-slate-400 text-[10px] font-semibold bg-slate-800 px-2 py-1 rounded-md">Finance</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  return <div className="min-h-screen bg-[#0B132B] flex flex-col justify-center py-12 sm:px-6 lg:px-8 text-slate-100">
+    <div className="sm:mx-auto sm:w-full sm:max-w-md text-center"><div className="w-14 h-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center mx-auto mb-4 shadow-xl"><Car className="w-8 h-8" /></div><h2 className="text-2xl font-extrabold text-white">Sales<span className="text-emerald-400">Plus</span> VSMS</h2><p className="mt-1 text-xs text-slate-400">Vehicle Sales Management System Staff Portal</p></div>
+    <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md"><div className="bg-[#131F3F] py-8 px-4 shadow-2xl border border-slate-800 sm:rounded-2xl sm:px-10">
+      {error && <div role="alert" className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-400">{error}</div>}
+      {message && <div role="status" className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-300">{message}</div>}
+      {mode === 'login' ? <form className="space-y-4" onSubmit={login}>
+        <label className="block text-xs font-semibold text-slate-300">Email Address<div className="relative mt-1"><Mail className="absolute left-3 top-3 h-4 w-4 text-slate-400"/><input type="email" required placeholder="e.g. admin@salesplus.com" autoComplete="username" value={email} onChange={event => setEmail(event.target.value)} className="w-full rounded-xl border border-slate-700 bg-[#0B132B] py-2.5 pl-9 pr-3 text-xs text-white focus:border-emerald-500 focus:outline-none placeholder:text-slate-500"/></div></label>
+        <label className="block text-xs font-semibold text-slate-300">Password<div className="relative mt-1"><Lock className="absolute left-3 top-3 h-4 w-4 text-slate-400"/><input type="password" required placeholder="••••••••" autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} className="w-full rounded-xl border border-slate-700 bg-[#0B132B] py-2.5 pl-9 pr-3 text-xs text-white focus:border-emerald-500 focus:outline-none placeholder:text-slate-500"/></div></label>
+        <button disabled={loading} className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-xs font-bold text-white disabled:opacity-60"><span>{loading ? 'Signing in…' : 'Sign in to Dashboard'}</span><ArrowRight className="h-4 w-4"/></button>
+        <div className="flex justify-between"><button type="button" onClick={() => { setMode('request-reset'); setError(''); setMessage(''); }} className="text-xs text-emerald-400 hover:text-emerald-300">Forgot password?</button><button type="button" onClick={() => { setMode('request-verification'); setError(''); setMessage(''); }} className="text-xs text-slate-400 hover:text-white">Verify email</button></div>
+      </form> : <form className="space-y-4" onSubmit={recover}>
+        <h3 className="text-sm font-bold">{mode === 'request-reset' ? 'Reset your password' : mode === 'reset' ? 'Choose a new password' : 'Verify your email address'}</h3>
+        {mode === 'request-reset' || mode === 'request-verification' ? <><label className="block text-xs font-semibold">Account email<input type="email" required placeholder="e.g. user@salesplus.com" value={email} onChange={event => setEmail(event.target.value)} className="mt-1 w-full rounded-xl border border-slate-700 bg-[#0B132B] p-3 text-white placeholder:text-slate-500"/></label><p className="text-[11px] text-slate-400">A one-time token will be sent if the account needs this action and email delivery is configured.</p></> : <><label className="block text-xs font-semibold">{mode === 'verify' ? 'Verification token' : 'Reset token'}<input required placeholder="e.g. 123456" value={token} onChange={event => setToken(event.target.value)} className="mt-1 w-full rounded-xl border border-slate-700 bg-[#0B132B] p-3 text-white placeholder:text-slate-500"/></label>{mode === 'reset' && <label className="block text-xs font-semibold">New password<input type="password" minLength={10} required placeholder="At least 10 characters" autoComplete="new-password" value={newPassword} onChange={event => setNewPassword(event.target.value)} className="mt-1 w-full rounded-xl border border-slate-700 bg-[#0B132B] p-3 text-white placeholder:text-slate-500"/></label>}</>}
+        <button disabled={loading} className="w-full rounded-xl bg-emerald-600 p-3 text-xs font-bold text-white disabled:opacity-60">{loading ? 'Please wait…' : mode === 'request-reset' || mode === 'request-verification' ? 'Send one-time token' : mode === 'verify' ? 'Verify email' : 'Update password'}</button><button type="button" onClick={goToLogin} className="w-full text-xs text-slate-400 hover:text-white">Back to sign in</button>
+      </form>}
+    </div></div>
+  </div>;
 }

@@ -5,6 +5,7 @@ export declare class Sale {
     customer: Types.ObjectId;
     vehicle: Types.ObjectId;
     salesperson: Types.ObjectId;
+    branch: Types.ObjectId;
     vehiclePrice: number;
     discount: number;
     additionalCharges: number;
@@ -51,6 +52,15 @@ export declare const SaleSchema: import("mongoose").Schema<Sale, import("mongoos
         id: string;
     }>> | undefined;
     salesperson?: import("mongoose").SchemaDefinitionProperty<Types.ObjectId, Sale, Document<unknown, {}, Sale, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Sale & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    branch?: import("mongoose").SchemaDefinitionProperty<Types.ObjectId, Sale, Document<unknown, {}, Sale, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Sale & {
         _id: Types.ObjectId;

@@ -13,6 +13,7 @@ exports.ReservationSchema = exports.Reservation = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 let Reservation = class Reservation {
+    reservationId;
     customer;
     vehicle;
     salesperson;
@@ -22,8 +23,14 @@ let Reservation = class Reservation {
     status;
     cancellationReason;
     refundStatus;
+    paymentMethod;
+    notes;
 };
 exports.Reservation = Reservation;
+__decorate([
+    (0, mongoose_1.Prop)({ unique: true, sparse: true }),
+    __metadata("design:type", String)
+], Reservation.prototype, "reservationId", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Customer', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
@@ -60,6 +67,14 @@ __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Reservation.prototype, "refundStatus", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Reservation.prototype, "paymentMethod", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Reservation.prototype, "notes", void 0);
 exports.Reservation = Reservation = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Reservation);

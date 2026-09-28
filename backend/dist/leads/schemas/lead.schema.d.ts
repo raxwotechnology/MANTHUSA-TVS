@@ -1,12 +1,17 @@
 import { Document, Types } from 'mongoose';
 export type LeadDocument = Lead & Document;
 export declare class Lead {
+    leadId: string;
     customer: Types.ObjectId;
     interestedVehicle: Types.ObjectId;
+    interestedVehicleText: string;
     source: string;
     assignedStaff: Types.ObjectId;
     budget: number;
     expectedPurchaseDate: Date;
+    inquiryType: string;
+    inquiryMessage: string;
+    preferredDate: Date;
     status: string;
     priority: string;
 }
@@ -19,6 +24,15 @@ export declare const LeadSchema: import("mongoose").Schema<Lead, import("mongoos
 }, "id"> & import("mongoose").HydratedDocumentOverrides<{
     id: string;
 }>, {
+    leadId?: import("mongoose").SchemaDefinitionProperty<string, Lead, Document<unknown, {}, Lead, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Lead & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
     customer?: import("mongoose").SchemaDefinitionProperty<Types.ObjectId, Lead, Document<unknown, {}, Lead, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Lead & {
@@ -29,6 +43,15 @@ export declare const LeadSchema: import("mongoose").Schema<Lead, import("mongoos
         id: string;
     }>> | undefined;
     interestedVehicle?: import("mongoose").SchemaDefinitionProperty<Types.ObjectId, Lead, Document<unknown, {}, Lead, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Lead & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    interestedVehicleText?: import("mongoose").SchemaDefinitionProperty<string, Lead, Document<unknown, {}, Lead, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Lead & {
         _id: Types.ObjectId;
@@ -65,6 +88,33 @@ export declare const LeadSchema: import("mongoose").Schema<Lead, import("mongoos
         id: string;
     }>> | undefined;
     expectedPurchaseDate?: import("mongoose").SchemaDefinitionProperty<Date, Lead, Document<unknown, {}, Lead, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Lead & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    inquiryType?: import("mongoose").SchemaDefinitionProperty<string, Lead, Document<unknown, {}, Lead, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Lead & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    inquiryMessage?: import("mongoose").SchemaDefinitionProperty<string, Lead, Document<unknown, {}, Lead, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Lead & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    preferredDate?: import("mongoose").SchemaDefinitionProperty<Date, Lead, Document<unknown, {}, Lead, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Lead & {
         _id: Types.ObjectId;

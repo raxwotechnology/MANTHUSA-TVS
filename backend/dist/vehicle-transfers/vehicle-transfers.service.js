@@ -18,11 +18,21 @@ const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 let VehicleTransfersService = class VehicleTransfersService {
     transferModel;
-    constructor(transferModel) {
+    vehicleModel;
+    constructor(transferModel, vehicleModel) {
         this.transferModel = transferModel;
+        this.vehicleModel = vehicleModel;
     }
     async create(createDto) {
-        const created = new this.transferModel(createDto);
+        if (!createDto.vehicle || !createDto.fromBranch || !createDto.toBranch || createDto.fromBranch === createDto.toBranch)
+            throw new common_1.BadRequestException('Vehicle and two different branches are required.');
+        const vehicle = await this.vehicleModel.findById(createDto.vehicle).exec();
+        if (!vehicle)
+            throw new common_1.NotFoundException('Vehicle not found.');
+        const currentBranch = vehicle.branch || vehicle.location;
+        if (currentBranch && String(currentBranch) !== String(createDto.fromBranch))
+            throw new common_1.BadRequestException('Vehicle is not currently assigned to the selected source branch.');
+        const created = new this.transferModel({ ...createDto, transferId: createDto.transferId || `TRF-${Date.now()}`, status: 'Pending' });
         return created.save();
     }
     async findAll() {
@@ -35,9 +45,19 @@ let VehicleTransfersService = class VehicleTransfersService {
         return item;
     }
     async update(id, updateDto) {
-        const item = await this.transferModel.findByIdAndUpdate(id, updateDto, { new: true }).exec();
+        const item = await this.transferModel.findById(id).exec();
         if (!item)
             throw new common_1.NotFoundException(`Transfer #${id} not found`);
+        if (updateDto.status === 'Completed') {
+            const vehicle = await this.vehicleModel.findById(item.vehicle).exec();
+            if (!vehicle)
+                throw new common_1.NotFoundException('Vehicle not found.');
+            vehicle.location = item.toBranch;
+            vehicle.branch = item.toBranch;
+            await vehicle.save();
+        }
+        Object.assign(item, updateDto);
+        await item.save();
         return item;
     }
     async remove(id) {
@@ -51,6 +71,8 @@ exports.VehicleTransfersService = VehicleTransfersService;
 exports.VehicleTransfersService = VehicleTransfersService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)('VehicleTransfer')),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __param(1, (0, mongoose_1.InjectModel)('Vehicle')),
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        mongoose_2.Model])
 ], VehicleTransfersService);
 //# sourceMappingURL=vehicle-transfers.service.js.map

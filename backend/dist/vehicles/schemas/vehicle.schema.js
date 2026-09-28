@@ -32,6 +32,7 @@ let Vehicle = class Vehicle {
     color;
     status;
     location;
+    branch;
     year;
     purchasePrice;
     transportCost;
@@ -120,6 +121,10 @@ __decorate([
     (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Branch' }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Vehicle.prototype, "location", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Branch' }),
+    __metadata("design:type", mongoose_2.Types.ObjectId)
+], Vehicle.prototype, "branch", void 0);
 __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)

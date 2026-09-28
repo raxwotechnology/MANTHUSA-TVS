@@ -7,3 +7,15 @@ export function getApiUrl(path: string): string {
   }
   return `http://localhost:3001${cleanPath}`;
 }
+
+export function apiFetch(path: string, init: RequestInit = {}): Promise<Response> {
+  const headers = new Headers(init.headers);
+  if (typeof window !== 'undefined') {
+    const token = window.localStorage.getItem('token');
+    if (token) headers.set('Authorization', `Bearer ${token}`);
+  }
+  if (init.body && !headers.has('Content-Type') && !(init.body instanceof FormData)) {
+    headers.set('Content-Type', 'application/json');
+  }
+  return fetch(getApiUrl(path), { ...init, headers });
+}

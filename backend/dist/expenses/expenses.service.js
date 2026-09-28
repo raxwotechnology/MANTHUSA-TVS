@@ -18,12 +18,24 @@ const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 let ExpensesService = class ExpensesService {
     expenseModel;
-    constructor(expenseModel) {
+    categoryModel;
+    cashModel;
+    constructor(expenseModel, categoryModel, cashModel) {
         this.expenseModel = expenseModel;
+        this.categoryModel = categoryModel;
+        this.cashModel = cashModel;
     }
     async create(createExpenseDto) {
-        const createdExpense = new this.expenseModel(createExpenseDto);
-        return createdExpense.save();
+        const amount = Number(createExpenseDto.amount);
+        if (!Number.isFinite(amount) || amount <= 0 || !createExpenseDto.expenseDate)
+            throw new common_1.BadRequestException('A positive amount and expense date are required.');
+        let category = createExpenseDto.category;
+        if (typeof category === 'string' && !/^[a-f\d]{24}$/i.test(category)) {
+            category = (await this.categoryModel.findOneAndUpdate({ name: category.trim() }, { $setOnInsert: { name: category.trim() } }, { upsert: true, new: true }))._id;
+        }
+        const createdExpense = await new this.expenseModel({ ...createExpenseDto, category, amount, expenseId: createExpenseDto.expenseId || `EXP-${Date.now()}` }).save();
+        await new this.cashModel({ transactionType: 'OUT', amount, transactionDate: createdExpense.expenseDate, source: 'Expense', referenceId: createdExpense._id, description: createdExpense.description || 'Business expense' }).save();
+        return createdExpense;
     }
     async findAll() {
         return this.expenseModel.find().populate('category').sort({ createdAt: -1 }).exec();
@@ -54,6 +66,10 @@ exports.ExpensesService = ExpensesService;
 exports.ExpensesService = ExpensesService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)('Expense')),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __param(1, (0, mongoose_1.InjectModel)('ExpenseCategory')),
+    __param(2, (0, mongoose_1.InjectModel)('CashTransaction')),
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        mongoose_2.Model,
+        mongoose_2.Model])
 ], ExpensesService);
 //# sourceMappingURL=expenses.service.js.map
