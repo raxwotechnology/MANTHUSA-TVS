@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { isValidObjectId, Model } from 'mongoose';
 import { ReservationDocument } from './schemas/reservation.schema';
 import { NotificationsService } from '../notifications/notifications.service';
 
@@ -9,13 +9,16 @@ export class ReservationsService {
   constructor(
     @InjectModel('Reservation') private readonly reservationModel: Model<ReservationDocument>,
     @InjectModel('Vehicle') private readonly vehicleModel: Model<any>,
+    @InjectModel('Customer') private readonly customerModel: Model<any>,
     private readonly notifications: NotificationsService,
   ) {}
 
   async create(input: any) {
-    if (!input.customer || !input.vehicle || !input.expiryDate || Number(input.reservationDeposit) < 0) {
+    const deposit = Number(input.reservationDeposit);
+    if (!isValidObjectId(input.customer) || !isValidObjectId(input.vehicle) || !input.expiryDate || !Number.isFinite(deposit) || deposit < 0) {
       throw new BadRequestException('Customer, vehicle, expiry date and a non-negative deposit are required.');
     }
+    if (!await this.customerModel.exists({ _id: input.customer })) throw new NotFoundException('Customer not found.');
     const vehicle = await this.vehicleModel.findById(input.vehicle).exec();
     if (!vehicle) throw new NotFoundException('Vehicle not found.');
     if (vehicle.status === 'Reserved') {
@@ -25,7 +28,7 @@ export class ReservationsService {
     if (vehicle.status !== 'Available') throw new BadRequestException('Only available vehicles can be reserved.');
     const expiryDate = new Date(input.expiryDate);
     if (Number.isNaN(expiryDate.getTime()) || expiryDate <= new Date()) throw new BadRequestException('Expiry date must be in the future.');
-    const reservation = await new this.reservationModel({ ...input, reservationId: input.reservationId || `RES-${Date.now()}` }).save();
+    const reservation = await new this.reservationModel({ ...input, reservationDeposit: deposit, status: 'Active', reservationId: input.reservationId || `RES-${Date.now()}` }).save();
     vehicle.status = 'Reserved';
     await vehicle.save();
     await this.notifications.create({ title: 'Vehicle reserved', message: `Vehicle ${vehicle.stockNumber} has been reserved.`, channel: 'in-app', entityType: 'Reservation', entityId: String(reservation._id) }).catch(() => undefined);

@@ -15,6 +15,7 @@ const refund_schema_1 = require("./schemas/refund.schema");
 const sale_schema_1 = require("../sales/schemas/sale.schema");
 const reservation_schema_1 = require("../reservations/schemas/reservation.schema");
 const cash_transaction_schema_1 = require("../cash-transactions/schemas/cash-transaction.schema");
+const vehicle_schema_1 = require("../vehicles/schemas/vehicle.schema");
 let RefundsModule = class RefundsModule {
 };
 exports.RefundsModule = RefundsModule;
@@ -25,6 +26,7 @@ exports.RefundsModule = RefundsModule = __decorate([
                 { name: 'Sale', schema: sale_schema_1.SaleSchema },
                 { name: 'Reservation', schema: reservation_schema_1.ReservationSchema },
                 { name: 'CashTransaction', schema: cash_transaction_schema_1.CashTransactionSchema },
+                { name: 'Vehicle', schema: vehicle_schema_1.VehicleSchema },
             ])],
         controllers: [refunds_controller_1.RefundsController],
         providers: [refunds_service_1.RefundsService]

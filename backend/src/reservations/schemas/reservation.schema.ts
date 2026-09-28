@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 
 export type ReservationDocument = Reservation & Document;
 
@@ -8,13 +8,13 @@ export class Reservation {
   @Prop({ unique: true, sparse: true })
   reservationId: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'Customer', required: true })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Customer', required: true })
   customer: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'Vehicle', required: true })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Vehicle', required: true })
   vehicle: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'User' })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User' })
   salesperson: Types.ObjectId;
 
   @Prop({ required: true })

@@ -24,15 +24,15 @@ let Refund = class Refund {
 };
 exports.Refund = Refund;
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Customer', required: true }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Customer', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Refund.prototype, "customer", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Sale' }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Sale' }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Refund.prototype, "sale", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Reservation' }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Reservation' }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Refund.prototype, "reservation", void 0);
 __decorate([

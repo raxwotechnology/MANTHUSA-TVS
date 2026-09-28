@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { isValidObjectId, Model } from 'mongoose';
 import { LeadDocument } from './schemas/lead.schema';
 import { NotificationsService } from '../notifications/notifications.service';
 
@@ -9,6 +9,7 @@ export class LeadsService {
   constructor(
     @InjectModel('Lead') private leadModel: Model<LeadDocument>,
     @InjectModel('Customer') private customerModel: Model<any>,
+    @InjectModel('Vehicle') private vehicleModel: Model<any>,
     private readonly notifications: NotificationsService,
   ) {}
 
@@ -27,6 +28,9 @@ export class LeadsService {
       throw new BadRequestException('Name, valid phone number and vehicle are required.');
     }
     const vehicleId = String(input.vehicle);
+    if (!isValidObjectId(vehicleId)) throw new BadRequestException('The selected vehicle ID is invalid.');
+    const vehicle = await this.vehicleModel.findById(vehicleId).exec();
+    if (!vehicle) throw new BadRequestException('The selected vehicle does not exist.');
     let customer = await this.customerModel.findOne({ phone }).exec();
     if (!customer) customer = await new this.customerModel({ fullName, phone, email: input.email, customerType: 'Individual' }).save();
     return this.create({ customer: customer._id, interestedVehicle: vehicleId, source: 'Website', status: 'New', priority: 'Medium', inquiryType: String(input.inquiryType || 'Details').slice(0, 40), inquiryMessage: String(input.message || '').slice(0, 1000), preferredDate: input.preferredDate || undefined });

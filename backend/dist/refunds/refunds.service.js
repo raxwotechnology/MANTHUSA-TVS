@@ -21,42 +21,70 @@ let RefundsService = class RefundsService {
     sales;
     reservations;
     cash;
-    constructor(refunds, sales, reservations, cash) {
+    vehicles;
+    constructor(refunds, sales, reservations, cash, vehicles) {
         this.refunds = refunds;
         this.sales = sales;
         this.reservations = reservations;
         this.cash = cash;
+        this.vehicles = vehicles;
     }
     async create(input) {
         const amount = Number(input.amount);
-        if (!input.customer || !Number.isFinite(amount) || amount <= 0 || (!input.sale && !input.reservation))
-            throw new common_1.BadRequestException('Customer, positive amount and sale or reservation are required.');
+        if (!(0, mongoose_2.isValidObjectId)(input.customer) || !Number.isFinite(amount) || amount <= 0 || Boolean(input.sale) === Boolean(input.reservation))
+            throw new common_1.BadRequestException('Customer, positive amount and exactly one sale or reservation are required.');
         let source;
+        let reservationRefunded = 0;
         if (input.sale) {
+            if (!(0, mongoose_2.isValidObjectId)(input.sale))
+                throw new common_1.BadRequestException('Sale ID is invalid.');
             source = await this.sales.findById(input.sale).exec();
             if (!source)
                 throw new common_1.NotFoundException('Sale not found.');
+            if (source.customer.toString() !== input.customer.toString())
+                throw new common_1.BadRequestException('Refund customer does not match the sale.');
             if (amount > Number(source.paidAmount || 0))
                 throw new common_1.BadRequestException('Refund exceeds the amount paid.');
         }
         else {
+            if (!(0, mongoose_2.isValidObjectId)(input.reservation))
+                throw new common_1.BadRequestException('Reservation ID is invalid.');
             source = await this.reservations.findById(input.reservation).exec();
             if (!source)
                 throw new common_1.NotFoundException('Reservation not found.');
+            if (source.customer.toString() !== input.customer.toString())
+                throw new common_1.BadRequestException('Refund customer does not match the reservation.');
+            if (source.status === 'ConvertedToSale')
+                throw new common_1.BadRequestException('Refund the resulting sale instead of its converted reservation.');
             if (!source.isRefundable)
                 throw new common_1.BadRequestException('This reservation deposit is not refundable.');
-            if (amount > Number(source.reservationDeposit || 0))
-                throw new common_1.BadRequestException('Refund exceeds the reservation deposit.');
+            const previousRefunds = await this.refunds.find({ reservation: source._id, status: 'Completed' }).select('amount').lean().exec();
+            reservationRefunded = previousRefunds.reduce((sum, row) => sum + Number(row.amount || 0), 0);
+            if (amount > Number(source.reservationDeposit || 0) - reservationRefunded)
+                throw new common_1.BadRequestException('Refund exceeds the unrefunded reservation deposit.');
         }
         const refund = await new this.refunds({ ...input, amount, refundDate: input.refundDate || new Date(), status: 'Completed' }).save();
         if (input.sale) {
+            const previouslyPaid = Number(source.paidAmount || 0);
             source.paidAmount = Number(source.paidAmount || 0) - amount;
             source.balance = Math.max(0, Number(source.finalAmount || 0) - source.paidAmount);
-            source.status = 'Refunded';
+            if (amount >= previouslyPaid) {
+                source.status = 'Refunded';
+                const vehicle = await this.vehicles.findById(source.vehicle).exec();
+                if (vehicle?.status === 'Sold') {
+                    vehicle.status = 'Available';
+                    await vehicle.save();
+                }
+            }
         }
         else {
             source.status = 'Cancelled';
-            source.refundStatus = 'Refunded';
+            source.refundStatus = amount + reservationRefunded >= Number(source.reservationDeposit || 0) ? 'Refunded' : 'Partially Refunded';
+            const vehicle = await this.vehicles.findById(source.vehicle).exec();
+            if (vehicle?.status === 'Reserved') {
+                vehicle.status = 'Available';
+                await vehicle.save();
+            }
         }
         await source.save();
         await new this.cash({ transactionType: 'OUT', amount, transactionDate: refund.refundDate, source: 'Refund', referenceId: refund._id, description: input.reason || 'Customer refund' }).save();
@@ -71,7 +99,9 @@ exports.RefundsService = RefundsService = __decorate([
     __param(1, (0, mongoose_1.InjectModel)('Sale')),
     __param(2, (0, mongoose_1.InjectModel)('Reservation')),
     __param(3, (0, mongoose_1.InjectModel)('CashTransaction')),
+    __param(4, (0, mongoose_1.InjectModel)('Vehicle')),
     __metadata("design:paramtypes", [mongoose_2.Model,
+        mongoose_2.Model,
         mongoose_2.Model,
         mongoose_2.Model,
         mongoose_2.Model])

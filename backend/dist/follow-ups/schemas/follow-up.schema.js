@@ -25,15 +25,15 @@ let FollowUp = class FollowUp {
 };
 exports.FollowUp = FollowUp;
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Customer', required: true }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Customer', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], FollowUp.prototype, "customer", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Vehicle' }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Vehicle' }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], FollowUp.prototype, "vehicle", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Lead' }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Lead' }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], FollowUp.prototype, "lead", void 0);
 __decorate([

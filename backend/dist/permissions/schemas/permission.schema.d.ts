@@ -1,4 +1,4 @@
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 export type PermissionDocument = Permission & Document;
 export declare class Permission {
     role: Types.ObjectId;
@@ -10,7 +10,7 @@ export declare class Permission {
     canApprove: boolean;
     canExport: boolean;
 }
-export declare const PermissionSchema: import("mongoose").Schema<Permission, import("mongoose").Model<Permission, any, any, any, any, any, Permission>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Permission, Document<unknown, {}, Permission, {
+export declare const PermissionSchema: MongooseSchema<Permission, import("mongoose").Model<Permission, any, any, any, any, any, Permission>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Permission, Document<unknown, {}, Permission, {
     id: string;
 }, import("mongoose").DefaultSchemaOptions> & Omit<Permission & {
     _id: Types.ObjectId;

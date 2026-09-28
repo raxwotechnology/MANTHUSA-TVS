@@ -1,4 +1,4 @@
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 export type VehicleMediaDocument = VehicleMedia & Document;
 export declare class VehicleMedia {
     vehicle: Types.ObjectId;
@@ -6,7 +6,7 @@ export declare class VehicleMedia {
     category: string;
     url: string;
 }
-export declare const VehicleMediaSchema: import("mongoose").Schema<VehicleMedia, import("mongoose").Model<VehicleMedia, any, any, any, any, any, VehicleMedia>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, VehicleMedia, Document<unknown, {}, VehicleMedia, {
+export declare const VehicleMediaSchema: MongooseSchema<VehicleMedia, import("mongoose").Model<VehicleMedia, any, any, any, any, any, VehicleMedia>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, VehicleMedia, Document<unknown, {}, VehicleMedia, {
     id: string;
 }, import("mongoose").DefaultSchemaOptions> & Omit<VehicleMedia & {
     _id: Types.ObjectId;

@@ -49,6 +49,20 @@ export default function PublicVehicleWebsite() {
   const [interestMessage, setInterestMessage] = useState('');
   const [interestError, setInterestError] = useState('');
   const [interestSuccess, setInterestSuccess] = useState(false);
+  const [showCompareModal, setShowCompareModal] = useState(false);
+  const [compareIds, setCompareIds] = useState<string[]>([]);
+
+  const toggleCompare = (id: string) => {
+    if (compareIds.includes(id)) {
+      setCompareIds(compareIds.filter(i => i !== id));
+    } else {
+      if (compareIds.length < 3) {
+        setCompareIds([...compareIds, id]);
+      } else {
+        alert('You can compare up to 3 vehicles on the public site.');
+      }
+    }
+  };
 
   const [tradeInForm, setTradeInForm] = useState({
     name: '',
@@ -280,7 +294,12 @@ export default function PublicVehicleWebsite() {
                       <span>Call Sales</span>
                     </button>
                   </div>
-                  <button onClick={() => { setInterestVehicle(v); setInterestType('Details'); setInterestSuccess(false); setInterestError(''); }} className="mt-2 w-full rounded-xl border border-emerald-500/40 bg-emerald-500/10 py-2.5 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20">Request details / test drive / reservation</button>
+                  <div className="flex items-center justify-between gap-2 mt-2">
+                    <button onClick={() => { setInterestVehicle(v); setInterestType('Details'); setInterestSuccess(false); setInterestError(''); }} className="flex-1 rounded-xl border border-emerald-500/40 bg-emerald-500/10 py-2.5 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20">Enquire / Book</button>
+                    <button onClick={() => toggleCompare(v.id)} className={`px-3 py-2.5 rounded-xl border text-xs font-bold transition-all ${compareIds.includes(v.id) ? 'bg-emerald-600 border-emerald-500 text-white' : 'border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700'}`}>
+                      {compareIds.includes(v.id) ? 'Selected' : '+ Compare'}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -340,6 +359,50 @@ export default function PublicVehicleWebsite() {
       )}
 
       {interestVehicle && <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4"><div className="w-full max-w-md rounded-2xl border border-slate-700 bg-[#131F3F] p-6"><div className="mb-4 flex items-center justify-between border-b border-slate-700 pb-3"><div><h3 className="font-bold">Enquire about {interestVehicle.make} {interestVehicle.model}</h3><p className="text-xs text-slate-400">Our sales team will follow up with you.</p></div><button onClick={()=>setInterestVehicle(null)} aria-label="Close"><X className="h-5 w-5" /></button></div>{interestSuccess?<div className="py-8 text-center"><CheckCircle2 className="mx-auto mb-2 h-10 w-10 text-emerald-400"/><p className="font-bold">Enquiry sent</p><p className="text-xs text-slate-400">The dealership will contact you.</p><button onClick={()=>setInterestVehicle(null)} className="mt-4 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-bold">Close</button></div>:<form onSubmit={submitInterest} className="space-y-3 text-xs">{interestError&&<p role="alert" className="text-rose-400">{interestError}</p>}<label className="block">Request<select value={interestType} onChange={(e)=>setInterestType(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-700 bg-[#0B132B] p-2.5"><option>Details</option><option>Test Drive</option><option>Reservation Request</option></select></label><label className="block">Full name<input required value={interestName} onChange={(e)=>setInterestName(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-700 bg-[#0B132B] p-2.5"/></label><label className="block">Phone<input required type="tel" value={interestPhone} onChange={(e)=>setInterestPhone(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-700 bg-[#0B132B] p-2.5"/></label>{interestType==='Test Drive'&&<label className="block">Preferred date and time<input required type="datetime-local" value={interestDate} onChange={(e)=>setInterestDate(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-700 bg-[#0B132B] p-2.5"/></label>}<label className="block">Message<textarea value={interestMessage} onChange={(e)=>setInterestMessage(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-700 bg-[#0B132B] p-2.5"/></label><button className="w-full rounded-lg bg-emerald-600 px-4 py-2.5 font-bold">Send enquiry</button></form>}</div></div>}
+
+      {/* Floating Compare Bar */}
+      {compareIds.length > 0 && (
+        <div className="fixed bottom-6 right-6 z-40 bg-emerald-600 text-white p-3 rounded-2xl shadow-2xl flex items-center gap-3">
+          <span className="text-xs font-bold">{compareIds.length} Vehicles selected</span>
+          <button onClick={() => setShowCompareModal(true)} className="bg-white text-emerald-950 font-black text-xs px-3.5 py-1.5 rounded-xl shadow-md">
+            Compare Now
+          </button>
+          <button onClick={() => setCompareIds([])} className="text-emerald-200 hover:text-white"><X className="w-4 h-4" /></button>
+        </div>
+      )}
+
+      {/* Public Comparison Modal */}
+      {showCompareModal && (
+        <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-[#131F3F] border border-slate-700 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-6 text-xs text-white">
+            <div className="flex items-center justify-between border-b border-slate-700 pb-3 mb-4">
+              <h3 className="text-lg font-bold">Vehicle Comparison Matrix</h3>
+              <button onClick={() => setShowCompareModal(false)} className="text-slate-400 hover:text-white"><X className="w-5 h-5" /></button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {vehicles.filter(v => compareIds.includes(v.id)).map(v => (
+                <div key={v.id} className="bg-[#0B132B] p-4 rounded-xl border border-slate-800 space-y-2">
+                  <div className="h-32 bg-slate-950 rounded-lg overflow-hidden">
+                    {v.image ? <img src={v.image} alt={v.model} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-slate-600"><Car className="w-10 h-10" /></div>}
+                  </div>
+                  <h4 className="font-extrabold text-base text-white">{v.make} {v.model}</h4>
+                  <p className="text-emerald-400 font-bold text-sm">{formatLKR(v.price)}</p>
+                  <hr className="border-slate-800" />
+                  <div><span className="text-slate-400">Year:</span> {v.year}</div>
+                  <div><span className="text-slate-400">Mileage:</span> {v.mileage}</div>
+                  <div><span className="text-slate-400">Fuel:</span> {v.fuelType}</div>
+                  <div><span className="text-slate-400">Transmission:</span> {v.transmission}</div>
+                  <div><span className="text-slate-400">Condition:</span> {v.condition || 'Used'}</div>
+                  <button onClick={() => { setShowCompareModal(false); setInterestVehicle(v); }} className="w-full mt-3 bg-emerald-600 hover:bg-emerald-500 font-bold py-2 rounded-xl text-center">
+                    Enquire This Vehicle
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <footer className="mt-auto border-t border-slate-800 bg-[#0B132B] py-8 px-4 text-center text-xs text-slate-500">

@@ -1,4 +1,4 @@
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 export type PaymentDocument = Payment & Document;
 export declare class Payment {
     sale: Types.ObjectId;
@@ -10,9 +10,12 @@ export declare class Payment {
     bank: string;
     receiptNumber: string;
     notes: string;
+    chequeNumber: string;
+    chequeDate: Date;
+    chequeStatus: string;
     status: string;
 }
-export declare const PaymentSchema: import("mongoose").Schema<Payment, import("mongoose").Model<Payment, any, any, any, any, any, Payment>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Payment, Document<unknown, {}, Payment, {
+export declare const PaymentSchema: MongooseSchema<Payment, import("mongoose").Model<Payment, any, any, any, any, any, Payment>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Payment, Document<unknown, {}, Payment, {
     id: string;
 }, import("mongoose").DefaultSchemaOptions> & Omit<Payment & {
     _id: Types.ObjectId;
@@ -94,6 +97,33 @@ export declare const PaymentSchema: import("mongoose").Schema<Payment, import("m
         id: string;
     }>> | undefined;
     notes?: import("mongoose").SchemaDefinitionProperty<string, Payment, Document<unknown, {}, Payment, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Payment & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    chequeNumber?: import("mongoose").SchemaDefinitionProperty<string, Payment, Document<unknown, {}, Payment, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Payment & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    chequeDate?: import("mongoose").SchemaDefinitionProperty<Date, Payment, Document<unknown, {}, Payment, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Payment & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    chequeStatus?: import("mongoose").SchemaDefinitionProperty<string, Payment, Document<unknown, {}, Payment, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Payment & {
         _id: Types.ObjectId;

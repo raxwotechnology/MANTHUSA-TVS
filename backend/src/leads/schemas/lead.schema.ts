@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 
 export type LeadDocument = Lead & Document;
 
@@ -8,10 +8,10 @@ export class Lead {
   @Prop({ unique: true, sparse: true })
   leadId: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'Customer', required: true })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Customer', required: true })
   customer: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'Vehicle' })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Vehicle' })
   interestedVehicle: Types.ObjectId;
 
   @Prop()
@@ -20,7 +20,7 @@ export class Lead {
   @Prop()
   source: string; // Facebook, Walk-in, Referral, etc.
 
-  @Prop({ type: Types.ObjectId, ref: 'User' })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User' })
   assignedStaff: Types.ObjectId;
 
   @Prop()

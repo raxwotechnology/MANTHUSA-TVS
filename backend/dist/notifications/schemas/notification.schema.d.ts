@@ -1,4 +1,4 @@
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 export type NotificationDocument = Notification & Document;
 export declare class Notification {
     recipient: Types.ObjectId;
@@ -9,7 +9,7 @@ export declare class Notification {
     entityType: string;
     entityId: string;
 }
-export declare const NotificationSchema: import("mongoose").Schema<Notification, import("mongoose").Model<Notification, any, any, any, any, any, Notification>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Notification, Document<unknown, {}, Notification, {
+export declare const NotificationSchema: MongooseSchema<Notification, import("mongoose").Model<Notification, any, any, any, any, any, Notification>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Notification, Document<unknown, {}, Notification, {
     id: string;
 }, import("mongoose").DefaultSchemaOptions> & Omit<Notification & {
     _id: Types.ObjectId;

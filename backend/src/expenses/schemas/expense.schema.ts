@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 
 export type ExpenseDocument = Expense & Document;
 
@@ -8,7 +8,7 @@ export class Expense {
   @Prop({ unique: true, sparse: true })
   expenseId: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'ExpenseCategory', required: true })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'ExpenseCategory', required: true })
   category: Types.ObjectId;
 
   @Prop({ required: true })
@@ -20,13 +20,13 @@ export class Expense {
   @Prop()
   description: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'Vehicle' })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Vehicle' })
   vehicle: Types.ObjectId; // If linked to a specific vehicle
 
-  @Prop({ type: Types.ObjectId, ref: 'Supplier' })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Supplier' })
   supplier: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'Branch' })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Branch' })
   branch: Types.ObjectId;
 
   @Prop()

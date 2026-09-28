@@ -22,7 +22,7 @@ let Installment = class Installment {
 };
 exports.Installment = Installment;
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'InstallmentAgreement', required: true }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'InstallmentAgreement', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Installment.prototype, "agreement", void 0);
 __decorate([

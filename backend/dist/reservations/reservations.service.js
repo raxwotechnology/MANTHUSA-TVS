@@ -20,16 +20,21 @@ const notifications_service_1 = require("../notifications/notifications.service"
 let ReservationsService = class ReservationsService {
     reservationModel;
     vehicleModel;
+    customerModel;
     notifications;
-    constructor(reservationModel, vehicleModel, notifications) {
+    constructor(reservationModel, vehicleModel, customerModel, notifications) {
         this.reservationModel = reservationModel;
         this.vehicleModel = vehicleModel;
+        this.customerModel = customerModel;
         this.notifications = notifications;
     }
     async create(input) {
-        if (!input.customer || !input.vehicle || !input.expiryDate || Number(input.reservationDeposit) < 0) {
+        const deposit = Number(input.reservationDeposit);
+        if (!(0, mongoose_2.isValidObjectId)(input.customer) || !(0, mongoose_2.isValidObjectId)(input.vehicle) || !input.expiryDate || !Number.isFinite(deposit) || deposit < 0) {
             throw new common_1.BadRequestException('Customer, vehicle, expiry date and a non-negative deposit are required.');
         }
+        if (!await this.customerModel.exists({ _id: input.customer }))
+            throw new common_1.NotFoundException('Customer not found.');
         const vehicle = await this.vehicleModel.findById(input.vehicle).exec();
         if (!vehicle)
             throw new common_1.NotFoundException('Vehicle not found.');
@@ -47,7 +52,7 @@ let ReservationsService = class ReservationsService {
         const expiryDate = new Date(input.expiryDate);
         if (Number.isNaN(expiryDate.getTime()) || expiryDate <= new Date())
             throw new common_1.BadRequestException('Expiry date must be in the future.');
-        const reservation = await new this.reservationModel({ ...input, reservationId: input.reservationId || `RES-${Date.now()}` }).save();
+        const reservation = await new this.reservationModel({ ...input, reservationDeposit: deposit, status: 'Active', reservationId: input.reservationId || `RES-${Date.now()}` }).save();
         vehicle.status = 'Reserved';
         await vehicle.save();
         await this.notifications.create({ title: 'Vehicle reserved', message: `Vehicle ${vehicle.stockNumber} has been reserved.`, channel: 'in-app', entityType: 'Reservation', entityId: String(reservation._id) }).catch(() => undefined);
@@ -82,7 +87,9 @@ exports.ReservationsService = ReservationsService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)('Reservation')),
     __param(1, (0, mongoose_1.InjectModel)('Vehicle')),
+    __param(2, (0, mongoose_1.InjectModel)('Customer')),
     __metadata("design:paramtypes", [mongoose_2.Model,
+        mongoose_2.Model,
         mongoose_2.Model,
         notifications_service_1.NotificationsService])
 ], ReservationsService);

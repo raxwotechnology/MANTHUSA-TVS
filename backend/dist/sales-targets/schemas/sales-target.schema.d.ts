@@ -1,4 +1,4 @@
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 export type SalesTargetDocument = SalesTarget & Document;
 export declare class SalesTarget {
     salesperson: Types.ObjectId;
@@ -9,7 +9,7 @@ export declare class SalesTarget {
     actualRevenue: number;
     achievementPercentage: number;
 }
-export declare const SalesTargetSchema: import("mongoose").Schema<SalesTarget, import("mongoose").Model<SalesTarget, any, any, any, any, any, SalesTarget>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, SalesTarget, Document<unknown, {}, SalesTarget, {
+export declare const SalesTargetSchema: MongooseSchema<SalesTarget, import("mongoose").Model<SalesTarget, any, any, any, any, any, SalesTarget>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, SalesTarget, Document<unknown, {}, SalesTarget, {
     id: string;
 }, import("mongoose").DefaultSchemaOptions> & Omit<SalesTarget & {
     _id: Types.ObjectId;

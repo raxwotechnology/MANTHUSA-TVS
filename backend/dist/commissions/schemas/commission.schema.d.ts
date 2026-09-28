@@ -1,4 +1,4 @@
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 export type CommissionDocument = Commission & Document;
 export declare class Commission {
     salesperson: Types.ObjectId;
@@ -9,7 +9,7 @@ export declare class Commission {
     status: string;
     paidDate: Date;
 }
-export declare const CommissionSchema: import("mongoose").Schema<Commission, import("mongoose").Model<Commission, any, any, any, any, any, Commission>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Commission, Document<unknown, {}, Commission, {
+export declare const CommissionSchema: MongooseSchema<Commission, import("mongoose").Model<Commission, any, any, any, any, any, Commission>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Commission, Document<unknown, {}, Commission, {
     id: string;
 }, import("mongoose").DefaultSchemaOptions> & Omit<Commission & {
     _id: Types.ObjectId;

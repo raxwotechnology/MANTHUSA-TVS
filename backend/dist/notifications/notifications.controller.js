@@ -23,7 +23,12 @@ let NotificationsController = class NotificationsController {
     }
     findMine(req) { return this.notifications.findForUser(req.user.sub); }
     markRead(id, req) { return this.notifications.markRead(id, req.user.sub); }
-    create(body) { return this.notifications.create(body); }
+    sendSms(body) {
+        return this.notifications.sendSms(body.phone, body.message);
+    }
+    sendWhatsApp(body) {
+        return this.notifications.sendWhatsApp(body.phone, body.message);
+    }
 };
 exports.NotificationsController = NotificationsController;
 __decorate([
@@ -42,13 +47,21 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], NotificationsController.prototype, "markRead", null);
 __decorate([
-    (0, roles_decorator_1.Roles)('Admin / Owner'),
-    (0, common_1.Post)(),
+    (0, roles_decorator_1.Roles)('Admin / Owner', 'Sales & Operations', 'Accountant / Finance Staff'),
+    (0, common_1.Post)('send-sms'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
-], NotificationsController.prototype, "create", null);
+], NotificationsController.prototype, "sendSms", null);
+__decorate([
+    (0, roles_decorator_1.Roles)('Admin / Owner', 'Sales & Operations', 'Accountant / Finance Staff'),
+    (0, common_1.Post)('send-whatsapp'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], NotificationsController.prototype, "sendWhatsApp", null);
 exports.NotificationsController = NotificationsController = __decorate([
     (0, common_1.Controller)('notifications'),
     (0, roles_decorator_1.Roles)('Sales & Operations', 'Accountant / Finance Staff'),

@@ -158,6 +158,18 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
             </Link>
 
             <Link
+              href="/dashboard/vehicles/compare"
+              className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
+                pathname === '/dashboard/vehicles/compare'
+                  ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold'
+                  : 'hover:bg-slate-800/60 text-slate-300'
+              }`}
+            >
+              <ArrowLeftRight className="w-4 h-4" />
+              <span>Vehicle Comparison</span>
+            </Link>
+
+            <Link
               href="/dashboard/inspections"
               className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
                 pathname === '/dashboard/inspections'
@@ -364,6 +376,18 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
               >
                 <CreditCard className="w-4 h-4" />
                 <span>Installments & Finance</span>
+              </Link>
+
+              <Link
+                href="/dashboard/leasing"
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
+                  pathname === '/dashboard/leasing'
+                    ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold'
+                    : 'hover:bg-slate-800/60 text-slate-300'
+                }`}
+              >
+                <Building2 className="w-4 h-4" />
+                <span>Leasing Partners</span>
               </Link>
 
               <Link href="/dashboard/refunds" className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${pathname === '/dashboard/refunds' ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold' : 'hover:bg-slate-800/60 text-slate-300'}`}>

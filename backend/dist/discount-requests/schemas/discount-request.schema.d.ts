@@ -1,4 +1,4 @@
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 export type DiscountRequestDocument = DiscountRequest & Document;
 export declare class DiscountRequest {
     quotation: Types.ObjectId;
@@ -10,7 +10,7 @@ export declare class DiscountRequest {
     approvedBy: Types.ObjectId;
     approvalDate: Date;
 }
-export declare const DiscountRequestSchema: import("mongoose").Schema<DiscountRequest, import("mongoose").Model<DiscountRequest, any, any, any, any, any, DiscountRequest>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, DiscountRequest, Document<unknown, {}, DiscountRequest, {
+export declare const DiscountRequestSchema: MongooseSchema<DiscountRequest, import("mongoose").Model<DiscountRequest, any, any, any, any, any, DiscountRequest>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, DiscountRequest, Document<unknown, {}, DiscountRequest, {
     id: string;
 }, import("mongoose").DefaultSchemaOptions> & Omit<DiscountRequest & {
     _id: Types.ObjectId;

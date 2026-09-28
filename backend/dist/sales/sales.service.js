@@ -20,17 +20,24 @@ const notifications_service_1 = require("../notifications/notifications.service"
 let SalesService = class SalesService {
     saleModel;
     vehicleModel;
+    customerModel;
     reservations;
     notifications;
-    constructor(saleModel, vehicleModel, reservations, notifications) {
+    constructor(saleModel, vehicleModel, customerModel, reservations, notifications) {
         this.saleModel = saleModel;
         this.vehicleModel = vehicleModel;
+        this.customerModel = customerModel;
         this.reservations = reservations;
         this.notifications = notifications;
     }
     async create(createSaleDto) {
         if (!createSaleDto.customer || !createSaleDto.vehicle)
             throw new common_1.BadRequestException('Customer and vehicle are required.');
+        if (!(0, mongoose_2.isValidObjectId)(createSaleDto.customer) || !(0, mongoose_2.isValidObjectId)(createSaleDto.vehicle))
+            throw new common_1.BadRequestException('Customer or vehicle ID is invalid.');
+        const customer = await this.customerModel.findById(createSaleDto.customer).exec();
+        if (!customer)
+            throw new common_1.NotFoundException('Customer not found.');
         const vehicle = await this.vehicleModel.findById(createSaleDto.vehicle).exec();
         if (!vehicle)
             throw new common_1.NotFoundException('Vehicle not found.');
@@ -39,6 +46,8 @@ let SalesService = class SalesService {
         let reservation;
         if (vehicle.status === 'Reserved') {
             reservation = await this.reservations.findOne({ vehicle: vehicle._id, status: 'Active' }).exec();
+            if (!reservation)
+                throw new common_1.BadRequestException('This vehicle has no active reservation. Release it before recording a sale.');
             if (reservation && reservation.customer.toString() !== createSaleDto.customer.toString())
                 throw new common_1.BadRequestException('This vehicle is reserved for a different customer.');
             if (reservation && reservation.expiryDate <= new Date()) {
@@ -113,8 +122,10 @@ exports.SalesService = SalesService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)('Sale')),
     __param(1, (0, mongoose_1.InjectModel)('Vehicle')),
-    __param(2, (0, mongoose_1.InjectModel)('Reservation')),
+    __param(2, (0, mongoose_1.InjectModel)('Customer')),
+    __param(3, (0, mongoose_1.InjectModel)('Reservation')),
     __metadata("design:paramtypes", [mongoose_2.Model,
+        mongoose_2.Model,
         mongoose_2.Model,
         mongoose_2.Model,
         notifications_service_1.NotificationsService])

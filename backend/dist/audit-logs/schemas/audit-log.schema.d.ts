@@ -1,4 +1,4 @@
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 export type AuditLogDocument = AuditLog & Document;
 export declare class AuditLog {
     user: Types.ObjectId;
@@ -9,7 +9,7 @@ export declare class AuditLog {
     newValue: any;
     ipAddress: string;
 }
-export declare const AuditLogSchema: import("mongoose").Schema<AuditLog, import("mongoose").Model<AuditLog, any, any, any, any, any, AuditLog>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, AuditLog, Document<unknown, {}, AuditLog, {
+export declare const AuditLogSchema: MongooseSchema<AuditLog, import("mongoose").Model<AuditLog, any, any, any, any, any, AuditLog>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, AuditLog, Document<unknown, {}, AuditLog, {
     id: string;
 }, import("mongoose").DefaultSchemaOptions> & Omit<AuditLog & {
     _id: Types.ObjectId;

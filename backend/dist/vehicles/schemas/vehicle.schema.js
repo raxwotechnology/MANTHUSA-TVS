@@ -35,14 +35,33 @@ let Vehicle = class Vehicle {
     branch;
     year;
     purchasePrice;
+    importCost;
     transportCost;
     repairCost;
     detailingCost;
+    registrationCost;
+    insuranceCost;
+    advertisementCost;
+    otherCosts;
     totalInvestment;
     sellingPrice;
     minimumSellingPrice;
     expectedProfit;
+    actualProfit;
+    horsepower;
+    torque;
+    seatingCapacity;
+    doors;
+    bodyType;
+    dimensions;
+    weight;
+    fuelTankCapacity;
+    safetyFeatures;
+    entertainmentFeatures;
+    comfortFeatures;
+    customSpecifications;
     images;
+    mediaAngles;
 };
 exports.Vehicle = Vehicle;
 __decorate([
@@ -118,11 +137,11 @@ __decorate([
     __metadata("design:type", String)
 ], Vehicle.prototype, "status", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Branch' }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Branch' }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Vehicle.prototype, "location", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Branch' }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Branch' }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Vehicle.prototype, "branch", void 0);
 __decorate([
@@ -136,6 +155,10 @@ __decorate([
 __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
+], Vehicle.prototype, "importCost", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
 ], Vehicle.prototype, "transportCost", void 0);
 __decorate([
     (0, mongoose_1.Prop)(),
@@ -145,6 +168,22 @@ __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
 ], Vehicle.prototype, "detailingCost", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], Vehicle.prototype, "registrationCost", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], Vehicle.prototype, "insuranceCost", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], Vehicle.prototype, "advertisementCost", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], Vehicle.prototype, "otherCosts", void 0);
 __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", Number)
@@ -162,9 +201,65 @@ __decorate([
     __metadata("design:type", Number)
 ], Vehicle.prototype, "expectedProfit", void 0);
 __decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], Vehicle.prototype, "actualProfit", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], Vehicle.prototype, "horsepower", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Vehicle.prototype, "torque", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], Vehicle.prototype, "seatingCapacity", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], Vehicle.prototype, "doors", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Vehicle.prototype, "bodyType", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Vehicle.prototype, "dimensions", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Vehicle.prototype, "weight", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Vehicle.prototype, "fuelTankCapacity", void 0);
+__decorate([
+    (0, mongoose_1.Prop)([String]),
+    __metadata("design:type", Array)
+], Vehicle.prototype, "safetyFeatures", void 0);
+__decorate([
+    (0, mongoose_1.Prop)([String]),
+    __metadata("design:type", Array)
+], Vehicle.prototype, "entertainmentFeatures", void 0);
+__decorate([
+    (0, mongoose_1.Prop)([String]),
+    __metadata("design:type", Array)
+], Vehicle.prototype, "comfortFeatures", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: Object }),
+    __metadata("design:type", Object)
+], Vehicle.prototype, "customSpecifications", void 0);
+__decorate([
     (0, mongoose_1.Prop)([String]),
     __metadata("design:type", Array)
 ], Vehicle.prototype, "images", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: Object }),
+    __metadata("design:type", Object)
+], Vehicle.prototype, "mediaAngles", void 0);
 exports.Vehicle = Vehicle = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Vehicle);

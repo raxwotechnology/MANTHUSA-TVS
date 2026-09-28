@@ -1,4 +1,4 @@
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 export type TestDriveDocument = TestDrive & Document;
 export declare class TestDrive {
     customer: Types.ObjectId;
@@ -11,7 +11,7 @@ export declare class TestDrive {
     status: string;
     feedback: string;
 }
-export declare const TestDriveSchema: import("mongoose").Schema<TestDrive, import("mongoose").Model<TestDrive, any, any, any, any, any, TestDrive>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, TestDrive, Document<unknown, {}, TestDrive, {
+export declare const TestDriveSchema: MongooseSchema<TestDrive, import("mongoose").Model<TestDrive, any, any, any, any, any, TestDrive>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, TestDrive, Document<unknown, {}, TestDrive, {
     id: string;
 }, import("mongoose").DefaultSchemaOptions> & Omit<TestDrive & {
     _id: Types.ObjectId;

@@ -1,4 +1,4 @@
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 export type CashTransactionDocument = CashTransaction & Document;
 export declare class CashTransaction {
     transactionType: string;
@@ -10,7 +10,7 @@ export declare class CashTransaction {
     paymentMethod: string;
     referenceNumber: string;
 }
-export declare const CashTransactionSchema: import("mongoose").Schema<CashTransaction, import("mongoose").Model<CashTransaction, any, any, any, any, any, CashTransaction>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, CashTransaction, Document<unknown, {}, CashTransaction, {
+export declare const CashTransactionSchema: MongooseSchema<CashTransaction, import("mongoose").Model<CashTransaction, any, any, any, any, any, CashTransaction>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, CashTransaction, Document<unknown, {}, CashTransaction, {
     id: string;
 }, import("mongoose").DefaultSchemaOptions> & Omit<CashTransaction & {
     _id: Types.ObjectId;

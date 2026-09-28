@@ -1,4 +1,4 @@
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 export type VehicleCostDocument = VehicleCost & Document;
 export declare class VehicleCost {
     vehicle: Types.ObjectId;
@@ -16,7 +16,7 @@ export declare class VehicleCost {
     minimumSellingPrice: number;
     expectedProfit: number;
 }
-export declare const VehicleCostSchema: import("mongoose").Schema<VehicleCost, import("mongoose").Model<VehicleCost, any, any, any, any, any, VehicleCost>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, VehicleCost, Document<unknown, {}, VehicleCost, {
+export declare const VehicleCostSchema: MongooseSchema<VehicleCost, import("mongoose").Model<VehicleCost, any, any, any, any, any, VehicleCost>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, VehicleCost, Document<unknown, {}, VehicleCost, {
     id: string;
 }, import("mongoose").DefaultSchemaOptions> & Omit<VehicleCost & {
     _id: Types.ObjectId;

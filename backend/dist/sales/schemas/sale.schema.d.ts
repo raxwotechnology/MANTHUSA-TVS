@@ -1,4 +1,4 @@
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 export type SaleDocument = Sale & Document;
 export declare class Sale {
     invoiceNumber: string;
@@ -15,7 +15,7 @@ export declare class Sale {
     status: string;
     saleDate: Date;
 }
-export declare const SaleSchema: import("mongoose").Schema<Sale, import("mongoose").Model<Sale, any, any, any, any, any, Sale>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Sale, Document<unknown, {}, Sale, {
+export declare const SaleSchema: MongooseSchema<Sale, import("mongoose").Model<Sale, any, any, any, any, any, Sale>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Sale, Document<unknown, {}, Sale, {
     id: string;
 }, import("mongoose").DefaultSchemaOptions> & Omit<Sale & {
     _id: Types.ObjectId;

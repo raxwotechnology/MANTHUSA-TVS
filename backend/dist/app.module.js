@@ -50,6 +50,8 @@ const vehicle_transfers_module_1 = require("./vehicle-transfers/vehicle-transfer
 const vehicle_valuations_module_1 = require("./vehicle-valuations/vehicle-valuations.module");
 const notifications_module_1 = require("./notifications/notifications.module");
 const documents_module_1 = require("./documents/documents.module");
+const stock_movements_module_1 = require("./stock-movements/stock-movements.module");
+const leasing_partners_module_1 = require("./leasing-partners/leasing-partners.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -78,6 +80,8 @@ exports.AppModule = AppModule = __decorate([
             vehicle_valuations_module_1.VehicleValuationsModule,
             notifications_module_1.NotificationsModule,
             documents_module_1.DocumentsModule,
+            stock_movements_module_1.StockMovementsModule,
+            leasing_partners_module_1.LeasingPartnersModule,
             suppliers_module_1.SuppliersModule,
             supplier_payments_module_1.SupplierPaymentsModule,
             customers_module_1.CustomersModule,

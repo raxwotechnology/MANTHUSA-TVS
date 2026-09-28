@@ -20,14 +20,18 @@ let VehiclePurchase = class VehiclePurchase {
     additionalCosts;
     paymentStatus;
     paidAmount;
+    sellerNicPassport;
+    sellerPhone;
+    sellerAddress;
+    sellerBankDetails;
 };
 exports.VehiclePurchase = VehiclePurchase;
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Vehicle', required: true }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Vehicle', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], VehiclePurchase.prototype, "vehicle", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Supplier', required: true }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Supplier', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], VehiclePurchase.prototype, "supplier", void 0);
 __decorate([
@@ -50,6 +54,22 @@ __decorate([
     (0, mongoose_1.Prop)({ default: 0 }),
     __metadata("design:type", Number)
 ], VehiclePurchase.prototype, "paidAmount", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], VehiclePurchase.prototype, "sellerNicPassport", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], VehiclePurchase.prototype, "sellerPhone", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], VehiclePurchase.prototype, "sellerAddress", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], VehiclePurchase.prototype, "sellerBankDetails", void 0);
 exports.VehiclePurchase = VehiclePurchase = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], VehiclePurchase);

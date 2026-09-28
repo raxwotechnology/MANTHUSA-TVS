@@ -1,4 +1,4 @@
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 export type SaleItemDocument = SaleItem & Document;
 export declare class SaleItem {
     sale: Types.ObjectId;
@@ -6,7 +6,7 @@ export declare class SaleItem {
     amount: number;
     type: string;
 }
-export declare const SaleItemSchema: import("mongoose").Schema<SaleItem, import("mongoose").Model<SaleItem, any, any, any, any, any, SaleItem>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, SaleItem, Document<unknown, {}, SaleItem, {
+export declare const SaleItemSchema: MongooseSchema<SaleItem, import("mongoose").Model<SaleItem, any, any, any, any, any, SaleItem>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, SaleItem, Document<unknown, {}, SaleItem, {
     id: string;
 }, import("mongoose").DefaultSchemaOptions> & Omit<SaleItem & {
     _id: Types.ObjectId;

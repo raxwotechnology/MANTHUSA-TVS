@@ -1,4 +1,4 @@
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 export type SupplierPaymentDocument = SupplierPayment & Document;
 export declare class SupplierPayment {
     supplier: Types.ObjectId;
@@ -8,7 +8,7 @@ export declare class SupplierPayment {
     paymentMethod: string;
     referenceNumber: string;
 }
-export declare const SupplierPaymentSchema: import("mongoose").Schema<SupplierPayment, import("mongoose").Model<SupplierPayment, any, any, any, any, any, SupplierPayment>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, SupplierPayment, Document<unknown, {}, SupplierPayment, {
+export declare const SupplierPaymentSchema: MongooseSchema<SupplierPayment, import("mongoose").Model<SupplierPayment, any, any, any, any, any, SupplierPayment>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, SupplierPayment, Document<unknown, {}, SupplierPayment, {
     id: string;
 }, import("mongoose").DefaultSchemaOptions> & Omit<SupplierPayment & {
     _id: Types.ObjectId;

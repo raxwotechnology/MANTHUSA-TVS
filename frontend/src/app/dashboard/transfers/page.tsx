@@ -78,46 +78,41 @@ export default function TransfersPage() {
     
       {showAddModal && (
         <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-xl max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-bold text-slate-900 mb-4">Add New Record</h3>
+          <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-xl max-h-[90vh] overflow-y-auto text-slate-900">
+            <h3 className="text-lg font-bold text-slate-900 mb-4">Add Branch Transfer Record</h3>
             <div className="space-y-3">
-              
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">transferId</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, transferId: e.target.value})} />
+                <label className="block text-xs font-bold text-slate-700 mb-1">Transfer ID</label>
+                <input type="text" placeholder="e.g. TRF-2026-001" className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, transferId: e.target.value})} />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">vehicleName</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, vehicleName: e.target.value})} />
+                <label className="block text-xs font-bold text-slate-700 mb-1">Vehicle Name / Make & Model</label>
+                <input type="text" placeholder="e.g. Toyota Premio / Honda Vezel" className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, vehicleName: e.target.value})} />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">fromBranch</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, fromBranch: e.target.value})} />
+                <label className="block text-xs font-bold text-slate-700 mb-1">From Branch</label>
+                <input type="text" placeholder="e.g. Colombo Head Office" className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, fromBranch: e.target.value})} />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">toBranch</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, toBranch: e.target.value})} />
+                <label className="block text-xs font-bold text-slate-700 mb-1">To Branch</label>
+                <input type="text" placeholder="e.g. Kandy Branch" className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, toBranch: e.target.value})} />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">date</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, date: e.target.value})} />
+                <label className="block text-xs font-bold text-slate-700 mb-1">Transfer Date</label>
+                <input type="date" className="w-full border border-slate-300 rounded-lg p-2 text-xs text-slate-900" onChange={(e) => setNewFormData({...newFormData, date: e.target.value})} />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">driver</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, driver: e.target.value})} />
+                <label className="block text-xs font-bold text-slate-700 mb-1">Driver Name</label>
+                <input type="text" placeholder="e.g. Sunera Fernando" className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, driver: e.target.value})} />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">transportCost</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, transportCost: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">status</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, status: e.target.value})} />
+                <label className="block text-xs font-bold text-slate-700 mb-1">Transport Cost (LKR)</label>
+                <input type="number" placeholder="e.g. 25,000" className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, transportCost: e.target.value})} />
               </div>
             </div>
             <div className="flex justify-end gap-2 mt-6 pt-4 border-t">
               <button onClick={() => setShowAddModal(false)} className="px-4 py-2 border rounded-lg text-slate-600 font-semibold text-xs">Cancel</button>
-              <button onClick={saveTransfer} className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold text-xs">Save</button>
+              <button onClick={saveTransfer} className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold text-xs">Save Transfer</button>
             </div>
           </div>
         </div>
@@ -126,5 +121,3 @@ export default function TransfersPage() {
     </DashboardLayout>
   );
 }
-
-

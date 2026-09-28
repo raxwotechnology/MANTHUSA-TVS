@@ -23,11 +23,11 @@ let VehicleInspection = class VehicleInspection {
 };
 exports.VehicleInspection = VehicleInspection;
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Vehicle', required: true }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Vehicle', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], VehicleInspection.prototype, "vehicle", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'User' }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'User' }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], VehicleInspection.prototype, "inspector", void 0);
 __decorate([

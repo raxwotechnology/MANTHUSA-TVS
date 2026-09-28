@@ -1,4 +1,4 @@
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 export type InstallmentDocument = Installment & Document;
 export declare class Installment {
     agreement: Types.ObjectId;
@@ -8,7 +8,7 @@ export declare class Installment {
     status: string;
     paidDate: Date;
 }
-export declare const InstallmentSchema: import("mongoose").Schema<Installment, import("mongoose").Model<Installment, any, any, any, any, any, Installment>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Installment, Document<unknown, {}, Installment, {
+export declare const InstallmentSchema: MongooseSchema<Installment, import("mongoose").Model<Installment, any, any, any, any, any, Installment>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Installment, Document<unknown, {}, Installment, {
     id: string;
 }, import("mongoose").DefaultSchemaOptions> & Omit<Installment & {
     _id: Types.ObjectId;

@@ -22,15 +22,18 @@ let Payment = class Payment {
     bank;
     receiptNumber;
     notes;
+    chequeNumber;
+    chequeDate;
+    chequeStatus;
     status;
 };
 exports.Payment = Payment;
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Sale', required: true }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Sale', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Payment.prototype, "sale", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Customer', required: true }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Customer', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Payment.prototype, "customer", void 0);
 __decorate([
@@ -61,6 +64,18 @@ __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Payment.prototype, "notes", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Payment.prototype, "chequeNumber", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Date)
+], Payment.prototype, "chequeDate", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Payment.prototype, "chequeStatus", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ default: 'Completed' }),
     __metadata("design:type", String)

@@ -23,7 +23,6 @@ export default function QuotationsPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [newFormData, setNewFormData] = useState({});
 
-
   const [selectedPdfQuote, setSelectedPdfQuote] = useState<Quotation | null>(null);
 
   const loadQuotations = async () => {
@@ -113,39 +112,79 @@ export default function QuotationsPage() {
       {/* PDF Printable Quotation Modal */}
       {selectedPdfQuote && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-8 shadow-xl border border-slate-200 print:shadow-none">
+          <div className="bg-white rounded-2xl max-w-2xl w-full p-8 shadow-xl border border-slate-200 print:shadow-none text-slate-900">
             <div className="flex items-center justify-between border-b pb-4 mb-6">
               <div>
                 <h2 className="text-xl font-extrabold text-slate-900">SalesPlus Dealership</h2>
                 <p className="text-xs text-slate-500">Official Vehicle Sales Quotation</p>
               </div>
-              <button onClick={() => setSelectedPdfQuote(null)} className="text-slate-400 hover:text-slate-600"><X className="w-5 h-5" /></button>
+              <button onClick={() => setSelectedPdfQuote(null)} className="text-slate-400 hover:text-slate-600 print:hidden">
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 mb-6 text-xs">
+            <div className="flex justify-between items-start mb-6 text-xs">
               <div>
-                <span className="text-slate-400 block font-semibold">Prepared For:</span>
-                <p className="font-bold text-slate-900 text-sm">{selectedPdfQuote.customerName}</p>
-                <p className="text-slate-600">Rajagiriya, Colombo</p>
+                <span className="text-slate-500 block">Quotation For:</span>
+                <span className="font-extrabold text-slate-900 text-sm">{selectedPdfQuote.customerName}</span>
               </div>
               <div className="text-right">
-                <span className="text-slate-400 block font-semibold">Quotation Number:</span>
-                <p className="font-mono font-bold text-slate-900 text-sm">{selectedPdfQuote.quotationNumber}</p>
-                <p className="text-slate-500">Date: {new Date().toLocaleDateString()}</p>
+                <span className="text-slate-500 block">Quote Reference:</span>
+                <span className="font-mono font-bold text-emerald-600">{selectedPdfQuote.quotationNumber}</span>
               </div>
             </div>
 
-            <div className="border rounded-xl p-4 mb-6 text-xs space-y-2 bg-slate-50">
-              <h4 className="font-bold text-slate-900 text-sm">{selectedPdfQuote.vehicleName}</h4>
-              <div className="flex justify-between border-t pt-2"><span>Vehicle List Price:</span> <span className="font-bold">{formatLKR(selectedPdfQuote.vehiclePrice)}</span></div>
-              <div className="flex justify-between text-rose-600 font-semibold"><span>Approved Discount:</span> <span>-{formatLKR(selectedPdfQuote.discount)}</span></div>
-              <div className="flex justify-between"><span>Registration & Insurance Fee:</span> <span>+{formatLKR(selectedPdfQuote.additionalCharges)}</span></div>
-              <div className="flex justify-between font-extrabold text-emerald-700 text-base border-t pt-2"><span>Final Offer Total:</span> <span>{formatLKR(selectedPdfQuote.totalAmount)}</span></div>
-              <div className="flex justify-between text-slate-600"><span>Required Advance Deposit:</span> <span className="font-bold">{formatLKR(selectedPdfQuote.advancePayment)}</span></div>
+            <div className="bg-slate-50 rounded-xl p-4 mb-6 border border-slate-100 text-xs">
+              <span className="text-slate-500 block mb-1">Vehicle Specification:</span>
+              <span className="font-bold text-slate-900 text-sm">{selectedPdfQuote.vehicleName}</span>
             </div>
 
-            <div className="flex justify-end gap-3 border-t pt-4">
-              <button onClick={() => window.print()} className="px-5 py-2 bg-slate-900 text-white rounded-lg font-semibold text-xs flex items-center gap-1.5">
+            <div className="space-y-2 text-xs border-t border-b py-4 mb-6">
+              <div className="flex justify-between">
+                <span className="text-slate-600">Vehicle Base Selling Price:</span>
+                <span className="font-bold text-slate-900">{formatLKR(selectedPdfQuote.vehiclePrice)}</span>
+              </div>
+              {selectedPdfQuote.additionalCharges > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-slate-600">Registration & Insurance Fees:</span>
+                  <span className="font-bold text-slate-900">+{formatLKR(selectedPdfQuote.additionalCharges)}</span>
+                </div>
+              )}
+              {selectedPdfQuote.discount > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-slate-600">Approved Discount:</span>
+                  <span className="font-bold text-rose-600">-{formatLKR(selectedPdfQuote.discount)}</span>
+                </div>
+              )}
+              <div className="flex justify-between font-extrabold text-base border-t pt-2 text-emerald-700">
+                <span>Final Payable Price:</span>
+                <span>{formatLKR(selectedPdfQuote.totalAmount)}</span>
+              </div>
+              {selectedPdfQuote.advancePayment > 0 && (
+                <div className="flex justify-between font-medium text-blue-600">
+                  <span>Advance Paid:</span>
+                  <span>{formatLKR(selectedPdfQuote.advancePayment)}</span>
+                </div>
+              )}
+              {selectedPdfQuote.balanceAmount > 0 && (
+                <div className="flex justify-between font-bold text-slate-900">
+                  <span>Remaining Balance:</span>
+                  <span>{formatLKR(selectedPdfQuote.balanceAmount)}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="flex justify-end gap-3 print:hidden">
+              <button
+                onClick={() => setSelectedPdfQuote(null)}
+                className="px-4 py-2 border rounded-lg text-slate-600 text-xs font-semibold"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => window.print()}
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold flex items-center gap-2"
+              >
                 <Printer className="w-4 h-4" />
                 <span>Print Document</span>
               </button>
@@ -156,54 +195,41 @@ export default function QuotationsPage() {
     
       {showAddModal && (
         <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-xl max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-bold text-slate-900 mb-4">Add New Record</h3>
+          <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-xl max-h-[90vh] overflow-y-auto text-slate-900">
+            <h3 className="text-lg font-bold text-slate-900 mb-4">Create New Quotation</h3>
             <div className="space-y-3">
-              
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">quotationNumber</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, quotationNumber: e.target.value})} />
+                <label className="block text-xs font-bold text-slate-700 mb-1">Quotation Number</label>
+                <input type="text" placeholder="e.g. QT-2026-001 (Auto-generated if blank)" className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, quotationNumber: e.target.value})} />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">customerName</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, customerName: e.target.value})} />
+                <label className="block text-xs font-bold text-slate-700 mb-1">Customer Name</label>
+                <input type="text" placeholder="e.g. Kamal Gunaratne" className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, customerName: e.target.value})} />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">vehicleName</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, vehicleName: e.target.value})} />
+                <label className="block text-xs font-bold text-slate-700 mb-1">Vehicle Name / Make & Model</label>
+                <input type="text" placeholder="e.g. Toyota Axio / Premio" className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, vehicleName: e.target.value})} />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">vehiclePrice</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, vehiclePrice: e.target.value})} />
+                <label className="block text-xs font-bold text-slate-700 mb-1">Vehicle Price (LKR)</label>
+                <input type="number" placeholder="e.g. 13,500,000" className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, vehiclePrice: e.target.value})} />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">discount</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, discount: e.target.value})} />
+                <label className="block text-xs font-bold text-slate-700 mb-1">Approved Discount (LKR)</label>
+                <input type="number" placeholder="e.g. 75,000" className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, discount: e.target.value})} />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">additionalCharges</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, additionalCharges: e.target.value})} />
+                <label className="block text-xs font-bold text-slate-700 mb-1">Additional Charges (Registration/Insurance)</label>
+                <input type="number" placeholder="e.g. 50,000" className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, additionalCharges: e.target.value})} />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">totalAmount</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, totalAmount: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">advancePayment</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, advancePayment: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">balanceAmount</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, balanceAmount: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">status</label>
-                <input type="text" className="w-full border border-slate-300 rounded-lg p-2 text-xs" onChange={(e) => setNewFormData({...newFormData, status: e.target.value})} />
+                <label className="block text-xs font-bold text-slate-700 mb-1">Advance Payment (LKR)</label>
+                <input type="number" placeholder="e.g. 500,000" className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, advancePayment: e.target.value})} />
               </div>
             </div>
             <div className="flex justify-end gap-2 mt-6 pt-4 border-t">
               <button onClick={() => setShowAddModal(false)} className="px-4 py-2 border rounded-lg text-slate-600 font-semibold text-xs">Cancel</button>
-              <button onClick={saveQuotation} className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold text-xs">Save</button>
+              <button onClick={saveQuotation} className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold text-xs">Save Quotation</button>
             </div>
           </div>
         </div>
@@ -212,5 +238,3 @@ export default function QuotationsPage() {
     </DashboardLayout>
   );
 }
-
-

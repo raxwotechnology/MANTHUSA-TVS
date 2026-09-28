@@ -20,7 +20,7 @@ let VehicleMedia = class VehicleMedia {
 };
 exports.VehicleMedia = VehicleMedia;
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Vehicle', required: true }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Vehicle', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], VehicleMedia.prototype, "vehicle", void 0);
 __decorate([

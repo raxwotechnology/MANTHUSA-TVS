@@ -15,6 +15,7 @@ const sale_schema_1 = require("./schemas/sale.schema");
 const vehicle_schema_1 = require("../vehicles/schemas/vehicle.schema");
 const notifications_module_1 = require("../notifications/notifications.module");
 const reservation_schema_1 = require("../reservations/schemas/reservation.schema");
+const customer_schema_1 = require("../customers/schemas/customer.schema");
 let SalesModule = class SalesModule {
 };
 exports.SalesModule = SalesModule;
@@ -25,6 +26,7 @@ exports.SalesModule = SalesModule = __decorate([
                 { name: 'Sale', schema: sale_schema_1.SaleSchema },
                 { name: 'Vehicle', schema: vehicle_schema_1.VehicleSchema },
                 { name: 'Reservation', schema: reservation_schema_1.ReservationSchema },
+                { name: 'Customer', schema: customer_schema_1.CustomerSchema },
             ])
         ],
         controllers: [sales_controller_1.SalesController],

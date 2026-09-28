@@ -36,14 +36,24 @@ export class ExpensesService {
   }
 
   async update(id: string, updateExpenseDto: any): Promise<ExpenseDocument> {
-    const existingExpense = await this.expenseModel.findByIdAndUpdate(
-      id,
-      updateExpenseDto,
-      { new: true }
-    ).exec();
+    const existingExpense = await this.expenseModel.findById(id).exec();
     if (!existingExpense) {
       throw new NotFoundException(`Expense #${id} not found`);
     }
+    const previousAmount = Number(existingExpense.amount);
+    if (updateExpenseDto.amount !== undefined) {
+      updateExpenseDto.amount = Number(updateExpenseDto.amount);
+      if (!Number.isFinite(updateExpenseDto.amount) || updateExpenseDto.amount <= 0) throw new BadRequestException('Expense amount must be positive.');
+    }
+    if (typeof updateExpenseDto.category === 'string' && !/^[a-f\d]{24}$/i.test(updateExpenseDto.category)) {
+      const categoryName = updateExpenseDto.category.trim();
+      if (!categoryName) throw new BadRequestException('Expense category cannot be empty.');
+      updateExpenseDto.category = (await this.categoryModel.findOneAndUpdate({ name: categoryName }, { $setOnInsert: { name: categoryName } }, { upsert: true, new: true }))._id;
+    }
+    Object.assign(existingExpense, updateExpenseDto);
+    await existingExpense.save();
+    const difference = Number(existingExpense.amount) - previousAmount;
+    if (difference !== 0) await new this.cashModel({ transactionType: difference > 0 ? 'OUT' : 'IN', amount: Math.abs(difference), transactionDate: new Date(), source: 'ExpenseAdjustment', referenceId: existingExpense._id, description: `Adjustment for ${existingExpense.expenseId || existingExpense._id}` }).save();
     return existingExpense;
   }
 
@@ -52,6 +62,7 @@ export class ExpensesService {
     if (!deletedExpense) {
       throw new NotFoundException(`Expense #${id} not found`);
     }
+    await new this.cashModel({ transactionType: 'IN', amount: Number(deletedExpense.amount), transactionDate: new Date(), source: 'ExpenseReversal', referenceId: deletedExpense._id, description: `Reversal for deleted expense ${deletedExpense.expenseId || deletedExpense._id}` }).save();
     return deletedExpense;
   }
 }

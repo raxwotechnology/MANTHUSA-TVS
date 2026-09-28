@@ -20,10 +20,12 @@ const notifications_service_1 = require("../notifications/notifications.service"
 let LeadsService = class LeadsService {
     leadModel;
     customerModel;
+    vehicleModel;
     notifications;
-    constructor(leadModel, customerModel, notifications) {
+    constructor(leadModel, customerModel, vehicleModel, notifications) {
         this.leadModel = leadModel;
         this.customerModel = customerModel;
+        this.vehicleModel = vehicleModel;
         this.notifications = notifications;
     }
     async create(createLeadDto) {
@@ -40,6 +42,11 @@ let LeadsService = class LeadsService {
             throw new common_1.BadRequestException('Name, valid phone number and vehicle are required.');
         }
         const vehicleId = String(input.vehicle);
+        if (!(0, mongoose_2.isValidObjectId)(vehicleId))
+            throw new common_1.BadRequestException('The selected vehicle ID is invalid.');
+        const vehicle = await this.vehicleModel.findById(vehicleId).exec();
+        if (!vehicle)
+            throw new common_1.BadRequestException('The selected vehicle does not exist.');
         let customer = await this.customerModel.findOne({ phone }).exec();
         if (!customer)
             customer = await new this.customerModel({ fullName, phone, email: input.email, customerType: 'Individual' }).save();
@@ -75,7 +82,9 @@ exports.LeadsService = LeadsService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)('Lead')),
     __param(1, (0, mongoose_1.InjectModel)('Customer')),
+    __param(2, (0, mongoose_1.InjectModel)('Vehicle')),
     __metadata("design:paramtypes", [mongoose_2.Model,
+        mongoose_2.Model,
         mongoose_2.Model,
         notifications_service_1.NotificationsService])
 ], LeadsService);

@@ -3,6 +3,7 @@ import { VehicleDocument } from './schemas/vehicle.schema';
 export declare class VehiclesService {
     private vehicleModel;
     constructor(vehicleModel: Model<VehicleDocument>);
+    private calculateFinancials;
     create(createVehicleDto: any): Promise<VehicleDocument>;
     findAll(): Promise<VehicleDocument[]>;
     findPublicListings(): Promise<(import("./schemas/vehicle.schema").Vehicle & import("mongoose").Document<import("mongoose").Types.ObjectId, any, any, Record<string, any>, {}> & Required<{

@@ -5,11 +5,13 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ReservationSchema } from './schemas/reservation.schema';
 import { VehicleSchema } from '../vehicles/schemas/vehicle.schema';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { CustomerSchema } from '../customers/schemas/customer.schema';
 
 @Module({
   imports: [NotificationsModule, MongooseModule.forFeature([
     { name: 'Reservation', schema: ReservationSchema },
     { name: 'Vehicle', schema: VehicleSchema },
+    { name: 'Customer', schema: CustomerSchema },
   ])],
   controllers: [ReservationsController],
   providers: [ReservationsService]

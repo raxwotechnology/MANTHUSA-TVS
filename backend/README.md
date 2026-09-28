@@ -13,6 +13,14 @@ For complete system documentation, architecture overview, and deployment guides,
 npm install
 ```
 
+### Existing Database Migration
+For databases created before reference fields were stored as BSON ObjectIds, run this once before starting the updated API:
+
+```bash
+npm run migrate:reference-ids
+```
+The migration is idempotent and converts valid 24-character reference IDs in place.
+
 ### 2. Database Initialization (Seed)
 Populate MongoDB with default system roles, demo users, sample vehicle inventory, and financial ledger data:
 

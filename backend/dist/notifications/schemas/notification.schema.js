@@ -23,7 +23,7 @@ let Notification = class Notification {
 };
 exports.Notification = Notification;
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'User' }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'User' }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Notification.prototype, "recipient", void 0);
 __decorate([

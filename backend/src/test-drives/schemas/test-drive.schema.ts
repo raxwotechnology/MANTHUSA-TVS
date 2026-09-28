@@ -1,17 +1,17 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 
 export type TestDriveDocument = TestDrive & Document;
 
 @Schema({ timestamps: true })
 export class TestDrive {
-  @Prop({ type: Types.ObjectId, ref: 'Customer', required: true })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Customer', required: true })
   customer: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'Vehicle', required: true })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Vehicle', required: true })
   vehicle: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true })
   salesperson: Types.ObjectId;
 
   @Prop({ required: true })

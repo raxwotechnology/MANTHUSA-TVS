@@ -14,13 +14,14 @@ const leads_service_1 = require("./leads.service");
 const lead_schema_1 = require("./schemas/lead.schema");
 const notifications_module_1 = require("../notifications/notifications.module");
 const customer_schema_1 = require("../customers/schemas/customer.schema");
+const vehicle_schema_1 = require("../vehicles/schemas/vehicle.schema");
 let LeadsModule = class LeadsModule {
 };
 exports.LeadsModule = LeadsModule;
 exports.LeadsModule = LeadsModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            mongoose_1.MongooseModule.forFeature([{ name: 'Lead', schema: lead_schema_1.LeadSchema }, { name: 'Customer', schema: customer_schema_1.CustomerSchema }]), notifications_module_1.NotificationsModule
+            mongoose_1.MongooseModule.forFeature([{ name: 'Lead', schema: lead_schema_1.LeadSchema }, { name: 'Customer', schema: customer_schema_1.CustomerSchema }, { name: 'Vehicle', schema: vehicle_schema_1.VehicleSchema }]), notifications_module_1.NotificationsModule
         ],
         controllers: [leads_controller_1.LeadsController],
         providers: [leads_service_1.LeadsService]

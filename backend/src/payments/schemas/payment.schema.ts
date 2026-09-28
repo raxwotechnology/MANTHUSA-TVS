@@ -1,14 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 
 export type PaymentDocument = Payment & Document;
 
 @Schema({ timestamps: true })
 export class Payment {
-  @Prop({ type: Types.ObjectId, ref: 'Sale', required: true })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Sale', required: true })
   sale: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'Customer', required: true })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Customer', required: true })
   customer: Types.ObjectId;
 
   @Prop({ required: true })
@@ -31,6 +31,15 @@ export class Payment {
 
   @Prop()
   notes: string;
+
+  @Prop()
+  chequeNumber: string;
+
+  @Prop()
+  chequeDate: Date;
+
+  @Prop()
+  chequeStatus: string; // 'Pending Cheque', 'Cleared', 'Bounced'
 
   @Prop({ default: 'Completed' })
   status: string; // 'Completed', 'Reversed', 'Refunded'

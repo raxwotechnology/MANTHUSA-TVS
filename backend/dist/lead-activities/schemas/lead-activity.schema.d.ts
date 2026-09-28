@@ -1,4 +1,4 @@
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 export type LeadActivityDocument = LeadActivity & Document;
 export declare class LeadActivity {
     lead: Types.ObjectId;
@@ -8,7 +8,7 @@ export declare class LeadActivity {
     newStatus: string;
     description: string;
 }
-export declare const LeadActivitySchema: import("mongoose").Schema<LeadActivity, import("mongoose").Model<LeadActivity, any, any, any, any, any, LeadActivity>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, LeadActivity, Document<unknown, {}, LeadActivity, {
+export declare const LeadActivitySchema: MongooseSchema<LeadActivity, import("mongoose").Model<LeadActivity, any, any, any, any, any, LeadActivity>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, LeadActivity, Document<unknown, {}, LeadActivity, {
     id: string;
 }, import("mongoose").DefaultSchemaOptions> & Omit<LeadActivity & {
     _id: Types.ObjectId;

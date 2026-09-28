@@ -1,11 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 
 export type QuotationItemDocument = QuotationItem & Document;
 
 @Schema({ timestamps: true })
 export class QuotationItem {
-  @Prop({ type: Types.ObjectId, ref: 'Quotation', required: true })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Quotation', required: true })
   quotation: Types.ObjectId;
 
   @Prop({ required: true })

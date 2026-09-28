@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 
 export type UserDocument = User & Document;
 
@@ -14,10 +14,10 @@ export class User {
   @Prop({ required: true })
   passwordHash: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'Role', required: true })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Role', required: true })
   role: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'Branch' })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Branch' })
   branch: Types.ObjectId;
 
   @Prop({ default: true })

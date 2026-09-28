@@ -1,4 +1,4 @@
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 export type VehiclePurchaseDocument = VehiclePurchase & Document;
 export declare class VehiclePurchase {
     vehicle: Types.ObjectId;
@@ -8,8 +8,12 @@ export declare class VehiclePurchase {
     additionalCosts: number;
     paymentStatus: string;
     paidAmount: number;
+    sellerNicPassport: string;
+    sellerPhone: string;
+    sellerAddress: string;
+    sellerBankDetails: string;
 }
-export declare const VehiclePurchaseSchema: import("mongoose").Schema<VehiclePurchase, import("mongoose").Model<VehiclePurchase, any, any, any, any, any, VehiclePurchase>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, VehiclePurchase, Document<unknown, {}, VehiclePurchase, {
+export declare const VehiclePurchaseSchema: MongooseSchema<VehiclePurchase, import("mongoose").Model<VehiclePurchase, any, any, any, any, any, VehiclePurchase>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, VehiclePurchase, Document<unknown, {}, VehiclePurchase, {
     id: string;
 }, import("mongoose").DefaultSchemaOptions> & Omit<VehiclePurchase & {
     _id: Types.ObjectId;
@@ -73,6 +77,42 @@ export declare const VehiclePurchaseSchema: import("mongoose").Schema<VehiclePur
         id: string;
     }>> | undefined;
     paidAmount?: import("mongoose").SchemaDefinitionProperty<number, VehiclePurchase, Document<unknown, {}, VehiclePurchase, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<VehiclePurchase & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    sellerNicPassport?: import("mongoose").SchemaDefinitionProperty<string, VehiclePurchase, Document<unknown, {}, VehiclePurchase, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<VehiclePurchase & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    sellerPhone?: import("mongoose").SchemaDefinitionProperty<string, VehiclePurchase, Document<unknown, {}, VehiclePurchase, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<VehiclePurchase & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    sellerAddress?: import("mongoose").SchemaDefinitionProperty<string, VehiclePurchase, Document<unknown, {}, VehiclePurchase, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<VehiclePurchase & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    sellerBankDetails?: import("mongoose").SchemaDefinitionProperty<string, VehiclePurchase, Document<unknown, {}, VehiclePurchase, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<VehiclePurchase & {
         _id: Types.ObjectId;

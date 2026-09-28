@@ -1,4 +1,4 @@
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 export type UserDocument = User & Document;
 export declare class User {
     name: string;
@@ -13,7 +13,7 @@ export declare class User {
     emailVerificationTokenHash: string;
     emailVerificationExpiresAt: Date;
 }
-export declare const UserSchema: import("mongoose").Schema<User, import("mongoose").Model<User, any, any, any, any, any, User>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, User, Document<unknown, {}, User, {
+export declare const UserSchema: MongooseSchema<User, import("mongoose").Model<User, any, any, any, any, any, User>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, User, Document<unknown, {}, User, {
     id: string;
 }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
     _id: Types.ObjectId;

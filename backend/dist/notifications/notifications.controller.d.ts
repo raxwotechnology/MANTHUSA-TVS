@@ -4,5 +4,12 @@ export declare class NotificationsController {
     constructor(notifications: NotificationsService);
     findMine(req: any): Promise<any[]>;
     markRead(id: string, req: any): Promise<any>;
-    create(body: any): any;
+    sendSms(body: {
+        phone: string;
+        message: string;
+    }): Promise<void>;
+    sendWhatsApp(body: {
+        phone: string;
+        message: string;
+    }): Promise<void>;
 }

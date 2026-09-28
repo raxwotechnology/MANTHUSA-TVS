@@ -29,15 +29,15 @@ __decorate([
     __metadata("design:type", String)
 ], VehicleTransfer.prototype, "transferId", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Vehicle', required: true }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Vehicle', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], VehicleTransfer.prototype, "vehicle", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Branch', required: true }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Branch', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], VehicleTransfer.prototype, "fromBranch", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Branch', required: true }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Branch', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], VehicleTransfer.prototype, "toBranch", void 0);
 __decorate([

@@ -1,14 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 
 export type CommissionDocument = Commission & Document;
 
 @Schema({ timestamps: true })
 export class Commission {
-  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true })
   salesperson: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'Sale', required: true })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Sale', required: true })
   sale: Types.ObjectId;
 
   @Prop({ required: true })

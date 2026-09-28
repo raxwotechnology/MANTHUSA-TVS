@@ -42,6 +42,8 @@ import { VehicleTransfersModule } from './vehicle-transfers/vehicle-transfers.mo
 import { VehicleValuationsModule } from './vehicle-valuations/vehicle-valuations.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { DocumentsModule } from './documents/documents.module';
+import { StockMovementsModule } from './stock-movements/stock-movements.module';
+import { LeasingPartnersModule } from './leasing-partners/leasing-partners.module';
 
 @Module({
   imports: [
@@ -67,6 +69,8 @@ import { DocumentsModule } from './documents/documents.module';
     VehicleValuationsModule,
     NotificationsModule,
     DocumentsModule,
+    StockMovementsModule,
+    LeasingPartnersModule,
     SuppliersModule,
     SupplierPaymentsModule,
     CustomersModule,

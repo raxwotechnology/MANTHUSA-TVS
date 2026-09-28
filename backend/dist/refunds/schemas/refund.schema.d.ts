@@ -1,4 +1,4 @@
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 export type RefundDocument = Refund & Document;
 export declare class Refund {
     customer: Types.ObjectId;
@@ -10,7 +10,7 @@ export declare class Refund {
     paymentMethod: string;
     status: string;
 }
-export declare const RefundSchema: import("mongoose").Schema<Refund, import("mongoose").Model<Refund, any, any, any, any, any, Refund>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Refund, Document<unknown, {}, Refund, {
+export declare const RefundSchema: MongooseSchema<Refund, import("mongoose").Model<Refund, any, any, any, any, any, Refund>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Refund, Document<unknown, {}, Refund, {
     id: string;
 }, import("mongoose").DefaultSchemaOptions> & Omit<Refund & {
     _id: Types.ObjectId;

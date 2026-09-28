@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 
 export type VehicleTransferDocument = VehicleTransfer & Document;
 
@@ -8,13 +8,13 @@ export class VehicleTransfer {
   @Prop({ required: true })
   transferId: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'Vehicle', required: true })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Vehicle', required: true })
   vehicle: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'Branch', required: true })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Branch', required: true })
   fromBranch: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'Branch', required: true })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Branch', required: true })
   toBranch: Types.ObjectId;
 
   @Prop({ default: Date.now })

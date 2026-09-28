@@ -40,7 +40,7 @@ __decorate([
     __metadata("design:type", String)
 ], CashTransaction.prototype, "source", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], CashTransaction.prototype, "referenceId", void 0);
 __decorate([

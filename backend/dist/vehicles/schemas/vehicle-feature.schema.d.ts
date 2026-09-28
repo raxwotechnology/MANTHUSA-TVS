@@ -1,4 +1,4 @@
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 export type VehicleFeatureDocument = VehicleFeature & Document;
 export declare class VehicleFeature {
     vehicle: Types.ObjectId;
@@ -6,7 +6,7 @@ export declare class VehicleFeature {
     featureName: string;
     featureValue: string;
 }
-export declare const VehicleFeatureSchema: import("mongoose").Schema<VehicleFeature, import("mongoose").Model<VehicleFeature, any, any, any, any, any, VehicleFeature>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, VehicleFeature, Document<unknown, {}, VehicleFeature, {
+export declare const VehicleFeatureSchema: MongooseSchema<VehicleFeature, import("mongoose").Model<VehicleFeature, any, any, any, any, any, VehicleFeature>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, VehicleFeature, Document<unknown, {}, VehicleFeature, {
     id: string;
 }, import("mongoose").DefaultSchemaOptions> & Omit<VehicleFeature & {
     _id: Types.ObjectId;

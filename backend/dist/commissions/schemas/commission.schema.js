@@ -23,11 +23,11 @@ let Commission = class Commission {
 };
 exports.Commission = Commission;
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'User', required: true }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'User', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Commission.prototype, "salesperson", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Sale', required: true }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Sale', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Commission.prototype, "sale", void 0);
 __decorate([

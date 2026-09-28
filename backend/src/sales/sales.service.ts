@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { isValidObjectId, Model } from 'mongoose';
 import { SaleDocument } from './schemas/sale.schema';
 import { NotificationsService } from '../notifications/notifications.service';
 
@@ -9,18 +9,23 @@ export class SalesService {
   constructor(
     @InjectModel('Sale') private saleModel: Model<SaleDocument>,
     @InjectModel('Vehicle') private vehicleModel: Model<any>,
+    @InjectModel('Customer') private customerModel: Model<any>,
     @InjectModel('Reservation') private reservations: Model<any>,
     private readonly notifications: NotificationsService,
   ) {}
 
   async create(createSaleDto: any): Promise<SaleDocument> {
     if (!createSaleDto.customer || !createSaleDto.vehicle) throw new BadRequestException('Customer and vehicle are required.');
+    if (!isValidObjectId(createSaleDto.customer) || !isValidObjectId(createSaleDto.vehicle)) throw new BadRequestException('Customer or vehicle ID is invalid.');
+    const customer = await this.customerModel.findById(createSaleDto.customer).exec();
+    if (!customer) throw new NotFoundException('Customer not found.');
     const vehicle = await this.vehicleModel.findById(createSaleDto.vehicle).exec();
     if (!vehicle) throw new NotFoundException('Vehicle not found.');
     if (!['Available', 'Reserved'].includes(vehicle.status)) throw new BadRequestException('Vehicle is not available for sale.');
     let reservation: any;
     if (vehicle.status === 'Reserved') {
       reservation = await this.reservations.findOne({ vehicle: vehicle._id, status: 'Active' }).exec();
+      if (!reservation) throw new BadRequestException('This vehicle has no active reservation. Release it before recording a sale.');
       if (reservation && reservation.customer.toString() !== createSaleDto.customer.toString()) throw new BadRequestException('This vehicle is reserved for a different customer.');
       if (reservation && reservation.expiryDate <= new Date()) {
         reservation.status = 'Expired'; await reservation.save();

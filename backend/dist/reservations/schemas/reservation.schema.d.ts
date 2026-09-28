@@ -1,4 +1,4 @@
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 export type ReservationDocument = Reservation & Document;
 export declare class Reservation {
     reservationId: string;
@@ -14,7 +14,7 @@ export declare class Reservation {
     paymentMethod: string;
     notes: string;
 }
-export declare const ReservationSchema: import("mongoose").Schema<Reservation, import("mongoose").Model<Reservation, any, any, any, any, any, Reservation>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Reservation, Document<unknown, {}, Reservation, {
+export declare const ReservationSchema: MongooseSchema<Reservation, import("mongoose").Model<Reservation, any, any, any, any, any, Reservation>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Reservation, Document<unknown, {}, Reservation, {
     id: string;
 }, import("mongoose").DefaultSchemaOptions> & Omit<Reservation & {
     _id: Types.ObjectId;

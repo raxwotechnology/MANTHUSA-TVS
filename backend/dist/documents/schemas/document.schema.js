@@ -47,7 +47,7 @@ __decorate([
     __metadata("design:type", Number)
 ], DocumentRecord.prototype, "size", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'User' }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'User' }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], DocumentRecord.prototype, "uploadedBy", void 0);
 exports.DocumentRecord = DocumentRecord = __decorate([

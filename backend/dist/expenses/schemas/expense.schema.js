@@ -31,7 +31,7 @@ __decorate([
     __metadata("design:type", String)
 ], Expense.prototype, "expenseId", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'ExpenseCategory', required: true }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'ExpenseCategory', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Expense.prototype, "category", void 0);
 __decorate([
@@ -47,15 +47,15 @@ __decorate([
     __metadata("design:type", String)
 ], Expense.prototype, "description", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Vehicle' }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Vehicle' }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Expense.prototype, "vehicle", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Supplier' }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Supplier' }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Expense.prototype, "supplier", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Branch' }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Branch' }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Expense.prototype, "branch", void 0);
 __decorate([

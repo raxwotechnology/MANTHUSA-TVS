@@ -1,4 +1,4 @@
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 export type ComplaintDocument = Complaint & Document;
 export declare class Complaint {
     customer: Types.ObjectId;
@@ -10,7 +10,7 @@ export declare class Complaint {
     resolution: string;
     status: string;
 }
-export declare const ComplaintSchema: import("mongoose").Schema<Complaint, import("mongoose").Model<Complaint, any, any, any, any, any, Complaint>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Complaint, Document<unknown, {}, Complaint, {
+export declare const ComplaintSchema: MongooseSchema<Complaint, import("mongoose").Model<Complaint, any, any, any, any, any, Complaint>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Complaint, Document<unknown, {}, Complaint, {
     id: string;
 }, import("mongoose").DefaultSchemaOptions> & Omit<Complaint & {
     _id: Types.ObjectId;

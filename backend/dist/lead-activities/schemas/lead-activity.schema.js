@@ -22,11 +22,11 @@ let LeadActivity = class LeadActivity {
 };
 exports.LeadActivity = LeadActivity;
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Lead', required: true }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Lead', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], LeadActivity.prototype, "lead", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'User', required: true }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'User', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], LeadActivity.prototype, "performedBy", void 0);
 __decorate([

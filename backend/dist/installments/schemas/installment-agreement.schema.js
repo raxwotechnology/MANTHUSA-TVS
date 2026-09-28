@@ -26,11 +26,11 @@ let InstallmentAgreement = class InstallmentAgreement {
 };
 exports.InstallmentAgreement = InstallmentAgreement;
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Sale', required: true }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Sale', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], InstallmentAgreement.prototype, "sale", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Customer', required: true }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Customer', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], InstallmentAgreement.prototype, "customer", void 0);
 __decorate([

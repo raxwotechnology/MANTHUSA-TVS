@@ -3,6 +3,7 @@ import { apiFetch } from '@/lib/api';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 export default function NewSalePage() {
   const router = useRouter();
@@ -18,6 +19,7 @@ export default function NewSalePage() {
   const [customers, setCustomers] = useState<any[]>([]);
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     Promise.all([apiFetch('/customers'), apiFetch('/vehicles')]).then(async ([customerRes, vehicleRes]) => {
@@ -34,6 +36,8 @@ export default function NewSalePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setBusy(true);
+    setError('');
     const finalAmount = Number(formData.vehiclePrice) - Number(formData.discount) + Number(formData.additionalCharges);
     try {
       const res = await apiFetch('/sales', {
@@ -50,58 +54,76 @@ export default function NewSalePage() {
     } catch (err) {
       console.error(err);
       setError('Cannot connect to the server.');
+    } finally {
+      setBusy(false);
     }
   };
 
   return (
-    <div className="max-w-3xl mx-auto py-6 sm:px-6 lg:px-8">
-      {error && <div role="alert" className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
-      <div className="md:flex md:items-center md:justify-between mb-6">
-        <div className="flex-1 min-w-0">
-          <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">Create Sale Invoice</h2>
+    <DashboardLayout>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div>
+          <h1 className="text-2xl font-extrabold text-slate-900">Create Sale Invoice</h1>
+          <p className="text-xs text-slate-500">Issue official vehicle sale invoice and record customer payment terms</p>
         </div>
-        <div className="mt-4 flex md:mt-0 md:ml-4">
+        <div>
           <Link href="/dashboard/sales">
-            <button type="button" className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">Cancel</button>
+            <button type="button" className="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50">Cancel</button>
           </Link>
         </div>
       </div>
 
-      <div className="bg-white shadow sm:rounded-lg">
-        <div className="px-4 py-5 sm:p-6">
-          <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-6 gap-6">
-              <div className="col-span-6 sm:col-span-3">
-                <label className="block text-sm font-medium text-gray-700">Invoice Number</label>
-                <input type="text" name="invoiceNumber" placeholder="e.g. INV-2026-0089 (Leave blank for auto)" onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm text-black placeholder:text-gray-400" />
-              </div>
-              <div className="col-span-6 sm:col-span-3">
-                <label className="block text-sm font-medium text-gray-700">Customer</label>
-                <select required name="customer" value={formData.customer} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm text-black"><option value="">-- Choose a customer (e.g. Nimal Perera) --</option>{customers.map((customer) => <option key={customer._id} value={customer._id}>{customer.fullName} · {customer.phone}</option>)}</select>
-              </div>
-              <div className="col-span-6 sm:col-span-3">
-                <label className="block text-sm font-medium text-gray-700">Vehicle</label>
-                <select required name="vehicle" value={formData.vehicle} onChange={(event) => { const vehicle = vehicles.find((item) => item._id === event.target.value); setFormData((current) => ({ ...current, vehicle: event.target.value, vehiclePrice: vehicle?.sellingPrice || 0 })); }} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm text-black"><option value="">-- Choose a vehicle (e.g. Toyota Axio) --</option>{vehicles.map((vehicle) => <option key={vehicle._id} value={vehicle._id}>{vehicle.make} {vehicle.model} {vehicle.year} · LKR {Number(vehicle.sellingPrice || 0).toLocaleString()}</option>)}</select>
-              </div>
-              <div className="col-span-6 sm:col-span-3">
-                <label className="block text-sm font-medium text-gray-700">Vehicle Price (LKR)</label>
-                <input required type="number" name="vehiclePrice" placeholder="e.g. 12,500,000" onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm text-black placeholder:text-gray-400" />
-              </div>
-              <div className="col-span-6 sm:col-span-3">
-                <label className="block text-sm font-medium text-gray-700">Discount (LKR)</label>
-                <input type="number" name="discount" placeholder="e.g. 150,000" onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm text-black placeholder:text-gray-400" />
-              </div>
-              <div className="col-span-6 sm:col-span-3">
-                <label className="block text-sm font-medium text-gray-700">Additional Charges (LKR)</label>
-                <input type="number" name="additionalCharges" placeholder="e.g. 25,000" onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm text-black placeholder:text-gray-400" />
-              </div>
+      {error && <div role="alert" className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700 font-medium">{error}</div>}
+
+      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs max-w-4xl">
+        <form onSubmit={handleSubmit} className="space-y-4 text-xs text-slate-900">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Invoice Number</label>
+              <input type="text" name="invoiceNumber" placeholder="e.g. INV-2026-0089 (Leave blank for auto)" onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400" />
             </div>
-            <div className="mt-6">
-              <button type="submit" className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 font-bold">Process Sale Invoice</button>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Customer</label>
+              <select required name="customer" value={formData.customer} onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900">
+                <option value="">-- Choose a customer (e.g. Nimal Perera) --</option>
+                {customers.map((customer) => (
+                  <option key={customer._id} value={customer._id}>{customer.fullName} · {customer.phone}</option>
+                ))}
+              </select>
             </div>
-          </form>
-        </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Vehicle</label>
+              <select required name="vehicle" value={formData.vehicle} onChange={(event) => { const vehicle = vehicles.find((item) => item._id === event.target.value); setFormData((current) => ({ ...current, vehicle: event.target.value, vehiclePrice: vehicle?.sellingPrice || 0 })); }} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900">
+                <option value="">-- Choose a vehicle (e.g. Toyota Axio) --</option>
+                {vehicles.map((vehicle) => (
+                  <option key={vehicle._id} value={vehicle._id}>{vehicle.make} {vehicle.model} {vehicle.year} · LKR {Number(vehicle.sellingPrice || 0).toLocaleString()}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Vehicle Price (LKR)</label>
+              <input required type="number" name="vehiclePrice" placeholder="e.g. 12,500,000" value={formData.vehiclePrice || ''} onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400 font-bold text-emerald-700" />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Discount (LKR)</label>
+              <input type="number" name="discount" placeholder="e.g. 150,000" onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400" />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Additional Charges (LKR)</label>
+              <input type="number" name="additionalCharges" placeholder="e.g. 25,000" onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400" />
+            </div>
+          </div>
+
+          <div className="mt-6 pt-4 border-t flex justify-end gap-3">
+            <Link href="/dashboard/sales">
+              <button type="button" className="px-4 py-2 border rounded-lg text-slate-600 text-xs font-semibold">Cancel</button>
+            </Link>
+            <button type="submit" disabled={busy} className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold disabled:opacity-50 shadow-xs">
+              {busy ? 'Processing Invoice...' : 'Process Sale Invoice'}
+            </button>
+          </div>
+        </form>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

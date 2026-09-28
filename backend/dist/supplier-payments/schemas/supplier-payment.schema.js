@@ -22,11 +22,11 @@ let SupplierPayment = class SupplierPayment {
 };
 exports.SupplierPayment = SupplierPayment;
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Supplier', required: true }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Supplier', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], SupplierPayment.prototype, "supplier", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'VehiclePurchase' }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'VehiclePurchase' }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], SupplierPayment.prototype, "purchase", void 0);
 __decorate([

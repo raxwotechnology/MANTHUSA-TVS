@@ -1,4 +1,4 @@
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 export type StoredDocument = DocumentRecord & Document;
 export declare class DocumentRecord {
     entityType: string;
@@ -9,7 +9,7 @@ export declare class DocumentRecord {
     size: number;
     uploadedBy: Types.ObjectId;
 }
-export declare const DocumentSchema: import("mongoose").Schema<DocumentRecord, import("mongoose").Model<DocumentRecord, any, any, any, any, any, DocumentRecord>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, DocumentRecord, Document<unknown, {}, DocumentRecord, {
+export declare const DocumentSchema: MongooseSchema<DocumentRecord, import("mongoose").Model<DocumentRecord, any, any, any, any, any, DocumentRecord>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, DocumentRecord, Document<unknown, {}, DocumentRecord, {
     id: string;
 }, import("mongoose").DefaultSchemaOptions> & Omit<DocumentRecord & {
     _id: Types.ObjectId;

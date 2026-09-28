@@ -1,4 +1,4 @@
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 export type FollowUpDocument = FollowUp & Document;
 export declare class FollowUp {
     customer: Types.ObjectId;
@@ -11,7 +11,7 @@ export declare class FollowUp {
     status: string;
     nextFollowUp: Date;
 }
-export declare const FollowUpSchema: import("mongoose").Schema<FollowUp, import("mongoose").Model<FollowUp, any, any, any, any, any, FollowUp>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, FollowUp, Document<unknown, {}, FollowUp, {
+export declare const FollowUpSchema: MongooseSchema<FollowUp, import("mongoose").Model<FollowUp, any, any, any, any, any, FollowUp>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, FollowUp, Document<unknown, {}, FollowUp, {
     id: string;
 }, import("mongoose").DefaultSchemaOptions> & Omit<FollowUp & {
     _id: Types.ObjectId;

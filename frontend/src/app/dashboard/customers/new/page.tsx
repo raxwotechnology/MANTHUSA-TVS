@@ -3,6 +3,7 @@ import { apiFetch } from '@/lib/api';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 export default function NewCustomerPage() {
   const router = useRouter();
@@ -39,48 +40,45 @@ export default function NewCustomerPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto py-6 sm:px-6 lg:px-8">
-      <div className="md:flex md:items-center md:justify-between mb-6">
-        <div className="flex-1 min-w-0">
-          <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">Add New Customer</h2>
+    <DashboardLayout>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div>
+          <h1 className="text-2xl font-extrabold text-slate-900">Add New Customer</h1>
+          <p className="text-xs text-slate-500">Create new customer profile in CRM directory</p>
         </div>
-        <div className="mt-4 flex md:mt-0 md:ml-4">
-          <Link href="/dashboard/customers">
-            <button type="button" className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">Cancel</button>
-          </Link>
-        </div>
+        <Link href="/dashboard/customers">
+          <button type="button" className="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50">Cancel</button>
+        </Link>
       </div>
 
-      <div className="bg-white shadow sm:rounded-lg">
-        <div className="px-4 py-5 sm:p-6">
-          <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-6 gap-6">
-              <div className="col-span-6 sm:col-span-3">
-                <label className="block text-sm font-medium text-gray-700">Full Name</label>
-                <input required type="text" name="fullName" placeholder="e.g. Kasun Kalhara" onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-black placeholder:text-gray-400" />
-              </div>
-              <div className="col-span-6 sm:col-span-3">
-                <label className="block text-sm font-medium text-gray-700">Phone</label>
-                <input required type="text" name="phone" placeholder="e.g. +94 77 123 4567" onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-black placeholder:text-gray-400" />
-              </div>
-              <div className="col-span-6 sm:col-span-3">
-                <label className="block text-sm font-medium text-gray-700">Email</label>
-                <input type="email" name="email" placeholder="e.g. kasun@example.com" onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-black placeholder:text-gray-400" />
-              </div>
-              <div className="col-span-6 sm:col-span-3">
-                <label className="block text-sm font-medium text-gray-700">NIC / Passport</label>
-                <input type="text" name="nicOrPassport" placeholder="e.g. 199212345678 / 921234567V" onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-black placeholder:text-gray-400" />
-              </div>
+      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs max-w-4xl">
+        <form onSubmit={handleSubmit} className="space-y-4 text-xs text-slate-900">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Full Name</label>
+              <input required type="text" name="fullName" placeholder="e.g. Kasun Kalhara" onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400" />
             </div>
-            <div className="mt-6">
-              <button type="submit" className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Save Customer</button>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Phone Number</label>
+              <input required type="text" name="phone" placeholder="e.g. +94 77 123 4567" onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400" />
             </div>
-          </form>
-        </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Email</label>
+              <input type="email" name="email" placeholder="e.g. kasun@example.com" onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400" />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">NIC / Passport</label>
+              <input type="text" name="nicOrPassport" placeholder="e.g. 199212345678 / 921234567V" onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400" />
+            </div>
+          </div>
+          <div className="mt-6 pt-4 border-t flex justify-end gap-3">
+            <Link href="/dashboard/customers">
+              <button type="button" className="px-4 py-2 border rounded-lg text-slate-600 text-xs font-semibold">Cancel</button>
+            </Link>
+            <button type="submit" className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-xs">Save Customer</button>
+          </div>
+        </form>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
-
-
-

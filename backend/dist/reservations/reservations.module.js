@@ -14,6 +14,7 @@ const mongoose_1 = require("@nestjs/mongoose");
 const reservation_schema_1 = require("./schemas/reservation.schema");
 const vehicle_schema_1 = require("../vehicles/schemas/vehicle.schema");
 const notifications_module_1 = require("../notifications/notifications.module");
+const customer_schema_1 = require("../customers/schemas/customer.schema");
 let ReservationsModule = class ReservationsModule {
 };
 exports.ReservationsModule = ReservationsModule;
@@ -22,6 +23,7 @@ exports.ReservationsModule = ReservationsModule = __decorate([
         imports: [notifications_module_1.NotificationsModule, mongoose_1.MongooseModule.forFeature([
                 { name: 'Reservation', schema: reservation_schema_1.ReservationSchema },
                 { name: 'Vehicle', schema: vehicle_schema_1.VehicleSchema },
+                { name: 'Customer', schema: customer_schema_1.CustomerSchema },
             ])],
         controllers: [reservations_controller_1.ReservationsController],
         providers: [reservations_service_1.ReservationsService]

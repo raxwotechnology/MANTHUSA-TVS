@@ -1,4 +1,4 @@
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 export type LeadDocument = Lead & Document;
 export declare class Lead {
     leadId: string;
@@ -15,7 +15,7 @@ export declare class Lead {
     status: string;
     priority: string;
 }
-export declare const LeadSchema: import("mongoose").Schema<Lead, import("mongoose").Model<Lead, any, any, any, any, any, Lead>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Lead, Document<unknown, {}, Lead, {
+export declare const LeadSchema: MongooseSchema<Lead, import("mongoose").Model<Lead, any, any, any, any, any, Lead>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Lead, Document<unknown, {}, Lead, {
     id: string;
 }, import("mongoose").DefaultSchemaOptions> & Omit<Lead & {
     _id: Types.ObjectId;

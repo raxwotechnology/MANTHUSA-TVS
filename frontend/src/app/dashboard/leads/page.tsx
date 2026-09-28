@@ -200,15 +200,15 @@ export default function LeadsPage() {
             <form onSubmit={handleAddLead} className="space-y-3 text-xs">
               <div>
                 <label className="block font-semibold mb-1">Customer Name</label>
-                <input type="text" required value={newLead.customerName} onChange={(e) => setNewLead({ ...newLead, customerName: e.target.value })} className="w-full p-2 border rounded-lg bg-slate-50" />
+                <input type="text" required placeholder="e.g. Ruwan Gunawardena" value={newLead.customerName} onChange={(e) => setNewLead({ ...newLead, customerName: e.target.value })} className="w-full p-2 border rounded-lg bg-slate-50 placeholder:text-slate-400" />
               </div>
               <div>
                 <label className="block font-semibold mb-1">Customer Phone</label>
-                <input type="tel" required value={newLead.customerPhone} onChange={(e) => setNewLead({ ...newLead, customerPhone: e.target.value })} className="w-full p-2 border rounded-lg bg-slate-50" />
+                <input type="tel" required placeholder="e.g. +94 77 123 4567" value={newLead.customerPhone} onChange={(e) => setNewLead({ ...newLead, customerPhone: e.target.value })} className="w-full p-2 border rounded-lg bg-slate-50 placeholder:text-slate-400" />
               </div>
               <div>
                 <label className="block font-semibold mb-1">Interested Vehicle</label>
-                <input type="text" required value={newLead.interestedVehicle} onChange={(e) => setNewLead({ ...newLead, interestedVehicle: e.target.value })} className="w-full p-2 border rounded-lg bg-slate-50" />
+                <input type="text" required placeholder="e.g. Toyota Premio / Vezel RS" value={newLead.interestedVehicle} onChange={(e) => setNewLead({ ...newLead, interestedVehicle: e.target.value })} className="w-full p-2 border rounded-lg bg-slate-50 placeholder:text-slate-400" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -226,7 +226,7 @@ export default function LeadsPage() {
                 </div>
                 <div>
                   <label className="block font-semibold mb-1">Budget (LKR)</label>
-                  <input type="number" value={newLead.budget} onChange={(e) => setNewLead({ ...newLead, budget: Number(e.target.value) })} className="w-full p-2 border rounded-lg bg-slate-50" />
+                  <input type="number" placeholder="e.g. 12,000,000" value={newLead.budget} onChange={(e) => setNewLead({ ...newLead, budget: Number(e.target.value) })} className="w-full p-2 border rounded-lg bg-slate-50 placeholder:text-slate-400" />
                 </div>
               </div>
 

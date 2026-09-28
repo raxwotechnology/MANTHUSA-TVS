@@ -4,6 +4,15 @@ const bcrypt = require('bcrypt');
 async function seed() {
   await mongoose.connect('mongodb://localhost:27017/salesplus');
 
+  // Never erase an existing dealership database. This legacy seed entry point
+  // is retained for compatibility, but is safe to run only on an empty DB.
+  const collections = await mongoose.connection.db.listCollections().toArray();
+  for (const collection of collections) {
+    if (await mongoose.connection.db.collection(collection.name).estimatedDocumentCount()) {
+      throw new Error(`Database already contains data (${collection.name}); refusing to seed.`);
+    }
+  }
+
   const roleSchema = new mongoose.Schema({
     name: String,
     description: String,
@@ -18,10 +27,6 @@ async function seed() {
     isActive: Boolean
   }, { collection: 'users' });
   const User = mongoose.model('User', userSchema);
-
-  console.log('Cleaning up old users and roles...');
-  await User.deleteMany({});
-  await Role.deleteMany({});
 
   console.log('Creating roles...');
   const adminRole = await Role.create({ name: 'Admin / Owner', description: 'Full system control' });

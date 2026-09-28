@@ -1,11 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 
 export type InstallmentDocument = Installment & Document;
 
 @Schema({ timestamps: true })
 export class Installment {
-  @Prop({ type: Types.ObjectId, ref: 'InstallmentAgreement', required: true })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'InstallmentAgreement', required: true })
   agreement: Types.ObjectId;
 
   @Prop({ required: true })

@@ -1,4 +1,4 @@
-import { Document, Types } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 export type VehicleHandoverDocument = VehicleHandover & Document;
 export declare class VehicleHandover {
     sale: Types.ObjectId;
@@ -19,7 +19,7 @@ export declare class VehicleHandover {
     status: string;
     handoverDate: Date;
 }
-export declare const VehicleHandoverSchema: import("mongoose").Schema<VehicleHandover, import("mongoose").Model<VehicleHandover, any, any, any, any, any, VehicleHandover>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, VehicleHandover, Document<unknown, {}, VehicleHandover, {
+export declare const VehicleHandoverSchema: MongooseSchema<VehicleHandover, import("mongoose").Model<VehicleHandover, any, any, any, any, any, VehicleHandover>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, VehicleHandover, Document<unknown, {}, VehicleHandover, {
     id: string;
 }, import("mongoose").DefaultSchemaOptions> & Omit<VehicleHandover & {
     _id: Types.ObjectId;
