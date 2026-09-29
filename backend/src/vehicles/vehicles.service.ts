@@ -21,7 +21,7 @@ export class VehiclesService {
     const other = Number(dto.otherCosts || 0);
 
     const calculatedInvestment = purchase + importCost + transport + repair + detailing + registration + insurance + ad + other;
-    const totalInvestment = dto.totalInvestment && Number(dto.totalInvestment) > 0 ? Number(dto.totalInvestment) : calculatedInvestment;
+    const totalInvestment = calculatedInvestment;
     const sellingPrice = Number(dto.sellingPrice || 0);
     const expectedProfit = sellingPrice > 0 ? sellingPrice - totalInvestment : Number(dto.expectedProfit || 0);
 
@@ -51,16 +51,11 @@ export class VehiclesService {
   }
 
   async update(id: string, updateVehicleDto: any): Promise<VehicleDocument> {
-    const payload = this.calculateFinancials(updateVehicleDto);
-    const existingVehicle = await this.vehicleModel.findByIdAndUpdate(
-      id,
-      payload,
-      { new: true }
-    ).exec();
-    if (!existingVehicle) {
-      throw new NotFoundException(`Vehicle #${id} not found`);
-    }
-    return existingVehicle;
+    const vehicle = await this.vehicleModel.findById(id).exec();
+    if (!vehicle) throw new NotFoundException(`Vehicle #${id} not found`);
+    const { _id, createdAt, updatedAt, ...changes } = updateVehicleDto;
+    Object.assign(vehicle, this.calculateFinancials({ ...vehicle.toObject(), ...changes }));
+    return vehicle.save();
   }
 
   async remove(id: string): Promise<any> {

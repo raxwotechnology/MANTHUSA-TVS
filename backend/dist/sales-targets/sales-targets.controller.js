@@ -24,6 +24,7 @@ let SalesTargetsController = class SalesTargetsController {
     create(body) { return this.targets.create(body); }
     findAll() { return this.targets.findAll(); }
     update(id, body) { return this.targets.update(id, body); }
+    remove(id) { return this.targets.remove(id); }
 };
 exports.SalesTargetsController = SalesTargetsController;
 __decorate([
@@ -47,6 +48,13 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
 ], SalesTargetsController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], SalesTargetsController.prototype, "remove", null);
 exports.SalesTargetsController = SalesTargetsController = __decorate([
     (0, common_1.Controller)('sales-targets'),
     (0, roles_decorator_1.Roles)('Sales & Operations'),

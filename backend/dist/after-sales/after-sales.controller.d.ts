@@ -5,4 +5,5 @@ export declare class AfterSalesController {
     create(body: any): any;
     findAll(): Promise<any[]>;
     update(id: string, body: any): Promise<any>;
+    remove(id: string): Promise<any>;
 }

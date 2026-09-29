@@ -24,6 +24,7 @@ let CommissionsController = class CommissionsController {
     create(body) { return this.commissions.create(body); }
     findAll() { return this.commissions.findAll(); }
     update(id, body) { return this.commissions.update(id, body); }
+    remove(id) { return this.commissions.remove(id); }
 };
 exports.CommissionsController = CommissionsController;
 __decorate([
@@ -47,6 +48,13 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
 ], CommissionsController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], CommissionsController.prototype, "remove", null);
 exports.CommissionsController = CommissionsController = __decorate([
     (0, common_1.Controller)('commissions'),
     (0, roles_decorator_1.Roles)('Admin / Owner', 'Sales & Operations', 'Accountant / Finance Staff'),

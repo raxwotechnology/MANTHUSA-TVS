@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { AfterSalesService } from './after-sales.service';
 import { Roles } from '../auth/roles.decorator';
 
@@ -9,4 +9,5 @@ export class AfterSalesController {
   @Post() create(@Body() body: any) { return this.afterSales.create(body); }
   @Get() findAll() { return this.afterSales.findAll(); }
   @Put(':id') update(@Param('id') id: string, @Body() body: any) { return this.afterSales.update(id, body); }
+  @Delete(':id') remove(@Param('id') id: string) { return this.afterSales.remove(id); }
 }

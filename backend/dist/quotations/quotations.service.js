@@ -50,11 +50,26 @@ let QuotationsService = class QuotationsService {
         return quotation;
     }
     async update(id, updateQuotationDto) {
-        const existingQuotation = await this.quotationModel.findByIdAndUpdate(id, updateQuotationDto, { new: true }).exec();
-        if (!existingQuotation) {
+        const quotation = await this.quotationModel.findById(id).exec();
+        if (!quotation)
             throw new common_1.NotFoundException(`Quotation #${id} not found`);
+        const vehiclePrice = Number(updateQuotationDto.vehiclePrice ?? quotation.vehiclePrice ?? 0);
+        const discount = Number(updateQuotationDto.discount ?? quotation.discount ?? 0);
+        const registrationFee = Number(updateQuotationDto.registrationFee ?? quotation.registrationFee ?? 0);
+        const insuranceFee = Number(updateQuotationDto.insuranceFee ?? quotation.insuranceFee ?? 0);
+        const otherCharges = Number(updateQuotationDto.otherCharges ?? updateQuotationDto.additionalCharges ?? quotation.otherCharges ?? 0);
+        const advancePayment = Number(updateQuotationDto.advancePayment ?? quotation.advancePayment ?? 0);
+        if (vehiclePrice <= 0 || discount < 0 || discount >= vehiclePrice || registrationFee < 0 || insuranceFee < 0 || otherCharges < 0) {
+            throw new common_1.BadRequestException('Quotation pricing is invalid.');
         }
-        return existingQuotation;
+        const totalAmount = vehiclePrice - discount + registrationFee + insuranceFee + otherCharges;
+        if (advancePayment < 0 || advancePayment > totalAmount)
+            throw new common_1.BadRequestException('Advance payment must be between zero and the quotation total.');
+        Object.assign(quotation, updateQuotationDto, {
+            vehiclePrice, discount, registrationFee, insuranceFee, otherCharges, advancePayment,
+            totalAmount,
+        });
+        return quotation.save();
     }
     async remove(id) {
         const deletedQuotation = await this.quotationModel.findByIdAndDelete(id).exec();

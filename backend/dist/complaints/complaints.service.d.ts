@@ -5,4 +5,5 @@ export declare class ComplaintsService {
     create(input: any): any;
     findAll(): Promise<any[]>;
     update(id: string, input: any): Promise<any>;
+    remove(id: string): Promise<any>;
 }

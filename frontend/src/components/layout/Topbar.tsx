@@ -165,8 +165,8 @@ export function Topbar({ user, onToggleSidebar }: TopbarProps) {
             <User className="w-4 h-4 text-blue-600" />
           </div>
           <div className="hidden sm:block text-left">
-            <p className="text-xs font-bold text-gray-800 truncate max-w-[100px] md:max-w-none">{user?.name || 'Saman Kumara'}</p>
-            <p className="text-[10px] text-gray-500 font-medium">{user?.role || 'Administrator'}</p>
+            <p className="text-xs font-bold text-gray-800 truncate max-w-[100px] md:max-w-none">{user?.name || 'User'}</p>
+            <p className="text-[10px] text-gray-500 font-medium">{user?.role || ''}</p>
           </div>
           <button
             onClick={handleLogout}

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { CommissionsService } from './commissions.service';
 import { Roles } from '../auth/roles.decorator';
 
@@ -9,4 +9,5 @@ export class CommissionsController {
   @Post() create(@Body() body: any) { return this.commissions.create(body); }
   @Get() findAll() { return this.commissions.findAll(); }
   @Put(':id') update(@Param('id') id: string, @Body() body: any) { return this.commissions.update(id, body); }
+  @Delete(':id') remove(@Param('id') id: string) { return this.commissions.remove(id); }
 }

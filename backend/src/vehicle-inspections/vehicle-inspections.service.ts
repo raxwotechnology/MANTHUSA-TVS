@@ -28,4 +28,14 @@ export class VehicleInspectionsService {
     }
     return item;
   }
+  async remove(id: string) {
+    const item = await this.inspections.findByIdAndDelete(id).exec();
+    if (!item) throw new NotFoundException(`Inspection ${id} not found.`);
+    const vehicle = await this.vehicles.findById(item.vehicle).exec();
+    if (vehicle && ['Under Inspection', 'Under Repair'].includes(vehicle.status)) {
+      vehicle.status = 'Available';
+      await vehicle.save();
+    }
+    return item;
+  }
 }

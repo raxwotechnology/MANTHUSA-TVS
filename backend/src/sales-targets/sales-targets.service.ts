@@ -33,4 +33,9 @@ export class SalesTargetsService {
     if (!row) throw new NotFoundException(`Sales target ${id} not found.`);
     return row;
   }
+  async remove(id: string) {
+    const row = await this.model.findByIdAndDelete(id).exec();
+    if (!row) throw new NotFoundException(`Sales target ${id} not found.`);
+    return row;
+  }
 }

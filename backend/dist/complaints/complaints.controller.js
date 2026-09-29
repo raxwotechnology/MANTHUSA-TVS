@@ -24,6 +24,7 @@ let ComplaintsController = class ComplaintsController {
     create(body) { return this.complaints.create(body); }
     findAll() { return this.complaints.findAll(); }
     update(id, body) { return this.complaints.update(id, body); }
+    remove(id) { return this.complaints.remove(id); }
 };
 exports.ComplaintsController = ComplaintsController;
 __decorate([
@@ -47,6 +48,13 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
 ], ComplaintsController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], ComplaintsController.prototype, "remove", null);
 exports.ComplaintsController = ComplaintsController = __decorate([
     (0, common_1.Controller)('complaints'),
     (0, roles_decorator_1.Roles)('Sales & Operations'),

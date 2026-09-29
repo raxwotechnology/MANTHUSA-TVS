@@ -24,6 +24,7 @@ let AfterSalesController = class AfterSalesController {
     create(body) { return this.afterSales.create(body); }
     findAll() { return this.afterSales.findAll(); }
     update(id, body) { return this.afterSales.update(id, body); }
+    remove(id) { return this.afterSales.remove(id); }
 };
 exports.AfterSalesController = AfterSalesController;
 __decorate([
@@ -47,6 +48,13 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
 ], AfterSalesController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], AfterSalesController.prototype, "remove", null);
 exports.AfterSalesController = AfterSalesController = __decorate([
     (0, common_1.Controller)('after-sales'),
     (0, roles_decorator_1.Roles)('Sales & Operations'),

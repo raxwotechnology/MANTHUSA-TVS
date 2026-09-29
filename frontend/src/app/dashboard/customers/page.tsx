@@ -23,6 +23,8 @@ export default function CustomersPage() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
+  const [deletingCustomer, setDeletingCustomer] = useState<Customer | null>(null);
   const [selectedTimelineCustomer, setSelectedTimelineCustomer] = useState<Customer | null>(null);
   const [timeline, setTimeline] = useState<any[]>([]);
   const [timelineError, setTimelineError] = useState('');
@@ -62,18 +64,33 @@ export default function CustomersPage() {
   const handleAddCust = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await apiFetch('/customers', {
-        method: 'POST',
+      const response = await apiFetch(editingCustomer ? `/customers/${editingCustomer._id}` : '/customers', {
+        method: editingCustomer ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...newCust, nicOrPassport: newCust.nicPassport })
       });
       if (!response.ok) throw new Error('Could not save customer. Check the details and try again.');
       const saved = await response.json();
-      setCustomers((current) => [saved, ...current]);
+      setCustomers((current) => editingCustomer
+        ? current.map((customer) => customer._id === editingCustomer._id ? { ...customer, ...saved, nicPassport: saved.nicOrPassport || saved.nicPassport || newCust.nicPassport } : customer)
+        : [saved, ...current]);
       setShowAddModal(false);
+      setEditingCustomer(null);
       setNewCust({ fullName: '', nicPassport: '', phone: '', email: '', address: '', city: 'Colombo', occupation: '', customerType: 'Individual' });
     } catch (err) {
       window.alert(err instanceof Error ? err.message : 'Could not connect to the server.');
+    }
+  };
+
+  const deleteCustomer = async () => {
+    if (!deletingCustomer) return;
+    try {
+      const response = await apiFetch(`/customers/${deletingCustomer._id}`, { method: 'DELETE' });
+      if (!response.ok) throw new Error('Could not delete customer. They may have linked sales or records.');
+      setCustomers((current) => current.filter((customer) => customer._id !== deletingCustomer._id));
+      setDeletingCustomer(null);
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : 'Could not delete customer.');
     }
   };
 
@@ -125,7 +142,7 @@ export default function CustomersPage() {
                 <th className="py-3 px-4">NIC / Passport</th>
                 <th className="py-3 px-4">Contact</th>
                 <th className="py-3 px-4">Location</th>
-                <th className="py-3 px-4 text-center">Lifecycle Timeline</th>
+                <th className="py-3 px-4 text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -151,6 +168,8 @@ export default function CustomersPage() {
                     >
                       View Timeline →
                     </button>
+                    <button onClick={() => { setEditingCustomer(c); setNewCust({ fullName: c.fullName || '', nicPassport: c.nicPassport || '', phone: c.phone || '', email: c.email || '', address: c.address || '', city: c.city || '', occupation: c.occupation || '', customerType: c.customerType || 'Individual' }); setShowAddModal(true); }} className="ml-2 rounded-lg border px-3 py-1.5 text-[11px] font-semibold">Edit</button>
+                    <button onClick={() => setDeletingCustomer(c)} className="ml-2 rounded-lg border border-rose-200 px-3 py-1.5 text-[11px] font-semibold text-rose-700">Delete</button>
                   </td>
                 </tr>
               ))}
@@ -164,7 +183,7 @@ export default function CustomersPage() {
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-200">
             <div className="flex items-center justify-between border-b pb-3 mb-4">
-              <h3 className="text-base font-bold text-slate-900">Create Customer Profile</h3>
+              <h3 className="text-base font-bold text-slate-900">{editingCustomer ? 'Edit Customer Profile' : 'Create Customer Profile'}</h3>
               <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-slate-600"><X className="w-5 h-5" /></button>
             </div>
 
@@ -204,13 +223,15 @@ export default function CustomersPage() {
               </div>
 
               <div className="flex justify-end gap-2 pt-3 border-t">
-                <button type="button" onClick={() => setShowAddModal(false)} className="px-4 py-2 border rounded-lg">Cancel</button>
-                <button type="submit" className="px-5 py-2 bg-emerald-600 text-white rounded-lg font-semibold">Save Profile</button>
+                <button type="button" onClick={() => { setShowAddModal(false); setEditingCustomer(null); }} className="px-4 py-2 border rounded-lg">Cancel</button>
+                <button type="submit" className="px-5 py-2 bg-emerald-600 text-white rounded-lg font-semibold">{editingCustomer ? 'Save Changes' : 'Save Profile'}</button>
               </div>
             </form>
           </div>
         </div>
       )}
+
+      {deletingCustomer && <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/50 p-4"><section role="alertdialog" aria-modal="true" className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"><h2 className="text-lg font-bold">Delete {deletingCustomer.fullName}?</h2><p className="mt-2 text-sm text-slate-600">Linked customer records may prevent deletion.</p><div className="mt-6 flex justify-end gap-2"><button onClick={() => setDeletingCustomer(null)} className="rounded-lg border px-4 py-2 text-sm">Cancel</button><button onClick={deleteCustomer} className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white">Delete customer</button></div></section></div>}
 
       {/* Customer Timeline Modal (Section 11) */}
       {selectedTimelineCustomer && (

@@ -71,7 +71,16 @@ export class SalesService {
     if (!existingSale) {
       throw new NotFoundException(`Sale #${id} not found`);
     }
-    Object.assign(existingSale, updateSaleDto);
+    const vehiclePrice = Number(updateSaleDto.vehiclePrice ?? existingSale.vehiclePrice ?? 0);
+    const discount = Number(updateSaleDto.discount ?? existingSale.discount ?? 0);
+    const additionalCharges = Number(updateSaleDto.additionalCharges ?? existingSale.additionalCharges ?? 0);
+    if (vehiclePrice <= 0 || discount < 0 || discount >= vehiclePrice || additionalCharges < 0) {
+      throw new BadRequestException('Sale pricing is invalid.');
+    }
+    const finalAmount = vehiclePrice - discount + additionalCharges;
+    const paidAmount = Number(updateSaleDto.paidAmount ?? existingSale.paidAmount ?? 0);
+    if (paidAmount < 0 || paidAmount > finalAmount) throw new BadRequestException('Paid amount cannot exceed the updated sale total.');
+    Object.assign(existingSale, updateSaleDto, { vehiclePrice, discount, additionalCharges, finalAmount, paidAmount, balance: finalAmount - paidAmount });
     if (existingSale.status === 'Cancelled' || existingSale.status === 'Refunded') {
       const vehicle = await this.vehicleModel.findById(existingSale.vehicle).exec();
       if (vehicle?.status === 'Sold') { vehicle.status = 'Available'; await vehicle.save(); }
@@ -84,6 +93,11 @@ export class SalesService {
     const deletedSale = await this.saleModel.findByIdAndDelete(id).exec();
     if (!deletedSale) {
       throw new NotFoundException(`Sale #${id} not found`);
+    }
+    const vehicle = await this.vehicleModel.findById(deletedSale.vehicle).exec();
+    if (vehicle?.status === 'Sold') {
+      vehicle.status = 'Available';
+      await vehicle.save();
     }
     return deletedSale;
   }

@@ -15,4 +15,9 @@ export class TestDrivesService {
     if (!item) throw new NotFoundException(`Test drive ${id} not found.`);
     return item;
   }
+  async remove(id: string) {
+    const item = await this.model.findByIdAndDelete(id).exec();
+    if (!item) throw new NotFoundException(`Test drive ${id} not found.`);
+    return item;
+  }
 }

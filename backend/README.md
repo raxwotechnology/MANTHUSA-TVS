@@ -22,9 +22,18 @@ npm run migrate:reference-ids
 The migration is idempotent and converts valid 24-character reference IDs in place.
 
 ### 2. Database Initialization (Seed)
-Populate MongoDB with default system roles, demo users, sample vehicle inventory, and financial ledger data:
+Create the system roles and an administrator account. Set unique administrator credentials before running this command; no sample dealership records are created. The command refuses to run if the database already contains data.
 
 ```bash
+BOOTSTRAP_ADMIN_NAME="Your Name" BOOTSTRAP_ADMIN_EMAIL="you@example.com" BOOTSTRAP_ADMIN_PASSWORD="use-a-unique-password-at-least-12-chars" npm run seed
+```
+
+On PowerShell, set the variables for the current session first:
+
+```powershell
+$env:BOOTSTRAP_ADMIN_NAME = "Your Name"
+$env:BOOTSTRAP_ADMIN_EMAIL = "you@example.com"
+$env:BOOTSTRAP_ADMIN_PASSWORD = "use-a-unique-password-at-least-12-chars"
 npm run seed
 ```
 

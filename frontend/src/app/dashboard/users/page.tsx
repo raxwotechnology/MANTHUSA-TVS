@@ -14,45 +14,7 @@ interface UserItem {
 }
 
 export default function UsersPermissionsPage() {
-  const defaultUsersList: UserItem[] = [
-    {
-      name: 'Saman Kumara',
-      email: 'admin@salesplus.com',
-      role: 'Admin / Owner',
-      access: 'Full system control',
-      status: 'Active'
-    },
-    {
-      name: 'Nimal Perera',
-      email: 'manager@salesplus.com',
-      role: 'Admin / Owner',
-      access: 'Full system control',
-      status: 'Active'
-    },
-    {
-      name: 'Kasun Fernando',
-      email: 'executive@salesplus.com',
-      role: 'Sales & Operations Staff',
-      access: 'Customers, CRM, Vehicles, Test Drives, Quotations, Sales',
-      status: 'Active'
-    },
-    {
-      name: 'Dilini Silva',
-      email: 'accountant@salesplus.com',
-      role: 'Accountant / Finance Staff',
-      access: 'Payments, Installments, Expenses, Cash Flow, Financial Reports',
-      status: 'Active'
-    },
-    {
-      name: 'Ruwan Jayasinghe',
-      email: 'manager2@salesplus.com',
-      role: 'Sales & Operations Staff',
-      access: 'Inventory, Inspections, Handovers & Transfers',
-      status: 'Active'
-    }
-  ];
-
-  const [usersList, setUsersList] = useState<UserItem[]>(defaultUsersList);
+  const [usersList, setUsersList] = useState<UserItem[]>([]);
   const [roles, setRoles] = useState<any[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [error, setError] = useState('');
@@ -75,11 +37,11 @@ export default function UsersPermissionsPage() {
       }
       if (usersRes.ok) {
         const usersData = await usersRes.json();
-        if (Array.isArray(usersData) && usersData.length > 0) {
+        if (Array.isArray(usersData)) {
           const mappedUsers: UserItem[] = usersData.map((u: any) => ({
             _id: u._id,
-            name: u.name || 'Staff Member',
-            email: u.email || 'user@salesplus.com',
+            name: u.name || '',
+            email: u.email || '',
             role: u.role?.name || (typeof u.role === 'string' ? u.role : 'Sales & Operations Staff'),
             access: u.role?.name?.includes('Admin') ? 'Full system control' : u.role?.name?.includes('Accountant') ? 'Payments, Installments, Expenses, Cash Flow, Financial Reports' : 'Customers, CRM, Vehicles, Test Drives, Quotations, Sales',
             status: u.isActive !== false ? 'Active' : 'Inactive'
@@ -87,8 +49,9 @@ export default function UsersPermissionsPage() {
           setUsersList(mappedUsers);
         }
       }
-    } catch (err) {
-      console.log('Using default users list', err);
+    } catch {
+      setUsersList([]);
+      setError('Could not load staff accounts.');
     }
   };
 
@@ -201,62 +164,6 @@ export default function UsersPermissionsPage() {
             ))}
           </tbody>
         </table>
-      </div>
-
-      {/* Dynamic Role & Permission Matrix Editor */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
-        <div className="flex items-center justify-between border-b pb-3 mb-4">
-          <div>
-            <h3 className="font-bold text-slate-900 text-sm">Dynamic RBAC Permission Matrix</h3>
-            <p className="text-xs text-slate-500">Configure granular module-level actions (View, Create, Edit, Delete, Approve, Export) per role</p>
-          </div>
-          <button onClick={() => alert('Permissions updated successfully!')} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-xs">
-            Save Permission Matrix
-          </button>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs text-left border-collapse">
-            <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-slate-700 font-bold uppercase">
-                <th className="p-3">Module</th>
-                <th className="p-3 text-center">View</th>
-                <th className="p-3 text-center">Create</th>
-                <th className="p-3 text-center">Edit</th>
-                <th className="p-3 text-center">Delete</th>
-                <th className="p-3 text-center">Approve</th>
-                <th className="p-3 text-center">Export</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 text-slate-800 font-medium">
-              {[
-                { module: 'Vehicles & Stock', admin: [1,1,1,1,1,1], sales: [1,1,1,0,0,1], finance: [1,0,0,0,0,1] },
-                { module: 'Leads & CRM', admin: [1,1,1,1,1,1], sales: [1,1,1,1,0,1], finance: [1,0,0,0,0,0] },
-                { module: 'Test Drives', admin: [1,1,1,1,1,1], sales: [1,1,1,1,0,0], finance: [1,0,0,0,0,0] },
-                { module: 'Quotations', admin: [1,1,1,1,1,1], sales: [1,1,1,0,0,1], finance: [1,0,0,0,0,1] },
-                { module: 'Discount Approvals', admin: [1,1,1,1,1,1], sales: [1,1,0,0,0,0], finance: [1,0,0,0,0,0] },
-                { module: 'Reservations', admin: [1,1,1,1,1,1], sales: [1,1,1,1,0,1], finance: [1,0,0,0,0,1] },
-                { module: 'Sales Invoices', admin: [1,1,1,1,1,1], sales: [1,1,1,0,0,1], finance: [1,1,1,0,0,1] },
-                { module: 'Payments & Receipts', admin: [1,1,1,1,1,1], sales: [1,0,0,0,0,1], finance: [1,1,1,1,1,1] },
-                { module: 'Expenses & Cash Ledger', admin: [1,1,1,1,1,1], sales: [0,0,0,0,0,0], finance: [1,1,1,1,1,1] },
-                { module: 'Reports & Audit Logs', admin: [1,1,1,1,1,1], sales: [1,0,0,0,0,1], finance: [1,0,0,0,0,1] },
-              ].map((row, idx) => (
-                <tr key={idx} className="hover:bg-slate-50">
-                  <td className="p-3 font-bold text-slate-900">{row.module}</td>
-                  {['View', 'Create', 'Edit', 'Delete', 'Approve', 'Export'].map((action, actionIdx) => (
-                    <td key={actionIdx} className="p-3 text-center">
-                      <input
-                        type="checkbox"
-                        defaultChecked={row.admin[actionIdx] === 1}
-                        className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500 cursor-pointer"
-                      />
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
       </div>
 
       {/* Add Staff Account Modal */}

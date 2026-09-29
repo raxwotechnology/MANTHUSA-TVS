@@ -24,6 +24,8 @@ let VehiclePurchasesController = class VehiclePurchasesController {
     create(body) { return this.purchases.create(body); }
     findAll() { return this.purchases.findAll(); }
     findOne(id) { return this.purchases.findOne(id); }
+    update(id, body) { return this.purchases.update(id, body); }
+    remove(id) { return this.purchases.remove(id); }
 };
 exports.VehiclePurchasesController = VehiclePurchasesController;
 __decorate([
@@ -46,6 +48,21 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], VehiclePurchasesController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.Put)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", void 0)
+], VehiclePurchasesController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], VehiclePurchasesController.prototype, "remove", null);
 exports.VehiclePurchasesController = VehiclePurchasesController = __decorate([
     (0, common_1.Controller)('vehicle-purchases'),
     (0, roles_decorator_1.Roles)('Sales & Operations', 'Accountant / Finance Staff'),

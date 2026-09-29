@@ -29,6 +29,12 @@ let ComplaintsService = class ComplaintsService {
             throw new common_1.NotFoundException(`Complaint ${id} not found.`);
         return item;
     }
+    async remove(id) {
+        const item = await this.model.findByIdAndDelete(id).exec();
+        if (!item)
+            throw new common_1.NotFoundException(`Complaint ${id} not found.`);
+        return item;
+    }
 };
 exports.ComplaintsService = ComplaintsService;
 exports.ComplaintsService = ComplaintsService = __decorate([

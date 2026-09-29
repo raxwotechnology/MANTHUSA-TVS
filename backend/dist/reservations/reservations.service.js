@@ -81,6 +81,19 @@ let ReservationsService = class ReservationsService {
         Object.assign(reservation, input);
         return reservation.save();
     }
+    async remove(id) {
+        const reservation = await this.reservationModel.findByIdAndDelete(id).exec();
+        if (!reservation)
+            throw new common_1.NotFoundException(`Reservation ${id} not found.`);
+        if (reservation.status === 'Active') {
+            const vehicle = await this.vehicleModel.findById(reservation.vehicle).exec();
+            if (vehicle?.status === 'Reserved') {
+                vehicle.status = 'Available';
+                await vehicle.save();
+            }
+        }
+        return reservation;
+    }
 };
 exports.ReservationsService = ReservationsService;
 exports.ReservationsService = ReservationsService = __decorate([

@@ -32,7 +32,7 @@ let VehiclesService = class VehiclesService {
         const ad = Number(dto.advertisementCost || 0);
         const other = Number(dto.otherCosts || 0);
         const calculatedInvestment = purchase + importCost + transport + repair + detailing + registration + insurance + ad + other;
-        const totalInvestment = dto.totalInvestment && Number(dto.totalInvestment) > 0 ? Number(dto.totalInvestment) : calculatedInvestment;
+        const totalInvestment = calculatedInvestment;
         const sellingPrice = Number(dto.sellingPrice || 0);
         const expectedProfit = sellingPrice > 0 ? sellingPrice - totalInvestment : Number(dto.expectedProfit || 0);
         return { ...dto, totalInvestment, expectedProfit };
@@ -56,12 +56,12 @@ let VehiclesService = class VehiclesService {
         return vehicle;
     }
     async update(id, updateVehicleDto) {
-        const payload = this.calculateFinancials(updateVehicleDto);
-        const existingVehicle = await this.vehicleModel.findByIdAndUpdate(id, payload, { new: true }).exec();
-        if (!existingVehicle) {
+        const vehicle = await this.vehicleModel.findById(id).exec();
+        if (!vehicle)
             throw new common_1.NotFoundException(`Vehicle #${id} not found`);
-        }
-        return existingVehicle;
+        const { _id, createdAt, updatedAt, ...changes } = updateVehicleDto;
+        Object.assign(vehicle, this.calculateFinancials({ ...vehicle.toObject(), ...changes }));
+        return vehicle.save();
     }
     async remove(id) {
         const deletedVehicle = await this.vehicleModel.findByIdAndDelete(id).exec();

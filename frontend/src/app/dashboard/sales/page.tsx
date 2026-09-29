@@ -7,6 +7,8 @@ import { DollarSign, Plus, Printer, CheckCircle2, FileText, Search, X } from 'lu
 
 interface Sale {
   _id: string;
+  customerId?: string;
+  vehicleId?: string;
   invoiceNumber: string;
   customerName: string;
   vehicleName: string;
@@ -23,13 +25,22 @@ export default function SalesPage() {
 
 
   const [selectedInvoice, setSelectedInvoice] = useState<Sale | null>(null);
+  const [deletingInvoice, setDeletingInvoice] = useState<Sale | null>(null);
+
+  const deleteInvoice = async () => {
+    if (!deletingInvoice) return;
+    const response = await apiFetch(`/sales/${deletingInvoice._id}`, { method: 'DELETE' });
+    if (!response.ok) { window.alert('Could not delete invoice.'); return; }
+    setSales((current) => current.filter((sale) => sale._id !== deletingInvoice._id));
+    setDeletingInvoice(null);
+  };
 
   useEffect(() => {
     apiFetch('/sales').then(async (response) => {
       if (!response.ok) throw new Error('Could not load sales.');
       const data = await response.json();
       setSales(data.map((sale: any) => ({
-        _id: sale._id, invoiceNumber: sale.invoiceNumber,
+        _id: sale._id, invoiceNumber: sale.invoiceNumber, customerId: sale.customer?._id, vehicleId: sale.vehicle?._id,
         customerName: sale.customer?.fullName || '—',
         vehicleName: [sale.vehicle?.make, sale.vehicle?.model, sale.vehicle?.year].filter(Boolean).join(' '),
         finalAmount: Number(sale.finalAmount || 0), paidAmount: Number(sale.paidAmount || 0),
@@ -68,7 +79,7 @@ export default function SalesPage() {
                 <th className="py-3 px-4">Final Amount</th>
                 <th className="py-3 px-4">Paid Amount</th>
                 <th className="py-3 px-4">Status</th>
-                <th className="py-3 px-4 text-center">Invoice PDF</th>
+                <th className="py-3 px-4 text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -84,6 +95,7 @@ export default function SalesPage() {
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">{s.saleStatus}</span>
                   </td>
                   <td className="py-3 px-4 text-center">
+                    <div className="flex flex-wrap justify-center gap-1.5">
                     <button
                       onClick={() => setSelectedInvoice(s)}
                       className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-[11px] rounded-lg border flex items-center gap-1.5 mx-auto"
@@ -91,6 +103,9 @@ export default function SalesPage() {
                       <Printer className="w-3.5 h-3.5" />
                       <span>View Invoice</span>
                     </button>
+                    <button onClick={() => router.push(`/dashboard/sales/new?id=${s._id}`)} className="rounded-lg border border-emerald-200 px-3 py-1.5 text-[11px] font-semibold text-emerald-700">Edit</button>
+                    <button onClick={() => setDeletingInvoice(s)} className="rounded-lg border border-rose-200 px-3 py-1.5 text-[11px] font-semibold text-rose-700">Delete</button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -128,6 +143,7 @@ export default function SalesPage() {
           </div>
         </div>
       )}
+      {deletingInvoice && <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/50 p-4"><section role="alertdialog" aria-modal="true" className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"><h2 className="text-lg font-bold">Delete invoice {deletingInvoice.invoiceNumber}?</h2><p className="mt-2 text-sm text-slate-600">The invoice will be removed and its vehicle returned to available inventory.</p><div className="mt-6 flex justify-end gap-2"><button onClick={() => setDeletingInvoice(null)} className="rounded-lg border px-4 py-2 text-sm">Cancel</button><button onClick={deleteInvoice} className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white">Delete invoice</button></div></section></div>}
     
     </DashboardLayout>
   );

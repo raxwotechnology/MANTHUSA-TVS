@@ -23,4 +23,9 @@ export class CommissionsService {
     if (!item) throw new NotFoundException(`Commission ${id} not found.`);
     return item;
   }
+  async remove(id: string) {
+    const item = await this.model.findByIdAndDelete(id).exec();
+    if (!item) throw new NotFoundException(`Commission ${id} not found.`);
+    return item;
+  }
 }

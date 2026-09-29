@@ -49,6 +49,12 @@ let SalesTargetsService = class SalesTargetsService {
             throw new common_1.NotFoundException(`Sales target ${id} not found.`);
         return row;
     }
+    async remove(id) {
+        const row = await this.model.findByIdAndDelete(id).exec();
+        if (!row)
+            throw new common_1.NotFoundException(`Sales target ${id} not found.`);
+        return row;
+    }
 };
 exports.SalesTargetsService = SalesTargetsService;
 exports.SalesTargetsService = SalesTargetsService = __decorate([

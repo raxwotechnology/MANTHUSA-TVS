@@ -6,6 +6,8 @@ import { apiFetch } from '@/lib/api';
 
 interface Quotation {
   _id: string;
+  customerId?: string;
+  vehicleId?: string;
   quotationNumber: string;
   customerName: string;
   vehicleName: string;
@@ -16,6 +18,7 @@ interface Quotation {
   advancePayment: number;
   balanceAmount: number;
   status: string;
+  validUntil?: string;
 }
 
 export default function QuotationsPage() {
@@ -24,12 +27,14 @@ export default function QuotationsPage() {
   const [newFormData, setNewFormData] = useState({});
 
   const [selectedPdfQuote, setSelectedPdfQuote] = useState<Quotation | null>(null);
+  const [editingQuote, setEditingQuote] = useState<Quotation | null>(null);
+  const [deletingQuote, setDeletingQuote] = useState<Quotation | null>(null);
 
   const loadQuotations = async () => {
     const response = await apiFetch('/quotations');
     if (!response.ok) throw new Error('Could not load quotations.');
     const data = await response.json();
-    setQuotations(data.map((quote: any) => ({ ...quote, customerName: quote.customer?.fullName || '', vehicleName: `${quote.vehicle?.make || ''} ${quote.vehicle?.model || ''} ${quote.vehicle?.year || ''}`.trim(), additionalCharges: Number(quote.registrationFee || 0) + Number(quote.insuranceFee || 0) + Number(quote.otherCharges || 0), balanceAmount: Number(quote.totalAmount || 0) - Number(quote.advancePayment || 0), status: quote.status || 'Active' })));
+    setQuotations(data.map((quote: any) => ({ ...quote, customerId: quote.customer?._id, vehicleId: quote.vehicle?._id, customerName: quote.customer?.fullName || '', vehicleName: `${quote.vehicle?.make || ''} ${quote.vehicle?.model || ''} ${quote.vehicle?.year || ''}`.trim(), additionalCharges: Number(quote.registrationFee || 0) + Number(quote.insuranceFee || 0) + Number(quote.otherCharges || 0), balanceAmount: Number(quote.totalAmount || 0) - Number(quote.advancePayment || 0), status: quote.status || 'Active' })));
   };
   useEffect(() => { loadQuotations().catch((error) => window.alert(error.message)); }, []);
 
@@ -39,13 +44,27 @@ export default function QuotationsPage() {
       const [customerResponse, vehicleResponse] = await Promise.all([apiFetch('/customers'), apiFetch('/vehicles')]);
       if (!customerResponse.ok || !vehicleResponse.ok) throw new Error('Could not load quotation options.');
       const [customers, vehicles] = await Promise.all([customerResponse.json(), vehicleResponse.json()]);
-      const customer = customers.find((row: any) => row.fullName?.toLowerCase() === String(form.customerName || '').trim().toLowerCase());
-      const vehicle = vehicles.find((row: any) => `${row.make} ${row.model}`.toLowerCase() === String(form.vehicleName || '').trim().toLowerCase());
+      const customer = customers.find((row: any) => row.fullName?.toLowerCase() === String(form.customerName || '').trim().toLowerCase()) || customers.find((row: any) => row._id === editingQuote?.customerId);
+      const requestedVehicle = String(form.vehicleName || '').trim().toLowerCase();
+      const vehicle = vehicles.find((row: any) => `${row.make} ${row.model}`.toLowerCase() === requestedVehicle)
+        || vehicles.find((row: any) => `${row.make} ${row.model} ${row.year || ''}`.trim().toLowerCase() === requestedVehicle)
+        || vehicles.find((row: any) => row._id === editingQuote?.vehicleId);
       if (!customer || !vehicle) throw new Error('Enter an exact customer name and vehicle make/model from the system.');
-      const response = await apiFetch('/quotations', { method: 'POST', body: JSON.stringify({ customer: customer._id, vehicle: vehicle._id, vehiclePrice: Number(form.vehiclePrice || vehicle.sellingPrice), discount: Number(form.discount || 0), otherCharges: Number(form.additionalCharges || 0), advancePayment: Number(form.advancePayment || 0), validUntil: form.validUntil || new Date(Date.now() + 7 * 86400000).toISOString() }) });
-      if (!response.ok) throw new Error('Could not save quotation.');
-      await loadQuotations(); setShowAddModal(false); setNewFormData({});
+      const response = await apiFetch(editingQuote ? `/quotations/${editingQuote._id}` : '/quotations', { method: editingQuote ? 'PUT' : 'POST', body: JSON.stringify({ customer: customer._id, vehicle: vehicle._id, vehiclePrice: Number(form.vehiclePrice || vehicle.sellingPrice), discount: Number(form.discount || 0), registrationFee: 0, insuranceFee: 0, otherCharges: Number(form.additionalCharges || 0), advancePayment: Number(form.advancePayment || 0), validUntil: form.validUntil || editingQuote?.validUntil || new Date(Date.now() + 7 * 86400000).toISOString() }) });
+      if (!response.ok) {
+        const details = await response.json().catch(() => ({}));
+        throw new Error(details.message || 'Could not save quotation.');
+      }
+      await loadQuotations(); setShowAddModal(false); setEditingQuote(null); setNewFormData({});
     } catch (error) { window.alert(error instanceof Error ? error.message : 'Could not save quotation.'); }
+  };
+
+  const removeQuotation = async () => {
+    if (!deletingQuote) return;
+    const response = await apiFetch(`/quotations/${deletingQuote._id}`, { method: 'DELETE' });
+    if (!response.ok) { window.alert('Could not delete quotation.'); return; }
+    setQuotations((items) => items.filter((item) => item._id !== deletingQuote._id));
+    setDeletingQuote(null);
   };
 
   const formatLKR = (val: number) => {
@@ -78,7 +97,7 @@ export default function QuotationsPage() {
                 <th className="py-3 px-4">Discount</th>
                 <th className="py-3 px-4">Final Total</th>
                 <th className="py-3 px-4">Status</th>
-                <th className="py-3 px-4 text-center">PDF Export</th>
+                <th className="py-3 px-4 text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -94,6 +113,7 @@ export default function QuotationsPage() {
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">{q.status}</span>
                   </td>
                   <td className="py-3 px-4 text-center">
+                    <div className="flex flex-wrap justify-center gap-1.5">
                     <button
                       onClick={() => setSelectedPdfQuote(q)}
                       className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-[11px] rounded-lg border flex items-center gap-1.5 mx-auto"
@@ -101,6 +121,9 @@ export default function QuotationsPage() {
                       <Printer className="w-3.5 h-3.5" />
                       <span>Print / PDF</span>
                     </button>
+                    <button onClick={() => { setEditingQuote(q); setNewFormData({ quotationNumber: q.quotationNumber, customerName: q.customerName, vehicleName: q.vehicleName, vehiclePrice: String(q.vehiclePrice), discount: String(q.discount), additionalCharges: String(q.additionalCharges), advancePayment: String(q.advancePayment) }); setShowAddModal(true); }} className="rounded-lg border border-emerald-200 px-3 py-1.5 text-[11px] font-semibold text-emerald-700">Edit</button>
+                    <button onClick={() => setDeletingQuote(q)} className="rounded-lg border border-rose-200 px-3 py-1.5 text-[11px] font-semibold text-rose-700">Delete</button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -196,7 +219,7 @@ export default function QuotationsPage() {
       {showAddModal && (
         <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-xl max-h-[90vh] overflow-y-auto text-slate-900">
-            <h3 className="text-lg font-bold text-slate-900 mb-4">Create New Quotation</h3>
+            <h3 className="text-lg font-bold text-slate-900 mb-4">{editingQuote ? 'Edit Quotation' : 'Create New Quotation'}</h3>
             <div className="space-y-3">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Quotation Number</label>
@@ -204,36 +227,37 @@ export default function QuotationsPage() {
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Customer Name</label>
-                <input type="text" placeholder="e.g. Kamal Gunaratne" className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, customerName: e.target.value})} />
+                <input type="text" placeholder="e.g. Kamal Gunaratne" value={(newFormData as any).customerName || ''} className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, customerName: e.target.value})} />
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Vehicle Name / Make & Model</label>
-                <input type="text" placeholder="e.g. Toyota Axio / Premio" className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, vehicleName: e.target.value})} />
+                <input type="text" placeholder="e.g. Toyota Axio / Premio" value={(newFormData as any).vehicleName || ''} className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, vehicleName: e.target.value})} />
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Vehicle Price (LKR)</label>
-                <input type="number" placeholder="e.g. 13,500,000" className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, vehiclePrice: e.target.value})} />
+                <input type="number" placeholder="e.g. 13,500,000" value={(newFormData as any).vehiclePrice || ''} className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, vehiclePrice: e.target.value})} />
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Approved Discount (LKR)</label>
-                <input type="number" placeholder="e.g. 75,000" className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, discount: e.target.value})} />
+                <input type="number" placeholder="e.g. 75,000" value={(newFormData as any).discount || ''} className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, discount: e.target.value})} />
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Additional Charges (Registration/Insurance)</label>
-                <input type="number" placeholder="e.g. 50,000" className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, additionalCharges: e.target.value})} />
+                <input type="number" placeholder="e.g. 50,000" value={(newFormData as any).additionalCharges || ''} className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, additionalCharges: e.target.value})} />
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Advance Payment (LKR)</label>
-                <input type="number" placeholder="e.g. 500,000" className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, advancePayment: e.target.value})} />
+                <input type="number" placeholder="e.g. 500,000" value={(newFormData as any).advancePayment || ''} className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, advancePayment: e.target.value})} />
               </div>
             </div>
             <div className="flex justify-end gap-2 mt-6 pt-4 border-t">
-              <button onClick={() => setShowAddModal(false)} className="px-4 py-2 border rounded-lg text-slate-600 font-semibold text-xs">Cancel</button>
-              <button onClick={saveQuotation} className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold text-xs">Save Quotation</button>
+              <button onClick={() => { setShowAddModal(false); setEditingQuote(null); setNewFormData({}); }} className="px-4 py-2 border rounded-lg text-slate-600 font-semibold text-xs">Cancel</button>
+              <button onClick={saveQuotation} className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold text-xs">{editingQuote ? 'Save Changes' : 'Save Quotation'}</button>
             </div>
           </div>
         </div>
       )}
+      {deletingQuote && <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/50 p-4"><section role="alertdialog" aria-modal="true" className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"><h2 className="text-lg font-bold">Delete quotation {deletingQuote.quotationNumber}?</h2><p className="mt-2 text-sm text-slate-600">This action cannot be undone.</p><div className="mt-6 flex justify-end gap-2"><button onClick={() => setDeletingQuote(null)} className="rounded-lg border px-4 py-2 text-sm">Cancel</button><button onClick={removeQuotation} className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white">Delete quotation</button></div></section></div>}
     
     </DashboardLayout>
   );

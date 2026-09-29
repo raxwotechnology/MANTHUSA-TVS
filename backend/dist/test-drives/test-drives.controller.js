@@ -24,6 +24,7 @@ let TestDrivesController = class TestDrivesController {
     create(body) { return this.drives.create(body); }
     findAll() { return this.drives.findAll(); }
     update(id, body) { return this.drives.update(id, body); }
+    remove(id) { return this.drives.remove(id); }
 };
 exports.TestDrivesController = TestDrivesController;
 __decorate([
@@ -47,6 +48,13 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
 ], TestDrivesController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], TestDrivesController.prototype, "remove", null);
 exports.TestDrivesController = TestDrivesController = __decorate([
     (0, common_1.Controller)('test-drives'),
     (0, roles_decorator_1.Roles)('Sales & Operations'),

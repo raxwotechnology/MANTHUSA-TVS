@@ -24,6 +24,7 @@ let ReservationsController = class ReservationsController {
     create(body) { return this.reservations.create(body); }
     findAll() { return this.reservations.findAll(); }
     update(id, body) { return this.reservations.update(id, body); }
+    remove(id) { return this.reservations.remove(id); }
 };
 exports.ReservationsController = ReservationsController;
 __decorate([
@@ -47,6 +48,13 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
 ], ReservationsController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], ReservationsController.prototype, "remove", null);
 exports.ReservationsController = ReservationsController = __decorate([
     (0, common_1.Controller)('reservations'),
     (0, roles_decorator_1.Roles)('Sales & Operations', 'Accountant / Finance Staff'),

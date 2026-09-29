@@ -27,4 +27,18 @@ export declare class VehiclePurchasesService {
     } & {
         id: string;
     }>;
+    update(id: string, input: any): Promise<import("mongoose").Document<unknown, {}, VehiclePurchaseDocument, {}, import("mongoose").DefaultSchemaOptions> & import("./schemas/vehicle-purchase.schema").VehiclePurchase & import("mongoose").Document<import("mongoose").Types.ObjectId, any, any, Record<string, any>, {}> & Required<{
+        _id: import("mongoose").Types.ObjectId;
+    }> & {
+        __v: number;
+    } & {
+        id: string;
+    }>;
+    remove(id: string): Promise<import("mongoose").Document<unknown, {}, VehiclePurchaseDocument, {}, import("mongoose").DefaultSchemaOptions> & import("./schemas/vehicle-purchase.schema").VehiclePurchase & import("mongoose").Document<import("mongoose").Types.ObjectId, any, any, Record<string, any>, {}> & Required<{
+        _id: import("mongoose").Types.ObjectId;
+    }> & {
+        __v: number;
+    } & {
+        id: string;
+    }>;
 }

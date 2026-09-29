@@ -32,9 +32,9 @@ export default function LeadsPage() {
   const [newLead, setNewLead] = useState({
     customerName: '',
     customerPhone: '',
-    interestedVehicle: 'Toyota Premio',
+    interestedVehicle: '',
     source: 'Website',
-    budget: 12000000,
+    budget: '',
     status: 'New',
     priority: 'Medium'
   });
@@ -226,7 +226,7 @@ export default function LeadsPage() {
                 </div>
                 <div>
                   <label className="block font-semibold mb-1">Budget (LKR)</label>
-                  <input type="number" placeholder="e.g. 12,000,000" value={newLead.budget} onChange={(e) => setNewLead({ ...newLead, budget: Number(e.target.value) })} className="w-full p-2 border rounded-lg bg-slate-50 placeholder:text-slate-400" />
+                  <input type="number" placeholder="e.g. 12,000,000" value={newLead.budget} onChange={(e) => setNewLead({ ...newLead, budget: e.target.value })} className="w-full p-2 border rounded-lg bg-slate-50 placeholder:text-slate-400" />
                 </div>
               </div>
 

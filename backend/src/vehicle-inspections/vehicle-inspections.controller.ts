@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { VehicleInspectionsService } from './vehicle-inspections.service';
 import { Roles } from '../auth/roles.decorator';
 
@@ -9,4 +9,5 @@ export class VehicleInspectionsController {
   @Post() create(@Body() body: any) { return this.inspections.create(body); }
   @Get() findAll() { return this.inspections.findAll(); }
   @Put(':id') update(@Param('id') id: string, @Body() body: any) { return this.inspections.update(id, body); }
+  @Delete(':id') remove(@Param('id') id: string) { return this.inspections.remove(id); }
 }

@@ -80,29 +80,30 @@ export default function VehicleInventoryPage() {
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
+  const [deletingVehicle, setDeletingVehicle] = useState<Vehicle | null>(null);
 
   // Form State
   const [newVehicle, setNewVehicle] = useState({
-    stockNumber: `STK-2026-00${vehicles.length + 1}`,
+    stockNumber: '',
     registrationNumber: '',
-    make: 'Toyota',
+    make: '',
     model: '',
     variant: '',
-    year: 2020,
+    year: '',
     fuelType: 'Petrol',
     transmission: 'Automatic',
-    engineCapacity: 1500,
+    engineCapacity: '',
     chassisNumber: '',
-    mileage: 30000,
-    color: 'White',
-    purchasePrice: 10000000,
-    transportCost: 30000,
-    repairCost: 50000,
-    detailingCost: 20000,
-    sellingPrice: 12000000,
-    minimumSellingPrice: 11800000,
+    mileage: '',
+    color: '',
+    purchasePrice: '',
+    transportCost: '',
+    repairCost: '',
+    detailingCost: '',
+    sellingPrice: '',
+    minimumSellingPrice: '',
     status: 'Available',
-    images: ['https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=1000'],
+    images: [] as string[],
     mediaAngles: {
       front: '',
       rear: '',
@@ -174,6 +175,18 @@ export default function VehicleInventoryPage() {
     });
   };
 
+  const deleteVehicle = async () => {
+    if (!deletingVehicle) return;
+    const response = await apiFetch(`/vehicles/${deletingVehicle._id}`, { method: 'DELETE' });
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({}));
+      setApiError(body.message || 'Could not delete vehicle.');
+      return;
+    }
+    setVehicles((current) => current.filter((vehicle) => vehicle._id !== deletingVehicle._id));
+    setDeletingVehicle(null);
+  };
+
   const handleAddVehicle = async (e: React.FormEvent) => {
     e.preventDefault();
     const purchasePrice = parseFloat(newVehicle.purchasePrice as any) || 0;
@@ -205,8 +218,8 @@ export default function VehicleInventoryPage() {
 
     const item: Vehicle = {
       _id: Date.now().toString(),
-      stockNumber: newVehicle.stockNumber,
-      registrationNumber: newVehicle.registrationNumber || 'UNREGISTERED',
+      stockNumber: newVehicle.stockNumber || `STK-${new Date().getFullYear()}-${Date.now()}`,
+      registrationNumber: newVehicle.registrationNumber,
       make: newVehicle.make,
       model: newVehicle.model,
       variant: newVehicle.variant,
@@ -214,7 +227,7 @@ export default function VehicleInventoryPage() {
       fuelType: newVehicle.fuelType,
       transmission: newVehicle.transmission,
       engineCapacity: Number(newVehicle.engineCapacity),
-      chassisNumber: newVehicle.chassisNumber || 'CHASSIS-' + Math.floor(100000 + Math.random() * 900000),
+      chassisNumber: newVehicle.chassisNumber,
       mileage: Number(newVehicle.mileage),
       color: newVehicle.color,
       purchasePrice,
@@ -389,6 +402,10 @@ export default function VehicleInventoryPage() {
                       <Eye className="w-3.5 h-3.5" />
                       <span>View Specs & Media</span>
                     </button>
+                    <div className="mt-2 flex justify-center gap-2">
+                      <button onClick={() => window.location.assign(`/dashboard/vehicles/new?id=${v._id}`)} className="rounded-lg border border-emerald-200 px-3 py-1.5 text-[11px] font-semibold text-emerald-700 hover:bg-emerald-50">Edit</button>
+                      <button onClick={() => setDeletingVehicle(v)} className="rounded-lg border border-rose-200 px-3 py-1.5 text-[11px] font-semibold text-rose-700 hover:bg-rose-50">Delete</button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -462,7 +479,7 @@ export default function VehicleInventoryPage() {
                     type="number"
                     placeholder="e.g. 2024"
                     value={newVehicle.year}
-                    onChange={(e) => setNewVehicle({ ...newVehicle, year: Number(e.target.value) })}
+                    onChange={(e) => setNewVehicle({ ...newVehicle, year: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg placeholder:text-slate-400"
                   />
                 </div>
@@ -916,6 +933,7 @@ export default function VehicleInventoryPage() {
           </div>
         </div>
       )}
+      {deletingVehicle && <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/50 p-4"><section role="alertdialog" aria-modal="true" className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"><h2 className="text-lg font-bold">Delete {deletingVehicle.make} {deletingVehicle.model}?</h2><p className="mt-2 text-sm text-slate-600">This removes the vehicle from inventory and cannot be undone.</p><div className="mt-6 flex justify-end gap-2"><button onClick={() => setDeletingVehicle(null)} className="rounded-lg border px-4 py-2 text-sm">Cancel</button><button onClick={deleteVehicle} className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white">Delete vehicle</button></div></section></div>}
     </DashboardLayout>
   );
 }

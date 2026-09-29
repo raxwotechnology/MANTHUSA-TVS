@@ -56,4 +56,14 @@ export class ReservationsService {
     Object.assign(reservation, input);
     return reservation.save();
   }
+
+  async remove(id: string) {
+    const reservation = await this.reservationModel.findByIdAndDelete(id).exec();
+    if (!reservation) throw new NotFoundException(`Reservation ${id} not found.`);
+    if (reservation.status === 'Active') {
+      const vehicle = await this.vehicleModel.findById(reservation.vehicle).exec();
+      if (vehicle?.status === 'Reserved') { vehicle.status = 'Available'; await vehicle.save(); }
+    }
+    return reservation;
+  }
 }

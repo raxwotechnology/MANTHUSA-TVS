@@ -24,6 +24,7 @@ let VehicleInspectionsController = class VehicleInspectionsController {
     create(body) { return this.inspections.create(body); }
     findAll() { return this.inspections.findAll(); }
     update(id, body) { return this.inspections.update(id, body); }
+    remove(id) { return this.inspections.remove(id); }
 };
 exports.VehicleInspectionsController = VehicleInspectionsController;
 __decorate([
@@ -47,6 +48,13 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
 ], VehicleInspectionsController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], VehicleInspectionsController.prototype, "remove", null);
 exports.VehicleInspectionsController = VehicleInspectionsController = __decorate([
     (0, common_1.Controller)('vehicle-inspections'),
     (0, roles_decorator_1.Roles)('Sales & Operations'),

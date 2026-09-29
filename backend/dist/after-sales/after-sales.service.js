@@ -29,6 +29,12 @@ let AfterSalesService = class AfterSalesService {
             throw new common_1.NotFoundException(`After-sales record ${id} not found.`);
         return item;
     }
+    async remove(id) {
+        const item = await this.model.findByIdAndDelete(id).exec();
+        if (!item)
+            throw new common_1.NotFoundException(`After-sales record ${id} not found.`);
+        return item;
+    }
 };
 exports.AfterSalesService = AfterSalesService;
 exports.AfterSalesService = AfterSalesService = __decorate([

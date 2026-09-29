@@ -50,6 +50,17 @@ let VehicleInspectionsService = class VehicleInspectionsService {
         }
         return item;
     }
+    async remove(id) {
+        const item = await this.inspections.findByIdAndDelete(id).exec();
+        if (!item)
+            throw new common_1.NotFoundException(`Inspection ${id} not found.`);
+        const vehicle = await this.vehicles.findById(item.vehicle).exec();
+        if (vehicle && ['Under Inspection', 'Under Repair'].includes(vehicle.status)) {
+            vehicle.status = 'Available';
+            await vehicle.save();
+        }
+        return item;
+    }
 };
 exports.VehicleInspectionsService = VehicleInspectionsService;
 exports.VehicleInspectionsService = VehicleInspectionsService = __decorate([

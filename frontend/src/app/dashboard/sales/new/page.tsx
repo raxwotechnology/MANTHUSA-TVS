@@ -20,6 +20,8 @@ export default function NewSalePage() {
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [existingPaidAmount, setExistingPaidAmount] = useState(0);
 
   useEffect(() => {
     Promise.all([apiFetch('/customers'), apiFetch('/vehicles')]).then(async ([customerRes, vehicleRes]) => {
@@ -28,6 +30,19 @@ export default function NewSalePage() {
       setCustomers(customerData);
       setVehicles(vehicleData.filter((vehicle: any) => ['Available', 'Reserved'].includes(vehicle.status)));
     }).catch((err) => setError(err instanceof Error ? err.message : 'Could not load sale options.'));
+  }, []);
+
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get('id');
+    if (!id) return;
+    setEditingId(id);
+    apiFetch(`/sales/${id}`).then(async (response) => {
+      if (!response.ok) throw new Error('Could not load invoice for editing.');
+      const sale = await response.json();
+      setExistingPaidAmount(Number(sale.paidAmount || 0));
+      setFormData({ invoiceNumber: sale.invoiceNumber || '', customer: sale.customer?._id || sale.customer || '', vehicle: sale.vehicle?._id || sale.vehicle || '', vehiclePrice: sale.vehiclePrice || 0, discount: sale.discount || 0, additionalCharges: sale.additionalCharges || 0, status: sale.status || 'Confirmed' });
+      if (sale.vehicle?._id) setVehicles((current) => current.some((vehicle) => vehicle._id === sale.vehicle._id) ? current : [...current, sale.vehicle]);
+    }).catch((err) => setError(err instanceof Error ? err.message : 'Could not load invoice.'));
   }, []);
 
   const handleChange = (e: any) => {
@@ -40,10 +55,10 @@ export default function NewSalePage() {
     setError('');
     const finalAmount = Number(formData.vehiclePrice) - Number(formData.discount) + Number(formData.additionalCharges);
     try {
-      const res = await apiFetch('/sales', {
-        method: 'POST',
+      const res = await apiFetch(editingId ? `/sales/${editingId}` : '/sales', {
+        method: editingId ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, finalAmount, balance: finalAmount, paidAmount: 0 })
+        body: JSON.stringify({ ...formData, finalAmount, balance: finalAmount - existingPaidAmount, paidAmount: existingPaidAmount })
       });
       if (res.ok) {
         router.push('/dashboard/sales');
@@ -63,7 +78,7 @@ export default function NewSalePage() {
     <DashboardLayout>
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900">Create Sale Invoice</h1>
+          <h1 className="text-2xl font-extrabold text-slate-900">{editingId ? 'Edit Sale Invoice' : 'Create Sale Invoice'}</h1>
           <p className="text-xs text-slate-500">Issue official vehicle sale invoice and record customer payment terms</p>
         </div>
         <div>
@@ -80,7 +95,7 @@ export default function NewSalePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Invoice Number</label>
-              <input type="text" name="invoiceNumber" placeholder="e.g. INV-2026-0089 (Leave blank for auto)" onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400" />
+              <input type="text" name="invoiceNumber" value={formData.invoiceNumber} placeholder="e.g. INV-2026-0089 (Leave blank for auto)" onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400" />
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Customer</label>
@@ -106,11 +121,11 @@ export default function NewSalePage() {
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Discount (LKR)</label>
-              <input type="number" name="discount" placeholder="e.g. 150,000" onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400" />
+              <input type="number" name="discount" value={formData.discount || ''} placeholder="e.g. 150,000" onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400" />
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Additional Charges (LKR)</label>
-              <input type="number" name="additionalCharges" placeholder="e.g. 25,000" onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400" />
+              <input type="number" name="additionalCharges" value={formData.additionalCharges || ''} placeholder="e.g. 25,000" onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400" />
             </div>
           </div>
 
@@ -119,7 +134,7 @@ export default function NewSalePage() {
               <button type="button" className="px-4 py-2 border rounded-lg text-slate-600 text-xs font-semibold">Cancel</button>
             </Link>
             <button type="submit" disabled={busy} className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold disabled:opacity-50 shadow-xs">
-              {busy ? 'Processing Invoice...' : 'Process Sale Invoice'}
+              {busy ? 'Saving Invoice...' : editingId ? 'Save Invoice Changes' : 'Process Sale Invoice'}
             </button>
           </div>
         </form>

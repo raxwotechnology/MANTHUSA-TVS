@@ -1,6 +1,6 @@
 "use client";
 import { apiFetch } from '@/lib/api';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
@@ -8,6 +8,8 @@ import { Camera, Upload, Paperclip } from 'lucide-react';
 
 export default function NewVehiclePage() {
   const router = useRouter();
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState('');
   const [formData, setFormData] = useState({
     stockNumber: '',
     make: '',
@@ -15,6 +17,9 @@ export default function NewVehiclePage() {
     variant: '',
     manufacturingYear: '',
     registrationNumber: '',
+    chassisNumber: '',
+    mileage: '',
+    engineCapacity: '',
     fuelType: 'Petrol',
     transmission: 'Automatic',
     color: '',
@@ -43,6 +48,17 @@ export default function NewVehiclePage() {
       youtubeUrl: ''
     }
   });
+
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get('id');
+    if (!id) return;
+    setEditingId(id);
+    apiFetch(`/vehicles/${id}`).then(async (response) => {
+      if (!response.ok) throw new Error('Could not load vehicle for editing.');
+      const vehicle = await response.json();
+      setFormData((current) => ({ ...current, ...vehicle, manufacturingYear: String(vehicle.year || vehicle.manufacturingYear || ''), images: vehicle.images?.length ? vehicle.images : [''], mediaAngles: { ...current.mediaAngles, ...(vehicle.mediaAngles || {}), damageText: (vehicle.mediaAngles?.damage || []).join(', '), documentsText: (vehicle.mediaAngles?.documents || []).join(', ') } }));
+    }).catch((error) => setLoadError(error.message));
+  }, []);
 
   const handleChange = (e: any) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -109,6 +125,7 @@ export default function NewVehiclePage() {
       detailingCost: Number(formData.detailingCost || 0),
       sellingPrice: Number(formData.sellingPrice || 0),
       minimumSellingPrice: Number(formData.minimumSellingPrice || 0),
+      mileage: Number(formData.mileage || 0),
       images: formData.images.filter(Boolean),
       mediaAngles: {
         front: formData.mediaAngles.front || undefined,
@@ -128,8 +145,8 @@ export default function NewVehiclePage() {
     };
 
     try {
-      const res = await apiFetch('/vehicles', {
-        method: 'POST',
+      const res = await apiFetch(editingId ? `/vehicles/${editingId}` : '/vehicles', {
+        method: editingId ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
@@ -148,7 +165,7 @@ export default function NewVehiclePage() {
     <DashboardLayout>
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900">Add New Vehicle</h1>
+          <h1 className="text-2xl font-extrabold text-slate-900">{editingId ? 'Edit Vehicle' : 'Add New Vehicle'}</h1>
           <p className="text-xs text-slate-500">Register new vehicle entry into showroom stock inventory</p>
         </div>
         <Link href="/dashboard/vehicles">
@@ -156,26 +173,46 @@ export default function NewVehiclePage() {
         </Link>
       </div>
 
+      {loadError && <div role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">{loadError}</div>}
+
       <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs max-w-4xl">
         <form onSubmit={handleSubmit} className="space-y-4 text-xs text-slate-900">
           <div className="font-bold text-slate-900 border-b pb-1">1. Basic Vehicle Identification</div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Stock Number</label>
-              <input required type="text" name="stockNumber" placeholder="e.g. STK-2026-001" onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400" />
+              <input required type="text" name="stockNumber" value={formData.stockNumber} placeholder="e.g. STK-2026-001" onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400" />
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Make</label>
-              <input required type="text" name="make" placeholder="e.g. Toyota" onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400" />
+              <input required type="text" name="make" value={formData.make} placeholder="e.g. Toyota" onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400" />
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Model</label>
-              <input required type="text" name="model" placeholder="e.g. Axio WxB" onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400" />
+              <input required type="text" name="model" value={formData.model} placeholder="e.g. Axio WxB" onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400" />
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Year</label>
-              <input required type="number" name="manufacturingYear" placeholder="e.g. 2024" onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400" />
+              <input required type="number" name="manufacturingYear" value={formData.manufacturingYear} placeholder="e.g. 2024" onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400" />
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-3 border-t pt-4 sm:grid-cols-2">
+            <label className="font-semibold text-slate-700">Registration Number<input name="registrationNumber" value={formData.registrationNumber} onChange={handleChange} className="mt-1 w-full rounded-lg border p-2.5 font-normal" /></label>
+            <label className="font-semibold text-slate-700">Chassis Number<input name="chassisNumber" value={formData.chassisNumber} onChange={handleChange} className="mt-1 w-full rounded-lg border p-2.5 font-normal" /></label>
+            <label className="font-semibold text-slate-700">Mileage (km)<input name="mileage" type="number" value={formData.mileage} onChange={handleChange} className="mt-1 w-full rounded-lg border p-2.5 font-normal" /></label>
+            <label className="font-semibold text-slate-700">Engine Capacity<input name="engineCapacity" value={formData.engineCapacity} onChange={handleChange} className="mt-1 w-full rounded-lg border p-2.5 font-normal" /></label>
+            <label className="font-semibold text-slate-700">Variant<input name="variant" value={formData.variant} onChange={handleChange} className="mt-1 w-full rounded-lg border p-2.5 font-normal" /></label>
+            <label className="font-semibold text-slate-700">Colour<input name="color" value={formData.color} onChange={handleChange} className="mt-1 w-full rounded-lg border p-2.5 font-normal" /></label>
+            <label className="font-semibold text-slate-700">Purchase Price<input name="purchasePrice" type="number" value={formData.purchasePrice} onChange={handleChange} className="mt-1 w-full rounded-lg border p-2.5 font-normal" /></label>
+            <label className="font-semibold text-slate-700">Transport Cost<input name="transportCost" type="number" value={formData.transportCost} onChange={handleChange} className="mt-1 w-full rounded-lg border p-2.5 font-normal" /></label>
+            <label className="font-semibold text-slate-700">Repair Cost<input name="repairCost" type="number" value={formData.repairCost} onChange={handleChange} className="mt-1 w-full rounded-lg border p-2.5 font-normal" /></label>
+            <label className="font-semibold text-slate-700">Detailing Cost<input name="detailingCost" type="number" value={formData.detailingCost} onChange={handleChange} className="mt-1 w-full rounded-lg border p-2.5 font-normal" /></label>
+            <label className="font-semibold text-slate-700">Selling Price<input name="sellingPrice" type="number" value={formData.sellingPrice} onChange={handleChange} className="mt-1 w-full rounded-lg border p-2.5 font-normal" /></label>
+            <label className="font-semibold text-slate-700">Minimum Selling Price<input name="minimumSellingPrice" type="number" value={formData.minimumSellingPrice} onChange={handleChange} className="mt-1 w-full rounded-lg border p-2.5 font-normal" /></label>
+            <label className="font-semibold text-slate-700">Fuel Type<select name="fuelType" value={formData.fuelType} onChange={handleChange} className="mt-1 w-full rounded-lg border p-2.5 font-normal"><option>Petrol</option><option>Hybrid</option><option>Diesel</option><option>Electric</option><option>Other</option></select></label>
+            <label className="font-semibold text-slate-700">Transmission<select name="transmission" value={formData.transmission} onChange={handleChange} className="mt-1 w-full rounded-lg border p-2.5 font-normal"><option>Automatic</option><option>CVT</option><option>Manual</option><option>Other</option></select></label>
+            {editingId && <label className="font-semibold text-slate-700">Status<select name="status" value={formData.status} onChange={handleChange} className="mt-1 w-full rounded-lg border p-2.5 font-normal"><option>Available</option><option>Reserved</option><option>Sold</option><option>Under Inspection</option><option>Under Repair</option><option>Inactive</option></select></label>}
           </div>
 
           {/* 5. Vehicle Images & Media Assets Specification */}

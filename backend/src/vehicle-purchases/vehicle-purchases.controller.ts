@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { VehiclePurchasesService } from './vehicle-purchases.service';
 import { Roles } from '../auth/roles.decorator';
 
@@ -15,4 +15,10 @@ export class VehiclePurchasesController {
 
   @Get(':id')
   findOne(@Param('id') id: string) { return this.purchases.findOne(id); }
+
+  @Put(':id')
+  update(@Param('id') id: string, @Body() body: any) { return this.purchases.update(id, body); }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) { return this.purchases.remove(id); }
 }

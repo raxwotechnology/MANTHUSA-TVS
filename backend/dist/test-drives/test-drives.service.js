@@ -33,6 +33,12 @@ let TestDrivesService = class TestDrivesService {
             throw new common_1.NotFoundException(`Test drive ${id} not found.`);
         return item;
     }
+    async remove(id) {
+        const item = await this.model.findByIdAndDelete(id).exec();
+        if (!item)
+            throw new common_1.NotFoundException(`Test drive ${id} not found.`);
+        return item;
+    }
 };
 exports.TestDrivesService = TestDrivesService;
 exports.TestDrivesService = TestDrivesService = __decorate([

@@ -42,6 +42,12 @@ let CommissionsService = class CommissionsService {
             throw new common_1.NotFoundException(`Commission ${id} not found.`);
         return item;
     }
+    async remove(id) {
+        const item = await this.model.findByIdAndDelete(id).exec();
+        if (!item)
+            throw new common_1.NotFoundException(`Commission ${id} not found.`);
+        return item;
+    }
 };
 exports.CommissionsService = CommissionsService;
 exports.CommissionsService = CommissionsService = __decorate([

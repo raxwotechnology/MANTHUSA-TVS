@@ -179,7 +179,7 @@ export default function HandoversPage() {
                 const checklistCount = Object.values(h.checklist || {}).filter(Boolean).length;
                 return (
                   <tr key={h._id} className="hover:bg-slate-50/80">
-                    <td className="p-3.5 font-bold text-blue-700">{h.sale?.invoiceNumber || 'INV-SALE'}</td>
+                    <td className="p-3.5 font-bold text-blue-700">{h.sale?.invoiceNumber || '—'}</td>
                     <td className="p-3.5">{typeof h.customer === 'object' ? h.customer?.fullName : h.customer}</td>
                     <td className="p-3.5">{typeof h.vehicle === 'object' ? `${h.vehicle?.make} ${h.vehicle?.model}` : h.vehicle}</td>
                     <td className="p-3.5">{h.handoverDate ? new Date(h.handoverDate).toLocaleDateString() : 'Pending'}</td>

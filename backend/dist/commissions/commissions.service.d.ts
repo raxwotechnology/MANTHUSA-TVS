@@ -6,4 +6,5 @@ export declare class CommissionsService {
     create(input: any): Promise<any>;
     findAll(): Promise<any[]>;
     update(id: string, input: any): Promise<any>;
+    remove(id: string): Promise<any>;
 }

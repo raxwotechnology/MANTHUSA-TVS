@@ -67,10 +67,10 @@ export default function PublicVehicleWebsite() {
   const [tradeInForm, setTradeInForm] = useState({
     name: '',
     phone: '',
-    make: 'Toyota',
+    make: '',
     model: '',
-    year: 2018,
-    mileage: 60000,
+    year: '',
+    mileage: '',
     askingPrice: ''
   });
 

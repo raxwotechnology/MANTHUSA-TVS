@@ -23,4 +23,18 @@ export declare class VehiclePurchasesController {
     } & {
         id: string;
     }>;
+    update(id: string, body: any): Promise<import("mongoose").Document<unknown, {}, import("./schemas/vehicle-purchase.schema").VehiclePurchaseDocument, {}, import("mongoose").DefaultSchemaOptions> & import("./schemas/vehicle-purchase.schema").VehiclePurchase & import("mongoose").Document<import("mongoose").Types.ObjectId, any, any, Record<string, any>, {}> & Required<{
+        _id: import("mongoose").Types.ObjectId;
+    }> & {
+        __v: number;
+    } & {
+        id: string;
+    }>;
+    remove(id: string): Promise<import("mongoose").Document<unknown, {}, import("./schemas/vehicle-purchase.schema").VehiclePurchaseDocument, {}, import("mongoose").DefaultSchemaOptions> & import("./schemas/vehicle-purchase.schema").VehiclePurchase & import("mongoose").Document<import("mongoose").Types.ObjectId, any, any, Record<string, any>, {}> & Required<{
+        _id: import("mongoose").Types.ObjectId;
+    }> & {
+        __v: number;
+    } & {
+        id: string;
+    }>;
 }

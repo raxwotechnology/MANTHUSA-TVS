@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { ReservationsService } from './reservations.service';
 import { Roles } from '../auth/roles.decorator';
 
@@ -15,4 +15,7 @@ export class ReservationsController {
 
   @Put(':id')
   update(@Param('id') id: string, @Body() body: any) { return this.reservations.update(id, body); }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) { return this.reservations.remove(id); }
 }
