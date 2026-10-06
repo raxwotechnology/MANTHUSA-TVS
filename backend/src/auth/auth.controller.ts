@@ -47,6 +47,28 @@ export class AuthController {
   @Post('verify-email')
   verifyEmail(@Body() body: any) { return this.authService.verifyEmail(body.token); }
 
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @Post('mfa/login')
+  verifyMfaLogin(@Body() body: any) {
+    return this.authService.completeMfaLogin(body.userId, body.code);
+  }
+
+  @Post('mfa/setup')
+  setupMfa(@Req() req: any) {
+    return this.authService.setupMfa(req.user.userId || req.user.id || req.user.sub);
+  }
+
+  @Post('mfa/enable')
+  enableMfa(@Req() req: any, @Body() body: any) {
+    return this.authService.enableMfa(req.user.userId || req.user.id || req.user.sub, body.code, body.backupCodes);
+  }
+
+  @Post('mfa/disable')
+  disableMfa(@Req() req: any, @Body() body: any) {
+    return this.authService.disableMfa(req.user.userId || req.user.id || req.user.sub, body.code);
+  }
+
   private limitRecovery(ip: string) {
     const now = Date.now();
     const attempts = (this.recoveryAttempts.get(ip) || []).filter(timestamp => now - timestamp < 60_000);

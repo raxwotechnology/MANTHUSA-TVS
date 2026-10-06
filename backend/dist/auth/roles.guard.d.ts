@@ -6,6 +6,8 @@ export declare class RolesGuard implements CanActivate {
     private readonly connection;
     constructor(reflector: Reflector, connection: Connection);
     canActivate(context: ExecutionContext): Promise<boolean>;
+    private isAdminRole;
+    private matchRoles;
     private moduleName;
     private permissionFor;
 }

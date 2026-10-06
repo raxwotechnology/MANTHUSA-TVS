@@ -20,6 +20,9 @@ let User = class User {
     branch;
     isActive;
     emailVerified;
+    mfaEnabled;
+    mfaSecret;
+    mfaBackupCodes;
     passwordResetTokenHash;
     passwordResetExpiresAt;
     emailVerificationTokenHash;
@@ -54,6 +57,18 @@ __decorate([
     (0, mongoose_1.Prop)({ default: true }),
     __metadata("design:type", Boolean)
 ], User.prototype, "emailVerified", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: false }),
+    __metadata("design:type", Boolean)
+], User.prototype, "mfaEnabled", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], User.prototype, "mfaSecret", void 0);
+__decorate([
+    (0, mongoose_1.Prop)([String]),
+    __metadata("design:type", Array)
+], User.prototype, "mfaBackupCodes", void 0);
 __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)

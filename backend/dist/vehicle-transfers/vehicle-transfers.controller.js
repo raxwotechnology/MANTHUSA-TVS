@@ -75,7 +75,7 @@ __decorate([
 ], VehicleTransfersController.prototype, "remove", null);
 exports.VehicleTransfersController = VehicleTransfersController = __decorate([
     (0, common_1.Controller)('vehicle-transfers'),
-    (0, roles_decorator_1.Roles)('Sales & Operations'),
+    (0, roles_decorator_1.Roles)('Inventory Manager'),
     __metadata("design:paramtypes", [vehicle_transfers_service_1.VehicleTransfersService])
 ], VehicleTransfersController);
 //# sourceMappingURL=vehicle-transfers.controller.js.map

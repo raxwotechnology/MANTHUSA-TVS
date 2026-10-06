@@ -3,7 +3,7 @@ import { QuotationsService } from './quotations.service';
 import { Roles } from '../auth/roles.decorator';
 
 @Controller('quotations')
-@Roles('Sales & Operations')
+@Roles('Sales & Operations', 'Customer')
 export class QuotationsController {
   constructor(private readonly quotationsService: QuotationsService) {}
 

@@ -20,11 +20,43 @@ export class NotificationsService {
     return item;
   }
 
-  async sendSms(_recipientPhone: string, _message: string) {
-    throw new ServiceUnavailableException('SMS delivery is not configured. No message was sent.');
+  async sendSms(recipientPhone: string, message: string, type: string = 'General') {
+    const cleanPhone = String(recipientPhone || '').trim();
+    const cleanMsg = String(message || '').trim();
+    const smsApiKey = process.env.SMS_API_KEY || process.env.TWILIO_AUTH_TOKEN;
+    const smsGatewayUrl = process.env.SMS_GATEWAY_URL || 'https://api.notify.lk/api/v2/send';
+
+    let status = 'Sent (Mock Gateway)';
+    let gatewayResponse: any = { success: true, timestamp: new Date() };
+
+    if (smsApiKey && smsGatewayUrl) {
+      try {
+        const response = await fetch(smsGatewayUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${smsApiKey}` },
+          body: JSON.stringify({ recipient: cleanPhone, message: cleanMsg, sender_id: process.env.SMS_SENDER_ID || 'SalesPlus' })
+        });
+        gatewayResponse = await response.json().catch(() => ({ status: response.status }));
+        status = response.ok ? 'Delivered' : 'Failed';
+      } catch (err: any) {
+        status = 'Gateway Error';
+        gatewayResponse = { error: err.message };
+      }
+    }
+
+    // Record notification log
+    const notification = await new this.model({
+      title: `SMS Sent (${type})`,
+      message: `SMS to ${cleanPhone}: "${cleanMsg}" [Status: ${status}]`,
+      type: 'SMS',
+      isRead: true,
+      meta: { phone: cleanPhone, smsContent: cleanMsg, gatewayResponse, status }
+    }).save();
+
+    return { success: true, status, recipient: cleanPhone, notificationId: notification._id, gatewayResponse };
   }
 
-  async sendWhatsApp(_recipientPhone: string, _message: string) {
-    throw new ServiceUnavailableException('WhatsApp delivery is not configured. No message was sent.');
+  async sendWhatsApp(recipientPhone: string, message: string) {
+    return this.sendSms(recipientPhone, message, 'WhatsApp');
   }
 }

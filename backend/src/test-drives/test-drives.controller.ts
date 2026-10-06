@@ -3,7 +3,7 @@ import { TestDrivesService } from './test-drives.service';
 import { Roles } from '../auth/roles.decorator';
 
 @Controller('test-drives')
-@Roles('Sales & Operations')
+@Roles('Sales & Operations', 'Customer')
 export class TestDrivesController {
   constructor(private readonly drives: TestDrivesService) {}
   @Post() create(@Body() body: any) { return this.drives.create(body); }

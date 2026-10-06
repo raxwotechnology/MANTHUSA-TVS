@@ -35,14 +35,16 @@ export class SalesService {
     }
     const vehiclePrice = Number(createSaleDto.vehiclePrice ?? vehicle.sellingPrice ?? 0);
     const discount = Number(createSaleDto.discount || 0);
+    const tradeInAllowance = Number(createSaleDto.tradeInAllowance || 0);
     const additionalCharges = Number(createSaleDto.additionalCharges || 0);
-    if (vehiclePrice <= 0 || discount < 0 || discount >= vehiclePrice || additionalCharges < 0) throw new BadRequestException('Sale pricing is invalid.');
-    const finalAmount = vehiclePrice - discount + additionalCharges;
+    if (vehiclePrice <= 0 || discount < 0 || discount >= vehiclePrice || tradeInAllowance < 0 || additionalCharges < 0) throw new BadRequestException('Sale pricing is invalid.');
+    const finalAmount = Math.max(0, vehiclePrice - discount - tradeInAllowance + additionalCharges);
     const paidAmount = Number(createSaleDto.paidAmount || 0);
     if (paidAmount < 0 || paidAmount > finalAmount) throw new BadRequestException('Paid amount must be between zero and the sale total.');
     const invoiceNumber = createSaleDto.invoiceNumber || `INV-${Date.now()}`;
+    const contractNumber = createSaleDto.salesContractNumber || `AGR-${Date.now()}`;
     const createdSale = await new this.saleModel({
-      ...createSaleDto, branch: createSaleDto.branch || vehicle.branch || vehicle.location, invoiceNumber, vehiclePrice, discount, additionalCharges,
+      ...createSaleDto, branch: createSaleDto.branch || vehicle.branch || vehicle.location, invoiceNumber, salesContractNumber: contractNumber, vehiclePrice, discount, tradeInAllowance, additionalCharges,
       finalAmount, paidAmount, balance: finalAmount - paidAmount,
       status: createSaleDto.status || 'Confirmed', saleDate: createSaleDto.saleDate || new Date(),
     }).save();
@@ -87,6 +89,61 @@ export class SalesService {
     }
     await existingSale.save();
     return existingSale;
+  }
+
+  async getSalesContract(id: string) {
+    const sale = await this.saleModel.findById(id).populate('customer').populate('vehicle').exec();
+    if (!sale) throw new NotFoundException(`Sale #${id} not found`);
+    const customer = (sale.customer || {}) as any;
+    const vehicle = (sale.vehicle || {}) as any;
+
+    return {
+      contractTitle: 'VEHICLE SALES AGREEMENT & DEED OF SALE',
+      contractNumber: sale.salesContractNumber || `AGR-${String(id).slice(-6).toUpperCase()}`,
+      invoiceNumber: sale.invoiceNumber,
+      date: sale.saleDate || (sale as any).createdAt || new Date(),
+      seller: {
+        companyName: 'AUTOSALES LANKA (PVT) LTD',
+        registrationNumber: 'PV-123456',
+        address: '100 Galle Road, Colombo 03, Sri Lanka',
+        phone: '+94 11 234 5678',
+        email: 'sales@autosales.lk'
+      },
+      buyer: {
+        name: customer.name || 'N/A',
+        nicOrPassport: customer.nicNumber || customer.passportNumber || 'N/A',
+        address: customer.address || 'N/A',
+        phone: customer.phone || 'N/A',
+        email: customer.email || 'N/A'
+      },
+      vehicle: {
+        stockNumber: vehicle.stockNumber,
+        vin: vehicle.chassisNumber || vehicle.vin,
+        engineNumber: vehicle.engineNumber,
+        make: vehicle.make,
+        model: vehicle.model,
+        year: vehicle.year || vehicle.manufacturingYear,
+        color: vehicle.color,
+        registrationNumber: vehicle.registrationNumber || 'UNREGISTERED'
+      },
+      financials: {
+        vehiclePrice: sale.vehiclePrice,
+        discount: sale.discount,
+        tradeInAllowance: sale.tradeInAllowance || 0,
+        additionalCharges: sale.additionalCharges || 0,
+        totalAmount: sale.finalAmount,
+        paidAmount: sale.paidAmount,
+        balanceDue: sale.balance,
+        paymentMethod: sale.paymentMethod || 'Bank Transfer'
+      },
+      tradeIn: sale.tradeInVehicleDetails || null,
+      termsAndConditions: [
+        '1. The Seller certifies that the vehicle is free of legal encumbrances, legal seizures, and legal disputes.',
+        '2. The Buyer agrees to inspect and receive the vehicle in the agreed condition.',
+        '3. Ownership transfer documentation (RMV MTA 6 & MTA 8) will be executed upon settlement of balance.',
+        '4. All risk of loss or damage passes to the Buyer upon delivery of keys.'
+      ]
+    };
   }
 
   async remove(id: string): Promise<any> {

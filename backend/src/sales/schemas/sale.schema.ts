@@ -27,6 +27,30 @@ export class Sale {
   discount: number;
 
   @Prop({ default: 0 })
+  tradeInAllowance: number;
+
+  @Prop({ type: Object })
+  tradeInVehicleDetails: {
+    make?: string;
+    model?: string;
+    year?: number;
+    regNumber?: string;
+    valuationAmount?: number;
+  };
+
+  @Prop()
+  leasingProvider: string;
+
+  @Prop({ default: 0 })
+  leasingAmount: number;
+
+  @Prop()
+  paymentMethod: string; // 'Cash', 'Bank Transfer', 'Cheque', 'Card', 'Leasing'
+
+  @Prop()
+  salesContractNumber: string;
+
+  @Prop({ default: 0 })
   additionalCharges: number;
 
   @Prop({ default: 0 })

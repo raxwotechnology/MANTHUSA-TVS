@@ -4,7 +4,7 @@ import { Roles } from '../auth/roles.decorator';
 import { Public } from '../auth/public.decorator';
 
 @Controller('vehicle-valuations')
-@Roles('Sales & Operations')
+@Roles('Sales & Operations', 'Inventory Manager')
 export class VehicleValuationsController {
   constructor(private readonly service: VehicleValuationsService) {}
 

@@ -307,6 +307,30 @@ export default function VehicleInventoryPage() {
     return match ? `https://www.youtube.com/embed/${match[1]}` : null;
   };
 
+  const [qrModalData, setQrModalData] = useState<{ qrDataUrl: string; barcodeSvg: string; vin: string; stockNumber: string; make: string; model: string; price: number } | null>(null);
+
+  const handleShowQrCode = async (vehicle: Vehicle) => {
+    try {
+      const [qrRes, barcodeRes] = await Promise.all([
+        apiFetch(`/vehicles/${vehicle._id}/qr-code`),
+        apiFetch(`/vehicles/${vehicle._id}/barcode`)
+      ]);
+      const qrData = await qrRes.json();
+      const barcodeData = await barcodeRes.json();
+      setQrModalData({
+        qrDataUrl: qrData.qrDataUrl,
+        barcodeSvg: barcodeData.barcodeSvg,
+        vin: vehicle.chassisNumber || vehicle.stockNumber,
+        stockNumber: vehicle.stockNumber,
+        make: vehicle.make,
+        model: vehicle.model,
+        price: vehicle.sellingPrice
+      });
+    } catch {
+      alert('Could not generate vehicle QR/Barcode tag.');
+    }
+  };
+
   return (
     <DashboardLayout>
       {/* Top Header */}
@@ -922,13 +946,40 @@ export default function VehicleInventoryPage() {
               </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t flex justify-end">
+            <div className="mt-4 pt-3 border-t flex items-center justify-between">
+              <button
+                onClick={() => handleShowQrCode(selectedVehicle)}
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg flex items-center gap-1.5 shadow-xs"
+              >
+                <span>🏷️ Generate QR & Barcode Tag</span>
+              </button>
               <button
                 onClick={() => setSelectedVehicle(null)}
                 className="px-4 py-2 bg-slate-900 text-white font-semibold text-xs rounded-lg"
               >
                 Close Details
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {qrModalData && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-[70] p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 text-center text-slate-900">
+            <h3 className="text-base font-extrabold mb-1">Vehicle Showroom Stock Tag</h3>
+            <p className="text-xs text-slate-500 mb-4">{qrModalData.make} {qrModalData.model} • Stock #{qrModalData.stockNumber}</p>
+            <div className="border-2 border-dashed border-slate-300 p-4 rounded-xl bg-slate-50 mb-4 space-y-3">
+              <div className="font-extrabold text-sm text-slate-900 font-mono">VIN: {qrModalData.vin}</div>
+              <div className="text-xs font-bold text-emerald-600">LKR {(qrModalData.price || 0).toLocaleString('en-LK')}</div>
+              <div className="flex justify-center my-2">
+                <img src={qrModalData.qrDataUrl} alt="QR Code" className="w-36 h-36 border p-1 bg-white rounded-lg shadow-xs" />
+              </div>
+              <div className="flex justify-center overflow-hidden" dangerouslySetInnerHTML={{ __html: qrModalData.barcodeSvg }} />
+            </div>
+            <div className="flex gap-2 justify-center">
+              <button onClick={() => window.print()} className="px-4 py-2 bg-emerald-600 text-white font-bold text-xs rounded-lg">Print Tag / Sticker</button>
+              <button onClick={() => setQrModalData(null)} className="px-4 py-2 border text-slate-600 font-semibold text-xs rounded-lg">Close</button>
             </div>
           </div>
         </div>

@@ -8,6 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DashboardController = void 0;
 const common_1 = require("@nestjs/common");
@@ -18,20 +21,26 @@ let DashboardController = class DashboardController {
     constructor(dashboardService) {
         this.dashboardService = dashboardService;
     }
-    getStats() {
+    getStats(req) {
+        const role = (req.user?.role || '').toLowerCase();
+        if (role.includes('customer') || role.includes('client')) {
+            const uid = req.user?.sub || req.user?.id || req.user?._id;
+            return this.dashboardService.getCustomerStats(uid ? String(uid) : '', req.user?.email);
+        }
         return this.dashboardService.getDashboardStats();
     }
 };
 exports.DashboardController = DashboardController;
 __decorate([
     (0, common_1.Get)('stats'),
+    __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], DashboardController.prototype, "getStats", null);
 exports.DashboardController = DashboardController = __decorate([
     (0, common_1.Controller)('dashboard'),
-    (0, roles_decorator_1.Roles)('Sales & Operations', 'Accountant / Finance Staff'),
+    (0, roles_decorator_1.Roles)('Sales & Operations', 'Accountant / Finance Staff', 'Admin / Owner', 'Inventory Manager', 'Customer'),
     __metadata("design:paramtypes", [dashboard_service_1.DashboardService])
 ], DashboardController);
 //# sourceMappingURL=dashboard.controller.js.map

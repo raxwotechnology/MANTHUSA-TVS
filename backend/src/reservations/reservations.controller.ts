@@ -3,7 +3,7 @@ import { ReservationsService } from './reservations.service';
 import { Roles } from '../auth/roles.decorator';
 
 @Controller('reservations')
-@Roles('Sales & Operations', 'Accountant / Finance Staff')
+@Roles('Sales & Operations', 'Accountant / Finance Staff', 'Customer')
 export class ReservationsController {
   constructor(private readonly reservations: ReservationsService) {}
 

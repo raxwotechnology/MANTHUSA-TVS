@@ -99,4 +99,52 @@ export class ReportsService {
     const won = rows.filter(row => ['Won', 'Reserved', 'Sold', 'Completed'].includes(row._id)).reduce((sum, row) => sum + row.count, 0);
     return { total, converted: won, conversionRate: total ? Math.round((won / total) * 10000) / 100 : 0, statuses: rows };
   }
+
+  async accountingExport(format: string = 'quickbooks') {
+    const [sales, expenses] = await Promise.all([
+      this.sales.find({ status: { $nin: ['Cancelled'] } }).populate('customer').populate('vehicle').lean().exec(),
+      this.expenses.find().populate('vehicle').lean().exec()
+    ]);
+
+    const type = String(format || 'quickbooks').toLowerCase();
+    if (type === 'xero') {
+      let csv = '*ContactName,*InvoiceNumber,*InvoiceDate,*DueDate,*Total,*Description,*AccountCode,*TaxType\n';
+      sales.forEach(s => {
+        const contact = s.customer?.name || 'Customer';
+        const invNum = s.saleNumber || s._id;
+        const date = s.saleDate ? new Date(s.saleDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+        const total = s.finalAmount || 0;
+        const desc = `${s.vehicle?.make || ''} ${s.vehicle?.model || ''} - VIN ${s.vehicle?.chassisNumber || ''}`;
+        csv += `"${contact}","${invNum}","${date}","${date}",${total},"${desc}","200","OUTPUT"\n`;
+      });
+      expenses.forEach(e => {
+        const contact = e.payee || 'Supplier/Vendor';
+        const invNum = e.expenseNumber || e._id;
+        const date = e.expenseDate ? new Date(e.expenseDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+        const total = e.amount || 0;
+        const desc = `${e.category || 'Expense'} - ${e.description || ''}`;
+        csv += `"${contact}","${invNum}","${date}","${date}",${total},"${desc}","400","INPUT"\n`;
+      });
+      return { format: 'xero', filename: 'Xero_Accounting_Export.csv', content: csv };
+    } else {
+      let csv = 'TransactionType,DocNumber,Date,Customer/Vendor,Amount,Memo,Account\n';
+      sales.forEach(s => {
+        const contact = s.customer?.name || 'Customer';
+        const invNum = s.saleNumber || s._id;
+        const date = s.saleDate ? new Date(s.saleDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+        const total = s.finalAmount || 0;
+        const desc = `Vehicle Sale: ${s.vehicle?.make || ''} ${s.vehicle?.model || ''}`;
+        csv += `"Invoice","${invNum}","${date}","${contact}",${total},"${desc}","Sales Income"\n`;
+      });
+      expenses.forEach(e => {
+        const contact = e.payee || 'Vendor';
+        const invNum = e.expenseNumber || e._id;
+        const date = e.expenseDate ? new Date(e.expenseDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+        const total = e.amount || 0;
+        const desc = `Vehicle Expense: ${e.category || ''} - ${e.description || ''}`;
+        csv += `"Expense","${invNum}","${date}","${contact}",${total},"${desc}","Vehicle Expense"\n`;
+      });
+      return { format: 'quickbooks', filename: 'QuickBooks_Accounting_Export.csv', content: csv };
+    }
+  }
 }

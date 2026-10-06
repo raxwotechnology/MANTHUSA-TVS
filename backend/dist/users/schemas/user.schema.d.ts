@@ -8,6 +8,9 @@ export declare class User {
     branch: Types.ObjectId;
     isActive: boolean;
     emailVerified: boolean;
+    mfaEnabled: boolean;
+    mfaSecret: string;
+    mfaBackupCodes: string[];
     passwordResetTokenHash: string;
     passwordResetExpiresAt: Date;
     emailVerificationTokenHash: string;
@@ -77,6 +80,33 @@ export declare const UserSchema: MongooseSchema<User, import("mongoose").Model<U
         id: string;
     }>> | undefined;
     emailVerified?: import("mongoose").SchemaDefinitionProperty<boolean, User, Document<unknown, {}, User, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    mfaEnabled?: import("mongoose").SchemaDefinitionProperty<boolean, User, Document<unknown, {}, User, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    mfaSecret?: import("mongoose").SchemaDefinitionProperty<string, User, Document<unknown, {}, User, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    mfaBackupCodes?: import("mongoose").SchemaDefinitionProperty<string[], User, Document<unknown, {}, User, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
         _id: Types.ObjectId;

@@ -3,7 +3,7 @@ import { VehicleInspectionsService } from './vehicle-inspections.service';
 import { Roles } from '../auth/roles.decorator';
 
 @Controller('vehicle-inspections')
-@Roles('Sales & Operations')
+@Roles('Inventory Manager')
 export class VehicleInspectionsController {
   constructor(private readonly inspections: VehicleInspectionsService) {}
   @Post() create(@Body() body: any) { return this.inspections.create(body); }

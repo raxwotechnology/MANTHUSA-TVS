@@ -4,7 +4,7 @@ import { Roles } from '../auth/roles.decorator';
 import { Public } from '../auth/public.decorator';
 
 @Controller('leads')
-@Roles('Sales & Operations')
+@Roles('Sales & Operations', 'Customer')
 export class LeadsController {
   private readonly publicAttempts = new Map<string, number[]>();
   constructor(private readonly leadsService: LeadsService) {}

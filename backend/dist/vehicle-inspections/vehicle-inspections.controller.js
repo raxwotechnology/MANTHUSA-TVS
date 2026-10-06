@@ -57,7 +57,7 @@ __decorate([
 ], VehicleInspectionsController.prototype, "remove", null);
 exports.VehicleInspectionsController = VehicleInspectionsController = __decorate([
     (0, common_1.Controller)('vehicle-inspections'),
-    (0, roles_decorator_1.Roles)('Sales & Operations'),
+    (0, roles_decorator_1.Roles)('Inventory Manager'),
     __metadata("design:paramtypes", [vehicle_inspections_service_1.VehicleInspectionsService])
 ], VehicleInspectionsController);
 //# sourceMappingURL=vehicle-inspections.controller.js.map

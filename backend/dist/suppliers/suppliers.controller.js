@@ -57,7 +57,7 @@ __decorate([
 ], SuppliersController.prototype, "remove", null);
 exports.SuppliersController = SuppliersController = __decorate([
     (0, common_1.Controller)('suppliers'),
-    (0, roles_decorator_1.Roles)('Sales & Operations', 'Accountant / Finance Staff'),
+    (0, roles_decorator_1.Roles)('Inventory Manager'),
     __metadata("design:paramtypes", [suppliers_service_1.SuppliersService])
 ], SuppliersController);
 //# sourceMappingURL=suppliers.controller.js.map

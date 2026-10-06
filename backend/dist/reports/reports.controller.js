@@ -28,6 +28,7 @@ let ReportsController = class ReportsController {
     byBranch(from, to) { return this.reports.byBranch(from, to); }
     salesByCategory(year) { return this.reports.salesByCategory(year ? Number(year) : new Date().getFullYear()); }
     leadConversion() { return this.reports.leadConversion(); }
+    accountingExport(format) { return this.reports.accountingExport(format); }
 };
 exports.ReportsController = ReportsController;
 __decorate([
@@ -80,9 +81,16 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], ReportsController.prototype, "leadConversion", null);
+__decorate([
+    (0, common_1.Get)('accounting-export'),
+    __param(0, (0, common_1.Query)('format')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], ReportsController.prototype, "accountingExport", null);
 exports.ReportsController = ReportsController = __decorate([
     (0, common_1.Controller)('reports'),
-    (0, roles_decorator_1.Roles)('Sales & Operations', 'Accountant / Finance Staff'),
+    (0, roles_decorator_1.Roles)('Accountant / Finance Staff', 'Inventory Manager'),
     __metadata("design:paramtypes", [reports_service_1.ReportsService])
 ], ReportsController);
 //# sourceMappingURL=reports.controller.js.map

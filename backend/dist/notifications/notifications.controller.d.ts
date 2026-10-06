@@ -7,9 +7,21 @@ export declare class NotificationsController {
     sendSms(body: {
         phone: string;
         message: string;
-    }): Promise<void>;
+    }): Promise<{
+        success: boolean;
+        status: string;
+        recipient: string;
+        notificationId: any;
+        gatewayResponse: any;
+    }>;
     sendWhatsApp(body: {
         phone: string;
         message: string;
-    }): Promise<void>;
+    }): Promise<{
+        success: boolean;
+        status: string;
+        recipient: string;
+        notificationId: any;
+        gatewayResponse: any;
+    }>;
 }

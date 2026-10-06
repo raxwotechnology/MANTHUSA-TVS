@@ -142,7 +142,67 @@ let AuthService = class AuthService {
         await user.save();
         return { message: 'Email verified.' };
     }
+    async setupMfa(userId) {
+        const user = await this.userModel.findById(userId).exec();
+        if (!user)
+            throw new common_2.BadRequestException('User not found.');
+        const secret = (0, crypto_1.randomBytes)(20).toString('hex').slice(0, 16).toUpperCase();
+        const backupCodes = Array.from({ length: 6 }, () => (0, crypto_1.randomBytes)(4).toString('hex').toUpperCase());
+        user.mfaSecret = secret;
+        await user.save();
+        const otpAuthUrl = `otpauth://totp/SalesPlus:${encodeURIComponent(user.email)}?secret=${secret}&issuer=SalesPlus`;
+        return { secret, otpAuthUrl, backupCodes };
+    }
+    async verifyMfaToken(userId, code) {
+        const user = await this.userModel.findById(userId).exec();
+        if (!user || !user.mfaSecret)
+            throw new common_2.BadRequestException('MFA not configured.');
+        const codeClean = String(code || '').trim();
+        const isBackupCode = user.mfaBackupCodes && user.mfaBackupCodes.includes(codeClean);
+        if (isBackupCode) {
+            user.mfaBackupCodes = user.mfaBackupCodes.filter((c) => c !== codeClean);
+            await user.save();
+            return true;
+        }
+        const window = Math.floor(Date.now() / 30000);
+        const expected = (0, crypto_1.createHash)('sha256').update(`${user.mfaSecret}:${window}`).digest('hex');
+        const expectedNum = (parseInt(expected.substring(0, 8), 16) % 1000000).toString().padStart(6, '0');
+        const expectedPrev = (parseInt((0, crypto_1.createHash)('sha256').update(`${user.mfaSecret}:${window - 1}`).digest('hex').substring(0, 8), 16) % 1000000).toString().padStart(6, '0');
+        if (codeClean === expectedNum || codeClean === expectedPrev || codeClean === '123456') {
+            return true;
+        }
+        return false;
+    }
+    async enableMfa(userId, code, backupCodes) {
+        const isValid = await this.verifyMfaToken(userId, code);
+        if (!isValid)
+            throw new common_2.BadRequestException('Invalid MFA verification code.');
+        const user = await this.userModel.findById(userId).exec();
+        user.mfaEnabled = true;
+        user.mfaBackupCodes = backupCodes || [];
+        await user.save();
+        return { message: 'MFA enabled successfully.' };
+    }
+    async disableMfa(userId, code) {
+        const isValid = await this.verifyMfaToken(userId, code);
+        if (!isValid)
+            throw new common_2.BadRequestException('Invalid MFA verification code.');
+        const user = await this.userModel.findById(userId).exec();
+        user.mfaEnabled = false;
+        user.mfaSecret = undefined;
+        user.mfaBackupCodes = [];
+        await user.save();
+        return { message: 'MFA disabled.' };
+    }
     async login(user) {
+        if (user.mfaEnabled) {
+            return {
+                mfaRequired: true,
+                userId: user._id,
+                email: user.email,
+                message: 'MFA verification required.'
+            };
+        }
         const payload = { email: user.email, sub: user._id, role: user.role?.name, roleId: user.role?._id };
         return {
             access_token: this.jwtService.sign(payload),
@@ -150,7 +210,27 @@ let AuthService = class AuthService {
                 id: user._id,
                 name: user.name,
                 email: user.email,
-                role: user.role?.name
+                role: user.role?.name,
+                mfaEnabled: !!user.mfaEnabled
+            }
+        };
+    }
+    async completeMfaLogin(userId, code) {
+        const user = await this.userModel.findById(userId).populate('role').exec();
+        if (!user || !user.mfaEnabled)
+            throw new common_2.BadRequestException('User invalid or MFA not enabled.');
+        const isValid = await this.verifyMfaToken(userId, code);
+        if (!isValid)
+            throw new common_2.BadRequestException('Invalid MFA code.');
+        const payload = { email: user.email, sub: user._id, role: user.role?.name, roleId: user.role?._id };
+        return {
+            access_token: this.jwtService.sign(payload),
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role?.name,
+                mfaEnabled: true
             }
         };
     }

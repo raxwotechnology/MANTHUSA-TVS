@@ -75,7 +75,7 @@ __decorate([
 ], QuotationsController.prototype, "remove", null);
 exports.QuotationsController = QuotationsController = __decorate([
     (0, common_1.Controller)('quotations'),
-    (0, roles_decorator_1.Roles)('Sales & Operations'),
+    (0, roles_decorator_1.Roles)('Sales & Operations', 'Customer'),
     __metadata("design:paramtypes", [quotations_service_1.QuotationsService])
 ], QuotationsController);
 //# sourceMappingURL=quotations.controller.js.map

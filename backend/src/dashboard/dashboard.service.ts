@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 @Injectable()
 export class DashboardService {
@@ -82,5 +82,42 @@ export class DashboardService {
       netProfit,
       cashBalance
     };
+  }
+
+  async getCustomerStats(userId?: string, email?: string) {
+    try {
+      const availableVehicles = await this.vehicleModel.countDocuments({ status: 'Available' });
+      let myReservations = 0;
+      let myInquiries = 0;
+
+      let customerDoc: any = null;
+      if (email) {
+        customerDoc = await this.customerModel.findOne({ email: email.toLowerCase() });
+      }
+      if (!customerDoc && userId && Types.ObjectId.isValid(userId)) {
+        customerDoc = await this.customerModel.findById(userId);
+      }
+
+      if (customerDoc) {
+        myReservations = await this.leadModel.countDocuments({ customer: customerDoc._id, status: 'Reserved' });
+        myInquiries = await this.leadModel.countDocuments({ customer: customerDoc._id });
+      }
+
+      return {
+        totalVehicles: availableVehicles,
+        availableVehicles,
+        myReservations,
+        myInquiries,
+        isCustomerPortal: true
+      };
+    } catch {
+      return {
+        totalVehicles: 0,
+        availableVehicles: 0,
+        myReservations: 0,
+        myInquiries: 0,
+        isCustomerPortal: true
+      };
+    }
   }
 }

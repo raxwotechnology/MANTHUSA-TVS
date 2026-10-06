@@ -8,6 +8,18 @@ export declare class Sale {
     branch: Types.ObjectId;
     vehiclePrice: number;
     discount: number;
+    tradeInAllowance: number;
+    tradeInVehicleDetails: {
+        make?: string;
+        model?: string;
+        year?: number;
+        regNumber?: string;
+        valuationAmount?: number;
+    };
+    leasingProvider: string;
+    leasingAmount: number;
+    paymentMethod: string;
+    salesContractNumber: string;
     additionalCharges: number;
     finalAmount: number;
     paidAmount: number;
@@ -79,6 +91,66 @@ export declare const SaleSchema: MongooseSchema<Sale, import("mongoose").Model<S
         id: string;
     }>> | undefined;
     discount?: import("mongoose").SchemaDefinitionProperty<number, Sale, Document<unknown, {}, Sale, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Sale & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    tradeInAllowance?: import("mongoose").SchemaDefinitionProperty<number, Sale, Document<unknown, {}, Sale, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Sale & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    tradeInVehicleDetails?: import("mongoose").SchemaDefinitionProperty<{
+        make?: string;
+        model?: string;
+        year?: number;
+        regNumber?: string;
+        valuationAmount?: number;
+    }, Sale, Document<unknown, {}, Sale, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Sale & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    leasingProvider?: import("mongoose").SchemaDefinitionProperty<string, Sale, Document<unknown, {}, Sale, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Sale & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    leasingAmount?: import("mongoose").SchemaDefinitionProperty<number, Sale, Document<unknown, {}, Sale, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Sale & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    paymentMethod?: import("mongoose").SchemaDefinitionProperty<string, Sale, Document<unknown, {}, Sale, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Sale & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    salesContractNumber?: import("mongoose").SchemaDefinitionProperty<string, Sale, Document<unknown, {}, Sale, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Sale & {
         _id: Types.ObjectId;

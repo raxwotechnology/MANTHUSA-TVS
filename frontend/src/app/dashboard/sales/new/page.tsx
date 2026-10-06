@@ -13,9 +13,15 @@ export default function NewSalePage() {
     vehicle: '',
     vehiclePrice: 0,
     discount: 0,
+    tradeInAllowance: 0,
+    tradeInMake: '',
+    tradeInModel: '',
+    tradeInRegNumber: '',
+    paymentMethod: 'Bank Transfer',
     additionalCharges: 0,
     status: 'Confirmed'
   });
+  const [hasTradeIn, setHasTradeIn] = useState(false);
   const [customers, setCustomers] = useState<any[]>([]);
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [error, setError] = useState('');
@@ -40,7 +46,21 @@ export default function NewSalePage() {
       if (!response.ok) throw new Error('Could not load invoice for editing.');
       const sale = await response.json();
       setExistingPaidAmount(Number(sale.paidAmount || 0));
-      setFormData({ invoiceNumber: sale.invoiceNumber || '', customer: sale.customer?._id || sale.customer || '', vehicle: sale.vehicle?._id || sale.vehicle || '', vehiclePrice: sale.vehiclePrice || 0, discount: sale.discount || 0, additionalCharges: sale.additionalCharges || 0, status: sale.status || 'Confirmed' });
+      setFormData({
+        invoiceNumber: sale.invoiceNumber || '',
+        customer: sale.customer?._id || sale.customer || '',
+        vehicle: sale.vehicle?._id || sale.vehicle || '',
+        vehiclePrice: sale.vehiclePrice || 0,
+        discount: sale.discount || 0,
+        tradeInAllowance: sale.tradeInAllowance || 0,
+        tradeInMake: sale.tradeInVehicleDetails?.make || '',
+        tradeInModel: sale.tradeInVehicleDetails?.model || '',
+        tradeInRegNumber: sale.tradeInVehicleDetails?.regNumber || '',
+        paymentMethod: sale.paymentMethod || 'Bank Transfer',
+        additionalCharges: sale.additionalCharges || 0,
+        status: sale.status || 'Confirmed'
+      });
+      if (sale.tradeInAllowance > 0) setHasTradeIn(true);
       if (sale.vehicle?._id) setVehicles((current) => current.some((vehicle) => vehicle._id === sale.vehicle._id) ? current : [...current, sale.vehicle]);
     }).catch((err) => setError(err instanceof Error ? err.message : 'Could not load invoice.'));
   }, []);
@@ -53,12 +73,21 @@ export default function NewSalePage() {
     e.preventDefault();
     setBusy(true);
     setError('');
-    const finalAmount = Number(formData.vehiclePrice) - Number(formData.discount) + Number(formData.additionalCharges);
+    const tradeInAllowance = hasTradeIn ? Number(formData.tradeInAllowance || 0) : 0;
+    const finalAmount = Math.max(0, Number(formData.vehiclePrice) - Number(formData.discount) - tradeInAllowance + Number(formData.additionalCharges));
     try {
+      const payload = {
+        ...formData,
+        tradeInAllowance,
+        tradeInVehicleDetails: hasTradeIn ? { make: formData.tradeInMake, model: formData.tradeInModel, regNumber: formData.tradeInRegNumber, valuationAmount: tradeInAllowance } : undefined,
+        finalAmount,
+        balance: finalAmount - existingPaidAmount,
+        paidAmount: existingPaidAmount
+      };
       const res = await apiFetch(editingId ? `/sales/${editingId}` : '/sales', {
         method: editingId ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, finalAmount, balance: finalAmount - existingPaidAmount, paidAmount: existingPaidAmount })
+        body: JSON.stringify(payload)
       });
       if (res.ok) {
         router.push('/dashboard/sales');
@@ -73,6 +102,8 @@ export default function NewSalePage() {
       setBusy(false);
     }
   };
+
+  const calculatedTotal = Math.max(0, Number(formData.vehiclePrice || 0) - Number(formData.discount || 0) - (hasTradeIn ? Number(formData.tradeInAllowance || 0) : 0) + Number(formData.additionalCharges || 0));
 
   return (
     <DashboardLayout>
@@ -116,6 +147,16 @@ export default function NewSalePage() {
               </select>
             </div>
             <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Payment Method</label>
+              <select name="paymentMethod" value={formData.paymentMethod} onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900">
+                <option value="Bank Transfer">Bank Transfer / Cash Deposit</option>
+                <option value="Cash">Cash Payment</option>
+                <option value="Cheque">Cheque Payment</option>
+                <option value="Card">Card Payment</option>
+                <option value="Leasing">Leasing / Bank Loan Finance</option>
+              </select>
+            </div>
+            <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Vehicle Price (LKR)</label>
               <input required type="number" name="vehiclePrice" placeholder="e.g. 12,500,000" value={formData.vehiclePrice || ''} onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400 font-bold text-emerald-700" />
             </div>
@@ -123,10 +164,43 @@ export default function NewSalePage() {
               <label className="block text-xs font-bold text-slate-700 mb-1">Discount (LKR)</label>
               <input type="number" name="discount" value={formData.discount || ''} placeholder="e.g. 150,000" onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400" />
             </div>
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Additional Charges (LKR)</label>
-              <input type="number" name="additionalCharges" value={formData.additionalCharges || ''} placeholder="e.g. 25,000" onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400" />
+          </div>
+
+          {/* Trade-In / Vehicle Exchange Section */}
+          <div className="bg-amber-50/70 p-4 rounded-xl border border-amber-200 space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 cursor-pointer font-bold text-amber-900">
+                <input type="checkbox" checked={hasTradeIn} onChange={(e) => setHasTradeIn(e.target.checked)} className="w-4 h-4 text-emerald-600 rounded" />
+                <span>Trade-In / Vehicle Exchange (Customer's Old Vehicle Deduction)</span>
+              </label>
+              {hasTradeIn && <span className="text-[11px] font-bold text-amber-800">Valuation Allowance Deducted from Total</span>}
             </div>
+
+            {hasTradeIn && (
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-2">
+                <div>
+                  <label className="block text-[11px] font-semibold text-amber-900 mb-1">Trade-In Make</label>
+                  <input type="text" name="tradeInMake" value={formData.tradeInMake} placeholder="e.g. Suzuki" onChange={handleChange} className="w-full p-2 bg-white border border-amber-300 rounded-lg text-xs" />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-amber-900 mb-1">Trade-In Model</label>
+                  <input type="text" name="tradeInModel" value={formData.tradeInModel} placeholder="e.g. Wagon R" onChange={handleChange} className="w-full p-2 bg-white border border-amber-300 rounded-lg text-xs" />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-amber-900 mb-1">Reg Number</label>
+                  <input type="text" name="tradeInRegNumber" value={formData.tradeInRegNumber} placeholder="e.g. WP CAR-1234" onChange={handleChange} className="w-full p-2 bg-white border border-amber-300 rounded-lg text-xs" />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-amber-900 mb-1">Trade-In Allowance (LKR)</label>
+                  <input type="number" name="tradeInAllowance" value={formData.tradeInAllowance || ''} placeholder="e.g. 3,500,000" onChange={handleChange} className="w-full p-2 bg-white border border-amber-300 rounded-lg text-xs font-bold text-amber-900" />
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center justify-between bg-slate-900 text-white p-4 rounded-xl font-bold">
+            <span>Net Calculated Total Amount:</span>
+            <span className="text-base text-emerald-400 font-extrabold font-mono">LKR {calculatedTotal.toLocaleString('en-LK')}</span>
           </div>
 
           <div className="mt-6 pt-4 border-t flex justify-end gap-3">

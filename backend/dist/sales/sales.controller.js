@@ -30,6 +30,9 @@ let SalesController = class SalesController {
     findOne(id) {
         return this.salesService.findOne(id);
     }
+    getSalesContract(id) {
+        return this.salesService.getSalesContract(id);
+    }
     update(id, updateSaleDto) {
         return this.salesService.update(id, updateSaleDto);
     }
@@ -60,6 +63,13 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], SalesController.prototype, "findOne", null);
 __decorate([
+    (0, common_1.Get)(':id/contract'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], SalesController.prototype, "getSalesContract", null);
+__decorate([
     (0, common_1.Put)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
@@ -76,7 +86,7 @@ __decorate([
 ], SalesController.prototype, "remove", null);
 exports.SalesController = SalesController = __decorate([
     (0, common_1.Controller)('sales'),
-    (0, roles_decorator_1.Roles)('Sales & Operations'),
+    (0, roles_decorator_1.Roles)('Sales & Operations', 'Accountant / Finance Staff'),
     __metadata("design:paramtypes", [sales_service_1.SalesService])
 ], SalesController);
 //# sourceMappingURL=sales.controller.js.map

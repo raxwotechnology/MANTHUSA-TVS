@@ -3,7 +3,7 @@ import { SalesService } from './sales.service';
 import { Roles } from '../auth/roles.decorator';
 
 @Controller('sales')
-@Roles('Sales & Operations')
+@Roles('Sales & Operations', 'Accountant / Finance Staff')
 export class SalesController {
   constructor(private readonly salesService: SalesService) {}
 
@@ -20,6 +20,11 @@ export class SalesController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.salesService.findOne(id);
+  }
+
+  @Get(':id/contract')
+  getSalesContract(@Param('id') id: string) {
+    return this.salesService.getSalesContract(id);
   }
 
   @Put(':id')

@@ -23,6 +23,8 @@ let AfterSalesController = class AfterSalesController {
     }
     create(body) { return this.afterSales.create(body); }
     findAll() { return this.afterSales.findAll(); }
+    getMta6Form(id) { return this.afterSales.getMta6Form(id); }
+    getMta8Form(id) { return this.afterSales.getMta8Form(id); }
     update(id, body) { return this.afterSales.update(id, body); }
     remove(id) { return this.afterSales.remove(id); }
 };
@@ -40,6 +42,20 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], AfterSalesController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)(':id/mta6'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], AfterSalesController.prototype, "getMta6Form", null);
+__decorate([
+    (0, common_1.Get)(':id/mta8'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], AfterSalesController.prototype, "getMta8Form", null);
 __decorate([
     (0, common_1.Put)(':id'),
     __param(0, (0, common_1.Param)('id')),

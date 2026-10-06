@@ -16,6 +16,7 @@ exports.LeasingPartnersController = void 0;
 const common_1 = require("@nestjs/common");
 const leasing_partners_service_1 = require("./leasing-partners.service");
 const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
+const roles_decorator_1 = require("../auth/roles.decorator");
 let LeasingPartnersController = class LeasingPartnersController {
     leasingPartnersService;
     constructor(leasingPartnersService) {
@@ -66,6 +67,7 @@ __decorate([
 exports.LeasingPartnersController = LeasingPartnersController = __decorate([
     (0, common_1.Controller)('leasing-partners'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, roles_decorator_1.Roles)('Accountant / Finance Staff'),
     __metadata("design:paramtypes", [leasing_partners_service_1.LeasingPartnersService])
 ], LeasingPartnersController);
 //# sourceMappingURL=leasing-partners.controller.js.map

@@ -96,7 +96,7 @@ __decorate([
 ], LeadsController.prototype, "remove", null);
 exports.LeadsController = LeadsController = __decorate([
     (0, common_1.Controller)('leads'),
-    (0, roles_decorator_1.Roles)('Sales & Operations'),
+    (0, roles_decorator_1.Roles)('Sales & Operations', 'Customer'),
     __metadata("design:paramtypes", [leads_service_1.LeadsService])
 ], LeadsController);
 //# sourceMappingURL=leads.controller.js.map

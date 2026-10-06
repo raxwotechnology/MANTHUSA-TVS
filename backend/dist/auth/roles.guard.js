@@ -34,24 +34,56 @@ let RolesGuard = class RolesGuard {
         const allowed = this.reflector.getAllAndOverride(roles_decorator_1.ROLES_KEY, [context.getHandler(), context.getClass()]);
         const request = context.switchToHttp().getRequest();
         const role = request.user?.role;
-        if (role && ADMIN_ROLES.includes(role))
+        if (!role)
+            throw new common_1.ForbiddenException('User role is missing or unassigned.');
+        if (this.isAdminRole(role))
             return true;
-        if (role && (allowed?.includes(role) ?? false)) {
+        if (!allowed || allowed.length === 0 || this.matchRoles(role, allowed)) {
             const action = this.permissionFor(request.method, request.path);
             const roleId = request.user?.roleId;
             if (roleId && mongoose_2.Types.ObjectId.isValid(roleId)) {
-                const permission = await this.connection.collection('permissions').findOne({
-                    role: new mongoose_2.Types.ObjectId(roleId), module: this.moduleName(context),
+                const permissions = this.connection.collection('permissions');
+                const permission = await permissions.findOne({
+                    role: new mongoose_2.Types.ObjectId(roleId),
+                    module: this.moduleName(context),
                 });
-                if (permission) {
-                    if (permission[action] === true)
-                        return true;
+                const hasConfiguredPermissions = await permissions.findOne({
+                    role: new mongoose_2.Types.ObjectId(roleId),
+                });
+                if (permission?.[action] === true)
+                    return true;
+                if (hasConfiguredPermissions) {
                     throw new common_1.ForbiddenException(`The ${action} permission is disabled for this module.`);
                 }
             }
             return true;
         }
-        throw new common_1.ForbiddenException('Your role does not have permission to perform this action.');
+        throw new common_1.ForbiddenException(`Your role (${role}) does not have permission to access this resource.`);
+    }
+    isAdminRole(role) {
+        const r = (role || '').toLowerCase();
+        return r.includes('admin') || r.includes('owner');
+    }
+    matchRoles(userRole, allowedRoles) {
+        if (!allowedRoles || allowedRoles.length === 0)
+            return true;
+        const cleanUserRole = (userRole || '').toLowerCase().trim();
+        return allowedRoles.some((allowed) => {
+            const cleanAllowed = allowed.toLowerCase().trim();
+            if (cleanUserRole === cleanAllowed)
+                return true;
+            if ((cleanAllowed.includes('sales') || cleanAllowed.includes('operations')) && (cleanUserRole.includes('sales') || cleanUserRole.includes('executive') || cleanUserRole.includes('operations')))
+                return true;
+            if ((cleanAllowed.includes('accountant') || cleanAllowed.includes('finance')) && (cleanUserRole.includes('accountant') || cleanUserRole.includes('finance')))
+                return true;
+            if (cleanAllowed.includes('inventory') && cleanUserRole.includes('inventory'))
+                return true;
+            if (cleanAllowed.includes('customer') && (cleanUserRole.includes('customer') || cleanUserRole.includes('client')))
+                return true;
+            if ((cleanAllowed.includes('admin') || cleanAllowed.includes('owner')) && (cleanUserRole.includes('admin') || cleanUserRole.includes('owner')))
+                return true;
+            return false;
+        });
     }
     moduleName(context) {
         return context.getClass().name.replace(/Controller$/, '').replace(/[A-Z]/g, (letter, index) => `${index ? '-' : ''}${letter.toLowerCase()}`);

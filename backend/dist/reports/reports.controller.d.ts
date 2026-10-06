@@ -39,4 +39,9 @@ export declare class ReportsController {
         conversionRate: number;
         statuses: any[];
     }>;
+    accountingExport(format?: string): Promise<{
+        format: string;
+        filename: string;
+        content: string;
+    }>;
 }

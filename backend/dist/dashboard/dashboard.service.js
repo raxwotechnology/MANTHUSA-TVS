@@ -86,6 +86,40 @@ let DashboardService = class DashboardService {
             cashBalance
         };
     }
+    async getCustomerStats(userId, email) {
+        try {
+            const availableVehicles = await this.vehicleModel.countDocuments({ status: 'Available' });
+            let myReservations = 0;
+            let myInquiries = 0;
+            let customerDoc = null;
+            if (email) {
+                customerDoc = await this.customerModel.findOne({ email: email.toLowerCase() });
+            }
+            if (!customerDoc && userId && mongoose_2.Types.ObjectId.isValid(userId)) {
+                customerDoc = await this.customerModel.findById(userId);
+            }
+            if (customerDoc) {
+                myReservations = await this.leadModel.countDocuments({ customer: customerDoc._id, status: 'Reserved' });
+                myInquiries = await this.leadModel.countDocuments({ customer: customerDoc._id });
+            }
+            return {
+                totalVehicles: availableVehicles,
+                availableVehicles,
+                myReservations,
+                myInquiries,
+                isCustomerPortal: true
+            };
+        }
+        catch {
+            return {
+                totalVehicles: 0,
+                availableVehicles: 0,
+                myReservations: 0,
+                myInquiries: 0,
+                isCustomerPortal: true
+            };
+        }
+    }
 };
 exports.DashboardService = DashboardService;
 exports.DashboardService = DashboardService = __decorate([

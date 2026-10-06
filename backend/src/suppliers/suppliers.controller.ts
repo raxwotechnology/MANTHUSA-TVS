@@ -3,7 +3,7 @@ import { SuppliersService } from './suppliers.service';
 import { Roles } from '../auth/roles.decorator';
 
 @Controller('suppliers')
-@Roles('Sales & Operations', 'Accountant / Finance Staff')
+@Roles('Inventory Manager')
 export class SuppliersController {
   constructor(private readonly suppliers: SuppliersService) {}
   @Post() create(@Body() body: any) { return this.suppliers.create(body); }

@@ -19,13 +19,47 @@ export declare class AuthService {
     verifyEmail(tokenInput: string): Promise<{
         message: string;
     }>;
+    setupMfa(userId: string): Promise<{
+        secret: string;
+        otpAuthUrl: string;
+        backupCodes: string[];
+    }>;
+    verifyMfaToken(userId: string, code: string): Promise<boolean>;
+    enableMfa(userId: string, code: string, backupCodes: string[]): Promise<{
+        message: string;
+    }>;
+    disableMfa(userId: string, code: string): Promise<{
+        message: string;
+    }>;
     login(user: any): Promise<{
+        mfaRequired: boolean;
+        userId: any;
+        email: any;
+        message: string;
+        access_token?: undefined;
+        user?: undefined;
+    } | {
         access_token: string;
         user: {
             id: any;
             name: any;
             email: any;
             role: any;
+            mfaEnabled: boolean;
+        };
+        mfaRequired?: undefined;
+        userId?: undefined;
+        email?: undefined;
+        message?: undefined;
+    }>;
+    completeMfaLogin(userId: string, code: string): Promise<{
+        access_token: string;
+        user: {
+            id: any;
+            name: any;
+            email: any;
+            role: any;
+            mfaEnabled: boolean;
         };
     }>;
 }

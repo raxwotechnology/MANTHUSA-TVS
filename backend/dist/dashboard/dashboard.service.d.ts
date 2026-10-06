@@ -25,4 +25,11 @@ export declare class DashboardService {
         netProfit: number;
         cashBalance: number;
     }>;
+    getCustomerStats(userId?: string, email?: string): Promise<{
+        totalVehicles: number;
+        availableVehicles: number;
+        myReservations: number;
+        myInquiries: number;
+        isCustomerPortal: boolean;
+    }>;
 }

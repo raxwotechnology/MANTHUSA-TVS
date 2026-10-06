@@ -57,7 +57,7 @@ __decorate([
 ], TestDrivesController.prototype, "remove", null);
 exports.TestDrivesController = TestDrivesController = __decorate([
     (0, common_1.Controller)('test-drives'),
-    (0, roles_decorator_1.Roles)('Sales & Operations'),
+    (0, roles_decorator_1.Roles)('Sales & Operations', 'Customer'),
     __metadata("design:paramtypes", [test_drives_service_1.TestDrivesService])
 ], TestDrivesController);
 //# sourceMappingURL=test-drives.controller.js.map

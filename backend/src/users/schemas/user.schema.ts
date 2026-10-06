@@ -26,6 +26,15 @@ export class User {
   @Prop({ default: true })
   emailVerified: boolean;
 
+  @Prop({ default: false })
+  mfaEnabled: boolean;
+
+  @Prop()
+  mfaSecret: string;
+
+  @Prop([String])
+  mfaBackupCodes: string[];
+
   @Prop()
   passwordResetTokenHash: string;
 

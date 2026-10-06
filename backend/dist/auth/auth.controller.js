@@ -47,6 +47,18 @@ let AuthController = class AuthController {
         return this.authService.requestEmailVerification(body.email);
     }
     verifyEmail(body) { return this.authService.verifyEmail(body.token); }
+    verifyMfaLogin(body) {
+        return this.authService.completeMfaLogin(body.userId, body.code);
+    }
+    setupMfa(req) {
+        return this.authService.setupMfa(req.user.userId || req.user.id || req.user.sub);
+    }
+    enableMfa(req, body) {
+        return this.authService.enableMfa(req.user.userId || req.user.id || req.user.sub, body.code, body.backupCodes);
+    }
+    disableMfa(req, body) {
+        return this.authService.disableMfa(req.user.userId || req.user.id || req.user.sub, body.code);
+    }
     limitRecovery(ip) {
         const now = Date.now();
         const attempts = (this.recoveryAttempts.get(ip) || []).filter(timestamp => now - timestamp < 60_000);
@@ -101,6 +113,38 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "verifyEmail", null);
+__decorate([
+    (0, public_decorator_1.Public)(),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, common_1.Post)('mfa/login'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "verifyMfaLogin", null);
+__decorate([
+    (0, common_1.Post)('mfa/setup'),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "setupMfa", null);
+__decorate([
+    (0, common_1.Post)('mfa/enable'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "enableMfa", null);
+__decorate([
+    (0, common_1.Post)('mfa/disable'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "disableMfa", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

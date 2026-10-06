@@ -2,7 +2,13 @@ import { DashboardService } from './dashboard.service';
 export declare class DashboardController {
     private readonly dashboardService;
     constructor(dashboardService: DashboardService);
-    getStats(): Promise<{
+    getStats(req: any): Promise<{
+        totalVehicles: number;
+        availableVehicles: number;
+        myReservations: number;
+        myInquiries: number;
+        isCustomerPortal: boolean;
+    }> | Promise<{
         totalVehicles: number;
         availableVehicles: number;
         reservedVehicles: number;

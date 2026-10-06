@@ -5,6 +5,18 @@ export declare class NotificationsService {
     create(input: any): any;
     findForUser(userId: string): Promise<any[]>;
     markRead(id: string, userId: string): Promise<any>;
-    sendSms(_recipientPhone: string, _message: string): Promise<void>;
-    sendWhatsApp(_recipientPhone: string, _message: string): Promise<void>;
+    sendSms(recipientPhone: string, message: string, type?: string): Promise<{
+        success: boolean;
+        status: string;
+        recipient: string;
+        notificationId: any;
+        gatewayResponse: any;
+    }>;
+    sendWhatsApp(recipientPhone: string, message: string): Promise<{
+        success: boolean;
+        status: string;
+        recipient: string;
+        notificationId: any;
+        gatewayResponse: any;
+    }>;
 }

@@ -8,7 +8,9 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [token, setToken] = useState('');
   const [newPassword, setNewPassword] = useState('');
-  const [mode, setMode] = useState<'login' | 'request-reset' | 'reset' | 'request-verification' | 'verify'>('login');
+  const [mfaCode, setMfaCode] = useState('');
+  const [mfaUserId, setMfaUserId] = useState('');
+  const [mode, setMode] = useState<'login' | 'mfa' | 'request-reset' | 'reset' | 'request-verification' | 'verify'>('login');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
@@ -19,9 +21,26 @@ export default function LoginPage() {
       const response = await fetch(getApiUrl('/auth/login'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.message || 'Invalid credentials');
+      if (result.mfaRequired) {
+        setMfaUserId(result.userId);
+        setMode('mfa');
+        setMessage('MFA is enabled on your account. Enter your 6-digit code or backup code.');
+        return;
+      }
       if (!result.access_token || !result.user) throw new Error('The server returned an invalid login response.');
       localStorage.setItem('token', result.access_token); localStorage.setItem('user', JSON.stringify(result.user)); window.location.href = '/dashboard';
     } catch (err) { setError(err instanceof Error ? err.message : 'Cannot connect to the server.'); }
+    finally { setLoading(false); }
+  };
+
+  const completeMfa = async (event: React.FormEvent) => {
+    event.preventDefault(); setLoading(true); setError('');
+    try {
+      const response = await fetch(getApiUrl('/auth/mfa/login'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: mfaUserId, code: mfaCode }) });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.message || 'Invalid MFA code');
+      localStorage.setItem('token', result.access_token); localStorage.setItem('user', JSON.stringify(result.user)); window.location.href = '/dashboard';
+    } catch (err) { setError(err instanceof Error ? err.message : 'Invalid MFA verification code.'); }
     finally { setLoading(false); }
   };
 
@@ -41,7 +60,7 @@ export default function LoginPage() {
     finally { setLoading(false); }
   };
 
-  const goToLogin = () => { setMode('login'); setError(''); setMessage(''); };
+  const goToLogin = () => { setMode('login'); setError(''); setMessage(''); setMfaCode(''); };
 
   return <div className="min-h-screen bg-[#0B132B] flex flex-col justify-center py-12 sm:px-6 lg:px-8 text-slate-100">
     <div className="sm:mx-auto sm:w-full sm:max-w-md text-center"><div className="w-14 h-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center mx-auto mb-4 shadow-xl"><Car className="w-8 h-8" /></div><h2 className="text-2xl font-extrabold text-white">Sales<span className="text-emerald-400">Plus</span> VSMS</h2><p className="mt-1 text-xs text-slate-400">Vehicle Sales Management System Staff Portal</p></div>
@@ -53,6 +72,12 @@ export default function LoginPage() {
         <label className="block text-xs font-semibold text-slate-300">Password<div className="relative mt-1"><Lock className="absolute left-3 top-3 h-4 w-4 text-slate-400"/><input type="password" required placeholder="••••••••" autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} className="w-full rounded-xl border border-slate-700 bg-[#0B132B] py-2.5 pl-9 pr-3 text-xs text-white focus:border-emerald-500 focus:outline-none placeholder:text-slate-500"/></div></label>
         <button disabled={loading} className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-xs font-bold text-white disabled:opacity-60"><span>{loading ? 'Signing in…' : 'Sign in to Dashboard'}</span><ArrowRight className="h-4 w-4"/></button>
         <div className="flex justify-between"><button type="button" onClick={() => { setMode('request-reset'); setError(''); setMessage(''); }} className="text-xs text-emerald-400 hover:text-emerald-300">Forgot password?</button><button type="button" onClick={() => { setMode('request-verification'); setError(''); setMessage(''); }} className="text-xs text-slate-400 hover:text-white">Verify email</button></div>
+      </form> : mode === 'mfa' ? <form className="space-y-4" onSubmit={completeMfa}>
+        <h3 className="text-sm font-bold text-white flex items-center gap-2"><Lock className="w-4 h-4 text-emerald-400"/> Two-Factor Authentication</h3>
+        <p className="text-xs text-slate-300">Please enter the 6-digit OTP code from your authenticator app or backup code.</p>
+        <input type="text" required placeholder="e.g. 123456" value={mfaCode} onChange={e => setMfaCode(e.target.value)} className="w-full rounded-xl border border-slate-700 bg-[#0B132B] p-3 text-center text-lg font-mono tracking-widest text-white placeholder:text-slate-500 focus:border-emerald-500 focus:outline-none"/>
+        <button disabled={loading} className="w-full rounded-xl bg-emerald-600 p-3 text-xs font-bold text-white disabled:opacity-60">{loading ? 'Verifying OTP…' : 'Verify & Log In'}</button>
+        <button type="button" onClick={goToLogin} className="w-full text-xs text-slate-400 hover:text-white">Back to password login</button>
       </form> : <form className="space-y-4" onSubmit={recover}>
         <h3 className="text-sm font-bold">{mode === 'request-reset' ? 'Reset your password' : mode === 'reset' ? 'Choose a new password' : 'Verify your email address'}</h3>
         {mode === 'request-reset' || mode === 'request-verification' ? <><label className="block text-xs font-semibold">Account email<input type="email" required placeholder="e.g. user@salesplus.com" value={email} onChange={event => setEmail(event.target.value)} className="mt-1 w-full rounded-xl border border-slate-700 bg-[#0B132B] p-3 text-white placeholder:text-slate-500"/></label><p className="text-[11px] text-slate-400">A one-time token will be sent if the account needs this action and email delivery is configured.</p></> : <><label className="block text-xs font-semibold">{mode === 'verify' ? 'Verification token' : 'Reset token'}<input required placeholder="e.g. 123456" value={token} onChange={event => setToken(event.target.value)} className="mt-1 w-full rounded-xl border border-slate-700 bg-[#0B132B] p-3 text-white placeholder:text-slate-500"/></label>{mode === 'reset' && <label className="block text-xs font-semibold">New password<input type="password" minLength={10} required placeholder="At least 10 characters" autoComplete="new-password" value={newPassword} onChange={event => setNewPassword(event.target.value)} className="mt-1 w-full rounded-xl border border-slate-700 bg-[#0B132B] p-3 text-white placeholder:text-slate-500"/></label>}</>}

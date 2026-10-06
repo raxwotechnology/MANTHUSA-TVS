@@ -17,6 +17,9 @@ let AfterSales = class AfterSales {
     customer;
     customerFeedback;
     reminders;
+    warrantyInfo;
+    freeServices;
+    rmvTransfer;
     nextFollowUp;
 };
 exports.AfterSales = AfterSales;
@@ -36,6 +39,25 @@ __decorate([
     (0, mongoose_1.Prop)({ type: Object }),
     __metadata("design:type", Object)
 ], AfterSales.prototype, "reminders", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: Object }),
+    __metadata("design:type", Object)
+], AfterSales.prototype, "warrantyInfo", void 0);
+__decorate([
+    (0, mongoose_1.Prop)([{
+            serviceNumber: Number,
+            milestoneKm: Number,
+            dueDate: Date,
+            status: { type: String, default: 'Scheduled' },
+            completedDate: Date,
+            notes: String
+        }]),
+    __metadata("design:type", Array)
+], AfterSales.prototype, "freeServices", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: Object }),
+    __metadata("design:type", Object)
+], AfterSales.prototype, "rmvTransfer", void 0);
 __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", Date)

@@ -24,11 +24,21 @@ let VehiclesController = class VehiclesController {
     create(createVehicleDto) {
         return this.vehiclesService.create(createVehicleDto);
     }
-    findAll() {
-        return this.vehiclesService.findAll();
+    async findAll(req) {
+        const role = req.user?.role;
+        const list = await this.vehiclesService.findAll();
+        return list.map(v => this.vehiclesService.redactFinancials(v, role));
     }
-    findOne(id) {
-        return this.vehiclesService.findOne(id);
+    getQrCode(id) {
+        return this.vehiclesService.getQrCode(id);
+    }
+    getBarcode(id) {
+        return this.vehiclesService.getBarcode(id);
+    }
+    async findOne(id, req) {
+        const role = req.user?.role;
+        const vehicle = await this.vehiclesService.findOne(id);
+        return this.vehiclesService.redactFinancials(vehicle, role);
     }
     update(id, updateVehicleDto) {
         return this.vehiclesService.update(id, updateVehicleDto);
@@ -40,6 +50,7 @@ let VehiclesController = class VehiclesController {
 exports.VehiclesController = VehiclesController;
 __decorate([
     (0, common_1.Post)(),
+    (0, roles_decorator_1.Roles)('Admin / Owner', 'Inventory Manager', 'Sales & Operations'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -47,19 +58,36 @@ __decorate([
 ], VehiclesController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
+    __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
 ], VehiclesController.prototype, "findAll", null);
 __decorate([
-    (0, common_1.Get)(':id'),
+    (0, common_1.Get)(':id/qr-code'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
+], VehiclesController.prototype, "getQrCode", null);
+__decorate([
+    (0, common_1.Get)(':id/barcode'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], VehiclesController.prototype, "getBarcode", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
 ], VehiclesController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Put)(':id'),
+    (0, roles_decorator_1.Roles)('Admin / Owner', 'Inventory Manager', 'Sales & Operations'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -68,6 +96,7 @@ __decorate([
 ], VehiclesController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
+    (0, roles_decorator_1.Roles)('Admin / Owner', 'Inventory Manager'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -75,7 +104,7 @@ __decorate([
 ], VehiclesController.prototype, "remove", null);
 exports.VehiclesController = VehiclesController = __decorate([
     (0, common_1.Controller)('vehicles'),
-    (0, roles_decorator_1.Roles)('Sales & Operations', 'Accountant / Finance Staff'),
+    (0, roles_decorator_1.Roles)('Sales & Operations', 'Accountant / Finance Staff', 'Admin / Owner', 'Inventory Manager', 'Customer'),
     __metadata("design:paramtypes", [vehicles_service_1.VehiclesService])
 ], VehiclesController);
 //# sourceMappingURL=vehicles.controller.js.map

@@ -3,7 +3,7 @@ import { VehiclePurchasesService } from './vehicle-purchases.service';
 import { Roles } from '../auth/roles.decorator';
 
 @Controller('vehicle-purchases')
-@Roles('Sales & Operations', 'Accountant / Finance Staff')
+@Roles('Inventory Manager')
 export class VehiclePurchasesController {
   constructor(private readonly purchases: VehiclePurchasesService) {}
 

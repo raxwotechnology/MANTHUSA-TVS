@@ -77,7 +77,7 @@ __decorate([
 ], VehicleValuationsController.prototype, "remove", null);
 exports.VehicleValuationsController = VehicleValuationsController = __decorate([
     (0, common_1.Controller)('vehicle-valuations'),
-    (0, roles_decorator_1.Roles)('Sales & Operations'),
+    (0, roles_decorator_1.Roles)('Sales & Operations', 'Inventory Manager'),
     __metadata("design:paramtypes", [vehicle_valuations_service_1.VehicleValuationsService])
 ], VehicleValuationsController);
 //# sourceMappingURL=vehicle-valuations.controller.js.map

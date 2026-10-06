@@ -20,6 +20,12 @@ let Sale = class Sale {
     branch;
     vehiclePrice;
     discount;
+    tradeInAllowance;
+    tradeInVehicleDetails;
+    leasingProvider;
+    leasingAmount;
+    paymentMethod;
+    salesContractNumber;
     additionalCharges;
     finalAmount;
     paidAmount;
@@ -56,6 +62,30 @@ __decorate([
     (0, mongoose_1.Prop)({ default: 0 }),
     __metadata("design:type", Number)
 ], Sale.prototype, "discount", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: 0 }),
+    __metadata("design:type", Number)
+], Sale.prototype, "tradeInAllowance", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: Object }),
+    __metadata("design:type", Object)
+], Sale.prototype, "tradeInVehicleDetails", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Sale.prototype, "leasingProvider", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: 0 }),
+    __metadata("design:type", Number)
+], Sale.prototype, "leasingAmount", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Sale.prototype, "paymentMethod", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Sale.prototype, "salesContractNumber", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ default: 0 }),
     __metadata("design:type", Number)

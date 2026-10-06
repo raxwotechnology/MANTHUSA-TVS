@@ -60,9 +60,13 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
   };
 
   const role = user?.role || 'Admin';
-  const isAdmin = role === 'Admin' || role.includes('Admin') || role.includes('Owner');
-  const isSales = role.includes('Sales') || isAdmin;
-  const isFinance = role.includes('Accountant') || role.includes('Finance') || isAdmin;
+  const cleanRole = role.toLowerCase();
+  const isAdmin = cleanRole.includes('admin') || cleanRole.includes('owner');
+  const isSales = cleanRole.includes('sales') || cleanRole.includes('operations') || isAdmin;
+  const isFinance = cleanRole.includes('accountant') || cleanRole.includes('finance') || isAdmin;
+  const isInventory = cleanRole.includes('inventory') || isAdmin;
+  const isCustomer = cleanRole.includes('customer') || cleanRole.includes('client');
+  const isStaff = !isCustomer;
 
   const userInitials = user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2) : 'VS';
 
@@ -142,10 +146,10 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
         {/* INVENTORY & VEHICLES */}
         <div>
           <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-3 mb-1">
-            Inventory & Stock
+            Showroom & Inventory
           </div>
           <div className="space-y-0.5">
-            <Link
+            {(isInventory || isCustomer) && <Link
               href="/dashboard/vehicles"
               className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
                 pathname === '/dashboard/vehicles'
@@ -154,8 +158,8 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
               }`}
             >
               <Car className="w-4 h-4" />
-              <span>Vehicle Inventory</span>
-            </Link>
+              <span>Showroom Vehicles</span>
+            </Link>}
 
             <Link
               href="/dashboard/vehicles/compare"
@@ -169,82 +173,88 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
               <span>Vehicle Comparison</span>
             </Link>
 
-            <Link
-              href="/dashboard/inspections"
-              className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
-                pathname === '/dashboard/inspections'
-                  ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold'
-                  : 'hover:bg-slate-800/60 text-slate-300'
-              }`}
-            >
-              <ClipboardCheck className="w-4 h-4" />
-              <span>Vehicle Inspection</span>
-            </Link>
+            {isInventory && (
+              <>
+                <Link
+                  href="/dashboard/inspections"
+                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
+                    pathname === '/dashboard/inspections'
+                      ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold'
+                      : 'hover:bg-slate-800/60 text-slate-300'
+                  }`}
+                >
+                  <ClipboardCheck className="w-4 h-4" />
+                  <span>Vehicle Inspection</span>
+                </Link>
 
-            <Link
-              href="/dashboard/purchases"
-              className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
-                pathname === '/dashboard/purchases'
-                  ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold'
-                  : 'hover:bg-slate-800/60 text-slate-300'
-              }`}
-            >
-              <ShoppingCart className="w-4 h-4" />
-              <span>Acquisitions & Costs</span>
-            </Link>
+                <Link
+                  href="/dashboard/purchases"
+                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
+                    pathname === '/dashboard/purchases'
+                      ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold'
+                      : 'hover:bg-slate-800/60 text-slate-300'
+                  }`}
+                >
+                  <ShoppingCart className="w-4 h-4" />
+                  <span>Acquisitions & Costs</span>
+                </Link>
 
-            <Link
-              href="/dashboard/valuations"
-              className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
-                pathname === '/dashboard/valuations'
-                  ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold'
-                  : 'hover:bg-slate-800/60 text-slate-300'
-              }`}
-            >
-              <TrendingUp className="w-4 h-4" />
-              <span>Trade-ins & Valuations</span>
-            </Link>
+                <Link
+                  href="/dashboard/valuations"
+                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
+                    pathname === '/dashboard/valuations'
+                      ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold'
+                      : 'hover:bg-slate-800/60 text-slate-300'
+                  }`}
+                >
+                  <TrendingUp className="w-4 h-4" />
+                  <span>Trade-ins & Valuations</span>
+                </Link>
 
-            <Link
-              href="/dashboard/transfers"
-              className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
-                pathname === '/dashboard/transfers'
-                  ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold'
-                  : 'hover:bg-slate-800/60 text-slate-300'
-              }`}
-            >
-              <ArrowLeftRight className="w-4 h-4" />
-              <span>Stock Transfers</span>
-            </Link>
+                <Link
+                  href="/dashboard/transfers"
+                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
+                    pathname === '/dashboard/transfers'
+                      ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold'
+                      : 'hover:bg-slate-800/60 text-slate-300'
+                  }`}
+                >
+                  <ArrowLeftRight className="w-4 h-4" />
+                  <span>Stock Transfers</span>
+                </Link>
+              </>
+            )}
           </div>
         </div>
 
-        {/* PROCUREMENT & SUPPLIERS */}
-        <div>
-          <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-3 mb-1">
-            Procurement & Supply
+        {/* PROCUREMENT & SUPPLIERS (Staff only) */}
+        {isInventory && (
+          <div>
+            <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-3 mb-1">
+              Procurement & Supply
+            </div>
+            <Link
+              href="/dashboard/suppliers"
+              className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
+                pathname === '/dashboard/suppliers'
+                  ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold'
+                  : 'hover:bg-slate-800/60 text-slate-300'
+              }`}
+            >
+              <Building2 className="w-4 h-4" />
+              <span>Supplier Management</span>
+            </Link>
           </div>
-          <Link
-            href="/dashboard/suppliers"
-            className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
-              pathname === '/dashboard/suppliers'
-                ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold'
-                : 'hover:bg-slate-800/60 text-slate-300'
-            }`}
-          >
-            <Building2 className="w-4 h-4" />
-            <span>Supplier Management</span>
-          </Link>
-        </div>
+        )}
 
         {/* CRM & SALES LEADS */}
-        {isSales && (
+        {(isSales || isCustomer) && (
           <div>
             <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-3 mb-1">
               CRM & Sales Pipeline
             </div>
             <div className="space-y-0.5">
-              <Link
+              {isSales && <Link
                 href="/dashboard/customers"
                 className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
                   pathname === '/dashboard/customers'
@@ -254,7 +264,7 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
               >
                 <Users className="w-4 h-4" />
                 <span>Customer Profiles</span>
-              </Link>
+              </Link>}
 
               <Link
                 href="/dashboard/leads"
@@ -284,13 +294,13 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
         )}
 
         {/* SALES & CONTRACTS */}
-        {isSales && (
+        {(isSales || isFinance || isCustomer) && (
           <div>
             <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-3 mb-1">
               Sales & Deals
             </div>
             <div className="space-y-0.5">
-              <Link
+              {(isSales || isCustomer) && <Link
                 href="/dashboard/quotations"
                 className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
                   pathname === '/dashboard/quotations'
@@ -300,12 +310,12 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
               >
                 <FileText className="w-4 h-4" />
                 <span>Quotations & Discounts</span>
-              </Link>
-              <Link href="/dashboard/discount-approvals" className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${pathname === '/dashboard/discount-approvals' ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold' : 'hover:bg-slate-800/60 text-slate-300'}`}>
+              </Link>}
+              {isSales && <Link href="/dashboard/discount-approvals" className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${pathname === '/dashboard/discount-approvals' ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold' : 'hover:bg-slate-800/60 text-slate-300'}`}>
                 <CheckCircle2 className="w-4 h-4" /><span>Discount Approvals</span>
-              </Link>
+              </Link>}
 
-              <Link
+              {(isSales || isFinance) && <Link
                 href="/dashboard/reservations"
                 className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
                   pathname === '/dashboard/reservations'
@@ -315,9 +325,9 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
               >
                 <BookmarkCheck className="w-4 h-4" />
                 <span>Reservations</span>
-              </Link>
+              </Link>}
 
-              <Link
+              {(isSales || isFinance || isCustomer) && <Link
                 href="/dashboard/sales"
                 className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
                   pathname === '/dashboard/sales'
@@ -327,9 +337,9 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
               >
                 <DollarSign className="w-4 h-4" />
                 <span>Sales Invoices</span>
-              </Link>
+              </Link>}
 
-              <Link
+              {isSales && <Link
                 href="/dashboard/handovers"
                 className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
                   pathname === '/dashboard/handovers'
@@ -339,10 +349,10 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
               >
                 <Car className="w-4 h-4" />
                 <span>Vehicle Handover</span>
-              </Link>
-              <Link href="/dashboard/documents" className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${pathname === '/dashboard/documents' ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold' : 'hover:bg-slate-800/60 text-slate-300'}`}>
+              </Link>}
+              {(isSales || isFinance) && <Link href="/dashboard/documents" className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${pathname === '/dashboard/documents' ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold' : 'hover:bg-slate-800/60 text-slate-300'}`}>
                 <FileText className="w-4 h-4" /><span>Documents</span>
-              </Link>
+              </Link>}
             </div>
           </div>
         )}
@@ -408,9 +418,6 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
               <Link href="/dashboard/supplier-payments" className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${pathname === '/dashboard/supplier-payments' ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold' : 'hover:bg-slate-800/60 text-slate-300'}`}>
                 <Building2 className="w-4 h-4" /><span>Supplier Payments</span>
               </Link>
-              {!isSales && <Link href="/dashboard/documents" className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${pathname === '/dashboard/documents' ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold' : 'hover:bg-slate-800/60 text-slate-300'}`}>
-                <FileText className="w-4 h-4" /><span>Documents</span>
-              </Link>}
             </div>
           </div>
         )}
@@ -449,25 +456,25 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
           </div>
         )}
 
-        {/* AFTER SALES & COMPLAINTS */}
+        {/* AFTER SALES & INQUIRIES */}
         <div>
           <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-3 mb-1">
-            After Sales
+            Support & Feedback
           </div>
           <div className="space-y-0.5">
-            <Link
-              href="/dashboard/after-sales"
-              className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
-                pathname === '/dashboard/after-sales'
-                  ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold'
-                  : 'hover:bg-slate-800/60 text-slate-300'
-              }`}
-            >
-              <Wrench className="w-4 h-4" />
-              <span>Service & Renewals</span>
-            </Link>
+            {isSales && <Link
+                href="/dashboard/after-sales"
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
+                  pathname === '/dashboard/after-sales'
+                    ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold'
+                    : 'hover:bg-slate-800/60 text-slate-300'
+                }`}
+              >
+                <Wrench className="w-4 h-4" />
+                <span>Service & Renewals</span>
+              </Link>}
 
-            <Link
+            {isSales && <Link
               href="/dashboard/complaints"
               className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
                 pathname === '/dashboard/complaints'
@@ -476,16 +483,17 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
               }`}
             >
               <MessageSquareWarning className="w-4 h-4" />
-              <span>Customer Complaints</span>
-            </Link>
+              <span>Customer Inquiries & Feedback</span>
+            </Link>}
           </div>
         </div>
 
-        {/* REPORTS & ADMIN */}
-        <div>
-          <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-3 mb-1">
-            Reports & Security
-          </div>
+        {/* REPORTS & ADMIN (Staff only) */}
+        {(isFinance || isInventory) && (
+          <div>
+            <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-3 mb-1">
+              Reports & Security
+            </div>
           <div className="space-y-0.5">
             <Link
               href="/dashboard/reports"
@@ -528,6 +536,7 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
             )}
           </div>
         </div>
+        )}
       </nav>
 
       {/* User Footer Profile Card */}

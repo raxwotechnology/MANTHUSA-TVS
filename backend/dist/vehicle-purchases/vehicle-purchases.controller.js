@@ -65,7 +65,7 @@ __decorate([
 ], VehiclePurchasesController.prototype, "remove", null);
 exports.VehiclePurchasesController = VehiclePurchasesController = __decorate([
     (0, common_1.Controller)('vehicle-purchases'),
-    (0, roles_decorator_1.Roles)('Sales & Operations', 'Accountant / Finance Staff'),
+    (0, roles_decorator_1.Roles)('Inventory Manager'),
     __metadata("design:paramtypes", [vehicle_purchases_service_1.VehiclePurchasesService])
 ], VehiclePurchasesController);
 //# sourceMappingURL=vehicle-purchases.controller.js.map

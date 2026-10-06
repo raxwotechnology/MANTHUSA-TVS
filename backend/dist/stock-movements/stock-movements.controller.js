@@ -16,6 +16,7 @@ exports.StockMovementsController = void 0;
 const common_1 = require("@nestjs/common");
 const stock_movements_service_1 = require("./stock-movements.service");
 const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
+const roles_decorator_1 = require("../auth/roles.decorator");
 let StockMovementsController = class StockMovementsController {
     stockMovementsService;
     constructor(stockMovementsService) {
@@ -55,6 +56,7 @@ __decorate([
 exports.StockMovementsController = StockMovementsController = __decorate([
     (0, common_1.Controller)('stock-movements'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, roles_decorator_1.Roles)('Admin / Owner', 'Inventory Manager'),
     __metadata("design:paramtypes", [stock_movements_service_1.StockMovementsService])
 ], StockMovementsController);
 //# sourceMappingURL=stock-movements.controller.js.map

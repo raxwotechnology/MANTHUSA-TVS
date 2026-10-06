@@ -5,13 +5,25 @@ export declare class AuthController {
     private readonly recoveryAttempts;
     constructor(authService: AuthService);
     login(loginDto: any, request: any): Promise<{
+        mfaRequired: boolean;
+        userId: any;
+        email: any;
+        message: string;
+        access_token?: undefined;
+        user?: undefined;
+    } | {
         access_token: string;
         user: {
             id: any;
             name: any;
             email: any;
             role: any;
+            mfaEnabled: boolean;
         };
+        mfaRequired?: undefined;
+        userId?: undefined;
+        email?: undefined;
+        message?: undefined;
     }>;
     forgotPassword(body: any, request: any): Promise<{
         message: string;
@@ -23,6 +35,27 @@ export declare class AuthController {
         message: string;
     }>;
     verifyEmail(body: any): Promise<{
+        message: string;
+    }>;
+    verifyMfaLogin(body: any): Promise<{
+        access_token: string;
+        user: {
+            id: any;
+            name: any;
+            email: any;
+            role: any;
+            mfaEnabled: boolean;
+        };
+    }>;
+    setupMfa(req: any): Promise<{
+        secret: string;
+        otpAuthUrl: string;
+        backupCodes: string[];
+    }>;
+    enableMfa(req: any, body: any): Promise<{
+        message: string;
+    }>;
+    disableMfa(req: any, body: any): Promise<{
         message: string;
     }>;
     private limitRecovery;

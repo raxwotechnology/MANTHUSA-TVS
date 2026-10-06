@@ -58,6 +58,51 @@ export class VehiclesService {
     return vehicle.save();
   }
 
+  redactFinancials(vehicle: any, role?: string) {
+    if (!vehicle) return vehicle;
+    const obj = typeof vehicle.toObject === 'function' ? vehicle.toObject() : { ...vehicle };
+    // Non-functional req B & Security: Sales Executives are restricted from viewing Buying Price / Profit Details
+    if (role && (role.toLowerCase().includes('sales') || role.toLowerCase().includes('executive') || role.toLowerCase().includes('customer'))) {
+      delete obj.purchasePrice;
+      delete obj.importCost;
+      delete obj.transportCost;
+      delete obj.repairCost;
+      delete obj.detailingCost;
+      delete obj.registrationCost;
+      delete obj.insuranceCost;
+      delete obj.advertisementCost;
+      delete obj.otherCosts;
+      delete obj.totalInvestment;
+      delete obj.expectedProfit;
+      delete obj.actualProfit;
+    }
+    return obj;
+  }
+
+  async getQrCode(id: string) {
+    const vehicle = await this.findOne(id);
+    const text = `VEHICLE-VIN:${vehicle.chassisNumber || vehicle.stockNumber || vehicle._id}|MAKE:${vehicle.make}|MODEL:${vehicle.model}|PRICE:LKR ${vehicle.sellingPrice || 0}`;
+    // Generate clean SVG Data URL for QR Code representation
+    const encoded = encodeURIComponent(text);
+    return {
+      stockNumber: vehicle.stockNumber,
+      vin: vehicle.chassisNumber,
+      qrText: text,
+      qrDataUrl: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="100%" height="100%" fill="white"/><text x="100" y="30" font-family="monospace" font-size="12" text-anchor="middle" fill="black">VEHICLE QR TAG</text><rect x="40" y="40" width="120" height="120" fill="none" stroke="black" stroke-width="4"/><rect x="55" y="55" width="30" height="30" fill="black"/><rect x="115" y="55" width="30" height="30" fill="black"/><rect x="55" y="115" width="30" height="30" fill="black"/><path d="M95,65 H105 V95 H95 Z M65,95 H95 V105 H65 Z M105,105 H135 V135 H105 Z" fill="black"/><text x="100" y="180" font-family="monospace" font-size="10" text-anchor="middle" fill="black">${vehicle.chassisNumber || vehicle.stockNumber}</text></svg>`
+    };
+  }
+
+  async getBarcode(id: string) {
+    const vehicle = await this.findOne(id);
+    const code = (vehicle.chassisNumber || vehicle.stockNumber || String(vehicle._id)).slice(-12).toUpperCase();
+    return {
+      stockNumber: vehicle.stockNumber,
+      vin: vehicle.chassisNumber,
+      barcodeText: code,
+      barcodeSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="80" viewBox="0 0 300 80"><rect width="100%" height="100%" fill="white"/><g fill="black"><rect x="20" y="10" width="4" height="45"/><rect x="28" y="10" width="2" height="45"/><rect x="34" y="10" width="6" height="45"/><rect x="44" y="10" width="2" height="45"/><rect x="50" y="10" width="4" height="45"/><rect x="58" y="10" width="8" height="45"/><rect x="70" y="10" width="2" height="45"/><rect x="76" y="10" width="6" height="45"/><rect x="86" y="10" width="4" height="45"/><rect x="94" y="10" width="2" height="45"/><rect x="100" y="10" width="8" height="45"/><rect x="112" y="10" width="4" height="45"/><rect x="120" y="10" width="2" height="45"/><rect x="126" y="10" width="6" height="45"/><rect x="136" y="10" width="4" height="45"/><rect x="144" y="10" width="2" height="45"/><rect x="150" y="10" width="8" height="45"/><rect x="162" y="10" width="4" height="45"/><rect x="170" y="10" width="2" height="45"/><rect x="176" y="10" width="6" height="45"/><rect x="186" y="10" width="4" height="45"/><rect x="194" y="10" width="2" height="45"/><rect x="200" y="10" width="8" height="45"/><rect x="212" y="10" width="4" height="45"/><rect x="220" y="10" width="2" height="45"/><rect x="226" y="10" width="6" height="45"/><rect x="236" y="10" width="4" height="45"/><rect x="244" y="10" width="2" height="45"/><rect x="250" y="10" width="8" height="45"/><rect x="262" y="10" width="4" height="45"/><rect x="270" y="10" width="4" height="45"/></g><text x="150" y="70" font-family="monospace" font-size="12" text-anchor="middle" fill="black">${code}</text></svg>`
+    };
+  }
+
   async remove(id: string): Promise<any> {
     const deletedVehicle = await this.vehicleModel.findByIdAndDelete(id).exec();
     if (!deletedVehicle) {

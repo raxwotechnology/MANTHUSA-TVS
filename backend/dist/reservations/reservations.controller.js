@@ -57,7 +57,7 @@ __decorate([
 ], ReservationsController.prototype, "remove", null);
 exports.ReservationsController = ReservationsController = __decorate([
     (0, common_1.Controller)('reservations'),
-    (0, roles_decorator_1.Roles)('Sales & Operations', 'Accountant / Finance Staff'),
+    (0, roles_decorator_1.Roles)('Sales & Operations', 'Accountant / Finance Staff', 'Customer'),
     __metadata("design:paramtypes", [reservations_service_1.ReservationsService])
 ], ReservationsController);
 //# sourceMappingURL=reservations.controller.js.map

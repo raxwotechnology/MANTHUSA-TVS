@@ -3,7 +3,7 @@ import { VehicleTransfersService } from './vehicle-transfers.service';
 import { Roles } from '../auth/roles.decorator';
 
 @Controller('vehicle-transfers')
-@Roles('Sales & Operations')
+@Roles('Inventory Manager')
 export class VehicleTransfersController {
   constructor(private readonly service: VehicleTransfersService) {}
 
