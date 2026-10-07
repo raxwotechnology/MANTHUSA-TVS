@@ -336,7 +336,7 @@ export default function DashboardPage() {
             className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow-xs transition-colors"
           >
             <PlusCircle className="w-4 h-4" />
-            <span>+ Add New Vehicle</span>
+            <span>Add New Vehicle</span>
           </button>
 
           <button
@@ -344,7 +344,7 @@ export default function DashboardPage() {
             className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow-xs transition-colors"
           >
             <UserCheck className="w-4 h-4" />
-            <span>+ Create Sales Lead</span>
+            <span>Create Sales Lead</span>
           </button>
 
           <button
@@ -361,7 +361,7 @@ export default function DashboardPage() {
               className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow-xs transition-colors"
             >
               <Receipt className="w-4 h-4" />
-              <span>+ Record Cash IN / OUT</span>
+              <span>Record Cash IN / OUT</span>
             </button>
           )}
         </div>

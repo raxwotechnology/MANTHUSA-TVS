@@ -168,7 +168,7 @@ let AuthService = class AuthService {
         const expected = (0, crypto_1.createHash)('sha256').update(`${user.mfaSecret}:${window}`).digest('hex');
         const expectedNum = (parseInt(expected.substring(0, 8), 16) % 1000000).toString().padStart(6, '0');
         const expectedPrev = (parseInt((0, crypto_1.createHash)('sha256').update(`${user.mfaSecret}:${window - 1}`).digest('hex').substring(0, 8), 16) % 1000000).toString().padStart(6, '0');
-        if (codeClean === expectedNum || codeClean === expectedPrev || codeClean === '123456') {
+        if (codeClean === expectedNum || codeClean === expectedPrev) {
             return true;
         }
         return false;

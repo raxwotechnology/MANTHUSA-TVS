@@ -127,7 +127,7 @@ export default function ReceiptsVouchersPage() {
             className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2.5 rounded-lg shadow-xs transition-colors"
           >
             <Plus className="w-4 h-4" />
-            <span>+ Record Cash IN Receipt</span>
+            <span>Record Cash IN Receipt</span>
           </button>
 
           <button
@@ -135,7 +135,7 @@ export default function ReceiptsVouchersPage() {
             className="flex items-center gap-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs px-4 py-2.5 rounded-lg shadow-xs transition-colors"
           >
             <Plus className="w-4 h-4" />
-            <span>+ Issue Cash OUT Voucher</span>
+            <span>Issue Cash OUT Voucher</span>
           </button>
         </div>
       </div>

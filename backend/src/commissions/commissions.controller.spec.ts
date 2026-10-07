@@ -7,7 +7,7 @@ describe('CommissionsController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [CommissionsController],
-    }).compile();
+    }).useMocker(() => ({})).compile();
 
     controller = module.get<CommissionsController>(CommissionsController);
   });

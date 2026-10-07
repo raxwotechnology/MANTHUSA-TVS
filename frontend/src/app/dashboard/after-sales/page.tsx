@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { apiFetch } from '@/lib/api';
-import { ShieldCheck, FileText, Calendar, Plus, Printer, X, CheckCircle, Wrench } from 'lucide-react';
+import { ShieldCheck, Plus, Printer, X, CheckCircle, Wrench } from 'lucide-react';
 
 export default function AfterSalesPage() {
   const [records, setRecords] = useState<any[]>([]);

@@ -3,6 +3,7 @@ export declare class AuthController {
     private readonly authService;
     private readonly attempts;
     private readonly recoveryAttempts;
+    private readonly mfaAttempts;
     constructor(authService: AuthService);
     login(loginDto: any, request: any): Promise<{
         mfaRequired: boolean;
@@ -37,7 +38,7 @@ export declare class AuthController {
     verifyEmail(body: any): Promise<{
         message: string;
     }>;
-    verifyMfaLogin(body: any): Promise<{
+    verifyMfaLogin(body: any, request: any): Promise<{
         access_token: string;
         user: {
             id: any;
@@ -59,4 +60,5 @@ export declare class AuthController {
         message: string;
     }>;
     private limitRecovery;
+    private limitMfa;
 }

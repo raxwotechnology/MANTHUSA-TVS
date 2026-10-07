@@ -36,7 +36,11 @@ exports.AuthModule = AuthModule = __decorate([
                     const secret = config.get('JWT_SECRET');
                     if (!secret)
                         throw new Error('JWT_SECRET must be configured before starting the API.');
-                    return { secret, signOptions: { expiresIn: '1d' } };
+                    const configuredExpiry = config.get('JWT_EXPIRES_IN');
+                    const signOptions = configuredExpiry
+                        ? { expiresIn: configuredExpiry }
+                        : { expiresIn: '1d' };
+                    return { secret, signOptions };
                 },
             }),
         ],

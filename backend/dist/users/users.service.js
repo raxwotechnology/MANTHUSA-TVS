@@ -56,30 +56,35 @@ let UsersService = class UsersService {
         this.userModel = userModel;
     }
     async findAll() {
-        return this.userModel.find().select('-passwordHash').populate('role').exec();
+        return this.userModel.find().select('-passwordHash').populate('role').populate('branch').exec();
     }
     async findOne(id) {
-        const user = await this.userModel.findById(id).select('-passwordHash').populate('role').exec();
+        const user = await this.userModel.findById(id).select('-passwordHash').populate('role').populate('branch').exec();
         if (!user)
             throw new common_1.NotFoundException('User not found');
         return user;
     }
     async create(createUserDto) {
         const { password, ...userData } = createUserDto;
-        if (!password || password.length < 10)
-            throw new common_1.BadRequestException('Password must contain at least 10 characters.');
+        if (!password || password.length < 6)
+            throw new common_1.BadRequestException('Password must contain at least 6 characters.');
+        if (!userData.branch)
+            delete userData.branch;
         userData.passwordHash = await bcrypt.hash(password, 12);
         const createdUser = await new this.userModel(userData).save();
         return this.findOne(createdUser._id.toString());
     }
     async update(id, updateUserDto) {
         const { password, ...userData } = updateUserDto;
-        if (password) {
-            if (password.length < 10)
-                throw new common_1.BadRequestException('Password must contain at least 10 characters.');
+        if (password && password.trim()) {
+            if (password.length < 6)
+                throw new common_1.BadRequestException('Password must contain at least 6 characters.');
             userData.passwordHash = await bcrypt.hash(password, 12);
         }
-        const updatedUser = await this.userModel.findByIdAndUpdate(id, userData, { new: true }).select('-passwordHash').populate('role').exec();
+        if (!userData.branch) {
+            userData.branch = null;
+        }
+        const updatedUser = await this.userModel.findByIdAndUpdate(id, userData, { new: true }).select('-passwordHash').populate('role').populate('branch').exec();
         if (!updatedUser)
             throw new common_1.NotFoundException('User not found');
         return updatedUser;

@@ -20,6 +20,7 @@ let AuthController = class AuthController {
     authService;
     attempts = new Map();
     recoveryAttempts = new Map();
+    mfaAttempts = new Map();
     constructor(authService) {
         this.authService = authService;
     }
@@ -47,7 +48,8 @@ let AuthController = class AuthController {
         return this.authService.requestEmailVerification(body.email);
     }
     verifyEmail(body) { return this.authService.verifyEmail(body.token); }
-    verifyMfaLogin(body) {
+    verifyMfaLogin(body, request) {
+        this.limitMfa(request.ip || 'unknown', body.userId);
         return this.authService.completeMfaLogin(body.userId, body.code);
     }
     setupMfa(req) {
@@ -66,6 +68,16 @@ let AuthController = class AuthController {
             throw new common_1.HttpException('Too many account recovery requests. Try again in one minute.', common_1.HttpStatus.TOO_MANY_REQUESTS);
         attempts.push(now);
         this.recoveryAttempts.set(ip, attempts);
+    }
+    limitMfa(ip, userId) {
+        const key = `${ip}:${String(userId || '')}`;
+        const now = Date.now();
+        const attempts = (this.mfaAttempts.get(key) || []).filter((timestamp) => now - timestamp < 60_000);
+        if (attempts.length >= 10) {
+            throw new common_1.HttpException('Too many MFA attempts. Try again in one minute.', common_1.HttpStatus.TOO_MANY_REQUESTS);
+        }
+        attempts.push(now);
+        this.mfaAttempts.set(key, attempts);
     }
 };
 exports.AuthController = AuthController;
@@ -118,8 +130,9 @@ __decorate([
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, common_1.Post)('mfa/login'),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "verifyMfaLogin", null);
 __decorate([

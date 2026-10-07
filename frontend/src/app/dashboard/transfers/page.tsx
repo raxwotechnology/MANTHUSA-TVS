@@ -43,7 +43,7 @@ export default function TransfersPage() {
 
         <button className="flex items-center gap-1.5 bg-emerald-600 text-white font-semibold text-xs px-4 py-2.5 rounded-lg" onClick={() => setShowAddModal(true)}>
           <Plus className="w-4 h-4" />
-          <span>+ Create Branch Transfer</span>
+          <span>Create Branch Transfer</span>
         </button>
       </div>
 

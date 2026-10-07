@@ -8,18 +8,19 @@ export class UsersService {
   constructor(@InjectModel('User') private userModel: Model<any>) {}
 
   async findAll() {
-    return this.userModel.find().select('-passwordHash').populate('role').exec();
+    return this.userModel.find().select('-passwordHash').populate('role').populate('branch').exec();
   }
 
   async findOne(id: string) {
-    const user = await this.userModel.findById(id).select('-passwordHash').populate('role').exec();
+    const user = await this.userModel.findById(id).select('-passwordHash').populate('role').populate('branch').exec();
     if (!user) throw new NotFoundException('User not found');
     return user;
   }
 
   async create(createUserDto: any) {
     const { password, ...userData } = createUserDto;
-    if (!password || password.length < 10) throw new BadRequestException('Password must contain at least 10 characters.');
+    if (!password || password.length < 6) throw new BadRequestException('Password must contain at least 6 characters.');
+    if (!userData.branch) delete userData.branch;
     userData.passwordHash = await bcrypt.hash(password, 12);
     const createdUser = await new this.userModel(userData).save();
     return this.findOne(createdUser._id.toString());
@@ -27,11 +28,14 @@ export class UsersService {
 
   async update(id: string, updateUserDto: any) {
     const { password, ...userData } = updateUserDto;
-    if (password) {
-      if (password.length < 10) throw new BadRequestException('Password must contain at least 10 characters.');
+    if (password && password.trim()) {
+      if (password.length < 6) throw new BadRequestException('Password must contain at least 6 characters.');
       userData.passwordHash = await bcrypt.hash(password, 12);
     }
-    const updatedUser = await this.userModel.findByIdAndUpdate(id, userData, { new: true }).select('-passwordHash').populate('role').exec();
+    if (!userData.branch) {
+      userData.branch = null;
+    }
+    const updatedUser = await this.userModel.findByIdAndUpdate(id, userData, { new: true }).select('-passwordHash').populate('role').populate('branch').exec();
     if (!updatedUser) throw new NotFoundException('User not found');
     return updatedUser;
   }

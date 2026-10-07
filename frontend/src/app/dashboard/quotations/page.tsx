@@ -81,7 +81,7 @@ export default function QuotationsPage() {
 
         <button className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2.5 rounded-lg shadow-xs" onClick={() => setShowAddModal(true)}>
           <Plus className="w-4 h-4" />
-          <span>+ Create New Quotation</span>
+          <span>Create New Quotation</span>
         </button>
       </div>
 

@@ -6,6 +6,7 @@ import { Public } from './public.decorator';
 export class AuthController {
   private readonly attempts = new Map<string, number[]>();
   private readonly recoveryAttempts = new Map<string, number[]>();
+  private readonly mfaAttempts = new Map<string, number[]>();
   constructor(private readonly authService: AuthService) {}
 
   @HttpCode(HttpStatus.OK)
@@ -50,7 +51,8 @@ export class AuthController {
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post('mfa/login')
-  verifyMfaLogin(@Body() body: any) {
+  verifyMfaLogin(@Body() body: any, @Req() request: any) {
+    this.limitMfa(request.ip || 'unknown', body.userId);
     return this.authService.completeMfaLogin(body.userId, body.code);
   }
 
@@ -74,5 +76,16 @@ export class AuthController {
     const attempts = (this.recoveryAttempts.get(ip) || []).filter(timestamp => now - timestamp < 60_000);
     if (attempts.length >= 5) throw new HttpException('Too many account recovery requests. Try again in one minute.', HttpStatus.TOO_MANY_REQUESTS);
     attempts.push(now); this.recoveryAttempts.set(ip, attempts);
+  }
+
+  private limitMfa(ip: string, userId: string) {
+    const key = `${ip}:${String(userId || '')}`;
+    const now = Date.now();
+    const attempts = (this.mfaAttempts.get(key) || []).filter((timestamp) => now - timestamp < 60_000);
+    if (attempts.length >= 10) {
+      throw new HttpException('Too many MFA attempts. Try again in one minute.', HttpStatus.TOO_MANY_REQUESTS);
+    }
+    attempts.push(now);
+    this.mfaAttempts.set(key, attempts);
   }
 }

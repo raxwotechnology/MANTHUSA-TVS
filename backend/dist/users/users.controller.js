@@ -33,6 +33,9 @@ let UsersController = class UsersController {
     update(id, updateUserDto) {
         return this.usersService.update(id, updateUserDto);
     }
+    updatePut(id, updateUserDto) {
+        return this.usersService.update(id, updateUserDto);
+    }
     remove(id) {
         return this.usersService.remove(id);
     }
@@ -67,6 +70,14 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "update", null);
+__decorate([
+    (0, common_1.Put)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "updatePut", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id')),

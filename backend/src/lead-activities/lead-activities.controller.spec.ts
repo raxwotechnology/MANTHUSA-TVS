@@ -7,7 +7,7 @@ describe('LeadActivitiesController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [LeadActivitiesController],
-    }).compile();
+    }).useMocker(() => ({})).compile();
 
     controller = module.get<LeadActivitiesController>(LeadActivitiesController);
   });

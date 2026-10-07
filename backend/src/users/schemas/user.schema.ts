@@ -20,6 +20,24 @@ export class User {
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Branch' })
   branch: Types.ObjectId;
 
+  @Prop()
+  phone: string;
+
+  @Prop()
+  avatar: string;
+
+  @Prop()
+  nic: string;
+
+  @Prop()
+  salary: number;
+
+  @Prop([String])
+  documents: string[];
+
+  @Prop([String])
+  permissions: string[];
+
   @Prop({ default: true })
   isActive: boolean;
 

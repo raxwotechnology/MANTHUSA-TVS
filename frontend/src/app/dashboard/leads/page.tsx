@@ -145,7 +145,7 @@ export default function LeadsPage() {
           className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-4 py-2.5 rounded-lg shadow-xs transition-colors"
         >
           <Plus className="w-4 h-4" />
-          <span>+ Create Sales Lead</span>
+          <span>Create Sales Lead</span>
         </button>
       </div>
 

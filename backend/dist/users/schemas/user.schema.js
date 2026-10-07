@@ -18,6 +18,12 @@ let User = class User {
     passwordHash;
     role;
     branch;
+    phone;
+    avatar;
+    nic;
+    salary;
+    documents;
+    permissions;
     isActive;
     emailVerified;
     mfaEnabled;
@@ -49,6 +55,30 @@ __decorate([
     (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Branch' }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], User.prototype, "branch", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], User.prototype, "phone", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], User.prototype, "avatar", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], User.prototype, "nic", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", Number)
+], User.prototype, "salary", void 0);
+__decorate([
+    (0, mongoose_1.Prop)([String]),
+    __metadata("design:type", Array)
+], User.prototype, "documents", void 0);
+__decorate([
+    (0, mongoose_1.Prop)([String]),
+    __metadata("design:type", Array)
+], User.prototype, "permissions", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ default: true }),
     __metadata("design:type", Boolean)

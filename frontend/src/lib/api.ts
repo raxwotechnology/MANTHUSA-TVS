@@ -1,5 +1,7 @@
 export function getApiUrl(path: string): string {
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  const configuredBaseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
+  if (configuredBaseUrl) return `${configuredBaseUrl}${cleanPath}`;
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname || 'localhost';
     const protocol = window.location.protocol || 'http:';

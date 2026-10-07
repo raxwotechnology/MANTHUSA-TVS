@@ -155,7 +155,7 @@ export default function HandoversPage() {
             className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5"
           >
             <PenTool className="w-4 h-4" />
-            <span>+ Prepare New Handover</span>
+            <span>Prepare New Handover</span>
           </button>
         </div>
 
@@ -213,7 +213,7 @@ export default function HandoversPage() {
               })}
               {handovers.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="p-8 text-center text-slate-400">No handover records found. Click "+ Prepare New Handover" to create one.</td>
+                  <td colSpan={8} className="p-8 text-center text-slate-400">No handover records found. Click &quot;Prepare New Handover&quot; to create one.</td>
                 </tr>
               )}
             </tbody>

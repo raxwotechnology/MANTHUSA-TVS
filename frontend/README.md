@@ -19,6 +19,10 @@ npm run dev
 ```
 The frontend web application runs at: `http://localhost:3000`
 
+For a deployed API, set `NEXT_PUBLIC_API_URL` to the public backend URL (for example,
+`https://api.example.com`). Without it, local development uses the backend on port 3001
+of the current host.
+
 ---
 
 ## 📜 Available Scripts

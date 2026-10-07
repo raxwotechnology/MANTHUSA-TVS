@@ -73,7 +73,7 @@ export default function LeasingPartnersPage() {
             className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md flex items-center gap-1.5"
           >
             <Plus className="w-4 h-4" />
-            <span>+ Add Leasing Partner</span>
+            <span>Add Leasing Partner</span>
           </button>
         </div>
 
@@ -112,7 +112,7 @@ export default function LeasingPartnersPage() {
             <div className="col-span-full bg-white p-12 text-center rounded-2xl border border-slate-200 text-slate-400">
               <Building2 className="w-12 h-12 mx-auto mb-2 opacity-40" />
               <p className="text-sm font-semibold">No leasing partners registered yet.</p>
-              <p className="text-xs">Click "+ Add Leasing Partner" to add partner finance companies.</p>
+              <p className="text-xs">Click &quot;Add Leasing Partner&quot; to add partner finance companies.</p>
             </div>
           )}
         </div>

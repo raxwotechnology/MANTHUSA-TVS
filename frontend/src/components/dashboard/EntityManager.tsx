@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { Plus } from 'lucide-react';
 
 export type Field = {
   name: string;
@@ -34,8 +35,8 @@ export function getSmartPlaceholder(field: Field): string {
   const label = field.label.toLowerCase();
 
   if (name.includes('email') || label.includes('email')) return 'e.g. saman.perera@example.com';
-  if (name.includes('phone') || name.includes('contact') || label.includes('phone')) return 'e.g. +94 77 123 4567';
-  if (name.includes('chassis') || name.includes('vin')) return 'e.g. NZE141-9012345';
+  if (name.includes('license') || name.includes('licence') || label.includes('license') || label.includes('licence')) return 'e.g. B1234567';
+  if (name.includes('chassis') || name === 'vin' || name.startsWith('vin') || label.includes('chassis') || label.includes('vin')) return 'e.g. NZE141-9012345';
   if (name.includes('reg') || name.includes('plate') || label.includes('reg')) return 'e.g. WP CAB-5678';
   if (name.includes('amount') || name.includes('price') || name.includes('cost') || name.includes('value') || name.includes('target') || name.includes('commission') || name.includes('budget') || name.includes('fee')) return 'e.g. 1,500,000';
   if (name.includes('year')) return 'e.g. 2024';
@@ -123,7 +124,7 @@ export function EntityManager({ title, description, endpoint, fields, columns, i
     return String(value);
   };
 
-  return <DashboardLayout><div className="mb-6 flex items-center justify-between gap-4"><div><h1 className="text-2xl font-extrabold text-slate-900">{title}</h1><p className="text-xs text-slate-500">{description}</p></div><button onClick={() => { setError(''); setOpen(true); }} className="rounded-lg bg-emerald-600 px-4 py-2.5 text-xs font-semibold text-white">+ Add Record</button></div>
+  return <DashboardLayout><div className="mb-6 flex items-center justify-between gap-4"><div><h1 className="text-2xl font-extrabold text-slate-900">{title}</h1><p className="text-xs text-slate-500">{description}</p></div><button onClick={() => { setError(''); setOpen(true); }} className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2.5 text-xs font-semibold text-white shadow-xs hover:bg-emerald-700 transition-colors"><Plus className="w-4 h-4" /><span>Add Record</span></button></div>
     {error && <div role="alert" className="mb-4 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">{error}</div>}
     <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white p-4"><table className="w-full text-left text-xs"><thead><tr className="border-b bg-slate-50">{columns.map((column) => <th key={column.label} className="px-3 py-3 font-semibold">{column.label}</th>)}<th className="px-3 py-3">Actions</th></tr></thead><tbody className="divide-y">{rows.map((row) => <tr key={row._id}>{columns.map((column) => <td key={column.label} className="px-3 py-3">{display(column.value(row))}</td>)}<td className="px-3 py-3"><div className="flex flex-wrap gap-2"><button onClick={() => setViewingRow(row)} className="rounded border px-3 py-1.5">View</button>{canEdit && <><button onClick={()=>{ setEditingId(row._id); setForm(Object.fromEntries(fields.map((field)=>{ let value=getPath(row,field.name); if (value && typeof value==='object' && value._id) value=value._id; if (field.type==='date' && value) value=new Date(value).toISOString().slice(0,10); if (field.type==='datetime-local' && value) value=new Date(value).toISOString().slice(0,16); if (field.type==='month' && value) value=String(value).slice(0,7); return [field.name,value ?? '']; }))); setError(''); setOpen(true); }} className="rounded border border-emerald-200 px-3 py-1.5 text-emerald-700">Edit</button><button onClick={() => setDeletingId(row._id)} className="rounded border border-rose-200 px-3 py-1.5 text-rose-700">Delete</button></>}</div></td></tr>)}{rows.length === 0 && <tr><td colSpan={columns.length+1} className="py-8 text-center text-slate-500">No records found.</td></tr>}</tbody></table></div>
     {viewingRow && <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4" onMouseDown={(event) => { if (event.target === event.currentTarget) setViewingRow(null); }}><section role="dialog" aria-modal="true" className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-6"><div className="mb-4 flex items-center justify-between border-b pb-3"><h2 className="font-bold">{title} details</h2><button onClick={() => setViewingRow(null)} className="rounded border px-3 py-1.5">Close</button></div><dl className="grid gap-3 sm:grid-cols-2">{fields.map((field) => <div key={field.name} className="rounded-lg bg-slate-50 p-3"><dt className="text-[11px] font-semibold text-slate-500">{field.label}</dt><dd className="mt-1 break-words text-sm text-slate-900">{display(getPath(viewingRow, field.name))}</dd></div>)}</dl></section></div>}

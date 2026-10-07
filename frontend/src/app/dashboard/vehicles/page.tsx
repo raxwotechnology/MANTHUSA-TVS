@@ -78,12 +78,7 @@ export default function VehicleInventoryPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterMake, setFilterMake] = useState('ALL');
 
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
-  const [deletingVehicle, setDeletingVehicle] = useState<Vehicle | null>(null);
-
-  // Form State
-  const [newVehicle, setNewVehicle] = useState({
+  const defaultVehicleForm = {
     stockNumber: '',
     registrationNumber: '',
     make: '',
@@ -119,16 +114,101 @@ export default function VehicleInventoryPage() {
       videoUrl: '',
       youtubeUrl: ''
     }
-  });
+  };
+
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
+  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
+  const [deletingVehicle, setDeletingVehicle] = useState<Vehicle | null>(null);
+
+  // Form State
+  const [newVehicle, setNewVehicle] = useState(defaultVehicleForm);
+
+  const handleOpenAddModal = () => {
+    setEditingVehicle(null);
+    setNewVehicle(defaultVehicleForm);
+    setShowAddModal(true);
+  };
+
+  const handleOpenEditModal = (v: Vehicle) => {
+    setEditingVehicle(v);
+    setNewVehicle({
+      stockNumber: v.stockNumber || '',
+      registrationNumber: v.registrationNumber || '',
+      make: v.make || '',
+      model: v.model || '',
+      variant: v.variant || '',
+      year: v.year ? String(v.year) : (v as any).manufacturingYear ? String((v as any).manufacturingYear) : '',
+      fuelType: v.fuelType || 'Petrol',
+      transmission: v.transmission || 'Automatic',
+      engineCapacity: v.engineCapacity !== undefined && v.engineCapacity !== null ? String(v.engineCapacity) : '',
+      chassisNumber: v.chassisNumber || '',
+      mileage: v.mileage !== undefined && v.mileage !== null ? String(v.mileage) : '',
+      color: v.color || '',
+      purchasePrice: v.purchasePrice !== undefined && v.purchasePrice !== null ? String(v.purchasePrice) : '',
+      transportCost: v.transportCost !== undefined && v.transportCost !== null ? String(v.transportCost) : '',
+      repairCost: v.repairCost !== undefined && v.repairCost !== null ? String(v.repairCost) : '',
+      detailingCost: v.detailingCost !== undefined && v.detailingCost !== null ? String(v.detailingCost) : '',
+      sellingPrice: v.sellingPrice !== undefined && v.sellingPrice !== null ? String(v.sellingPrice) : '',
+      minimumSellingPrice: v.minimumSellingPrice !== undefined && v.minimumSellingPrice !== null ? String(v.minimumSellingPrice) : '',
+      status: v.status || 'Available',
+      images: v.images && v.images.length ? v.images : [],
+      mediaAngles: {
+        front: v.mediaAngles?.front || '',
+        rear: v.mediaAngles?.rear || '',
+        left: v.mediaAngles?.left || '',
+        right: v.mediaAngles?.right || '',
+        interior: v.mediaAngles?.interior || '',
+        dashboard: v.mediaAngles?.dashboard || '',
+        engine: v.mediaAngles?.engine || '',
+        wheels: v.mediaAngles?.wheels || '',
+        damageText: (v.mediaAngles?.damage || []).join(', '),
+        documentsText: (v.mediaAngles?.documents || []).join(', '),
+        view360Url: v.mediaAngles?.view360Url || '',
+        videoUrl: v.mediaAngles?.videoUrl || '',
+        youtubeUrl: v.mediaAngles?.youtubeUrl || ''
+      }
+    });
+    setShowAddModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowAddModal(false);
+    setEditingVehicle(null);
+    if (typeof window !== 'undefined' && (window.location.search.includes('edit=') || window.location.search.includes('id='))) {
+      window.history.replaceState({}, '', '/dashboard/vehicles');
+    }
+  };
 
   useEffect(() => {
     const fetchVehicles = async () => {
       try {
         const res = await apiFetch('/vehicles');
         if (res.ok) {
-          const data = await res.json();
+          const data: Vehicle[] = await res.json();
           setVehicles(data);
           setApiError('');
+
+          if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const targetId = params.get('edit') || params.get('id');
+            if (targetId) {
+              const matched = data.find((x) => x._id === targetId);
+              if (matched) {
+                handleOpenEditModal(matched);
+              } else {
+                try {
+                  const singleRes = await apiFetch(`/vehicles/${targetId}`);
+                  if (singleRes.ok) {
+                    const singleData = await singleRes.json();
+                    handleOpenEditModal(singleData);
+                  }
+                } catch {}
+              }
+            } else if (params.get('new') === '1') {
+              handleOpenAddModal();
+            }
+          }
         } else {
           setApiError('Could not load inventory from the server.');
         }
@@ -246,21 +326,39 @@ export default function VehicleInventoryPage() {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { _id, ...payload } = item;
-      const res = await apiFetch('/vehicles', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (res.ok) {
-        const savedData = await res.json();
-        setVehicles([savedData, ...vehicles]);
-        setShowAddModal(false);
-        setApiError('');
+      if (editingVehicle) {
+        const res = await apiFetch(`/vehicles/${editingVehicle._id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          const updatedData = await res.json();
+          setVehicles((current) => current.map((v) => (v._id === editingVehicle._id ? updatedData : v)));
+          handleCloseModal();
+          setApiError('');
+          return;
+        }
+        const details = await res.json().catch(() => ({}));
+        setApiError(details.message || 'Could not update vehicle. Check required fields and try again.');
+        return;
+      } else {
+        const res = await apiFetch('/vehicles', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          const savedData = await res.json();
+          setVehicles([savedData, ...vehicles]);
+          handleCloseModal();
+          setApiError('');
+          return;
+        }
+        const details = await res.json().catch(() => ({}));
+        setApiError(details.message || 'Could not save vehicle. Check required fields and try again.');
         return;
       }
-      const details = await res.json().catch(() => ({}));
-      setApiError(details.message || 'Could not save vehicle. Check required fields and try again.');
-      return;
     } catch {
       setApiError('Cannot connect to the server. Vehicle was not saved.');
       return;
@@ -343,11 +441,11 @@ export default function VehicleInventoryPage() {
         </div>
 
         <button
-          onClick={() => setShowAddModal(true)}
+          onClick={handleOpenAddModal}
           className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2.5 rounded-lg shadow-xs transition-colors"
         >
           <Plus className="w-4 h-4" />
-          <span>+ Add New Vehicle</span>
+          <span>Add New Vehicle</span>
         </button>
       </div>
 
@@ -427,7 +525,7 @@ export default function VehicleInventoryPage() {
                       <span>View Specs & Media</span>
                     </button>
                     <div className="mt-2 flex justify-center gap-2">
-                      <button onClick={() => window.location.assign(`/dashboard/vehicles/new?id=${v._id}`)} className="rounded-lg border border-emerald-200 px-3 py-1.5 text-[11px] font-semibold text-emerald-700 hover:bg-emerald-50">Edit</button>
+                      <button onClick={() => handleOpenEditModal(v)} className="rounded-lg border border-emerald-200 px-3 py-1.5 text-[11px] font-semibold text-emerald-700 hover:bg-emerald-50">Edit</button>
                       <button onClick={() => setDeletingVehicle(v)} className="rounded-lg border border-rose-200 px-3 py-1.5 text-[11px] font-semibold text-rose-700 hover:bg-rose-50">Delete</button>
                     </div>
                   </td>
@@ -451,10 +549,14 @@ export default function VehicleInventoryPage() {
           <div className="bg-white rounded-2xl max-w-3xl w-full p-6 shadow-xl border border-slate-200 max-h-[90vh] overflow-y-auto text-slate-900">
             <div className="flex items-center justify-between border-b pb-3 mb-4">
               <div>
-                <h3 className="text-base font-extrabold text-slate-900">Add Vehicle to Showroom Stock</h3>
-                <p className="text-xs text-slate-500">Enter vehicle specifications, cost sheet breakdown and media assets</p>
+                <h3 className="text-base font-extrabold text-slate-900">
+                  {editingVehicle ? `Edit Vehicle (${editingVehicle.make} ${editingVehicle.model})` : 'Add Vehicle to Showroom Stock'}
+                </h3>
+                <p className="text-xs text-slate-500">
+                  {editingVehicle ? 'Update vehicle specifications, cost sheet breakdown and media assets' : 'Enter vehicle specifications, cost sheet breakdown and media assets'}
+                </p>
               </div>
-              <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-slate-600">
+              <button onClick={handleCloseModal} className="text-slate-400 hover:text-slate-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -514,6 +616,49 @@ export default function VehicleInventoryPage() {
                     placeholder="e.g. WP CAB-8912"
                     value={newVehicle.registrationNumber}
                     onChange={(e) => setNewVehicle({ ...newVehicle, registrationNumber: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg placeholder:text-slate-400"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Stock Number</label>
+                  <input
+                    type="text"
+                    placeholder="Auto-generated if empty"
+                    value={newVehicle.stockNumber}
+                    onChange={(e) => setNewVehicle({ ...newVehicle, stockNumber: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg placeholder:text-slate-400 font-mono text-[11px]"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Chassis Number</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. NZE161-1234567"
+                    value={newVehicle.chassisNumber}
+                    onChange={(e) => setNewVehicle({ ...newVehicle, chassisNumber: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg placeholder:text-slate-400 font-mono text-[11px]"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Mileage (km)</label>
+                  <input
+                    type="number"
+                    placeholder="e.g. 45000"
+                    value={newVehicle.mileage}
+                    onChange={(e) => setNewVehicle({ ...newVehicle, mileage: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg placeholder:text-slate-400"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">Engine Capacity (cc)</label>
+                  <input
+                    type="number"
+                    placeholder="e.g. 1500"
+                    value={newVehicle.engineCapacity}
+                    onChange={(e) => setNewVehicle({ ...newVehicle, engineCapacity: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg placeholder:text-slate-400"
                   />
                 </div>
@@ -802,16 +947,16 @@ export default function VehicleInventoryPage() {
               <div className="flex items-center justify-end gap-2 pt-3 border-t">
                 <button
                   type="button"
-                  onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 rounded-lg border border-slate-200 text-slate-600 font-semibold"
+                  onClick={handleCloseModal}
+                  className="px-4 py-2 rounded-lg border border-slate-200 text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-xs"
+                  className="px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-xs transition-colors"
                 >
-                  Save Vehicle to Inventory
+                  {editingVehicle ? 'Update Vehicle' : 'Save Vehicle to Inventory'}
                 </button>
               </div>
             </form>

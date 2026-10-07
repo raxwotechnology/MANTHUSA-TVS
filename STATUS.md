@@ -34,7 +34,8 @@ The repository contains a Next.js frontend, a NestJS API, and Mongoose models/co
 - Added dashboard and reports visualizations for monthly revenue, lead conversion, and sales by vehicle category.
 - Added password reset and email verification token endpoints with one-time hashed tokens, expiration, account enumeration protection and per-process request throttling; added the password recovery and verification UI. Email delivery uses the configured Resend API.
 - Removed hard-coded demo account credentials from the login screen.
-- Backend and frontend production builds pass after the latest changes.
+- Backend and frontend production builds pass after the latest changes. Backend unit tests
+  now run with the Nest/Mongoose dependency versions used by the application.
 
 ## Work still required before calling this complete
 
@@ -42,7 +43,7 @@ The repository contains a Next.js frontend, a NestJS API, and Mongoose models/co
 - Configure and validate the Resend sender/key before password recovery or email verification can deliver; SMS/WhatsApp notifications are not implemented. Invoice PDFs currently rely on browser print rather than a generated server PDF.
 - Make multi-record financial workflows atomic and idempotent; the current MongoDB setup does not configure replica-set transactions. Audit coverage and role/action permissions still need a security review.
 - Finish DTO validation for all endpoints, use a shared rate-limit store for multi-process deployment, and ensure uploaded-file storage is durable/backed up in production.
-- Finish seed repeatability and deployment configuration, then verify critical workflows against a configured MongoDB instance. The local `.env` has no `MONGO_URI`, so database-backed workflows could not be exercised; backend/frontend builds pass.
+- Finish seed repeatability and deployment configuration, then verify critical workflows against a configured MongoDB instance. The local `.env` points at a local MongoDB instance, but database-backed workflows still require that service to be running. Set `NEXT_PUBLIC_API_URL` for a separately deployed frontend.
 
 ## Development configuration
 

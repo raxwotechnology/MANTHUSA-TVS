@@ -6,5 +6,6 @@ export declare class UsersController {
     findAll(): Promise<any[]>;
     findOne(id: string): Promise<any>;
     update(id: string, updateUserDto: any): Promise<any>;
+    updatePut(id: string, updateUserDto: any): Promise<any>;
     remove(id: string): Promise<any>;
 }

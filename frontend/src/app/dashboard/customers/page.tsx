@@ -114,7 +114,7 @@ export default function CustomersPage() {
           className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2.5 rounded-lg shadow-xs transition-colors"
         >
           <Plus className="w-4 h-4" />
-          <span>+ Add Customer Profile</span>
+          <span>Add Customer Profile</span>
         </button>
       </div>
 
