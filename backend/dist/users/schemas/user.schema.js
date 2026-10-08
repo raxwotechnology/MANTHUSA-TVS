@@ -18,6 +18,7 @@ let User = class User {
     passwordHash;
     role;
     branch;
+    customerId;
     phone;
     avatar;
     nic;
@@ -55,6 +56,10 @@ __decorate([
     (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Branch' }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], User.prototype, "branch", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.ObjectId, ref: 'Customer' }),
+    __metadata("design:type", mongoose_2.Types.ObjectId)
+], User.prototype, "customerId", void 0);
 __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)

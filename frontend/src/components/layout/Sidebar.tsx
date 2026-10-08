@@ -34,6 +34,7 @@ import {
   Building2,
   X
 } from 'lucide-react';
+import { useSettings } from '@/lib/useSettings';
 
 interface SidebarProps {
   user: any;
@@ -42,6 +43,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
+  const { settings: brand } = useSettings();
   const pathname = usePathname();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
@@ -88,15 +90,23 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
       >
         {/* Brand Logo Header */}
         <div className="p-4 border-b border-slate-800/80 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold shadow-md shadow-emerald-900/30">
-              <Car className="w-6 h-6" />
-            </div>
-            <div>
-              <h1 className="font-bold text-white text-base tracking-wide flex items-center gap-1">
-                Sales<span className="text-emerald-400">Plus</span>
+          <div className="flex items-center gap-3 min-w-0">
+            {brand.logoUrl ? (
+              <div className="w-10 h-10 rounded-lg bg-white/10 p-1 flex items-center justify-center border border-slate-700/60 overflow-hidden flex-shrink-0">
+                <img src={brand.logoUrl} alt={brand.dealershipName || 'Logo'} className="w-full h-full object-contain" />
+              </div>
+            ) : (
+              <div className="w-10 h-10 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold shadow-md shadow-emerald-900/30 flex-shrink-0">
+                <Car className="w-6 h-6" />
+              </div>
+            )}
+            <div className="min-w-0">
+              <h1 className="font-bold text-white text-base tracking-wide truncate">
+                {brand.dealershipName || 'SalesPlus'}
               </h1>
-              <p className="text-[10px] text-slate-400 uppercase tracking-wider font-medium">Vehicle Sales System</p>
+              <p className="text-[10px] text-slate-400 uppercase tracking-wider font-medium truncate max-w-[130px]">
+                {brand.tagline || 'Vehicle Sales System'}
+              </p>
             </div>
           </div>
 
@@ -536,6 +546,31 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
             )}
           </div>
         </div>
+        )}
+
+        {/* SYSTEM SETTINGS */}
+        {isAdmin && (
+          <div>
+            <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-3 mb-1">
+              System Settings
+            </div>
+            <div className="space-y-0.5">
+              <Link
+                href="/dashboard/settings"
+                className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
+                  pathname === '/dashboard/settings' || pathname === '/admin/settings'
+                    ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold'
+                    : 'hover:bg-slate-800/60 text-slate-300'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Settings className="w-4 h-4" />
+                  <span>Settings</span>
+                </div>
+                <ChevronDown className="w-3.5 h-3.5 -rotate-90 text-slate-500" />
+              </Link>
+            </div>
+          </div>
         )}
       </nav>
 

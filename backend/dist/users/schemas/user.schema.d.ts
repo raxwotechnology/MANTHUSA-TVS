@@ -6,6 +6,7 @@ export declare class User {
     passwordHash: string;
     role: Types.ObjectId;
     branch: Types.ObjectId;
+    customerId: Types.ObjectId;
     phone: string;
     avatar: string;
     nic: string;
@@ -68,6 +69,15 @@ export declare const UserSchema: MongooseSchema<User, import("mongoose").Model<U
         id: string;
     }>> | undefined;
     branch?: import("mongoose").SchemaDefinitionProperty<Types.ObjectId, User, Document<unknown, {}, User, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    customerId?: import("mongoose").SchemaDefinitionProperty<Types.ObjectId, User, Document<unknown, {}, User, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<User & {
         _id: Types.ObjectId;

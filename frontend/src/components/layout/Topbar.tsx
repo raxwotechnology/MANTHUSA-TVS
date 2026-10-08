@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Bell, Search, LogOut, Menu, User, Globe, ChevronDown } from 'lucide-react';
+import { Bell, Search, LogOut, Menu, User, Globe, ChevronDown, Settings } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 
 interface TopbarProps {
@@ -131,7 +131,7 @@ export function Topbar({ user, onToggleSidebar }: TopbarProps) {
 
         {/* Public Website Link */}
         <button
-          onClick={() => window.open('/', '_blank')}
+          onClick={() => router.push('/')}
           className="hidden xl:flex items-center gap-1.5 text-xs text-emerald-700 bg-emerald-50 hover:bg-emerald-100 font-medium px-3 py-1.5 rounded-lg border border-emerald-200 transition-colors"
         >
           <Globe className="w-3.5 h-3.5" />
@@ -158,6 +158,17 @@ export function Topbar({ user, onToggleSidebar }: TopbarProps) {
             </div>
           )}
         </div>
+
+        {/* Settings button */}
+        {(user?.role || '').toLowerCase().includes('admin') && (
+          <button
+            onClick={() => router.push('/dashboard/settings')}
+            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            title="System Settings"
+          >
+            <Settings className="w-5 h-5" />
+          </button>
+        )}
 
         {/* User Pill matching screenshot */}
         <div className="flex items-center gap-2 pl-2 border-l border-gray-200">

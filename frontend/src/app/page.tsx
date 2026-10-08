@@ -31,7 +31,8 @@ import {
   AlertCircle,
   RefreshCw,
   BadgeCheck,
-  FileText
+  FileText,
+  Menu
 } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 
@@ -216,6 +217,7 @@ const SHOWCASE_VEHICLES = [
 ];
 
 export default function PublicVehicleWebsite() {
+  const [loggedInUser, setLoggedInUser] = useState<any>(null);
   const [dbVehicles, setDbVehicles] = useState<any[]>([]);
   const [vehicleLoadError, setVehicleLoadError] = useState('');
   const [isLoadingVehicles, setIsLoadingVehicles] = useState(true);
@@ -228,6 +230,7 @@ export default function PublicVehicleWebsite() {
   const [selectedPriceTier, setSelectedPriceTier] = useState('ALL');
   const [sortBy, setSortBy] = useState('featured');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [showMobileNav, setShowMobileNav] = useState(false);
 
   // Interactive engagement states
   const [wishlist, setWishlist] = useState<string[]>([]);
@@ -272,6 +275,23 @@ export default function PublicVehicleWebsite() {
 
   // FAQ accordion state
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem('token');
+      const savedUser = localStorage.getItem('user');
+      if (token && savedUser) setLoggedInUser(JSON.parse(savedUser));
+    } catch {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    }
+  }, []);
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setLoggedInUser(null);
+  };
 
   // Load vehicles from backend API
   useEffect(() => {
@@ -570,6 +590,15 @@ export default function PublicVehicleWebsite() {
 
           {/* Header Action Buttons */}
           <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={() => setShowMobileNav((open) => !open)}
+              className="inline-flex lg:hidden p-2.5 rounded-xl bg-slate-800/80 border border-slate-700/80 text-slate-200"
+              aria-label="Toggle website navigation"
+              aria-expanded={showMobileNav}
+            >
+              <Menu className="w-4 h-4" />
+            </button>
             {/* Wishlist button */}
             <button
               onClick={() => setShowWishlistDrawer(true)}
@@ -605,26 +634,77 @@ export default function PublicVehicleWebsite() {
               <span>Instant Valuation</span>
             </button>
 
-            {/* Staff Portal Link */}
-            <Link
-              href="/login"
-              className="flex items-center gap-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md shadow-emerald-900/40 transition-all hover:shadow-emerald-500/25"
-            >
-              <span>Staff Portal</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+            {/* Customer and staff authentication */}
+            {loggedInUser ? (
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/dashboard"
+                  className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-emerald-900/40 transition-all hover:from-emerald-500 hover:to-emerald-500"
+                >
+                  <span>{loggedInUser.name ? `Dashboard · ${loggedInUser.name.split(' ')[0]}` : 'Open Dashboard'}</span>
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+                <button
+                  type="button"
+                  onClick={logout}
+                  className="hidden rounded-xl border border-slate-700 px-3 py-2 text-xs font-semibold text-slate-300 transition-colors hover:border-red-400/50 hover:text-red-300 sm:inline-flex"
+                >
+                  Sign out
+                </button>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="flex items-center gap-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-2.5 sm:px-4 py-2 rounded-xl text-xs font-bold shadow-md shadow-emerald-900/40 transition-all hover:shadow-emerald-500/25"
+              >
+                <span className="hidden sm:inline">Sign in / Register</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            )}
           </div>
         </div>
+        {showMobileNav && (
+          <div className="lg:hidden absolute left-0 right-0 top-full border-b border-slate-800 bg-[#0A122A] px-4 py-4 shadow-2xl">
+            <nav className="mx-auto flex max-w-7xl flex-col gap-1 text-sm font-semibold text-slate-200">
+              {[
+                ['Vehicle Inventory', '#inventory'],
+                ['Leasing Calculator', '#calculator'],
+                ['120-Point Guarantee', '#inspection'],
+                ['Reviews', '#reviews'],
+                ['Showrooms', '#contact'],
+              ].map(([label, href]) => (
+                <a
+                  key={href}
+                  href={href}
+                  onClick={() => setShowMobileNav(false)}
+                  className="rounded-xl px-3 py-3 hover:bg-slate-800 hover:text-emerald-400"
+                >
+                  {label}
+                </a>
+              ))}
+              <button
+                type="button"
+                onClick={() => {
+                  setShowMobileNav(false);
+                  setShowTradeInModal(true);
+                }}
+                className="rounded-xl px-3 py-3 text-left hover:bg-slate-800 hover:text-emerald-400"
+              >
+                Sell / Trade-in
+              </button>
+            </nav>
+          </div>
+        )}
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-14 pb-20 px-4 md:px-8 border-b border-slate-800/80 bg-radial-gradient">
+      <section className="relative overflow-hidden pt-10 sm:pt-14 pb-14 sm:pb-20 px-4 md:px-8 border-b border-slate-800/80 bg-radial-gradient">
         {/* Glow ambient background elements */}
         <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-b from-emerald-500/15 via-teal-500/5 to-transparent blur-3xl pointer-events-none rounded-full" />
 
         <div className="relative max-w-7xl mx-auto w-full text-center">
           {/* Trust Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-xs font-bold tracking-wide uppercase mb-6 shadow-inner">
+          <div className="inline-flex max-w-full flex-wrap justify-center items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-[10px] sm:text-xs font-bold tracking-wide uppercase mb-6 shadow-inner">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
             <span>Sri Lanka&apos;s Most Trusted Certified Vehicle Network</span>
             <span className="text-emerald-500">•</span>
@@ -632,7 +712,7 @@ export default function PublicVehicleWebsite() {
           </div>
 
           {/* Main Title */}
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight mb-5 max-w-4xl mx-auto leading-tight sm:leading-none">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight mb-5 max-w-4xl mx-auto leading-[1.08] sm:leading-none">
             Find Your Dream Car with <br className="hidden sm:inline" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">
               Complete Trust & Certified Quality
@@ -645,8 +725,8 @@ export default function PublicVehicleWebsite() {
           </p>
 
           {/* Quick Value Metrics Pill Strip */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-4xl mx-auto mb-10 text-left">
-            <div className="bg-[#0D1836]/90 border border-slate-800/90 rounded-2xl p-4 flex items-center gap-3 shadow-lg">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 max-w-4xl mx-auto mb-8 sm:mb-10 text-left">
+            <div className="bg-[#0D1836]/90 border border-slate-800/90 rounded-2xl p-3.5 sm:p-4 flex items-center gap-3 shadow-lg">
               <div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center shrink-0">
                 <BadgeCheck className="w-5 h-5" />
               </div>
@@ -688,7 +768,7 @@ export default function PublicVehicleWebsite() {
           </div>
 
           {/* Interactive Multi-Criteria Search Card */}
-          <div className="bg-[#0F1B3E] p-4 sm:p-5 rounded-3xl border border-slate-700/80 shadow-2xl shadow-black/60 max-w-5xl mx-auto text-xs text-left">
+          <div className="bg-[#0F1B3E] p-3 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-700/80 shadow-2xl shadow-black/60 max-w-5xl mx-auto text-xs text-left">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-3">
               {/* Search keyword input */}
               <div className="relative lg:col-span-2">
@@ -2194,7 +2274,7 @@ export default function PublicVehicleWebsite() {
               <li><a href="#calculator" className="hover:text-emerald-400 transition-colors">Leasing & Installment Calculator</a></li>
               <li><a href="#inspection" className="hover:text-emerald-400 transition-colors">120-Point Mechanical Inspection</a></li>
               <li><a href="#contact" className="hover:text-emerald-400 transition-colors">Showroom Branches & Test Drives</a></li>
-              <li><Link href="/login" className="hover:text-emerald-400 transition-colors">Staff CRM Management Portal</Link></li>
+              <li><Link href="/login" className="hover:text-emerald-400 transition-colors">Customer & Staff Portal</Link></li>
             </ul>
           </div>
 

@@ -1,6 +1,7 @@
-import { Document } from 'mongoose';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 export type CustomerDocument = Customer & Document;
 export declare class Customer {
+    userId: Types.ObjectId;
     fullName: string;
     nicOrPassport: string;
     dateOfBirth: Date;
@@ -13,19 +14,28 @@ export declare class Customer {
     company: string;
     customerType: string;
 }
-export declare const CustomerSchema: import("mongoose").Schema<Customer, import("mongoose").Model<Customer, any, any, any, any, any, Customer>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Customer, Document<unknown, {}, Customer, {
+export declare const CustomerSchema: MongooseSchema<Customer, import("mongoose").Model<Customer, any, any, any, any, any, Customer>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Customer, Document<unknown, {}, Customer, {
     id: string;
 }, import("mongoose").DefaultSchemaOptions> & Omit<Customer & {
-    _id: import("mongoose").Types.ObjectId;
+    _id: Types.ObjectId;
 } & {
     __v: number;
 }, "id"> & import("mongoose").HydratedDocumentOverrides<{
     id: string;
 }>, {
+    userId?: import("mongoose").SchemaDefinitionProperty<Types.ObjectId, Customer, Document<unknown, {}, Customer, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Customer & {
+        _id: Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
     fullName?: import("mongoose").SchemaDefinitionProperty<string, Customer, Document<unknown, {}, Customer, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Customer & {
-        _id: import("mongoose").Types.ObjectId;
+        _id: Types.ObjectId;
     } & {
         __v: number;
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
@@ -34,7 +44,7 @@ export declare const CustomerSchema: import("mongoose").Schema<Customer, import(
     nicOrPassport?: import("mongoose").SchemaDefinitionProperty<string, Customer, Document<unknown, {}, Customer, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Customer & {
-        _id: import("mongoose").Types.ObjectId;
+        _id: Types.ObjectId;
     } & {
         __v: number;
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
@@ -43,7 +53,7 @@ export declare const CustomerSchema: import("mongoose").Schema<Customer, import(
     dateOfBirth?: import("mongoose").SchemaDefinitionProperty<Date, Customer, Document<unknown, {}, Customer, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Customer & {
-        _id: import("mongoose").Types.ObjectId;
+        _id: Types.ObjectId;
     } & {
         __v: number;
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
@@ -52,7 +62,7 @@ export declare const CustomerSchema: import("mongoose").Schema<Customer, import(
     gender?: import("mongoose").SchemaDefinitionProperty<string, Customer, Document<unknown, {}, Customer, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Customer & {
-        _id: import("mongoose").Types.ObjectId;
+        _id: Types.ObjectId;
     } & {
         __v: number;
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
@@ -61,7 +71,7 @@ export declare const CustomerSchema: import("mongoose").Schema<Customer, import(
     phone?: import("mongoose").SchemaDefinitionProperty<string, Customer, Document<unknown, {}, Customer, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Customer & {
-        _id: import("mongoose").Types.ObjectId;
+        _id: Types.ObjectId;
     } & {
         __v: number;
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
@@ -70,7 +80,7 @@ export declare const CustomerSchema: import("mongoose").Schema<Customer, import(
     email?: import("mongoose").SchemaDefinitionProperty<string, Customer, Document<unknown, {}, Customer, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Customer & {
-        _id: import("mongoose").Types.ObjectId;
+        _id: Types.ObjectId;
     } & {
         __v: number;
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
@@ -79,7 +89,7 @@ export declare const CustomerSchema: import("mongoose").Schema<Customer, import(
     address?: import("mongoose").SchemaDefinitionProperty<string, Customer, Document<unknown, {}, Customer, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Customer & {
-        _id: import("mongoose").Types.ObjectId;
+        _id: Types.ObjectId;
     } & {
         __v: number;
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
@@ -88,7 +98,7 @@ export declare const CustomerSchema: import("mongoose").Schema<Customer, import(
     city?: import("mongoose").SchemaDefinitionProperty<string, Customer, Document<unknown, {}, Customer, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Customer & {
-        _id: import("mongoose").Types.ObjectId;
+        _id: Types.ObjectId;
     } & {
         __v: number;
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
@@ -97,7 +107,7 @@ export declare const CustomerSchema: import("mongoose").Schema<Customer, import(
     occupation?: import("mongoose").SchemaDefinitionProperty<string, Customer, Document<unknown, {}, Customer, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Customer & {
-        _id: import("mongoose").Types.ObjectId;
+        _id: Types.ObjectId;
     } & {
         __v: number;
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
@@ -106,7 +116,7 @@ export declare const CustomerSchema: import("mongoose").Schema<Customer, import(
     company?: import("mongoose").SchemaDefinitionProperty<string, Customer, Document<unknown, {}, Customer, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Customer & {
-        _id: import("mongoose").Types.ObjectId;
+        _id: Types.ObjectId;
     } & {
         __v: number;
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
@@ -115,7 +125,7 @@ export declare const CustomerSchema: import("mongoose").Schema<Customer, import(
     customerType?: import("mongoose").SchemaDefinitionProperty<string, Customer, Document<unknown, {}, Customer, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Customer & {
-        _id: import("mongoose").Types.ObjectId;
+        _id: Types.ObjectId;
     } & {
         __v: number;
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{

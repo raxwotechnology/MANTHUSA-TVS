@@ -9,12 +9,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { RolesGuard } from './roles.guard';
+import { CustomerSchema } from '../customers/schemas/customer.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: 'User', schema: UserSchema },
-      { name: 'Role', schema: RoleSchema }
+      { name: 'Role', schema: RoleSchema },
+      { name: 'Customer', schema: CustomerSchema }
     ]),
     JwtModule.registerAsync({
       global: true,

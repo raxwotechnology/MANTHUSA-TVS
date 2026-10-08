@@ -9,6 +9,12 @@ export class AuthController {
   private readonly mfaAttempts = new Map<string, number[]>();
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
+  @Post('register')
+  async register(@Body() body: any) {
+    return this.authService.registerCustomer(body);
+  }
+
   @HttpCode(HttpStatus.OK)
   @Public()
   @Post('login')

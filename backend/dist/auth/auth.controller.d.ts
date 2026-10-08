@@ -5,6 +5,28 @@ export declare class AuthController {
     private readonly recoveryAttempts;
     private readonly mfaAttempts;
     constructor(authService: AuthService);
+    register(body: any): Promise<{
+        mfaRequired: boolean;
+        userId: any;
+        email: any;
+        message: string;
+        access_token?: undefined;
+        user?: undefined;
+    } | {
+        access_token: string;
+        user: {
+            id: any;
+            name: any;
+            email: any;
+            role: any;
+            mfaEnabled: boolean;
+            customerId: any;
+        };
+        mfaRequired?: undefined;
+        userId?: undefined;
+        email?: undefined;
+        message?: undefined;
+    }>;
     login(loginDto: any, request: any): Promise<{
         mfaRequired: boolean;
         userId: any;
@@ -20,6 +42,7 @@ export declare class AuthController {
             email: any;
             role: any;
             mfaEnabled: boolean;
+            customerId: any;
         };
         mfaRequired?: undefined;
         userId?: undefined;
@@ -46,6 +69,7 @@ export declare class AuthController {
             email: any;
             role: any;
             mfaEnabled: boolean;
+            customerId: any;
         };
     }>;
     setupMfa(req: any): Promise<{

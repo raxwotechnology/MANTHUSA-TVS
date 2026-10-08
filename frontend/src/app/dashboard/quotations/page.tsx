@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { FileText, Plus, Printer, Download, CheckCircle2, XCircle, Clock, X } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
+import { useSettings } from '@/lib/useSettings';
 
 interface Quotation {
   _id: string;
@@ -22,6 +23,7 @@ interface Quotation {
 }
 
 export default function QuotationsPage() {
+  const { settings: brand } = useSettings();
   const [quotations, setQuotations] = useState<Quotation[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newFormData, setNewFormData] = useState({});
@@ -137,9 +139,19 @@ export default function QuotationsPage() {
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl max-w-2xl w-full p-8 shadow-xl border border-slate-200 print:shadow-none text-slate-900">
             <div className="flex items-center justify-between border-b pb-4 mb-6">
-              <div>
-                <h2 className="text-xl font-extrabold text-slate-900">SalesPlus Dealership</h2>
-                <p className="text-xs text-slate-500">Official Vehicle Sales Quotation</p>
+              <div className="flex items-center gap-3">
+                {brand.logoUrl ? (
+                  <img src={brand.logoUrl} alt={brand.dealershipName || 'Logo'} className="w-12 h-12 object-contain" />
+                ) : (
+                  <div className="w-12 h-12 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-bold">
+                    <FileText className="w-6 h-6" />
+                  </div>
+                )}
+                <div>
+                  <h2 className="text-xl font-extrabold text-slate-900">{brand.dealershipName || 'SalesPlus Dealership'}</h2>
+                  <p className="text-xs text-slate-500">{brand.tagline || 'Official Vehicle Sales Quotation'}</p>
+                  {brand.phone && <p className="text-[11px] text-slate-400">Hotline: {brand.phone}</p>}
+                </div>
               </div>
               <button onClick={() => setSelectedPdfQuote(null)} className="text-slate-400 hover:text-slate-600 print:hidden">
                 <X className="w-5 h-5" />

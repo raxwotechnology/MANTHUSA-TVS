@@ -4,22 +4,75 @@ import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { createHash, randomBytes } from 'crypto';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, ConflictException } from '@nestjs/common';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel('User') private userModel: Model<any>,
+    @InjectModel('Role') private roleModel: Model<any>,
+    @InjectModel('Customer') private customerModel: Model<any>,
     private jwtService: JwtService
   ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
-    const user = await this.userModel.findOne({ email }).populate('role');
+    const user = await this.userModel.findOne({ email: String(email || '').trim().toLowerCase(), isActive: { $ne: false } }).populate('role');
     if (user && await bcrypt.compare(pass, user.passwordHash)) {
       const { passwordHash, ...result } = user.toObject();
       return result;
     }
     return null;
+  }
+
+  async registerCustomer(input: {
+    name: string;
+    email: string;
+    password: string;
+    phone: string;
+    address?: string;
+    city?: string;
+  }) {
+    const name = String(input.name || '').trim();
+    const email = String(input.email || '').trim().toLowerCase();
+    const phone = String(input.phone || '').trim();
+    const password = String(input.password || '');
+
+    if (name.length < 2) throw new BadRequestException('Full name must contain at least 2 characters.');
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new BadRequestException('A valid email address is required.');
+    if (phone.length < 7) throw new BadRequestException('A valid phone number is required.');
+    if (password.length < 8) throw new BadRequestException('Password must contain at least 8 characters.');
+    if (await this.userModel.exists({ email })) throw new ConflictException('An account with this email already exists.');
+
+    const role = await this.roleModel.findOne({ name: 'Customer' }).exec();
+    if (!role) throw new BadRequestException('Customer role is not configured. Please run the database seed first.');
+
+    const customer = await new this.customerModel({
+      fullName: name,
+      email,
+      phone,
+      address: String(input.address || '').trim() || undefined,
+      city: String(input.city || '').trim() || undefined,
+      customerType: 'Individual',
+    }).save();
+
+    try {
+      const user = await new this.userModel({
+        name,
+        email,
+        passwordHash: await bcrypt.hash(password, 12),
+        role: role._id,
+        customerId: customer._id,
+        isActive: true,
+        emailVerified: true,
+      }).save();
+      customer.userId = user._id;
+      await customer.save();
+      return this.login({ _id: user._id, name, email, role: { _id: role._id, name: 'Customer' }, mfaEnabled: false, customerId: customer._id });
+    } catch (error) {
+      await this.customerModel.findByIdAndDelete(customer._id).exec();
+      if ((error as any)?.code === 11000) throw new ConflictException('An account with this email already exists.');
+      throw error;
+    }
   }
 
   private digest(token: string) { return createHash('sha256').update(token).digest('hex'); }
@@ -159,7 +212,8 @@ export class AuthService {
         name: user.name,
         email: user.email,
         role: user.role?.name,
-        mfaEnabled: !!user.mfaEnabled
+        mfaEnabled: !!user.mfaEnabled,
+        customerId: user.customerId
       }
     };
   }
@@ -177,7 +231,8 @@ export class AuthService {
         name: user.name,
         email: user.email,
         role: user.role?.name,
-        mfaEnabled: true
+        mfaEnabled: true,
+        customerId: user.customerId
       }
     };
   }

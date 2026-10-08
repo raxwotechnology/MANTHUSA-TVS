@@ -55,18 +55,69 @@ const crypto_1 = require("crypto");
 const common_2 = require("@nestjs/common");
 let AuthService = class AuthService {
     userModel;
+    roleModel;
+    customerModel;
     jwtService;
-    constructor(userModel, jwtService) {
+    constructor(userModel, roleModel, customerModel, jwtService) {
         this.userModel = userModel;
+        this.roleModel = roleModel;
+        this.customerModel = customerModel;
         this.jwtService = jwtService;
     }
     async validateUser(email, pass) {
-        const user = await this.userModel.findOne({ email }).populate('role');
+        const user = await this.userModel.findOne({ email: String(email || '').trim().toLowerCase(), isActive: { $ne: false } }).populate('role');
         if (user && await bcrypt.compare(pass, user.passwordHash)) {
             const { passwordHash, ...result } = user.toObject();
             return result;
         }
         return null;
+    }
+    async registerCustomer(input) {
+        const name = String(input.name || '').trim();
+        const email = String(input.email || '').trim().toLowerCase();
+        const phone = String(input.phone || '').trim();
+        const password = String(input.password || '');
+        if (name.length < 2)
+            throw new common_2.BadRequestException('Full name must contain at least 2 characters.');
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+            throw new common_2.BadRequestException('A valid email address is required.');
+        if (phone.length < 7)
+            throw new common_2.BadRequestException('A valid phone number is required.');
+        if (password.length < 8)
+            throw new common_2.BadRequestException('Password must contain at least 8 characters.');
+        if (await this.userModel.exists({ email }))
+            throw new common_2.ConflictException('An account with this email already exists.');
+        const role = await this.roleModel.findOne({ name: 'Customer' }).exec();
+        if (!role)
+            throw new common_2.BadRequestException('Customer role is not configured. Please run the database seed first.');
+        const customer = await new this.customerModel({
+            fullName: name,
+            email,
+            phone,
+            address: String(input.address || '').trim() || undefined,
+            city: String(input.city || '').trim() || undefined,
+            customerType: 'Individual',
+        }).save();
+        try {
+            const user = await new this.userModel({
+                name,
+                email,
+                passwordHash: await bcrypt.hash(password, 12),
+                role: role._id,
+                customerId: customer._id,
+                isActive: true,
+                emailVerified: true,
+            }).save();
+            customer.userId = user._id;
+            await customer.save();
+            return this.login({ _id: user._id, name, email, role: { _id: role._id, name: 'Customer' }, mfaEnabled: false, customerId: customer._id });
+        }
+        catch (error) {
+            await this.customerModel.findByIdAndDelete(customer._id).exec();
+            if (error?.code === 11000)
+                throw new common_2.ConflictException('An account with this email already exists.');
+            throw error;
+        }
     }
     digest(token) { return (0, crypto_1.createHash)('sha256').update(token).digest('hex'); }
     async sendEmail(to, subject, text) {
@@ -211,7 +262,8 @@ let AuthService = class AuthService {
                 name: user.name,
                 email: user.email,
                 role: user.role?.name,
-                mfaEnabled: !!user.mfaEnabled
+                mfaEnabled: !!user.mfaEnabled,
+                customerId: user.customerId
             }
         };
     }
@@ -230,7 +282,8 @@ let AuthService = class AuthService {
                 name: user.name,
                 email: user.email,
                 role: user.role?.name,
-                mfaEnabled: true
+                mfaEnabled: true,
+                customerId: user.customerId
             }
         };
     }
@@ -239,7 +292,11 @@ exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)('User')),
+    __param(1, (0, mongoose_1.InjectModel)('Role')),
+    __param(2, (0, mongoose_1.InjectModel)('Customer')),
     __metadata("design:paramtypes", [mongoose_2.Model,
+        mongoose_2.Model,
+        mongoose_2.Model,
         jwt_1.JwtService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

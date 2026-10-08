@@ -18,6 +18,7 @@ const config_1 = require("@nestjs/config");
 const core_1 = require("@nestjs/core");
 const jwt_auth_guard_1 = require("./jwt-auth.guard");
 const roles_guard_1 = require("./roles.guard");
+const customer_schema_1 = require("../customers/schemas/customer.schema");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -26,7 +27,8 @@ exports.AuthModule = AuthModule = __decorate([
         imports: [
             mongoose_1.MongooseModule.forFeature([
                 { name: 'User', schema: user_schema_1.UserSchema },
-                { name: 'Role', schema: role_schema_1.RoleSchema }
+                { name: 'Role', schema: role_schema_1.RoleSchema },
+                { name: 'Customer', schema: customer_schema_1.CustomerSchema }
             ]),
             jwt_1.JwtModule.registerAsync({
                 global: true,

@@ -20,6 +20,9 @@ export class User {
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Branch' })
   branch: Types.ObjectId;
 
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Customer' })
+  customerId: Types.ObjectId;
+
   @Prop()
   phone: string;
 

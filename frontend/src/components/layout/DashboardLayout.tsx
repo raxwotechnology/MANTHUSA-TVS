@@ -3,8 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
+import { useSettings } from '@/lib/useSettings';
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const { settings: brand } = useSettings();
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -49,11 +51,13 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           user={user}
           onToggleSidebar={() => setMobileSidebarOpen(!mobileSidebarOpen)}
         />
-        <main className="flex-1 p-3 sm:p-4 md:p-6 overflow-y-auto">
-          {children}
+        <main className="flex-1 min-w-0 p-3 sm:p-4 md:p-6 overflow-y-auto flex flex-col justify-between">
+          <div className="flex-1">{children}</div>
+          <footer className="mt-8 pt-4 pb-2 border-t border-slate-200/80 text-center text-xs text-slate-400 font-medium">
+            {brand.footerText || '© 2026 SalesPlus Vehicle Sales. All rights reserved.'}
+          </footer>
         </main>
       </div>
     </div>
   );
 }
-
