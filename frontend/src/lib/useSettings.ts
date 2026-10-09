@@ -76,8 +76,10 @@ export function useSettings() {
       if (e.detail) {
         const gen = e.detail.general || e.detail;
         const updated = { ...DEFAULT_BRAND, ...gen };
-        setSettings(updated);
+        // Write to localStorage synchronously so other tabs/reads see it immediately,
+        // but defer the React state update to avoid "setState during render" error.
         localStorage.setItem('dealership_brand', JSON.stringify(updated));
+        setTimeout(() => setSettings(updated), 0);
       }
     };
 

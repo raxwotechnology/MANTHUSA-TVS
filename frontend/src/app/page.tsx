@@ -5,7 +5,6 @@ import Link from 'next/link';
 import {
   Car,
   Search,
-  Phone,
   MessageSquare,
   Calendar,
   ShieldCheck,
@@ -25,202 +24,22 @@ import {
   Sparkles,
   MapPin,
   Clock,
-  Award,
-  Zap,
   Share2,
   AlertCircle,
   RefreshCw,
-  BadgeCheck,
   FileText,
-  Menu
+  Menu,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
-
-// Certified dealership showcase fallback data
-const SHOWCASE_VEHICLES = [
-  {
-    id: 'demo-prado-01',
-    _id: 'demo-prado-01',
-    make: 'Toyota',
-    model: 'Land Cruiser Prado',
-    variant: 'TX-L 7-Seater 4WD',
-    year: 2022,
-    manufacturingYear: 2022,
-    registeredYear: 2023,
-    color: 'Pearl White',
-    fuelType: 'Diesel',
-    transmission: 'Automatic',
-    driveType: '4WD',
-    engineCapacity: '2800cc GD Turbo',
-    mileage: '24,500 km',
-    sellingPrice: 42500000,
-    price: 42500000,
-    status: 'Available',
-    condition: 'Reconditioned Certified',
-    vehicleType: 'SUV',
-    image: 'https://images.unsplash.com/photo-1594502184342-2e12f877aa73?auto=format&fit=crop&w=1000&q=80',
-    images: [
-      'https://images.unsplash.com/photo-1594502184342-2e12f877aa73?auto=format&fit=crop&w=1000&q=80',
-      'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1000&q=80'
-    ],
-    features: ['Sunroof', 'Leather Electric Seats', 'Surround 360 Camera', 'Radar Safety Sense', 'Cool Box'],
-    warranty: '1-Year Powertrain & Battery',
-    isFeatured: true,
-    inspectionScore: '99/100'
-  },
-  {
-    id: 'demo-merc-02',
-    _id: 'demo-merc-02',
-    make: 'Mercedes-Benz',
-    model: 'C200',
-    variant: 'AMG Line Premium Plus',
-    year: 2023,
-    manufacturingYear: 2023,
-    registeredYear: 2023,
-    color: 'Obsidian Black Metallic',
-    fuelType: 'Petrol Mild-Hybrid',
-    transmission: 'Automatic 9G-Tronic',
-    driveType: 'RWD',
-    engineCapacity: '1500cc Turbo EQ Boost',
-    mileage: '12,000 km',
-    sellingPrice: 38800000,
-    price: 38800000,
-    status: 'Available',
-    condition: 'Direct Import Brand New',
-    vehicleType: 'Sedan',
-    image: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=1000&q=80',
-    images: [
-      'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=1000&q=80',
-      'https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?auto=format&fit=crop&w=1000&q=80'
-    ],
-    features: ['Burmester 3D Sound', 'Panoramic Glass Roof', 'Digital Light HUD', 'Wireless Apple CarPlay'],
-    warranty: '2-Year Dealership Certified',
-    isFeatured: true,
-    inspectionScore: '100/100'
-  },
-  {
-    id: 'demo-vezel-03',
-    _id: 'demo-vezel-03',
-    make: 'Honda',
-    model: 'Vezel e:HEV',
-    variant: 'Play Package Dual Tone',
-    year: 2022,
-    manufacturingYear: 2022,
-    registeredYear: 2022,
-    color: 'Sand Khaki Pearl & Black',
-    fuelType: 'Hybrid',
-    transmission: 'e-CVT Automatic',
-    driveType: '2WD',
-    engineCapacity: '1500cc Dual Motor e:HEV',
-    mileage: '18,200 km',
-    sellingPrice: 16800000,
-    price: 16800000,
-    status: 'Available',
-    condition: 'Registered 1st Owner',
-    vehicleType: 'Crossover',
-    image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1000&q=80',
-    images: [
-      'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1000&q=80'
-    ],
-    features: ['Honda SENSING Radar', 'Handsfree Power Tailgate', 'Panoramic Fixed Roof', 'Multi-View Camera'],
-    warranty: '1-Year Hybrid Battery Warranty',
-    isFeatured: true,
-    inspectionScore: '98/100'
-  },
-  {
-    id: 'demo-bmw-04',
-    _id: 'demo-bmw-04',
-    make: 'BMW',
-    model: '520d',
-    variant: 'M Sport LCI Edition',
-    year: 2021,
-    manufacturingYear: 2021,
-    registeredYear: 2022,
-    color: 'Phytonic Blue Metallic',
-    fuelType: 'Diesel Mild-Hybrid',
-    transmission: 'Steptronic Sport 8-Speed',
-    driveType: 'RWD',
-    engineCapacity: '2000cc TwinPower Turbo',
-    mileage: '29,400 km',
-    sellingPrice: 34500000,
-    price: 34500000,
-    status: 'Available',
-    condition: 'Registered 1st Owner',
-    vehicleType: 'Sedan',
-    image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1000&q=80',
-    images: [
-      'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1000&q=80'
-    ],
-    features: ['Laser Lights', 'Harmon Kardon Audio', 'M Aerodynamics Kit', 'Cognac Dakota Leather'],
-    warranty: '1-Year Comprehensive Warranty',
-    isFeatured: false,
-    inspectionScore: '97/100'
-  },
-  {
-    id: 'demo-audi-05',
-    _id: 'demo-audi-05',
-    make: 'Audi',
-    model: 'A6',
-    variant: '40 TFSI S-Line Sport',
-    year: 2022,
-    manufacturingYear: 2022,
-    registeredYear: 2023,
-    color: 'Daytona Grey Pearl',
-    fuelType: 'Petrol Mild-Hybrid',
-    transmission: 'S-Tronic 7-Speed',
-    driveType: 'FWD',
-    engineCapacity: '2000cc Turbocharged',
-    mileage: '15,600 km',
-    sellingPrice: 32900000,
-    price: 32900000,
-    status: 'Available',
-    condition: 'Direct Import Reconditioned',
-    vehicleType: 'Sedan',
-    image: 'https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?auto=format&fit=crop&w=1000&q=80',
-    images: [
-      'https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?auto=format&fit=crop&w=1000&q=80'
-    ],
-    features: ['Audi Virtual Cockpit Plus', 'Bang & Olufsen Sound', 'Matrix LED Headlamps', 'Valcona Leather'],
-    warranty: '1-Year Powertrain Guarantee',
-    isFeatured: false,
-    inspectionScore: '98/100'
-  },
-  {
-    id: 'demo-aqua-06',
-    _id: 'demo-aqua-06',
-    make: 'Toyota',
-    model: 'Aqua GR Sport',
-    variant: 'X Grade Generation 2',
-    year: 2023,
-    manufacturingYear: 2023,
-    registeredYear: 2024,
-    color: 'Emotional Red II',
-    fuelType: 'Hybrid',
-    transmission: 'CVT Automatic',
-    driveType: '2WD',
-    engineCapacity: '1500cc Dynamic Force',
-    mileage: '8,400 km',
-    sellingPrice: 12800000,
-    price: 12800000,
-    status: 'Available',
-    condition: 'Direct Import Unregistered',
-    vehicleType: 'Hatchback',
-    image: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1000&q=80',
-    images: [
-      'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1000&q=80'
-    ],
-    features: ['Toyota Safety Sense 2.5', '10.5-inch Display Audio', 'Bi-Beam LED Headlights', '33 km/L Fuel Eco'],
-    warranty: '2-Year Hybrid System Warranty',
-    isFeatured: true,
-    inspectionScore: '99/100'
-  }
-];
 
 export default function PublicVehicleWebsite() {
   const [loggedInUser, setLoggedInUser] = useState<any>(null);
   const [dbVehicles, setDbVehicles] = useState<any[]>([]);
   const [vehicleLoadError, setVehicleLoadError] = useState('');
   const [isLoadingVehicles, setIsLoadingVehicles] = useState(true);
+  const [isLightMode, setIsLightMode] = useState(false);
 
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState('');
@@ -287,6 +106,18 @@ export default function PublicVehicleWebsite() {
     }
   }, []);
 
+  useEffect(() => {
+    setIsLightMode(localStorage.getItem('salesplus_theme') === 'light');
+  }, []);
+
+  const toggleTheme = () => {
+    setIsLightMode((current) => {
+      const next = !current;
+      localStorage.setItem('salesplus_theme', next ? 'light' : 'dark');
+      return next;
+    });
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -305,7 +136,7 @@ export default function PublicVehicleWebsite() {
             ...vehicle,
             id: vehicle._id || vehicle.id,
             price: Number(vehicle.sellingPrice || 0),
-            image: vehicle.images?.[0] || 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1000&q=80',
+            image: vehicle.images?.[0] || '',
             mileage: vehicle.mileage ? `${Number(vehicle.mileage).toLocaleString()} km` : 'Unregistered',
             condition: vehicle.condition || 'Certified Dealership Stock',
             warranty: '1-Year Certified Warranty'
@@ -354,16 +185,8 @@ export default function PublicVehicleWebsite() {
     }
   };
 
-  // Combine database vehicles with showcase inventory
-  const allVehicles = useMemo(() => {
-    if (dbVehicles.length > 0) {
-      // If DB has vehicles, merge them with showcase fallback for variety
-      const existingIds = new Set(dbVehicles.map(v => v.id));
-      const complementShowcase = SHOWCASE_VEHICLES.filter(v => !existingIds.has(v.id));
-      return [...dbVehicles, ...complementShowcase];
-    }
-    return SHOWCASE_VEHICLES;
-  }, [dbVehicles]);
+  // Public inventory is sourced only from persisted API records.
+  const allVehicles = dbVehicles;
 
   // Unique make list for filter dropdown
   const uniqueMakes = useMemo(() => {
@@ -541,28 +364,9 @@ export default function PublicVehicleWebsite() {
   };
 
   return (
-    <div className="min-h-screen bg-[#070D1E] text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-white">
-      {/* Top Announcement Bar */}
-      <div className="bg-gradient-to-r from-emerald-900/90 via-[#0B1736] to-emerald-950 border-b border-emerald-500/20 py-2 px-4 text-xs font-medium text-slate-200">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
-          <div className="flex items-center gap-2">
-            <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-ping" />
-            <span className="text-emerald-300 font-bold uppercase tracking-wider text-[11px]">Special Offer:</span>
-            <span className="text-slate-300">Fast-Track 24-Hour Leasing Pre-Approval with Commercial Bank, HNB & Sampath Bank</span>
-          </div>
-          <div className="flex items-center gap-4 text-xs">
-            <a href="tel:0112345678" className="hover:text-emerald-400 flex items-center gap-1.5 transition-colors">
-              <Phone className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="font-semibold">Hotline: 011-2345678</span>
-            </a>
-            <span className="text-slate-600">|</span>
-            <span className="text-slate-400">Colombo • Kandy • Gampaha</span>
-          </div>
-        </div>
-      </div>
-
+    <div className={`public-site min-h-screen bg-[#070D1E] text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-white ${isLightMode ? 'light-mode' : ''}`}>
       {/* Main Header / Navigation */}
-      <header className="h-20 bg-[#0A122A]/90 backdrop-blur-xl border-b border-slate-800/80 sticky top-0 z-40 px-4 md:px-8">
+      <header className="h-[76px] bg-[#0A122A]/95 backdrop-blur-xl border-b border-slate-800/80 sticky top-0 z-40 px-4 md:px-8">
         <div className="max-w-7xl mx-auto h-full flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3.5 group">
@@ -579,17 +383,24 @@ export default function PublicVehicleWebsite() {
           </Link>
 
           {/* Navigation links */}
-          <nav className="hidden lg:flex items-center gap-7 text-xs font-semibold text-slate-300">
+          <nav className="hidden lg:flex items-center gap-6 text-xs font-semibold text-slate-300">
             <a href="#inventory" className="hover:text-emerald-400 transition-colors">Vehicle Inventory</a>
             <a href="#calculator" className="hover:text-emerald-400 transition-colors">Leasing Calculator</a>
             <button onClick={() => setShowTradeInModal(true)} className="hover:text-emerald-400 transition-colors">Sell / Trade-in</button>
             <a href="#inspection" className="hover:text-emerald-400 transition-colors">120-Point Guarantee</a>
-            <a href="#reviews" className="hover:text-emerald-400 transition-colors">Reviews</a>
-            <a href="#contact" className="hover:text-emerald-400 transition-colors">Showrooms</a>
           </nav>
 
           {/* Header Action Buttons */}
           <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 text-slate-200 transition-colors"
+              aria-label={isLightMode ? 'Switch to dark mode' : 'Switch to light mode'}
+              title={isLightMode ? 'Switch to dark mode' : 'Switch to light mode'}
+            >
+              {isLightMode ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4 text-amber-300" />}
+            </button>
             <button
               type="button"
               onClick={() => setShowMobileNav((open) => !open)}
@@ -670,8 +481,6 @@ export default function PublicVehicleWebsite() {
                 ['Vehicle Inventory', '#inventory'],
                 ['Leasing Calculator', '#calculator'],
                 ['120-Point Guarantee', '#inspection'],
-                ['Reviews', '#reviews'],
-                ['Showrooms', '#contact'],
               ].map(([label, href]) => (
                 <a
                   key={href}
@@ -698,77 +507,79 @@ export default function PublicVehicleWebsite() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-10 sm:pt-14 pb-14 sm:pb-20 px-4 md:px-8 border-b border-slate-800/80 bg-radial-gradient">
+      <section className="relative overflow-hidden pt-7 sm:pt-10 pb-9 sm:pb-12 px-4 md:px-8 border-b border-slate-800/80 bg-radial-gradient">
         {/* Glow ambient background elements */}
         <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-b from-emerald-500/15 via-teal-500/5 to-transparent blur-3xl pointer-events-none rounded-full" />
 
         <div className="relative max-w-7xl mx-auto w-full text-center">
-          {/* Trust Badge */}
-          <div className="inline-flex max-w-full flex-wrap justify-center items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-[10px] sm:text-xs font-bold tracking-wide uppercase mb-6 shadow-inner">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span>Sri Lanka&apos;s Most Trusted Certified Vehicle Network</span>
-            <span className="text-emerald-500">•</span>
-            <span>120-Point Mechanical Inspection</span>
+          <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-5 items-center text-left mb-7">
+            <div className="order-2 lg:order-1">
+              <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500/15 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-emerald-300 border border-emerald-400/25">
+                <Sparkles className="w-3.5 h-3.5" /> Drive with confidence
+              </span>
+              <h2 className="mt-4 text-3xl sm:text-5xl font-black tracking-tight text-white leading-[1.05]">
+                The right car for your <span className="text-emerald-400">next journey.</span>
+              </h2>
+              <p className="mt-4 max-w-xl text-sm sm:text-base leading-relaxed text-slate-300">
+                Explore carefully inspected vehicles with transparent pricing, trusted documentation, and support from enquiry to delivery.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <a href="#inventory" className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-3 text-xs font-black text-slate-950 shadow-lg shadow-emerald-900/30 hover:bg-emerald-400 transition-colors">
+                  Browse inventory <ArrowRight className="w-4 h-4" />
+                </a>
+                <button onClick={() => setShowTradeInModal(true)} className="inline-flex items-center gap-2 rounded-xl border border-slate-600 bg-slate-900/50 px-5 py-3 text-xs font-bold text-slate-200 hover:border-emerald-400 hover:text-emerald-300 transition-colors">
+                  Value my car <TrendingUp className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+            <div className="order-1 lg:order-2 relative min-h-[245px] sm:min-h-[315px]">
+              <div className="absolute right-0 top-0 w-[78%] h-[78%] overflow-hidden rounded-[2rem] border border-white/15 shadow-2xl shadow-black/40 rotate-2">
+                <img src="https://images.unsplash.com/photo-1553440569-bcc63803a83d?auto=format&fit=crop&w=1200&q=85" alt="Premium vehicle on the road" className="h-full w-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#070D1E]/80 via-transparent to-transparent" />
+              </div>
+              <div className="absolute bottom-0 left-0 w-[52%] h-[55%] overflow-hidden rounded-[1.5rem] border-4 border-[#070D1E] shadow-xl -rotate-3">
+                <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=85" alt="Sports car detail" className="h-full w-full object-cover" />
+              </div>
+              <div className="absolute bottom-5 right-4 rounded-2xl border border-emerald-400/30 bg-[#0D1836]/90 px-4 py-3 text-left shadow-xl backdrop-blur">
+                <p className="text-[10px] font-black uppercase tracking-wider text-emerald-300">Certified selection</p>
+                <p className="mt-1 text-xs font-bold text-white">Inspected. Verified. Ready.</p>
+              </div>
+            </div>
           </div>
+        </div>
+      </section>
 
-          {/* Main Title */}
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight mb-5 max-w-4xl mx-auto leading-[1.08] sm:leading-none">
-            Find Your Dream Car with <br className="hidden sm:inline" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">
-              Complete Trust & Certified Quality
+      {/* Vehicle Inventory Catalog Section */}
+      <section id="inventory" className="py-12 sm:py-16 px-4 md:px-8 max-w-7xl mx-auto w-full">
+        {/* Section Heading & Controls */}
+        <div className="mb-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-2 text-emerald-400 font-bold text-xs uppercase tracking-wider mb-2">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Certified Dealership Collection</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                Available Vehicle Showroom Stock
+              </h2>
+              <p className="text-xs text-slate-400 mt-1">
+                Search and filter our currently available showroom vehicles.
+              </p>
+            </div>
+            <span className="text-xs font-bold text-emerald-400 bg-emerald-950/70 px-3.5 py-1.5 rounded-xl border border-emerald-800/60 shrink-0">
+              {filteredVehicles.length} Vehicles Found
             </span>
-          </h1>
-
-          <p className="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto mb-10 leading-relaxed">
-            Browse inspected Japanese & European luxury sedans, family SUVs, and eco hybrids.
-            Enjoy same-day leasing pre-approval, verified RMV documentation, and 1-year powertrain guarantees.
-          </p>
-
-          {/* Quick Value Metrics Pill Strip */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 max-w-4xl mx-auto mb-8 sm:mb-10 text-left">
-            <div className="bg-[#0D1836]/90 border border-slate-800/90 rounded-2xl p-3.5 sm:p-4 flex items-center gap-3 shadow-lg">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center shrink-0">
-                <BadgeCheck className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-xs font-bold text-white">120-Point Checked</p>
-                <p className="text-[11px] text-slate-400">Mechanical & chassis</p>
-              </div>
-            </div>
-
-            <div className="bg-[#0D1836]/90 border border-slate-800/90 rounded-2xl p-4 flex items-center gap-3 shadow-lg">
-              <div className="w-10 h-10 rounded-xl bg-cyan-500/15 text-cyan-400 flex items-center justify-center shrink-0">
-                <Zap className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-xs font-bold text-white">24h Lease Approval</p>
-                <p className="text-[11px] text-slate-400">Major banks at 13.5%</p>
-              </div>
-            </div>
-
-            <div className="bg-[#0D1836]/90 border border-slate-800/90 rounded-2xl p-4 flex items-center gap-3 shadow-lg">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center shrink-0">
-                <Award className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-xs font-bold text-white">1-Year Warranty</p>
-                <p className="text-[11px] text-slate-400">Engine & gearbox</p>
-              </div>
-            </div>
-
-            <div className="bg-[#0D1836]/90 border border-slate-800/90 rounded-2xl p-4 flex items-center gap-3 shadow-lg">
-              <div className="w-10 h-10 rounded-xl bg-teal-500/15 text-teal-400 flex items-center justify-center shrink-0">
-                <TrendingUp className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-xs font-bold text-white">Fair Trade-Ins</p>
-                <p className="text-[11px] text-slate-400">Instant market valuations</p>
-              </div>
-            </div>
           </div>
 
-          {/* Interactive Multi-Criteria Search Card */}
-          <div className="bg-[#0F1B3E] p-3 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-700/80 shadow-2xl shadow-black/60 max-w-5xl mx-auto text-xs text-left">
+          {/* Showroom stock search and filters */}
+          <div className="mt-6 bg-[#0F1B3E] p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl border border-emerald-400/20 shadow-2xl shadow-black/30 text-xs text-left">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-3">
+              <div>
+                <p className="text-sm font-black text-white">Find your next vehicle</p>
+                <p className="text-[11px] text-slate-400">Search by make, model, fuel type, or budget</p>
+              </div>
+              <span className="text-[11px] font-semibold text-emerald-300">{isLoadingVehicles ? 'Loading inventory...' : `${filteredVehicles.length} vehicles available`}</span>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-3">
               {/* Search keyword input */}
               <div className="relative lg:col-span-2">
@@ -778,7 +589,7 @@ export default function PublicVehicleWebsite() {
                   placeholder="Search Make, Model, or Variant (e.g. Prado, C200)..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-[#070D1E] border border-slate-700/80 rounded-2xl pl-10 pr-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 text-xs font-medium transition-colors"
+                  className="w-full bg-[#070D1E] border border-slate-700/80 rounded-xl pl-10 pr-4 py-3.5 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15 text-xs font-medium transition-colors"
                 />
                 {searchQuery && (
                   <button onClick={() => setSearchQuery('')} className="absolute right-3.5 top-3.5 text-slate-400 hover:text-white">
@@ -792,7 +603,7 @@ export default function PublicVehicleWebsite() {
                 <select
                   value={selectedMake}
                   onChange={(e) => setSelectedMake(e.target.value)}
-                  className="w-full bg-[#070D1E] border border-slate-700/80 rounded-2xl px-3.5 py-3 text-white focus:outline-none focus:border-emerald-500 font-semibold cursor-pointer text-xs"
+                  className="w-full bg-[#070D1E] border border-slate-700/80 rounded-xl px-3.5 py-3.5 text-white focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15 font-semibold cursor-pointer text-xs"
                 >
                   <option value="ALL">All Brands & Makes</option>
                   {uniqueMakes.map((m) => (
@@ -806,7 +617,7 @@ export default function PublicVehicleWebsite() {
                 <select
                   value={selectedFuel}
                   onChange={(e) => setSelectedFuel(e.target.value)}
-                  className="w-full bg-[#070D1E] border border-slate-700/80 rounded-2xl px-3.5 py-3 text-white focus:outline-none focus:border-emerald-500 font-semibold cursor-pointer text-xs"
+                  className="w-full bg-[#070D1E] border border-slate-700/80 rounded-xl px-3.5 py-3.5 text-white focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15 font-semibold cursor-pointer text-xs"
                 >
                   <option value="ALL">All Fuel Types</option>
                   <option value="Petrol">Petrol</option>
@@ -821,7 +632,7 @@ export default function PublicVehicleWebsite() {
                 <select
                   value={selectedPriceTier}
                   onChange={(e) => setSelectedPriceTier(e.target.value)}
-                  className="w-full bg-[#070D1E] border border-slate-700/80 rounded-2xl px-3.5 py-3 text-white focus:outline-none focus:border-emerald-500 font-semibold cursor-pointer text-xs"
+                  className="w-full bg-[#070D1E] border border-slate-700/80 rounded-xl px-3.5 py-3.5 text-white focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15 font-semibold cursor-pointer text-xs"
                 >
                   <option value="ALL">All Price Ranges</option>
                   <option value="Under15M">Under LKR 15M</option>
@@ -877,63 +688,6 @@ export default function PublicVehicleWebsite() {
             </div>
           </div>
         </div>
-      </section>
-
-      {/* Vehicle Inventory Catalog Section */}
-      <section id="inventory" className="py-16 px-4 md:px-8 max-w-7xl mx-auto w-full">
-        {/* Section Heading & Controls */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-          <div>
-            <div className="inline-flex items-center gap-2 text-emerald-400 font-bold text-xs uppercase tracking-wider mb-2">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Certified Dealership Collection</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-              Available Vehicle Showroom Stock
-            </h2>
-            <p className="text-xs text-slate-400 mt-1">
-              Every vehicle includes comprehensive 120-point mechanical evaluation, clear title records, and full history checks.
-            </p>
-          </div>
-
-          {/* Controls: Sort and View Mode */}
-          <div className="flex items-center gap-3">
-            <span className="text-xs font-bold text-emerald-400 bg-emerald-950/70 px-3.5 py-1.5 rounded-xl border border-emerald-800/60 shrink-0">
-              {filteredVehicles.length} Vehicles Found
-            </span>
-
-            {/* Sort Selector */}
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="bg-[#0F1B3E] border border-slate-700/80 rounded-xl px-3 py-1.5 text-xs text-white font-semibold focus:outline-none focus:border-emerald-500 cursor-pointer"
-            >
-              <option value="featured">Sort: Featured Stock</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
-              <option value="year-desc">Year: Newest First</option>
-              <option value="mileage-asc">Lowest Mileage</option>
-            </select>
-
-            {/* View Mode Toggle */}
-            <div className="hidden sm:flex bg-[#0F1B3E] border border-slate-700/80 p-0.5 rounded-xl">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${viewMode === 'grid' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'}`}
-                title="Grid View"
-              >
-                Grid
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${viewMode === 'list' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'}`}
-                title="List View"
-              >
-                List
-              </button>
-            </div>
-          </div>
-        </div>
 
         {/* Vehicles Display Grid or Empty State */}
         {filteredVehicles.length === 0 ? (
@@ -970,7 +724,7 @@ export default function PublicVehicleWebsite() {
                   {/* Vehicle Image Header */}
                   <div className="relative h-56 overflow-hidden bg-slate-950">
                     <img
-                      src={v.image || 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80'}
+                      src={v.image}
                       alt={`${v.make} ${v.model}`}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       loading="lazy"
@@ -1157,7 +911,7 @@ export default function PublicVehicleWebsite() {
                   <div className="flex flex-col sm:flex-row gap-5 items-center w-full md:w-auto">
                     <div className="relative w-full sm:w-48 h-36 rounded-2xl overflow-hidden shrink-0 bg-slate-950">
                       <img
-                        src={v.image || 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=600&q=80'}
+                        src={v.image}
                         alt={`${v.make} ${v.model}`}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                       />
@@ -1485,92 +1239,6 @@ export default function PublicVehicleWebsite() {
         </div>
       </section>
 
-      {/* Customer Testimonials Section */}
-      <section id="reviews" className="py-16 px-4 md:px-8 border-t border-slate-800/80 bg-[#0A132C]">
-        <div className="max-w-7xl mx-auto w-full">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <div className="inline-flex items-center gap-2 text-amber-400 font-bold text-xs uppercase tracking-wider mb-2">
-              <Star className="w-4 h-4 fill-amber-400" />
-              <span>4.9 / 5.0 Rated Dealership</span>
-            </div>
-            <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-              Trusted by Hundreds of Vehicle Owners
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-300 mt-2">
-              Read authentic feedback from drivers who purchased or traded in their vehicles with SalesPlus.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-[#0F1B3E] p-6 rounded-3xl border border-slate-800 shadow-xl flex flex-col justify-between">
-              <div>
-                <div className="flex items-center gap-1 text-amber-400 mb-3">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-amber-400" />
-                  ))}
-                </div>
-                <p className="text-xs text-slate-300 leading-relaxed italic mb-4">
-                  &quot;I purchased a certified Toyota Land Cruiser Prado from SalesPlus Colombo. The 120-point mechanical report gave me complete confidence. The leasing was processed through Commercial Bank in under 24 hours!&quot;
-                </p>
-              </div>
-              <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
-                <div>
-                  <h4 className="text-xs font-bold text-white">Dr. Samantha Weerasinghe</h4>
-                  <p className="text-[11px] text-slate-400">Colombo 07 • Toyota Prado TX-L</p>
-                </div>
-                <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-800">
-                  Verified Buyer
-                </span>
-              </div>
-            </div>
-
-            <div className="bg-[#0F1B3E] p-6 rounded-3xl border border-slate-800 shadow-xl flex flex-col justify-between">
-              <div>
-                <div className="flex items-center gap-1 text-amber-400 mb-3">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-amber-400" />
-                  ))}
-                </div>
-                <p className="text-xs text-slate-300 leading-relaxed italic mb-4">
-                  &quot;I traded in my 2018 Honda Civic and upgraded to a Mercedes C200 AMG. Their valuation team inspected my vehicle at my home and offered an honest market price without any hidden deductions. Outstanding service!&quot;
-                </p>
-              </div>
-              <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
-                <div>
-                  <h4 className="text-xs font-bold text-white">Chirath Bandara</h4>
-                  <p className="text-[11px] text-slate-400">Kandy • Mercedes C200 AMG</p>
-                </div>
-                <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-800">
-                  Verified Trade-In
-                </span>
-              </div>
-            </div>
-
-            <div className="bg-[#0F1B3E] p-6 rounded-3xl border border-slate-800 shadow-xl flex flex-col justify-between">
-              <div>
-                <div className="flex items-center gap-1 text-amber-400 mb-3">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-amber-400" />
-                  ))}
-                </div>
-                <p className="text-xs text-slate-300 leading-relaxed italic mb-4">
-                  &quot;The online installment calculator matched the exact bank quotation I received down to the rupee. The team took care of all RMV paperwork, number plate transfer, and revenue license. Highly recommended!&quot;
-                </p>
-              </div>
-              <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
-                <div>
-                  <h4 className="text-xs font-bold text-white">Nadeeka Perera</h4>
-                  <p className="text-[11px] text-slate-400">Gampaha • Honda Vezel e:HEV</p>
-                </div>
-                <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-800">
-                  Verified Buyer
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Interactive FAQ Accordion Section */}
       <section className="py-16 px-4 md:px-8 max-w-4xl mx-auto w-full">
         <div className="text-center mb-10">
@@ -1760,7 +1428,7 @@ export default function PublicVehicleWebsite() {
                     <div key={v.id} className="bg-[#070D1E] p-3 rounded-2xl border border-slate-800 flex gap-3 items-center justify-between">
                       <div className="flex items-center gap-3">
                         <img
-                          src={v.image || 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=200&q=80'}
+                          src={v.image}
                           alt={v.model}
                           className="w-16 h-12 rounded-xl object-cover"
                         />
