@@ -9,8 +9,31 @@ async function bootstrap() {
   app.use(json({ limit: '20mb' }));
   app.use(urlencoded({ extended: true, limit: '20mb' }));
 
-  app.enableCors({ origin: process.env.FRONTEND_ORIGIN || 'http://localhost:3000' });
+  const rawOrigin = process.env.FRONTEND_ORIGIN;
+  const allowedOrigins = rawOrigin
+    ? rawOrigin.split(',').map((o) => o.trim().replace(/\/$/, ''))
+    : ['http://localhost:3000'];
+
+  app.enableCors({
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+      // Allow requests with no origin (like mobile apps, curl, server-to-server)
+      if (!origin) return callback(null, true);
+      if (
+        !rawOrigin ||
+        rawOrigin === '*' ||
+        allowedOrigins.includes(origin) ||
+        origin.endsWith('.vercel.app')
+      ) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
+    credentials: true,
+  });
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
-  await app.listen(Number(process.env.PORT) || 3001); // Next.js uses port 3000 by default.
+
+  const port = Number(process.env.PORT) || 3001;
+  await app.listen(port, '0.0.0.0');
+  console.log(`Backend is running on http://0.0.0.0:${port}`);
 }
 bootstrap();
