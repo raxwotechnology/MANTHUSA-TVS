@@ -117,12 +117,15 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* --- Public Site Light Mode Comprehensive Overrides --- */
 .public-site.light-mode {
-  background: #f6f8fb;
-  color: #172033;
+  background: #f8fafc !important;
+  color: #0f172a !important;
 }
 
-.public-site.light-mode [class*="bg-[#070D1E]"] {
+/* Page, section, and container backgrounds */
+.public-site.light-mode [class*="bg-[#070D1E]"],
+.public-site.light-mode [class*="bg-[#050A17]"] {
   background-color: #f8fafc !important;
 }
 
@@ -133,44 +136,104 @@
   background-color: #ffffff !important;
 }
 
-.public-site.light-mode [class*="bg-[#050A17]"] {
-  background-color: #e9eef5 !important;
+/* Slate surfaces in light mode: bright crisp light slate instead of dark murky blue */
+.public-site.light-mode [class*="bg-slate-950"],
+.public-site.light-mode [class*="bg-slate-900"],
+.public-site.light-mode [class*="bg-slate-800"],
+.public-site.light-mode [class*="bg-slate-700"] {
+  background-color: #f1f5f9 !important;
+  color: #1e293b !important;
 }
 
-.public-site.light-mode [class*="bg-slate-900"],
-.public-site.light-mode [class*="bg-slate-950"] {
+.public-site.light-mode [class*="bg-slate-800/80"],
+.public-site.light-mode [class*="bg-slate-900/50"] {
   background-color: #f1f5f9 !important;
 }
 
-.public-site.light-mode [class*="border-slate-800"],
-.public-site.light-mode [class*="border-slate-700"] {
-  border-color: #d8e0ea !important;
+.public-site.light-mode [class*="hover:bg-slate-700"]:hover,
+.public-site.light-mode [class*="hover:bg-slate-800"]:hover {
+  background-color: #e2e8f0 !important;
 }
 
+/* Borders */
+.public-site.light-mode [class*="border-slate-800"],
+.public-site.light-mode [class*="border-slate-700"],
+.public-site.light-mode [class*="border-slate-600"] {
+  border-color: #cbd5e1 !important;
+}
+
+/* Text colors */
 .public-site.light-mode [class*="text-slate-100"],
-.public-site.light-mode [class*="text-slate-200"],
+.public-site.light-mode [class*="text-slate-200"] {
+  color: #1e293b !important;
+}
+
 .public-site.light-mode [class*="text-slate-300"] {
   color: #334155 !important;
 }
 
-.public-site.light-mode [class*="text-slate-400"],
+.public-site.light-mode [class*="text-slate-400"] {
+  color: #64748b !important;
+}
+
 .public-site.light-mode [class*="text-slate-500"] {
   color: #64748b !important;
 }
 
-.public-site.light-mode [class*="text-white"] {
-  color: #172033 !important;
+/* Headings and generic white text to dark text */
+.public-site.light-mode h1,
+.public-site.light-mode h2,
+.public-site.light-mode h3,
+.public-site.light-mode h4,
+.public-site.light-mode h5,
+.public-site.light-mode h6 {
+  color: #0f172a !important;
 }
 
-.public-site.light-mode [class*="text-white"].bg-emerald-500,
-.public-site.light-mode [class*="text-white"][class*="bg-gradient-to"] {
+.public-site.light-mode [class*="text-white"]:not([class*="bg-emerald-"]):not([class*="bg-rose-"]):not([class*="bg-cyan-"]):not([class*="bg-teal-"]):not([class*="bg-gradient-to"]):not([class*="bg-emerald-500"]) {
+  color: #0f172a !important;
+}
+
+/* Solid colored buttons, badges, gradients must KEEP white text and white icons */
+.public-site.light-mode .bg-emerald-600,
+.public-site.light-mode .bg-emerald-500,
+.public-site.light-mode .bg-rose-500,
+.public-site.light-mode .bg-rose-600,
+.public-site.light-mode .bg-cyan-600,
+.public-site.light-mode .bg-blue-600,
+.public-site.light-mode [class*="bg-gradient-to"] {
   color: #ffffff !important;
 }
 
+.public-site.light-mode .bg-emerald-600 *,
+.public-site.light-mode .bg-emerald-500 *,
+.public-site.light-mode .bg-rose-500 *,
+.public-site.light-mode .bg-rose-600 *,
+.public-site.light-mode .bg-cyan-600 *,
+.public-site.light-mode .bg-blue-600 *,
+.public-site.light-mode [class*="bg-gradient-to"] * {
+  color: #ffffff !important;
+  stroke: #ffffff;
+}
+
+/* Dark cyan and dark emerald badges in light mode */
+.public-site.light-mode [class*="bg-cyan-950"] {
+  background-color: #ecfeff !important;
+  color: #0e7490 !important;
+  border-color: #a5f3fc !important;
+}
+
+.public-site.light-mode [class*="bg-emerald-950"] {
+  background-color: #ecfdf5 !important;
+  color: #047857 !important;
+  border-color: #a7f3d0 !important;
+}
+
+/* Form controls in light mode */
 .public-site.light-mode input,
 .public-site.light-mode select,
 .public-site.light-mode textarea {
-  color: #172033 !important;
+  color: #0f172a !important;
   background-color: #ffffff !important;
   border-color: #cbd5e1 !important;
 }
@@ -180,8 +243,14 @@
   color: #94a3b8 !important;
 }
 
+/* SVG icons visibility guarantee in light mode */
+.public-site.light-mode [class*="bg-slate-"] svg {
+  color: #334155 !important;
+  stroke: currentColor;
+}
+
 .public-site.light-mode .bg-radial-gradient {
-  background-image: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.12), transparent 52%);
+  background-image: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.08), transparent 52%);
 }
 
 @layer base {

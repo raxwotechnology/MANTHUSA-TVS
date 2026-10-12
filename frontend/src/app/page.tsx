@@ -371,23 +371,23 @@ export default function PublicVehicleWebsite() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3.5 group">
             <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-400 text-white flex items-center justify-center font-bold shadow-lg shadow-emerald-500/25 group-hover:scale-105 transition-transform duration-300">
-              <Car className="w-6 h-6" />
+              <Car className="w-6 h-6 text-white" />
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="font-black text-white text-xl tracking-tight">Sales<span className="text-emerald-400">Plus</span></span>
-                <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Certified</span>
+                <span className={`font-black text-xl tracking-tight ${isLightMode ? 'text-slate-900' : 'text-white'}`}>Sales<span className="text-emerald-500">Plus</span></span>
+                <span className={`text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded ${isLightMode ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'}`}>Certified</span>
               </div>
-              <p className="text-[10px] text-slate-400 font-semibold tracking-wider uppercase">Automotive Dealership Sri Lanka</p>
+              <p className={`text-[10px] font-semibold tracking-wider uppercase ${isLightMode ? 'text-slate-500' : 'text-slate-400'}`}>Automotive Dealership Sri Lanka</p>
             </div>
           </Link>
 
           {/* Navigation links */}
-          <nav className="hidden lg:flex items-center gap-6 text-xs font-semibold text-slate-300">
-            <a href="#inventory" className="hover:text-emerald-400 transition-colors">Vehicle Inventory</a>
-            <a href="#calculator" className="hover:text-emerald-400 transition-colors">Leasing Calculator</a>
-            <button onClick={() => setShowTradeInModal(true)} className="hover:text-emerald-400 transition-colors">Sell / Trade-in</button>
-            <a href="#inspection" className="hover:text-emerald-400 transition-colors">120-Point Guarantee</a>
+          <nav className={`hidden lg:flex items-center gap-6 text-xs font-semibold ${isLightMode ? 'text-slate-700' : 'text-slate-300'}`}>
+            <a href="#inventory" className={`transition-colors ${isLightMode ? 'hover:text-emerald-600' : 'hover:text-emerald-400'}`}>Vehicle Inventory</a>
+            <a href="#calculator" className={`transition-colors ${isLightMode ? 'hover:text-emerald-600' : 'hover:text-emerald-400'}`}>Leasing Calculator</a>
+            <button onClick={() => setShowTradeInModal(true)} className={`transition-colors ${isLightMode ? 'hover:text-emerald-600' : 'hover:text-emerald-400'}`}>Sell / Trade-in</button>
+            <a href="#inspection" className={`transition-colors ${isLightMode ? 'hover:text-emerald-600' : 'hover:text-emerald-400'}`}>120-Point Guarantee</a>
           </nav>
 
           {/* Header Action Buttons */}
@@ -395,16 +395,24 @@ export default function PublicVehicleWebsite() {
             <button
               type="button"
               onClick={toggleTheme}
-              className="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 text-slate-200 transition-colors"
+              className={`p-2.5 rounded-xl border transition-all ${
+                isLightMode
+                  ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-800 shadow-xs'
+                  : 'bg-slate-800/90 hover:bg-slate-700/90 border-slate-700/80 text-amber-300 shadow-md'
+              }`}
               aria-label={isLightMode ? 'Switch to dark mode' : 'Switch to light mode'}
               title={isLightMode ? 'Switch to dark mode' : 'Switch to light mode'}
             >
-              {isLightMode ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4 text-amber-300" />}
+              {isLightMode ? <Moon className="w-4 h-4 text-slate-800" /> : <Sun className="w-4 h-4 text-amber-300" />}
             </button>
             <button
               type="button"
               onClick={() => setShowMobileNav((open) => !open)}
-              className="inline-flex lg:hidden p-2.5 rounded-xl bg-slate-800/80 border border-slate-700/80 text-slate-200"
+              className={`inline-flex lg:hidden p-2.5 rounded-xl border transition-all ${
+                isLightMode
+                  ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-800 shadow-xs'
+                  : 'bg-slate-800/90 border-slate-700/80 text-slate-200'
+              }`}
               aria-label="Toggle website navigation"
               aria-expanded={showMobileNav}
             >
@@ -413,11 +421,15 @@ export default function PublicVehicleWebsite() {
             {/* Wishlist button */}
             <button
               onClick={() => setShowWishlistDrawer(true)}
-              className="relative p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 text-slate-200 transition-all hover:scale-105"
+              className={`relative p-2.5 rounded-xl border transition-all hover:scale-105 ${
+                isLightMode
+                  ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-800 shadow-xs'
+                  : 'bg-slate-800/90 hover:bg-slate-700/90 border-slate-700/80 text-slate-200 shadow-md'
+              }`}
               title="Saved Vehicles"
               aria-label="Wishlist"
             >
-              <Heart className={`w-4 h-4 ${wishlist.length > 0 ? 'text-rose-500 fill-rose-500' : 'text-slate-300'}`} />
+              <Heart className={`w-4 h-4 ${wishlist.length > 0 ? 'text-rose-500 fill-rose-500' : isLightMode ? 'text-slate-700' : 'text-slate-300'}`} />
               {wishlist.length > 0 && (
                 <span className="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center">
                   {wishlist.length}
@@ -429,7 +441,11 @@ export default function PublicVehicleWebsite() {
             {compareIds.length > 0 && (
               <button
                 onClick={() => setShowCompareModal(true)}
-                className="hidden sm:flex items-center gap-1.5 bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 px-3 py-2 rounded-xl text-xs font-bold hover:bg-cyan-900/60 transition-all"
+                className={`hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                  isLightMode
+                    ? 'bg-cyan-50 border border-cyan-300 text-cyan-800 hover:bg-cyan-100 shadow-xs'
+                    : 'bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-900/60'
+                }`}
               >
                 <SlidersHorizontal className="w-3.5 h-3.5" />
                 <span>Compare ({compareIds.length})</span>
@@ -439,7 +455,11 @@ export default function PublicVehicleWebsite() {
             {/* Sell / Trade-in Button */}
             <button
               onClick={() => setShowTradeInModal(true)}
-              className="hidden sm:flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/30 px-3.5 py-2 rounded-xl text-xs font-bold transition-all"
+              className={`hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+                isLightMode
+                  ? 'bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800 shadow-xs'
+                  : 'bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400'
+              }`}
             >
               <TrendingUp className="w-4 h-4" />
               <span>Instant Valuation</span>
@@ -453,12 +473,16 @@ export default function PublicVehicleWebsite() {
                   className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-emerald-900/40 transition-all hover:from-emerald-500 hover:to-emerald-500"
                 >
                   <span>{loggedInUser.name ? `Dashboard · ${loggedInUser.name.split(' ')[0]}` : 'Open Dashboard'}</span>
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-4 w-4 text-white" />
                 </Link>
                 <button
                   type="button"
                   onClick={logout}
-                  className="hidden rounded-xl border border-slate-700 px-3 py-2 text-xs font-semibold text-slate-300 transition-colors hover:border-red-400/50 hover:text-red-300 sm:inline-flex"
+                  className={`hidden rounded-xl border px-3 py-2 text-xs font-semibold transition-colors sm:inline-flex ${
+                    isLightMode
+                      ? 'border-slate-300 text-slate-700 hover:border-red-500 hover:text-red-600 hover:bg-red-50'
+                      : 'border-slate-700 text-slate-300 hover:border-red-400/50 hover:text-red-300'
+                  }`}
                 >
                   Sign out
                 </button>
@@ -469,14 +493,18 @@ export default function PublicVehicleWebsite() {
                 className="flex items-center gap-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-2.5 sm:px-4 py-2 rounded-xl text-xs font-bold shadow-md shadow-emerald-900/40 transition-all hover:shadow-emerald-500/25"
               >
                 <span className="hidden sm:inline">Sign in / Register</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 text-white" />
               </Link>
             )}
           </div>
         </div>
         {showMobileNav && (
-          <div className="lg:hidden absolute left-0 right-0 top-full border-b border-slate-800 bg-[#0A122A] px-4 py-4 shadow-2xl">
-            <nav className="mx-auto flex max-w-7xl flex-col gap-1 text-sm font-semibold text-slate-200">
+          <div className={`lg:hidden absolute left-0 right-0 top-full border-b shadow-2xl px-4 py-4 ${
+            isLightMode ? 'bg-white border-slate-200' : 'bg-[#0A122A] border-slate-800'
+          }`}>
+            <nav className={`mx-auto flex max-w-7xl flex-col gap-1 text-sm font-semibold ${
+              isLightMode ? 'text-slate-800' : 'text-slate-200'
+            }`}>
               {[
                 ['Vehicle Inventory', '#inventory'],
                 ['Leasing Calculator', '#calculator'],
@@ -486,7 +514,9 @@ export default function PublicVehicleWebsite() {
                   key={href}
                   href={href}
                   onClick={() => setShowMobileNav(false)}
-                  className="rounded-xl px-3 py-3 hover:bg-slate-800 hover:text-emerald-400"
+                  className={`rounded-xl px-3 py-3 transition-colors ${
+                    isLightMode ? 'hover:bg-slate-100 hover:text-emerald-600' : 'hover:bg-slate-800 hover:text-emerald-400'
+                  }`}
                 >
                   {label}
                 </a>
@@ -497,7 +527,9 @@ export default function PublicVehicleWebsite() {
                   setShowMobileNav(false);
                   setShowTradeInModal(true);
                 }}
-                className="rounded-xl px-3 py-3 text-left hover:bg-slate-800 hover:text-emerald-400"
+                className={`rounded-xl px-3 py-3 text-left transition-colors ${
+                  isLightMode ? 'hover:bg-slate-100 hover:text-emerald-600' : 'hover:bg-slate-800 hover:text-emerald-400'
+                }`}
               >
                 Sell / Trade-in
               </button>
@@ -527,7 +559,11 @@ export default function PublicVehicleWebsite() {
                 <a href="#inventory" className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-3 text-xs font-black text-slate-950 shadow-lg shadow-emerald-900/30 hover:bg-emerald-400 transition-colors">
                   Browse inventory <ArrowRight className="w-4 h-4" />
                 </a>
-                <button onClick={() => setShowTradeInModal(true)} className="inline-flex items-center gap-2 rounded-xl border border-slate-600 bg-slate-900/50 px-5 py-3 text-xs font-bold text-slate-200 hover:border-emerald-400 hover:text-emerald-300 transition-colors">
+                <button onClick={() => setShowTradeInModal(true)} className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-bold transition-colors ${
+                  isLightMode
+                    ? 'border-slate-300 bg-white text-slate-800 hover:border-emerald-500 hover:text-emerald-700 shadow-xs'
+                    : 'border-slate-600 bg-slate-900/50 text-slate-200 hover:border-emerald-400 hover:text-emerald-300'
+                }`}>
                   Value my car <TrendingUp className="w-4 h-4" />
                 </button>
               </div>
