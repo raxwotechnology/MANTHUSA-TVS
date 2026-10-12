@@ -32,27 +32,80 @@ export default function QuotationsPage() {
   const [editingQuote, setEditingQuote] = useState<Quotation | null>(null);
   const [deletingQuote, setDeletingQuote] = useState<Quotation | null>(null);
 
+  const [customersList, setCustomersList] = useState<any[]>([]);
+  const [vehiclesList, setVehiclesList] = useState<any[]>([]);
+
   const loadQuotations = async () => {
-    const response = await apiFetch('/quotations');
-    if (!response.ok) throw new Error('Could not load quotations.');
-    const data = await response.json();
+    const [quoteRes, custRes, vehRes] = await Promise.all([
+      apiFetch('/quotations'),
+      apiFetch('/customers'),
+      apiFetch('/vehicles')
+    ]);
+    if (!quoteRes.ok) throw new Error('Could not load quotations.');
+    const data = await quoteRes.json();
     setQuotations(data.map((quote: any) => ({ ...quote, customerId: quote.customer?._id, vehicleId: quote.vehicle?._id, customerName: quote.customer?.fullName || '', vehicleName: `${quote.vehicle?.make || ''} ${quote.vehicle?.model || ''} ${quote.vehicle?.year || ''}`.trim(), additionalCharges: Number(quote.registrationFee || 0) + Number(quote.insuranceFee || 0) + Number(quote.otherCharges || 0), balanceAmount: Number(quote.totalAmount || 0) - Number(quote.advancePayment || 0), status: quote.status || 'Active' })));
+    
+    if (custRes.ok) {
+      const cData = await custRes.json();
+      setCustomersList(cData);
+    }
+    if (vehRes.ok) {
+      const vData = await vehRes.json();
+      setVehiclesList(vData);
+    }
   };
   useEffect(() => { loadQuotations().catch((error) => window.alert(error.message)); }, []);
 
   const saveQuotation = async () => {
     const form = newFormData as any;
     try {
-      const [customerResponse, vehicleResponse] = await Promise.all([apiFetch('/customers'), apiFetch('/vehicles')]);
-      if (!customerResponse.ok || !vehicleResponse.ok) throw new Error('Could not load quotation options.');
-      const [customers, vehicles] = await Promise.all([customerResponse.json(), vehicleResponse.json()]);
-      const customer = customers.find((row: any) => row.fullName?.toLowerCase() === String(form.customerName || '').trim().toLowerCase()) || customers.find((row: any) => row._id === editingQuote?.customerId);
-      const requestedVehicle = String(form.vehicleName || '').trim().toLowerCase();
-      const vehicle = vehicles.find((row: any) => `${row.make} ${row.model}`.toLowerCase() === requestedVehicle)
-        || vehicles.find((row: any) => `${row.make} ${row.model} ${row.year || ''}`.trim().toLowerCase() === requestedVehicle)
-        || vehicles.find((row: any) => row._id === editingQuote?.vehicleId);
-      if (!customer || !vehicle) throw new Error('Enter an exact customer name and vehicle make/model from the system.');
-      const response = await apiFetch(editingQuote ? `/quotations/${editingQuote._id}` : '/quotations', { method: editingQuote ? 'PUT' : 'POST', body: JSON.stringify({ customer: customer._id, vehicle: vehicle._id, vehiclePrice: Number(form.vehiclePrice || vehicle.sellingPrice), discount: Number(form.discount || 0), registrationFee: 0, insuranceFee: 0, otherCharges: Number(form.additionalCharges || 0), advancePayment: Number(form.advancePayment || 0), validUntil: form.validUntil || editingQuote?.validUntil || new Date(Date.now() + 7 * 86400000).toISOString() }) });
+      let customerId = form.customerId;
+      let vehicleId = form.vehicleId;
+
+      // Fallback matching if typed manually
+      if (!customerId && form.customerName) {
+        const queryName = String(form.customerName).trim().toLowerCase();
+        const found = customersList.find((c) => c.fullName?.toLowerCase() === queryName || c.fullName?.toLowerCase().includes(queryName));
+        if (found) customerId = found._id;
+      }
+      if (!vehicleId && form.vehicleName) {
+        const queryVeh = String(form.vehicleName).trim().toLowerCase();
+        const found = vehiclesList.find((v) => 
+          `${v.make} ${v.model}`.toLowerCase() === queryVeh ||
+          `${v.make} ${v.model}`.toLowerCase().includes(queryVeh) ||
+          `${v.make} ${v.model} ${v.year || ''}`.trim().toLowerCase().includes(queryVeh) ||
+          v.make?.toLowerCase() === queryVeh
+        );
+        if (found) vehicleId = found._id;
+      }
+
+      if (!customerId && editingQuote?.customerId) customerId = editingQuote.customerId;
+      if (!vehicleId && editingQuote?.vehicleId) vehicleId = editingQuote.vehicleId;
+
+      if (!customerId) {
+        throw new Error('Please select an existing customer from the dropdown list. If new, add them first under Customer Profiles.');
+      }
+      if (!vehicleId) {
+        throw new Error('Please select a vehicle from the dropdown list in the showroom inventory.');
+      }
+
+      const vehicle = vehiclesList.find((v) => v._id === vehicleId);
+      const vehiclePrice = Number(form.vehiclePrice || vehicle?.sellingPrice || 0);
+
+      const response = await apiFetch(editingQuote ? `/quotations/${editingQuote._id}` : '/quotations', { 
+        method: editingQuote ? 'PUT' : 'POST', 
+        body: JSON.stringify({ 
+          customer: customerId, 
+          vehicle: vehicleId, 
+          vehiclePrice, 
+          discount: Number(form.discount || 0), 
+          registrationFee: 0, 
+          insuranceFee: 0, 
+          otherCharges: Number(form.additionalCharges || 0), 
+          advancePayment: Number(form.advancePayment || 0), 
+          validUntil: form.validUntil || editingQuote?.validUntil || new Date(Date.now() + 7 * 86400000).toISOString() 
+        }) 
+      });
       if (!response.ok) {
         const details = await response.json().catch(() => ({}));
         throw new Error(details.message || 'Could not save quotation.');
@@ -123,7 +176,21 @@ export default function QuotationsPage() {
                       <Printer className="w-3.5 h-3.5" />
                       <span>Print / PDF</span>
                     </button>
-                    <button onClick={() => { setEditingQuote(q); setNewFormData({ quotationNumber: q.quotationNumber, customerName: q.customerName, vehicleName: q.vehicleName, vehiclePrice: String(q.vehiclePrice), discount: String(q.discount), additionalCharges: String(q.additionalCharges), advancePayment: String(q.advancePayment) }); setShowAddModal(true); }} className="rounded-lg border border-emerald-200 px-3 py-1.5 text-[11px] font-semibold text-emerald-700">Edit</button>
+                    <button onClick={() => { 
+                      setEditingQuote(q); 
+                      setNewFormData({ 
+                        quotationNumber: q.quotationNumber, 
+                        customerId: q.customerId,
+                        vehicleId: q.vehicleId,
+                        customerName: q.customerName, 
+                        vehicleName: q.vehicleName, 
+                        vehiclePrice: String(q.vehiclePrice), 
+                        discount: String(q.discount), 
+                        additionalCharges: String(q.additionalCharges), 
+                        advancePayment: String(q.advancePayment) 
+                      }); 
+                      setShowAddModal(true); 
+                    }} className="rounded-lg border border-emerald-200 px-3 py-1.5 text-[11px] font-semibold text-emerald-700">Edit</button>
                     <button onClick={() => setDeletingQuote(q)} className="rounded-lg border border-rose-200 px-3 py-1.5 text-[11px] font-semibold text-rose-700">Delete</button>
                     </div>
                   </td>
@@ -238,16 +305,68 @@ export default function QuotationsPage() {
                 <input type="text" placeholder="e.g. QT-2026-001 (Auto-generated if blank)" className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, quotationNumber: e.target.value})} />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Customer Name</label>
-                <input type="text" placeholder="e.g. Kamal Gunaratne" value={(newFormData as any).customerName || ''} className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, customerName: e.target.value})} />
+                <label className="block text-xs font-bold text-slate-700 mb-1">Select Customer *</label>
+                <select
+                  value={(newFormData as any).customerId || ''}
+                  onChange={(e) => {
+                    const selId = e.target.value;
+                    const cust = customersList.find((c) => c._id === selId);
+                    setNewFormData({
+                      ...newFormData,
+                      customerId: selId,
+                      customerName: cust?.fullName || ''
+                    });
+                  }}
+                  className="w-full border border-slate-300 rounded-lg p-2 text-xs bg-white text-slate-900"
+                >
+                  <option value="">-- Choose a registered customer --</option>
+                  {customersList.map((c) => (
+                    <option key={c._id} value={c._id}>
+                      {c.fullName} ({c.phone || c.email || 'No contact'})
+                    </option>
+                  ))}
+                </select>
+                {customersList.length === 0 && (
+                  <p className="text-[11px] text-amber-600 mt-1">
+                    No customers found yet. Create a customer profile under "Customer Profiles" first.
+                  </p>
+                )}
               </div>
+
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Vehicle Name / Make & Model</label>
-                <input type="text" placeholder="e.g. Toyota Axio / Premio" value={(newFormData as any).vehicleName || ''} className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, vehicleName: e.target.value})} />
+                <label className="block text-xs font-bold text-slate-700 mb-1">Select Vehicle *</label>
+                <select
+                  value={(newFormData as any).vehicleId || ''}
+                  onChange={(e) => {
+                    const selId = e.target.value;
+                    const veh = vehiclesList.find((v) => v._id === selId);
+                    setNewFormData({
+                      ...newFormData,
+                      vehicleId: selId,
+                      vehicleName: veh ? `${veh.make} ${veh.model} ${veh.year || ''}`.trim() : '',
+                      vehiclePrice: veh?.sellingPrice ? String(veh.sellingPrice) : (newFormData as any).vehiclePrice
+                    });
+                  }}
+                  className="w-full border border-slate-300 rounded-lg p-2 text-xs bg-white text-slate-900"
+                >
+                  <option value="">-- Choose vehicle from inventory --</option>
+                  {vehiclesList.map((v) => (
+                    <option key={v._id} value={v._id}>
+                      {v.make} {v.model} ({v.year || ''}) - LKR {Number(v.sellingPrice || 0).toLocaleString()} [{v.status || 'Stock'}]
+                    </option>
+                  ))}
+                </select>
               </div>
+
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Vehicle Price (LKR)</label>
-                <input type="number" placeholder="e.g. 13,500,000" value={(newFormData as any).vehiclePrice || ''} className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400" onChange={(e) => setNewFormData({...newFormData, vehiclePrice: e.target.value})} />
+                <label className="block text-xs font-bold text-slate-700 mb-1">Vehicle Price (LKR) *</label>
+                <input 
+                  type="number" 
+                  placeholder="e.g. 13500000" 
+                  value={(newFormData as any).vehiclePrice || ''} 
+                  className="w-full border border-slate-300 rounded-lg p-2 text-xs placeholder:text-slate-400 bg-white text-slate-900" 
+                  onChange={(e) => setNewFormData({...newFormData, vehiclePrice: e.target.value})} 
+                />
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Approved Discount (LKR)</label>
