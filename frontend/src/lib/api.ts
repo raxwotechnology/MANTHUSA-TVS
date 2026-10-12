@@ -19,5 +19,15 @@ export function apiFetch(path: string, init: RequestInit = {}): Promise<Response
   if (init.body && !headers.has('Content-Type') && !(init.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json');
   }
-  return fetch(getApiUrl(path), { ...init, headers });
+  return fetch(getApiUrl(path), { ...init, headers }).then((res) => {
+    if (res.status === 401 && typeof window !== 'undefined') {
+      const isAuthRoute = path.includes('/auth/login') || path.includes('/auth/register');
+      if (!isAuthRoute && window.location.pathname.startsWith('/dashboard')) {
+        window.localStorage.removeItem('token');
+        window.localStorage.removeItem('user');
+        window.location.href = '/login?expired=1';
+      }
+    }
+    return res;
+  });
 }

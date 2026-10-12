@@ -19,6 +19,15 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('expired') === '1') {
+        setError('Your session has expired. Please sign in again.');
+      }
+    }
+  }, []);
+
   const login = async (event: React.FormEvent) => {
     event.preventDefault(); setLoading(true); setError('');
     try {
