@@ -47,10 +47,11 @@ async function seed() {
 
     // Default seed user accounts
     const seedUsers = [
-      { name: adminName, email: adminEmail, password: adminPassword, role: rolesMap['Admin / Owner'] },
-      { name: 'Sales Executive', email: 'sales@salesplus.com', password: 'SalesPass1234!', role: rolesMap['Sales & Operations'] },
-      { name: 'Accountant Staff', email: 'accountant@salesplus.com', password: 'FinancePass1234!', role: rolesMap['Accountant / Finance Staff'] },
-      { name: 'Inventory Manager', email: 'inventory@salesplus.com', password: 'InventoryPass1234!', role: rolesMap['Inventory Manager'] },
+      { name: 'Admin', email: 'admin@salesplus.com', password: 'admin123', role: rolesMap['Admin / Owner'] },
+      { name: 'Manager', email: 'manager@salesplus.com', password: 'manager123', role: rolesMap['Inventory Manager'] },
+      { name: 'Sales Executive', email: 'executive@salesplus.com', password: 'ex123', role: rolesMap['Sales & Operations'] },
+      { name: 'Accountant', email: 'accountant@salesplus.com', password: 'accountant123', role: rolesMap['Accountant / Finance Staff'] },
+      { name: 'Sales Manager', email: 'manager2@salesplus.com', password: 'manag123', role: rolesMap['Sales & Operations'] },
       { name: 'Sample Customer', email: 'customer@salesplus.com', password: 'CustomerPass1234!', role: rolesMap['Customer'] },
     ];
 
