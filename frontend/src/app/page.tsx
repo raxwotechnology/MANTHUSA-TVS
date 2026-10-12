@@ -1043,14 +1043,22 @@ export default function PublicVehicleWebsite() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center max-w-5xl mx-auto bg-[#0F1B3E] p-6 sm:p-8 rounded-3xl border border-slate-700/80 shadow-2xl">
+          <div className={`grid grid-cols-1 lg:grid-cols-12 gap-8 items-center max-w-5xl mx-auto p-6 sm:p-8 rounded-3xl border shadow-2xl transition-colors duration-300 ${
+            isLightMode
+              ? 'bg-white border-slate-200 shadow-slate-200/50'
+              : 'bg-[#0F1B3E] border-slate-700/80 shadow-2xl'
+          }`}>
             {/* Sliders Input Column */}
             <div className="lg:col-span-7 space-y-6">
               {/* Vehicle Price Slider */}
               <div>
                 <div className="flex justify-between items-center mb-2">
-                  <label className="text-xs font-bold text-slate-300">Vehicle Price (LKR)</label>
-                  <span className="text-sm font-black text-emerald-400 bg-[#070D1E] px-3 py-1 rounded-xl border border-slate-700">
+                  <label className={`text-xs font-bold ${isLightMode ? 'text-slate-700' : 'text-slate-300'}`}>Vehicle Price (LKR)</label>
+                  <span className={`text-sm font-black px-3 py-1 rounded-xl border ${
+                    isLightMode
+                      ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
+                      : 'text-emerald-400 bg-[#070D1E] border-slate-700'
+                  }`}>
                     {formatLKR(calcPrice)}
                   </span>
                 </div>
@@ -1061,9 +1069,11 @@ export default function PublicVehicleWebsite() {
                   step={500000}
                   value={calcPrice}
                   onChange={(e) => setCalcPrice(Number(e.target.value))}
-                  className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                  className={`w-full h-2 rounded-lg appearance-none cursor-pointer accent-emerald-500 ${
+                    isLightMode ? 'bg-slate-200' : 'bg-slate-800'
+                  }`}
                 />
-                <div className="flex justify-between text-[10px] text-slate-500 mt-1">
+                <div className={`flex justify-between text-[10px] mt-1 ${isLightMode ? 'text-slate-500 font-medium' : 'text-slate-400'}`}>
                   <span>5 Million</span>
                   <span>30 Million</span>
                   <span>60 Million</span>
@@ -1073,10 +1083,14 @@ export default function PublicVehicleWebsite() {
               {/* Down Payment Slider */}
               <div>
                 <div className="flex justify-between items-center mb-2">
-                  <label className="text-xs font-bold text-slate-300">
-                    Down Payment: <span className="text-emerald-400 font-extrabold">{calcDownPercent}%</span>
+                  <label className={`text-xs font-bold ${isLightMode ? 'text-slate-700' : 'text-slate-300'}`}>
+                    Down Payment: <span className={isLightMode ? 'text-emerald-600 font-extrabold' : 'text-emerald-400 font-extrabold'}>{calcDownPercent}%</span>
                   </label>
-                  <span className="text-xs font-bold text-slate-300 bg-[#070D1E] px-3 py-1 rounded-xl border border-slate-700">
+                  <span className={`text-xs font-bold px-3 py-1 rounded-xl border ${
+                    isLightMode
+                      ? 'text-slate-700 bg-slate-100 border-slate-200'
+                      : 'text-slate-300 bg-[#070D1E] border-slate-700'
+                  }`}>
                     {formatLKR(currentLoanSummary.downAmount)}
                   </span>
                 </div>
@@ -1087,9 +1101,11 @@ export default function PublicVehicleWebsite() {
                   step={5}
                   value={calcDownPercent}
                   onChange={(e) => setCalcDownPercent(Number(e.target.value))}
-                  className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                  className={`w-full h-2 rounded-lg appearance-none cursor-pointer accent-emerald-500 ${
+                    isLightMode ? 'bg-slate-200' : 'bg-slate-800'
+                  }`}
                 />
-                <div className="flex justify-between text-[10px] text-slate-500 mt-1">
+                <div className={`flex justify-between text-[10px] mt-1 ${isLightMode ? 'text-slate-500 font-medium' : 'text-slate-400'}`}>
                   <span>10% (Minimum)</span>
                   <span>30% (Standard)</span>
                   <span>60% (Low EMI)</span>
@@ -1099,10 +1115,14 @@ export default function PublicVehicleWebsite() {
               {/* Tenure Period Slider */}
               <div>
                 <div className="flex justify-between items-center mb-2">
-                  <label className="text-xs font-bold text-slate-300">
-                    Tenure Period: <span className="text-emerald-400 font-extrabold">{calcTenureYears} Years</span> ({calcTenureYears * 12} Months)
+                  <label className={`text-xs font-bold ${isLightMode ? 'text-slate-700' : 'text-slate-300'}`}>
+                    Tenure Period: <span className={isLightMode ? 'text-emerald-600 font-extrabold' : 'text-emerald-400 font-extrabold'}>{calcTenureYears} Years</span> ({calcTenureYears * 12} Months)
                   </label>
-                  <span className="text-xs font-bold text-slate-300 bg-[#070D1E] px-3 py-1 rounded-xl border border-slate-700">
+                  <span className={`text-xs font-bold px-3 py-1 rounded-xl border ${
+                    isLightMode
+                      ? 'text-slate-700 bg-slate-100 border-slate-200'
+                      : 'text-slate-300 bg-[#070D1E] border-slate-700'
+                  }`}>
                     {calcTenureYears * 12} Installments
                   </span>
                 </div>
@@ -1113,9 +1133,11 @@ export default function PublicVehicleWebsite() {
                   step={1}
                   value={calcTenureYears}
                   onChange={(e) => setCalcTenureYears(Number(e.target.value))}
-                  className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+                  className={`w-full h-2 rounded-lg appearance-none cursor-pointer accent-cyan-500 ${
+                    isLightMode ? 'bg-slate-200' : 'bg-slate-800'
+                  }`}
                 />
-                <div className="flex justify-between text-[10px] text-slate-500 mt-1">
+                <div className={`flex justify-between text-[10px] mt-1 ${isLightMode ? 'text-slate-500 font-medium' : 'text-slate-400'}`}>
                   <span>1 Year</span>
                   <span>3 Years</span>
                   <span>5 Years</span>
@@ -1126,10 +1148,10 @@ export default function PublicVehicleWebsite() {
               {/* Annual Interest Rate Slider */}
               <div>
                 <div className="flex justify-between items-center mb-2">
-                  <label className="text-xs font-bold text-slate-300">
-                    Annual Interest Rate: <span className="text-cyan-400 font-extrabold">{calcInterestRate}%</span>
+                  <label className={`text-xs font-bold ${isLightMode ? 'text-slate-700' : 'text-slate-300'}`}>
+                    Annual Interest Rate: <span className={isLightMode ? 'text-cyan-700 font-extrabold' : 'text-cyan-400 font-extrabold'}>{calcInterestRate}%</span>
                   </label>
-                  <span className="text-[11px] font-semibold text-slate-400">Current Market: 12.5% - 15.0%</span>
+                  <span className={`text-[11px] font-semibold ${isLightMode ? 'text-slate-500' : 'text-slate-400'}`}>Current Market: 12.5% - 15.0%</span>
                 </div>
                 <input
                   type="range"
@@ -1138,9 +1160,11 @@ export default function PublicVehicleWebsite() {
                   step={0.5}
                   value={calcInterestRate}
                   onChange={(e) => setCalcInterestRate(Number(e.target.value))}
-                  className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+                  className={`w-full h-2 rounded-lg appearance-none cursor-pointer accent-cyan-500 ${
+                    isLightMode ? 'bg-slate-200' : 'bg-slate-800'
+                  }`}
                 />
-                <div className="flex justify-between text-[10px] text-slate-500 mt-1">
+                <div className={`flex justify-between text-[10px] mt-1 ${isLightMode ? 'text-slate-500 font-medium' : 'text-slate-400'}`}>
                   <span>10.0%</span>
                   <span>13.5% (Dealership Partner)</span>
                   <span>18.0%</span>
@@ -1149,41 +1173,69 @@ export default function PublicVehicleWebsite() {
             </div>
 
             {/* Live Calculation Output Card */}
-            <div className="lg:col-span-5 bg-gradient-to-br from-[#070D1E] to-[#0A1838] p-6 rounded-3xl border border-emerald-500/30 shadow-xl flex flex-col justify-between">
+            <div className={`lg:col-span-5 p-6 rounded-3xl border shadow-xl flex flex-col justify-between transition-colors ${
+              isLightMode
+                ? 'bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/70 border-emerald-300/60 shadow-emerald-100/50'
+                : 'bg-gradient-to-br from-[#070D1E] to-[#0A1838] border-emerald-500/30 shadow-xl'
+            }`}>
               <div>
-                <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-5">
-                  <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Estimated Monthly Rental</span>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                <div className={`flex items-center justify-between pb-4 border-b mb-5 ${
+                  isLightMode ? 'border-slate-200' : 'border-slate-800'
+                }`}>
+                  <span className={`text-xs font-extrabold uppercase tracking-wider ${
+                    isLightMode ? 'text-slate-600' : 'text-slate-400'
+                  }`}>
+                    Estimated Monthly Rental
+                  </span>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                    isLightMode
+                      ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                      : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                  }`}>
                     Official Formula
                   </span>
                 </div>
 
                 <div className="mb-6">
-                  <span className="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-300 block">
+                  <span className={`text-3xl sm:text-4xl font-black block ${
+                    isLightMode
+                      ? 'text-emerald-700'
+                      : 'text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-300'
+                  }`}>
                     {formatLKR(currentLoanSummary.emi)}
                   </span>
-                  <span className="text-[11px] text-slate-400 mt-1 block">
+                  <span className={`text-[11px] mt-1 block font-medium ${
+                    isLightMode ? 'text-slate-500' : 'text-slate-400'
+                  }`}>
                     Per month for {calcTenureYears * 12} consecutive months
                   </span>
                 </div>
 
                 {/* Financial Summary Breakdown */}
-                <div className="space-y-2.5 text-xs bg-[#0F1B3E]/80 p-4 rounded-2xl border border-slate-800/90 mb-6">
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Down Payment ({calcDownPercent}%):</span>
-                    <span className="font-bold text-white">{formatLKR(currentLoanSummary.downAmount)}</span>
+                <div className={`space-y-2.5 text-xs p-4 rounded-2xl border mb-6 ${
+                  isLightMode
+                    ? 'bg-white border-slate-200 shadow-sm'
+                    : 'bg-[#0F1B3E]/80 border-slate-800/90'
+                }`}>
+                  <div className="flex justify-between items-center">
+                    <span className={isLightMode ? 'text-slate-600 font-semibold' : 'text-slate-400'}>Down Payment ({calcDownPercent}%):</span>
+                    <span className={`font-bold ${isLightMode ? 'text-slate-900' : 'text-white'}`}>{formatLKR(currentLoanSummary.downAmount)}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Lease Financing Amount:</span>
-                    <span className="font-bold text-white">{formatLKR(currentLoanSummary.loanAmount)}</span>
+                  <div className="flex justify-between items-center">
+                    <span className={isLightMode ? 'text-slate-600 font-semibold' : 'text-slate-400'}>Lease Financing Amount:</span>
+                    <span className={`font-bold ${isLightMode ? 'text-slate-900' : 'text-white'}`}>{formatLKR(currentLoanSummary.loanAmount)}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Total Interest Payable:</span>
-                    <span className="font-bold text-slate-300">{formatLKR(currentLoanSummary.totalInterest)}</span>
+                  <div className="flex justify-between items-center">
+                    <span className={isLightMode ? 'text-slate-600 font-semibold' : 'text-slate-400'}>Total Interest Payable:</span>
+                    <span className={`font-bold ${isLightMode ? 'text-slate-900' : 'text-slate-300'}`}>{formatLKR(currentLoanSummary.totalInterest)}</span>
                   </div>
-                  <div className="flex justify-between border-t border-slate-800 pt-2 font-bold">
-                    <span className="text-slate-300">Total Capital Outlay:</span>
-                    <span className="text-emerald-400">{formatLKR(currentLoanSummary.totalPayable + currentLoanSummary.downAmount)}</span>
+                  <div className={`flex justify-between items-center border-t pt-2 font-bold ${
+                    isLightMode ? 'border-slate-200' : 'border-slate-800'
+                  }`}>
+                    <span className={isLightMode ? 'text-slate-800 font-bold' : 'text-slate-300'}>Total Capital Outlay:</span>
+                    <span className={isLightMode ? 'text-emerald-700 font-extrabold text-sm' : 'text-emerald-400'}>
+                      {formatLKR(currentLoanSummary.totalPayable + currentLoanSummary.downAmount)}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -1191,10 +1243,10 @@ export default function PublicVehicleWebsite() {
               {/* Action Button */}
               <button
                 onClick={handleOpenLeaseInquiry}
-                className="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs uppercase tracking-wider rounded-2xl shadow-lg shadow-emerald-950 transition-all flex items-center justify-center gap-2"
+                className="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs uppercase tracking-wider rounded-2xl shadow-lg shadow-emerald-950/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>Apply for Leasing Pre-Approval</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 text-white" />
               </button>
             </div>
           </div>
