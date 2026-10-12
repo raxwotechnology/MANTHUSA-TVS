@@ -124,9 +124,14 @@
 }
 
 /* Page, section, and container backgrounds */
-.public-site.light-mode [class*="bg-[#070D1E]"],
-.public-site.light-mode [class*="bg-[#050A17]"] {
+.public-site.light-mode [class*="bg-[#070D1E]"] {
   background-color: #f8fafc !important;
+}
+
+/* Grounded Footer background in light mode */
+.public-site.light-mode [class*="bg-[#050A17]"] {
+  background-color: #f1f5f9 !important;
+  border-top-color: #cbd5e1 !important;
 }
 
 .public-site.light-mode [class*="bg-[#0A122A]"],
@@ -134,6 +139,8 @@
 .public-site.light-mode [class*="bg-[#0D1836]"],
 .public-site.light-mode [class*="bg-[#0F1B3E]"] {
   background-color: #ffffff !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05) !important;
+  border-color: #e2e8f0 !important;
 }
 
 /* Slate surfaces in light mode: bright crisp light slate instead of dark murky blue */
@@ -142,7 +149,7 @@
 .public-site.light-mode [class*="bg-slate-800"],
 .public-site.light-mode [class*="bg-slate-700"] {
   background-color: #f1f5f9 !important;
-  color: #1e293b !important;
+  color: #0f172a !important;
 }
 
 .public-site.light-mode [class*="bg-slate-800/80"],
@@ -162,22 +169,25 @@
   border-color: #cbd5e1 !important;
 }
 
-/* Text colors */
+/* HIGH-CONTRAST READABLE TEXT COLORS IN LIGHT MODE */
 .public-site.light-mode [class*="text-slate-100"],
 .public-site.light-mode [class*="text-slate-200"] {
-  color: #1e293b !important;
+  color: #0f172a !important;
+  font-weight: 600;
 }
 
 .public-site.light-mode [class*="text-slate-300"] {
+  color: #1e293b !important;
+  font-weight: 500;
+}
+
+/* Previously washed-out descriptions & subtitles now crisp and readable */
+.public-site.light-mode [class*="text-slate-400"] {
   color: #334155 !important;
 }
 
-.public-site.light-mode [class*="text-slate-400"] {
-  color: #64748b !important;
-}
-
 .public-site.light-mode [class*="text-slate-500"] {
-  color: #64748b !important;
+  color: #475569 !important;
 }
 
 /* Headings and generic white text to dark text */
@@ -190,8 +200,29 @@
   color: #0f172a !important;
 }
 
-.public-site.light-mode [class*="text-white"]:not([class*="bg-emerald-"]):not([class*="bg-rose-"]):not([class*="bg-cyan-"]):not([class*="bg-teal-"]):not([class*="bg-gradient-to"]):not([class*="bg-emerald-500"]) {
+.public-site.light-mode [class*="text-white"]:not([class*="bg-emerald-"]):not([class*="bg-rose-"]):not([class*="bg-cyan-"]):not([class*="bg-teal-"]):not([class*="bg-gradient-to"]):not([class*="bg-emerald-500"]):not([class*="bg-emerald-600"]) {
   color: #0f172a !important;
+}
+
+/* Footer links and text readability */
+.public-site.light-mode footer a,
+.public-site.light-mode footer button {
+  color: #334155 !important;
+  font-weight: 500;
+}
+
+.public-site.light-mode footer a:hover,
+.public-site.light-mode footer button:hover {
+  color: #059669 !important;
+}
+
+.public-site.light-mode footer p {
+  color: #334155 !important;
+}
+
+.public-site.light-mode footer h4 {
+  color: #0f172a !important;
+  font-weight: 800;
 }
 
 /* Solid colored buttons, badges, gradients must KEEP white text and white icons */
@@ -221,12 +252,14 @@
   background-color: #ecfeff !important;
   color: #0e7490 !important;
   border-color: #a5f3fc !important;
+  font-weight: 700;
 }
 
 .public-site.light-mode [class*="bg-emerald-950"] {
   background-color: #ecfdf5 !important;
   color: #047857 !important;
   border-color: #a7f3d0 !important;
+  font-weight: 700;
 }
 
 /* Form controls in light mode */
@@ -235,17 +268,18 @@
 .public-site.light-mode textarea {
   color: #0f172a !important;
   background-color: #ffffff !important;
-  border-color: #cbd5e1 !important;
+  border-color: #94a3b8 !important;
+  font-weight: 500;
 }
 
 .public-site.light-mode input::placeholder,
 .public-site.light-mode textarea::placeholder {
-  color: #94a3b8 !important;
+  color: #64748b !important;
 }
 
 /* SVG icons visibility guarantee in light mode */
 .public-site.light-mode [class*="bg-slate-"] svg {
-  color: #334155 !important;
+  color: #1e293b !important;
   stroke: currentColor;
 }
 

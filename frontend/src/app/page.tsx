@@ -1939,53 +1939,58 @@ export default function PublicVehicleWebsite() {
       )}
 
       {/* Modern High-Trust Footer */}
-      <footer className="mt-auto border-t border-slate-800 bg-[#050A17] pt-14 pb-8 px-4 md:px-8 text-xs text-slate-400">
+      {/* Modern High-Trust Footer */}
+      <footer className={`mt-auto border-t pt-14 pb-8 px-4 md:px-8 text-xs transition-colors ${
+        isLightMode
+          ? 'bg-slate-100/90 border-slate-300 text-slate-700'
+          : 'bg-[#050A17] border-slate-800 text-slate-400'
+      }`}>
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           {/* Col 1: Brand Info */}
           <div className="space-y-3 md:col-span-1">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold">
-                <Car className="w-5 h-5" />
+              <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold shadow-md shadow-emerald-500/20">
+                <Car className="w-5 h-5 text-white" />
               </div>
-              <span className="font-extrabold text-white text-base">Sales<span className="text-emerald-400">Plus</span> Vehicles</span>
+              <span className={`font-extrabold text-base ${isLightMode ? 'text-slate-900' : 'text-white'}`}>Sales<span className="text-emerald-500">Plus</span> Vehicles</span>
             </div>
-            <p className="text-xs text-slate-400 leading-relaxed">
+            <p className={`text-xs leading-relaxed ${isLightMode ? 'text-slate-700 font-medium' : 'text-slate-400'}`}>
               Premier automotive dealership in Sri Lanka. Inspected Japanese & European imports, flexible leasing financing, and certified warranty protection.
             </p>
-            <div className="pt-2 text-xs text-slate-300">
-              <p className="font-semibold text-emerald-400">Hotline: 011-2345678</p>
+            <div className={`pt-2 text-xs font-semibold ${isLightMode ? 'text-slate-800' : 'text-slate-300'}`}>
+              <p className={isLightMode ? 'text-emerald-700 font-bold' : 'text-emerald-400 font-bold'}>Hotline: 011-2345678</p>
               <p>Email: sales@salesplus.com</p>
             </div>
           </div>
 
           {/* Col 2: Quick Links */}
           <div className="space-y-2">
-            <h4 className="font-extrabold text-white text-sm mb-3">Vehicle Categories</h4>
-            <ul className="space-y-2 text-xs">
-              <li><a href="#inventory" className="hover:text-emerald-400 transition-colors">Premium SUVs & 4WD</a></li>
-              <li><a href="#inventory" className="hover:text-emerald-400 transition-colors">Executive Luxury Sedans</a></li>
-              <li><a href="#inventory" className="hover:text-emerald-400 transition-colors">Hybrid & Electric Vehicles</a></li>
-              <li><a href="#inventory" className="hover:text-emerald-400 transition-colors">Unregistered Brand New Imports</a></li>
-              <li><a href="#inventory" className="hover:text-emerald-400 transition-colors">Budget Certified Cars Under 20M</a></li>
+            <h4 className={`font-extrabold text-sm mb-3 ${isLightMode ? 'text-slate-900' : 'text-white'}`}>Vehicle Categories</h4>
+            <ul className={`space-y-2 text-xs font-medium ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>
+              <li><a href="#inventory" className={`transition-colors ${isLightMode ? 'hover:text-emerald-700 font-semibold' : 'hover:text-emerald-400'}`}>Premium SUVs & 4WD</a></li>
+              <li><a href="#inventory" className={`transition-colors ${isLightMode ? 'hover:text-emerald-700 font-semibold' : 'hover:text-emerald-400'}`}>Executive Luxury Sedans</a></li>
+              <li><a href="#inventory" className={`transition-colors ${isLightMode ? 'hover:text-emerald-700 font-semibold' : 'hover:text-emerald-400'}`}>Hybrid & Electric Vehicles</a></li>
+              <li><a href="#inventory" className={`transition-colors ${isLightMode ? 'hover:text-emerald-700 font-semibold' : 'hover:text-emerald-400'}`}>Unregistered Brand New Imports</a></li>
+              <li><a href="#inventory" className={`transition-colors ${isLightMode ? 'hover:text-emerald-700 font-semibold' : 'hover:text-emerald-400'}`}>Budget Certified Cars Under 20M</a></li>
             </ul>
           </div>
 
           {/* Col 3: Services & Trust */}
           <div className="space-y-2">
-            <h4 className="font-extrabold text-white text-sm mb-3">Customer Services</h4>
-            <ul className="space-y-2 text-xs">
-              <li><button onClick={() => setShowTradeInModal(true)} className="hover:text-emerald-400 transition-colors">Sell or Trade-In Valuation</button></li>
-              <li><a href="#calculator" className="hover:text-emerald-400 transition-colors">Leasing & Installment Calculator</a></li>
-              <li><a href="#inspection" className="hover:text-emerald-400 transition-colors">120-Point Mechanical Inspection</a></li>
-              <li><a href="#contact" className="hover:text-emerald-400 transition-colors">Showroom Branches & Test Drives</a></li>
-              <li><Link href="/login" className="hover:text-emerald-400 transition-colors">Customer & Staff Portal</Link></li>
+            <h4 className={`font-extrabold text-sm mb-3 ${isLightMode ? 'text-slate-900' : 'text-white'}`}>Customer Services</h4>
+            <ul className={`space-y-2 text-xs font-medium ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>
+              <li><button onClick={() => setShowTradeInModal(true)} className={`transition-colors text-left ${isLightMode ? 'hover:text-emerald-700 font-semibold' : 'hover:text-emerald-400'}`}>Sell or Trade-In Valuation</button></li>
+              <li><a href="#calculator" className={`transition-colors ${isLightMode ? 'hover:text-emerald-700 font-semibold' : 'hover:text-emerald-400'}`}>Leasing & Installment Calculator</a></li>
+              <li><a href="#inspection" className={`transition-colors ${isLightMode ? 'hover:text-emerald-700 font-semibold' : 'hover:text-emerald-400'}`}>120-Point Mechanical Inspection</a></li>
+              <li><a href="#contact" className={`transition-colors ${isLightMode ? 'hover:text-emerald-700 font-semibold' : 'hover:text-emerald-400'}`}>Showroom Branches & Test Drives</a></li>
+              <li><Link href="/login" className={`transition-colors ${isLightMode ? 'hover:text-emerald-700 font-semibold' : 'hover:text-emerald-400'}`}>Customer & Staff Portal</Link></li>
             </ul>
           </div>
 
           {/* Col 4: New Stock Alerts */}
           <div className="space-y-3">
-            <h4 className="font-extrabold text-white text-sm mb-1">New Shipment Alerts</h4>
-            <p className="text-xs text-slate-400">
+            <h4 className={`font-extrabold text-sm mb-1 ${isLightMode ? 'text-slate-900' : 'text-white'}`}>New Shipment Alerts</h4>
+            <p className={`text-xs ${isLightMode ? 'text-slate-700 font-medium' : 'text-slate-400'}`}>
               Subscribe to get notified whenever new Japanese or European shipments clear Colombo port.
             </p>
             <form onSubmit={(e) => { e.preventDefault(); alert('Subscribed to SalesPlus Stock Alerts!'); }} className="space-y-2">
@@ -1993,11 +1998,15 @@ export default function PublicVehicleWebsite() {
                 type="email"
                 required
                 placeholder="Enter your email address..."
-                className="w-full p-2.5 rounded-xl bg-[#070D1E] border border-slate-700 text-white text-xs focus:outline-none focus:border-emerald-500"
+                className={`w-full p-2.5 rounded-xl border text-xs focus:outline-none focus:border-emerald-500 font-medium ${
+                  isLightMode
+                    ? 'bg-white border-slate-300 text-slate-900 placeholder-slate-500 shadow-xs'
+                    : 'bg-[#070D1E] border-slate-700 text-white placeholder-slate-500'
+                }`}
               />
               <button
                 type="submit"
-                className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition-colors"
+                className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition-colors shadow-md shadow-emerald-900/20"
               >
                 Subscribe for Arrivals
               </button>
@@ -2006,7 +2015,11 @@ export default function PublicVehicleWebsite() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="max-w-7xl mx-auto pt-8 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left text-[11px] text-slate-500">
+        <div className={`max-w-7xl mx-auto pt-8 border-t flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left text-[11px] font-semibold ${
+          isLightMode
+            ? 'border-slate-300 text-slate-600'
+            : 'border-slate-800/80 text-slate-500'
+        }`}>
           <p>© 2026 Vehicle Sales Management System (VSMS SalesPlus). All rights reserved.</p>
           <p>Head Office: No. 45, Baseline Road, Colombo 09 • Dealership Hotline: 011-2345678</p>
         </div>
