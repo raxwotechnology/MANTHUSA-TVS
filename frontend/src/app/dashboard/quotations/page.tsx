@@ -34,6 +34,16 @@ export default function QuotationsPage() {
 
   const [customersList, setCustomersList] = useState<any[]>([]);
   const [vehiclesList, setVehiclesList] = useState<any[]>([]);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('user');
+      if (saved) setCurrentUser(JSON.parse(saved));
+    } catch {}
+  }, []);
+
+  const isCustomer = (currentUser?.role || '').toLowerCase().includes('customer') || (currentUser?.role || '').toLowerCase().includes('client');
 
   const loadQuotations = async () => {
     const [quoteRes, custRes, vehRes] = await Promise.all([
@@ -130,14 +140,16 @@ export default function QuotationsPage() {
     <DashboardLayout>
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900">Quotations & Discount Approval</h1>
-          <p className="text-xs text-slate-500">Generate quotation breakdowns, handle manager discount approval, and export PDF invoices</p>
+          <h1 className="text-2xl font-extrabold text-slate-900">{isCustomer ? 'My Quotations' : 'Quotations & Discount Approval'}</h1>
+          <p className="text-xs text-slate-500">{isCustomer ? 'View official quotations and download PDF estimates provided for you' : 'Generate quotation breakdowns, handle manager discount approval, and export PDF invoices'}</p>
         </div>
 
-        <button className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2.5 rounded-lg shadow-xs" onClick={() => setShowAddModal(true)}>
-          <Plus className="w-4 h-4" />
-          <span>Create New Quotation</span>
-        </button>
+        {!isCustomer && (
+          <button className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2.5 rounded-lg shadow-xs" onClick={() => setShowAddModal(true)}>
+            <Plus className="w-4 h-4" />
+            <span>Create New Quotation</span>
+          </button>
+        )}
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs">
@@ -176,22 +188,26 @@ export default function QuotationsPage() {
                       <Printer className="w-3.5 h-3.5" />
                       <span>Print / PDF</span>
                     </button>
-                    <button onClick={() => { 
-                      setEditingQuote(q); 
-                      setNewFormData({ 
-                        quotationNumber: q.quotationNumber, 
-                        customerId: q.customerId,
-                        vehicleId: q.vehicleId,
-                        customerName: q.customerName, 
-                        vehicleName: q.vehicleName, 
-                        vehiclePrice: String(q.vehiclePrice), 
-                        discount: String(q.discount), 
-                        additionalCharges: String(q.additionalCharges), 
-                        advancePayment: String(q.advancePayment) 
-                      }); 
-                      setShowAddModal(true); 
-                    }} className="rounded-lg border border-emerald-200 px-3 py-1.5 text-[11px] font-semibold text-emerald-700">Edit</button>
-                    <button onClick={() => setDeletingQuote(q)} className="rounded-lg border border-rose-200 px-3 py-1.5 text-[11px] font-semibold text-rose-700">Delete</button>
+                    {!isCustomer && (
+                      <>
+                        <button onClick={() => { 
+                          setEditingQuote(q); 
+                          setNewFormData({ 
+                            quotationNumber: q.quotationNumber, 
+                            customerId: q.customerId,
+                            vehicleId: q.vehicleId,
+                            customerName: q.customerName, 
+                            vehicleName: q.vehicleName, 
+                            vehiclePrice: String(q.vehiclePrice), 
+                            discount: String(q.discount), 
+                            additionalCharges: String(q.additionalCharges), 
+                            advancePayment: String(q.advancePayment) 
+                          }); 
+                          setShowAddModal(true); 
+                        }} className="rounded-lg border border-emerald-200 px-3 py-1.5 text-[11px] font-semibold text-emerald-700">Edit</button>
+                        <button onClick={() => setDeletingQuote(q)} className="rounded-lg border border-rose-200 px-3 py-1.5 text-[11px] font-semibold text-rose-700">Delete</button>
+                      </>
+                    )}
                     </div>
                   </td>
                 </tr>

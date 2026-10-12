@@ -28,6 +28,17 @@ export default function SalesPage() {
   const [selectedInvoice, setSelectedInvoice] = useState<Sale | null>(null);
   const [deletingInvoice, setDeletingInvoice] = useState<Sale | null>(null);
 
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('user');
+      if (saved) setCurrentUser(JSON.parse(saved));
+    } catch {}
+  }, []);
+
+  const isCustomer = (currentUser?.role || '').toLowerCase().includes('customer') || (currentUser?.role || '').toLowerCase().includes('client');
+
   const deleteInvoice = async () => {
     if (!deletingInvoice) return;
     const response = await apiFetch(`/sales/${deletingInvoice._id}`, { method: 'DELETE' });
@@ -58,14 +69,16 @@ export default function SalesPage() {
     <DashboardLayout>
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900">Sales & Tax Invoices</h1>
-          <p className="text-xs text-slate-500">Record final deal confirmations, track paid balances, and print official invoices</p>
+          <h1 className="text-2xl font-extrabold text-slate-900">{isCustomer ? 'My Sales Invoices' : 'Sales & Tax Invoices'}</h1>
+          <p className="text-xs text-slate-500">{isCustomer ? 'View deal confirmations, paid amounts, remaining balances, and official receipts' : 'Record final deal confirmations, track paid balances, and print official invoices'}</p>
         </div>
 
-        <button className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2.5 rounded-lg shadow-xs cursor-pointer" onClick={() => router.push('/dashboard/sales/new')}>
-          <Plus className="w-4 h-4" />
-          <span>Create Sale Invoice</span>
-        </button>
+        {!isCustomer && (
+          <button className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2.5 rounded-lg shadow-xs cursor-pointer" onClick={() => router.push('/dashboard/sales/new')}>
+            <Plus className="w-4 h-4" />
+            <span>Create Sale Invoice</span>
+          </button>
+        )}
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs">
@@ -104,8 +117,12 @@ export default function SalesPage() {
                       <Printer className="w-3.5 h-3.5" />
                       <span>View Invoice</span>
                     </button>
-                    <button onClick={() => router.push(`/dashboard/sales/new?id=${s._id}`)} className="rounded-lg border border-emerald-200 px-3 py-1.5 text-[11px] font-semibold text-emerald-700 cursor-pointer">Edit</button>
-                    <button onClick={() => setDeletingInvoice(s)} className="rounded-lg border border-rose-200 px-3 py-1.5 text-[11px] font-semibold text-rose-700 cursor-pointer">Delete</button>
+                    {!isCustomer && (
+                      <>
+                        <button onClick={() => router.push(`/dashboard/sales/new?id=${s._id}`)} className="rounded-lg border border-emerald-200 px-3 py-1.5 text-[11px] font-semibold text-emerald-700 cursor-pointer">Edit</button>
+                        <button onClick={() => setDeletingInvoice(s)} className="rounded-lg border border-rose-200 px-3 py-1.5 text-[11px] font-semibold text-rose-700 cursor-pointer">Delete</button>
+                      </>
+                    )}
                     </div>
                   </td>
                 </tr>

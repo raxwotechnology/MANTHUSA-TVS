@@ -258,13 +258,13 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
         )}
 
         {/* CRM & SALES LEADS */}
-        {(isSales || isCustomer) && (
+        {isStaff && isSales && (
           <div>
             <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-3 mb-1">
               CRM & Sales Pipeline
             </div>
             <div className="space-y-0.5">
-              {isSales && <Link
+              <Link
                 href="/dashboard/customers"
                 className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
                   pathname === '/dashboard/customers'
@@ -274,7 +274,7 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
               >
                 <Users className="w-4 h-4" />
                 <span>Customer Profiles</span>
-              </Link>}
+              </Link>
 
               <Link
                 href="/dashboard/leads"
@@ -303,11 +303,33 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
           </div>
         )}
 
+        {/* CUSTOMER APPOINTMENTS & INQUIRIES */}
+        {isCustomer && (
+          <div>
+            <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-3 mb-1">
+              My Appointments
+            </div>
+            <div className="space-y-0.5">
+              <Link
+                href="/dashboard/test-drives"
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
+                  pathname === '/dashboard/test-drives'
+                    ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold'
+                    : 'hover:bg-slate-800/60 text-slate-300'
+                }`}
+              >
+                <Calendar className="w-4 h-4" />
+                <span>Test Drive Bookings</span>
+              </Link>
+            </div>
+          </div>
+        )}
+
         {/* SALES & CONTRACTS */}
         {(isSales || isFinance || isCustomer) && (
           <div>
             <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-3 mb-1">
-              Sales & Deals
+              {isCustomer ? 'My Orders & Invoices' : 'Sales & Deals'}
             </div>
             <div className="space-y-0.5">
               {(isSales || isCustomer) && <Link
@@ -319,7 +341,7 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
                 }`}
               >
                 <FileText className="w-4 h-4" />
-                <span>Quotations & Discounts</span>
+                <span>{isCustomer ? 'My Quotations' : 'Quotations & Discounts'}</span>
               </Link>}
               {isSales && <Link href="/dashboard/discount-approvals" className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${pathname === '/dashboard/discount-approvals' ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold' : 'hover:bg-slate-800/60 text-slate-300'}`}>
                 <CheckCircle2 className="w-4 h-4" /><span>Discount Approvals</span>
@@ -346,7 +368,7 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
                 }`}
               >
                 <DollarSign className="w-4 h-4" />
-                <span>Sales Invoices</span>
+                <span>{isCustomer ? 'My Sales Invoices' : 'Sales Invoices'}</span>
               </Link>}
 
               {isSales && <Link
