@@ -211,6 +211,7 @@ export class AuthService {
         id: user._id,
         name: user.name,
         email: user.email,
+        avatar: user.avatar || '',
         role: user.role?.name,
         mfaEnabled: !!user.mfaEnabled,
         customerId: user.customerId
@@ -230,6 +231,7 @@ export class AuthService {
         id: user._id,
         name: user.name,
         email: user.email,
+        avatar: user.avatar || '',
         role: user.role?.name,
         mfaEnabled: true,
         customerId: user.customerId

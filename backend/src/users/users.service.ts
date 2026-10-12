@@ -40,6 +40,23 @@ export class UsersService {
     return updatedUser;
   }
 
+  async updateAvatar(id: string, avatar: string) {
+    if (!/^data:image\/(?:jpeg|jpg|png|webp|gif);base64,[A-Za-z0-9+/]+={0,2}$/.test(avatar || '')) {
+      throw new BadRequestException('Please upload a valid image.');
+    }
+    if (avatar.length > 7 * 1024 * 1024) {
+      throw new BadRequestException('Profile image must be smaller than 5 MB.');
+    }
+    const updatedUser = await this.userModel
+      .findByIdAndUpdate(id, { avatar }, { new: true })
+      .select('-passwordHash')
+      .populate('role')
+      .populate('branch')
+      .exec();
+    if (!updatedUser) throw new NotFoundException('User not found');
+    return updatedUser;
+  }
+
   async remove(id: string) {
     const deletedUser = await this.userModel.findByIdAndDelete(id).exec();
     if (!deletedUser) throw new NotFoundException('User not found');

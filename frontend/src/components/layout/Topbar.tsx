@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Bell, Search, LogOut, Menu, User, Globe, ChevronDown, Settings } from 'lucide-react';
+import { Bell, Search, LogOut, Menu, User, Globe, Settings, Camera } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 
 interface TopbarProps {
@@ -15,7 +15,14 @@ export function Topbar({ user, onToggleSidebar }: TopbarProps) {
   const [selectedBranch, setSelectedBranch] = useState('Colombo Head Office');
   const [showNotifications, setShowNotifications] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [currentUser, setCurrentUser] = useState(user);
+  const [avatarError, setAvatarError] = useState('');
   const [notifications, setNotifications] = useState<any[]>([]);
+
+  useEffect(() => {
+    setCurrentUser(user);
+  }, [user]);
 
   useEffect(() => {
     if (!showNotifications) return;
@@ -45,6 +52,40 @@ export function Topbar({ user, onToggleSidebar }: TopbarProps) {
     }
   };
 
+  const handleAvatarUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setAvatarError('Please select an image file.');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setAvatarError('Profile image must be smaller than 5 MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const avatar = typeof reader.result === 'string' ? reader.result : '';
+      if (!avatar || !currentUser?.id) return;
+      setAvatarError('');
+      const response = await apiFetch('/users/profile/avatar', {
+        method: 'PATCH',
+        body: JSON.stringify({ avatar }),
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        setAvatarError(body.message || 'Could not update profile picture.');
+        return;
+      }
+      const updatedUser = { ...currentUser, avatar };
+      setCurrentUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      window.dispatchEvent(new CustomEvent('user-profile-updated', { detail: updatedUser }));
+    };
+    reader.readAsDataURL(file);
+    event.target.value = '';
+  };
+
   return (
     <header className="h-16 bg-white border-b border-gray-200 px-3 md:px-6 flex items-center justify-between sticky top-0 z-20 shadow-xs">
       <div className="flex items-center gap-2 sm:gap-4">
@@ -61,7 +102,7 @@ export function Topbar({ user, onToggleSidebar }: TopbarProps) {
         {/* Welcome Chip matching screenshot */}
         <div className="hidden sm:flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full border border-blue-100 text-xs font-medium">
           <span>Welcome,</span>
-          <span className="font-bold text-blue-900 truncate max-w-[120px] md:max-w-none">{user?.name || 'Administrator'}</span>
+          <span className="font-bold text-blue-900 truncate max-w-[120px] md:max-w-none">{currentUser?.name || 'Administrator'}</span>
         </div>
 
         {/* Branch Selector */}
@@ -171,13 +212,22 @@ export function Topbar({ user, onToggleSidebar }: TopbarProps) {
         )}
 
         {/* User Pill matching screenshot */}
-        <div className="flex items-center gap-2 pl-2 border-l border-gray-200">
-          <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center font-bold text-xs">
-            <User className="w-4 h-4 text-blue-600" />
-          </div>
+        <div className="relative flex items-center gap-2 pl-2 border-l border-gray-200">
+          <button
+            type="button"
+            onClick={() => setShowProfileMenu((open) => !open)}
+            className="w-8 h-8 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center font-bold text-xs overflow-hidden border border-blue-200"
+            title="Update profile picture"
+          >
+            {currentUser?.avatar ? (
+              <img src={currentUser.avatar} alt={`${currentUser.name || 'User'} profile`} className="w-full h-full object-cover" />
+            ) : (
+              <User className="w-4 h-4 text-blue-600" />
+            )}
+          </button>
           <div className="hidden sm:block text-left">
-            <p className="text-xs font-bold text-gray-800 truncate max-w-[100px] md:max-w-none">{user?.name || 'User'}</p>
-            <p className="text-[10px] text-gray-500 font-medium">{user?.role || ''}</p>
+            <p className="text-xs font-bold text-gray-800 truncate max-w-[100px] md:max-w-none">{currentUser?.name || 'User'}</p>
+            <p className="text-[10px] text-gray-500 font-medium">{currentUser?.role || ''}</p>
           </div>
           <button
             onClick={handleLogout}
@@ -187,6 +237,18 @@ export function Topbar({ user, onToggleSidebar }: TopbarProps) {
             <LogOut className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Logout</span>
           </button>
+          {showProfileMenu && (
+            <div className="absolute right-0 top-11 z-50 w-64 rounded-xl border border-slate-200 bg-white p-3 shadow-xl">
+              <p className="text-xs font-bold text-slate-800">Profile picture</p>
+              <p className="mt-1 text-[11px] text-slate-500">Upload an image to show it in your profile.</p>
+              <label className="mt-3 flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 hover:bg-blue-100">
+                <Camera className="h-3.5 w-3.5" />
+                Choose image
+                <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
+              </label>
+              {avatarError && <p className="mt-2 text-[11px] font-medium text-rose-600">{avatarError}</p>}
+            </div>
+          )}
         </div>
       </div>
     </header>

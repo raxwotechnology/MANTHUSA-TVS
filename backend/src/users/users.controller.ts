@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Put, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Put, Param, Delete, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Roles } from '../auth/roles.decorator';
 
@@ -10,6 +10,12 @@ export class UsersController {
   @Post()
   create(@Body() createUserDto: any) {
     return this.usersService.create(createUserDto);
+  }
+
+  @Patch('profile/avatar')
+  @Roles('Admin / Owner', 'Sales & Operations', 'Accountant / Finance Staff', 'Inventory Manager', 'Customer')
+  updateOwnAvatar(@Req() req: any, @Body('avatar') avatar: string) {
+    return this.usersService.updateAvatar(req.user.sub, avatar);
   }
 
   @Get()

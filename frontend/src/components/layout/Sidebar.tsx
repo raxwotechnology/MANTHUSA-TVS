@@ -48,6 +48,15 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [openSubmenu, setOpenSubmenu] = useState<string | null>('inventory');
+  const [currentUser, setCurrentUser] = useState(user);
+
+  React.useEffect(() => {
+    const handleProfileUpdate = (event: Event) => {
+      setCurrentUser((event as CustomEvent).detail);
+    };
+    window.addEventListener('user-profile-updated', handleProfileUpdate);
+    return () => window.removeEventListener('user-profile-updated', handleProfileUpdate);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -70,7 +79,7 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
   const isCustomer = cleanRole.includes('customer') || cleanRole.includes('client');
   const isStaff = !isCustomer;
 
-  const userInitials = user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2) : 'VS';
+  const userInitials = currentUser?.name ? currentUser.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2) : 'VS';
 
   return (
     <>
@@ -600,12 +609,14 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
       <div className="p-3 border-t border-slate-800/80 bg-[#091024]">
         <div className="flex items-center justify-between gap-2 p-2 rounded-lg bg-slate-900/60 border border-slate-800">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-emerald-500 text-slate-950 font-bold text-xs flex items-center justify-center">
-              {userInitials}
+            <div className="w-8 h-8 rounded-full bg-emerald-500 text-slate-950 font-bold text-xs flex items-center justify-center overflow-hidden">
+              {currentUser?.avatar ? (
+                <img src={currentUser.avatar} alt={`${currentUser.name || 'User'} profile`} className="w-full h-full object-cover" />
+              ) : userInitials}
             </div>
             <div className="overflow-hidden">
-              <p className="text-xs font-semibold text-white truncate">{user?.name || 'User'}</p>
-              <p className="text-[10px] text-emerald-400 truncate">{user?.role || 'Staff'}</p>
+              <p className="text-xs font-semibold text-white truncate">{currentUser?.name || 'User'}</p>
+              <p className="text-[10px] text-emerald-400 truncate">{currentUser?.role || 'Staff'}</p>
             </div>
           </div>
           <button
