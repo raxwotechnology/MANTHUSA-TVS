@@ -160,6 +160,15 @@ export class SettingsService {
         currency: all.commerce?.currency || 'LKR',
         currencySymbol: all.commerce?.currencySymbol || 'Rs.',
       },
+      vehicles: {
+        inspectionChecklistItems: all.vehicles?.inspectionChecklistItems || [],
+      },
+      leasing: {
+        preferredPartners: all.leasing?.preferredPartners || [],
+        defaultInterestRate: all.leasing?.defaultInterestRate,
+        minimumDownPaymentPercent: all.leasing?.minimumDownPaymentPercent,
+        defaultLeasingTenorMonths: all.leasing?.defaultLeasingTenorMonths,
+      },
     };
   }
 

@@ -3,8 +3,10 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Car, Lock, Mail, ArrowRight } from 'lucide-react';
 import { getApiUrl } from '@/lib/api';
+import { useSettings } from '@/lib/useSettings';
 
 export default function LoginPage() {
+  const { settings: brand } = useSettings();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -100,11 +102,29 @@ export default function LoginPage() {
   const goToLogin = () => { setMode('login'); setError(''); setMessage(''); setMfaCode(''); };
 
   return <div className="min-h-screen bg-[#0B132B] flex flex-col justify-center py-12 sm:px-6 lg:px-8 text-slate-100">
-    <div className="sm:mx-auto sm:w-full sm:max-w-md text-center"><div className="w-14 h-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center mx-auto mb-4 shadow-xl"><Car className="w-8 h-8" /></div><h2 className="text-2xl font-extrabold text-white">Sales<span className="text-emerald-400">Plus</span> VSMS</h2><p className="mt-1 text-xs text-slate-400">Vehicle Sales Management System Customer & Staff Portal</p></div>
+    <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
+      {brand.logoUrl ? (
+        <div className="w-16 h-16 rounded-2xl bg-white/10 p-1 flex items-center justify-center mx-auto mb-4 border border-slate-700/60 shadow-xl overflow-hidden">
+          <img src={brand.logoUrl} alt={brand.dealershipName || 'Logo'} className="w-full h-full object-contain" />
+        </div>
+      ) : (
+        <div className="w-14 h-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center mx-auto mb-4 shadow-xl">
+          <Car className="w-8 h-8" />
+        </div>
+      )}
+      <h2 className="text-2xl font-extrabold text-white">
+        {brand.dealershipName || 'SalesPlus'} VSMS
+      </h2>
+      <p className="mt-1 text-xs text-slate-400">
+        {brand.tagline || 'Vehicle Sales Management System Customer & Staff Portal'}
+      </p>
+    </div>
     <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md"><div className="bg-[#131F3F] py-8 px-4 shadow-2xl border border-slate-800 sm:rounded-2xl sm:px-10">
       <div className="mb-6 flex items-center justify-between border-b border-slate-700 pb-4 text-xs">
         <Link href="/" className="text-slate-400 transition-colors hover:text-white">← Back to website</Link>
-        <Link href="/" className="font-semibold text-emerald-400 transition-colors hover:text-emerald-300">SalesPlus Home</Link>
+        <Link href="/" className="font-semibold text-emerald-400 transition-colors hover:text-emerald-300">
+          {brand.dealershipName || 'SalesPlus'} Home
+        </Link>
       </div>
       {error && <div role="alert" className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-400">{error}</div>}
       {message && <div role="status" className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-300">{message}</div>}

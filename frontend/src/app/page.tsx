@@ -30,11 +30,14 @@ import {
   FileText,
   Menu,
   Sun,
-  Moon
+  Moon,
+  LogOut
 } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
+import { useSettings } from '@/lib/useSettings';
 
 export default function PublicVehicleWebsite() {
+  const { settings: brand } = useSettings();
   const [loggedInUser, setLoggedInUser] = useState<any>(null);
   const [dbVehicles, setDbVehicles] = useState<any[]>([]);
   const [vehicleLoadError, setVehicleLoadError] = useState('');
@@ -268,9 +271,14 @@ export default function PublicVehicleWebsite() {
     return calculateEMI(calcPrice, calcDownPercent, calcTenureYears, calcInterestRate);
   }, [calcPrice, calcDownPercent, calcTenureYears, calcInterestRate]);
 
-  const formatLKR = (val: number) => {
-    return 'LKR ' + (val || 0).toLocaleString('en-LK');
+  const formatPrice = (val: number) => {
+    const symbol = brand.currencySymbol || 'Rs.';
+    return `${symbol} ${(val || 0).toLocaleString('en-LK')}`;
   };
+  const formatLKR = formatPrice;
+
+  const rawWa = brand.whatsapp || brand.hotline || brand.phone || '+94771234567';
+  const cleanWaNumber = rawWa.replace(/[^0-9]/g, '') || '94771234567';
 
   const getEstMonthlyLease = (carPrice: number) => {
     const { emi } = calculateEMI(carPrice, 25, 5, 13.5);
@@ -366,36 +374,70 @@ export default function PublicVehicleWebsite() {
   return (
     <div className={`public-site min-h-screen bg-[#070D1E] text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-white ${isLightMode ? 'light-mode' : ''}`}>
       {/* Main Header / Navigation */}
-      <header className="h-[76px] bg-[#0A122A]/95 backdrop-blur-xl border-b border-slate-800/80 sticky top-0 z-40 px-4 md:px-8">
-        <div className="max-w-7xl mx-auto h-full flex items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-3.5 group">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-400 text-white flex items-center justify-center font-bold shadow-lg shadow-emerald-500/25 group-hover:scale-105 transition-transform duration-300">
-              <Car className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className={`font-black text-xl tracking-tight ${isLightMode ? 'text-slate-900' : 'text-white'}`}>Sales<span className="text-emerald-500">Plus</span></span>
-                <span className={`text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded ${isLightMode ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'}`}>Certified</span>
+      <header className="h-[74px] bg-[#0A122A]/95 backdrop-blur-xl border-b border-slate-800/80 sticky top-0 z-40 px-4 md:px-8">
+        <div className="max-w-7xl mx-auto h-full flex items-center justify-between gap-4">
+          {/* Brand Logo & Name */}
+          <Link href="/" className="flex items-center gap-3 group flex-shrink-0">
+            {brand.logoUrl ? (
+              <div className="w-10 h-10 rounded-xl bg-white/10 p-1 flex items-center justify-center border border-slate-700/60 overflow-hidden shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform duration-300 flex-shrink-0">
+                <img src={brand.logoUrl} alt={brand.dealershipName || 'Logo'} className="w-full h-full object-contain" />
               </div>
-              <p className={`text-[10px] font-semibold tracking-wider uppercase ${isLightMode ? 'text-slate-500' : 'text-slate-400'}`}>Automotive Dealership Sri Lanka</p>
+            ) : (
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 text-white flex items-center justify-center font-bold shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform duration-300 flex-shrink-0">
+                <Car className="w-5 h-5 text-white" />
+              </div>
+            )}
+            <div className="flex flex-col justify-center">
+              <div className="flex items-center gap-2">
+                <span className={`font-black text-lg sm:text-xl tracking-tight whitespace-nowrap ${isLightMode ? 'text-slate-900' : 'text-white'}`}>
+                  {brand.dealershipName || 'SalesPlus Auto Mart'}
+                </span>
+                <span className={`text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-md whitespace-nowrap ${isLightMode ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'}`}>
+                  Certified
+                </span>
+              </div>
+              <p className={`hidden 2xl:block text-[10px] font-medium tracking-wide truncate max-w-[240px] ${isLightMode ? 'text-slate-500' : 'text-slate-400'}`}>
+                {brand.tagline || 'Official Automotive Dealership'}
+              </p>
             </div>
           </Link>
 
-          {/* Navigation links */}
-          <nav className={`hidden lg:flex items-center gap-6 text-xs font-semibold ${isLightMode ? 'text-slate-700' : 'text-slate-300'}`}>
-            <a href="#inventory" className={`transition-colors ${isLightMode ? 'hover:text-emerald-600' : 'hover:text-emerald-400'}`}>Vehicle Inventory</a>
-            <a href="#calculator" className={`transition-colors ${isLightMode ? 'hover:text-emerald-600' : 'hover:text-emerald-400'}`}>Leasing Calculator</a>
-            <button onClick={() => setShowTradeInModal(true)} className={`transition-colors ${isLightMode ? 'hover:text-emerald-600' : 'hover:text-emerald-400'}`}>Sell / Trade-in</button>
-            <a href="#inspection" className={`transition-colors ${isLightMode ? 'hover:text-emerald-600' : 'hover:text-emerald-400'}`}>120-Point Guarantee</a>
+          {/* Navigation links - with whitespace-nowrap and clean spacing */}
+          <nav className={`hidden xl:flex items-center gap-1.5 text-xs font-semibold ${isLightMode ? 'text-slate-700' : 'text-slate-300'}`}>
+            <a
+              href="#inventory"
+              className={`px-3 py-2 rounded-xl whitespace-nowrap transition-colors ${isLightMode ? 'hover:bg-slate-100 hover:text-emerald-700' : 'hover:bg-slate-800/80 hover:text-emerald-400'}`}
+            >
+              Vehicle Inventory
+            </a>
+            <a
+              href="#calculator"
+              className={`px-3 py-2 rounded-xl whitespace-nowrap transition-colors ${isLightMode ? 'hover:bg-slate-100 hover:text-emerald-700' : 'hover:bg-slate-800/80 hover:text-emerald-400'}`}
+            >
+              Leasing Calculator
+            </a>
+            <button
+              type="button"
+              onClick={() => setShowTradeInModal(true)}
+              className={`px-3 py-2 rounded-xl whitespace-nowrap transition-colors cursor-pointer ${isLightMode ? 'hover:bg-slate-100 hover:text-emerald-700' : 'hover:bg-slate-800/80 hover:text-emerald-400'}`}
+            >
+              Sell / Trade-in
+            </button>
+            <a
+              href="#inspection"
+              className={`px-3 py-2 rounded-xl whitespace-nowrap transition-colors ${isLightMode ? 'hover:bg-slate-100 hover:text-emerald-700' : 'hover:bg-slate-800/80 hover:text-emerald-400'}`}
+            >
+              120-Point Guarantee
+            </a>
           </nav>
 
           {/* Header Action Buttons */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2 sm:gap-2.5 flex-shrink-0">
+            {/* Theme Toggle */}
             <button
               type="button"
               onClick={toggleTheme}
-              className={`p-2.5 rounded-xl border transition-all ${
+              className={`p-2.5 rounded-xl border transition-all cursor-pointer flex-shrink-0 ${
                 isLightMode
                   ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-800 shadow-xs'
                   : 'bg-slate-800/90 hover:bg-slate-700/90 border-slate-700/80 text-amber-300 shadow-md'
@@ -405,23 +447,12 @@ export default function PublicVehicleWebsite() {
             >
               {isLightMode ? <Moon className="w-4 h-4 text-slate-800" /> : <Sun className="w-4 h-4 text-amber-300" />}
             </button>
+
+            {/* Wishlist Button */}
             <button
               type="button"
-              onClick={() => setShowMobileNav((open) => !open)}
-              className={`inline-flex lg:hidden p-2.5 rounded-xl border transition-all ${
-                isLightMode
-                  ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-800 shadow-xs'
-                  : 'bg-slate-800/90 border-slate-700/80 text-slate-200'
-              }`}
-              aria-label="Toggle website navigation"
-              aria-expanded={showMobileNav}
-            >
-              <Menu className="w-4 h-4" />
-            </button>
-            {/* Wishlist button */}
-            <button
               onClick={() => setShowWishlistDrawer(true)}
-              className={`relative p-2.5 rounded-xl border transition-all hover:scale-105 ${
+              className={`relative p-2.5 rounded-xl border transition-all cursor-pointer flex-shrink-0 hover:scale-105 ${
                 isLightMode
                   ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-800 shadow-xs'
                   : 'bg-slate-800/90 hover:bg-slate-700/90 border-slate-700/80 text-slate-200 shadow-md'
@@ -431,17 +462,18 @@ export default function PublicVehicleWebsite() {
             >
               <Heart className={`w-4 h-4 ${wishlist.length > 0 ? 'text-rose-500 fill-rose-500' : isLightMode ? 'text-slate-700' : 'text-slate-300'}`} />
               {wishlist.length > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center">
                   {wishlist.length}
                 </span>
               )}
             </button>
 
-            {/* Compare Counter Pill */}
+            {/* Compare Pill */}
             {compareIds.length > 0 && (
               <button
+                type="button"
                 onClick={() => setShowCompareModal(true)}
-                className={`hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                className={`hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex-shrink-0 ${
                   isLightMode
                     ? 'bg-cyan-50 border border-cyan-300 text-cyan-800 hover:bg-cyan-100 shadow-xs'
                     : 'bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-900/60'
@@ -452,59 +484,77 @@ export default function PublicVehicleWebsite() {
               </button>
             )}
 
-            {/* Sell / Trade-in Button */}
+            {/* Sell / Valuation Pill on wide screens */}
             <button
+              type="button"
               onClick={() => setShowTradeInModal(true)}
-              className={`hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+              className={`hidden 2xl:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex-shrink-0 ${
                 isLightMode
                   ? 'bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800 shadow-xs'
                   : 'bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400'
               }`}
             >
-              <TrendingUp className="w-4 h-4" />
-              <span>Instant Valuation</span>
+              <TrendingUp className="w-3.5 h-3.5" />
+              <span>Valuation</span>
             </button>
 
-            {/* Customer and staff authentication */}
+            {/* Authentication Buttons */}
             {loggedInUser ? (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
                 <Link
                   href="/dashboard"
-                  className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-emerald-900/40 transition-all hover:from-emerald-500 hover:to-emerald-500"
+                  className="whitespace-nowrap flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 px-3.5 py-2 text-xs font-bold text-white shadow-md shadow-emerald-950/40 transition-all flex-shrink-0"
                 >
-                  <span>{loggedInUser.name ? `Dashboard · ${loggedInUser.name.split(' ')[0]}` : 'Open Dashboard'}</span>
-                  <ArrowRight className="h-4 w-4 text-white" />
+                  <span>Dashboard</span>
+                  <ArrowRight className="h-3.5 w-3.5 text-white" />
                 </Link>
                 <button
                   type="button"
                   onClick={logout}
-                  className={`hidden rounded-xl border px-3 py-2 text-xs font-semibold transition-colors sm:inline-flex ${
+                  title="Sign out"
+                  className={`whitespace-nowrap flex items-center gap-1.5 rounded-xl border px-2.5 sm:px-3 py-2 text-xs font-semibold transition-colors cursor-pointer flex-shrink-0 ${
                     isLightMode
                       ? 'border-slate-300 text-slate-700 hover:border-red-500 hover:text-red-600 hover:bg-red-50'
-                      : 'border-slate-700 text-slate-300 hover:border-red-400/50 hover:text-red-300'
+                      : 'border-slate-700/80 text-slate-300 hover:border-red-500/40 hover:text-red-300 hover:bg-red-500/10'
                   }`}
                 >
-                  Sign out
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Sign out</span>
                 </button>
               </div>
             ) : (
               <Link
                 href="/login"
-                className="flex items-center gap-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-2.5 sm:px-4 py-2 rounded-xl text-xs font-bold shadow-md shadow-emerald-900/40 transition-all hover:shadow-emerald-500/25"
+                className="whitespace-nowrap flex items-center gap-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold shadow-md shadow-emerald-950/40 transition-all flex-shrink-0"
               >
-                <span className="hidden sm:inline">Sign in / Register</span>
-                <ArrowRight className="w-4 h-4 text-white" />
+                <span>Sign in</span>
+                <ArrowRight className="w-3.5 h-3.5 text-white" />
               </Link>
             )}
+
+            {/* Mobile Nav Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setShowMobileNav((open) => !open)}
+              className={`inline-flex xl:hidden p-2.5 rounded-xl border transition-all cursor-pointer flex-shrink-0 ${
+                isLightMode
+                  ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-800 shadow-xs'
+                  : 'bg-slate-800/90 border-slate-700/80 text-slate-200 hover:bg-slate-700'
+              }`}
+              aria-label="Toggle website navigation"
+              aria-expanded={showMobileNav}
+            >
+              <Menu className="w-4 h-4" />
+            </button>
           </div>
         </div>
+
+        {/* Mobile Nav Drawer */}
         {showMobileNav && (
-          <div className={`lg:hidden absolute left-0 right-0 top-full border-b shadow-2xl px-4 py-4 ${
-            isLightMode ? 'bg-white border-slate-200' : 'bg-[#0A122A] border-slate-800'
+          <div className={`xl:hidden absolute left-0 right-0 top-full border-b shadow-2xl px-4 py-4 animate-in fade-in slide-in-from-top-2 duration-200 ${
+            isLightMode ? 'bg-white border-slate-200 text-slate-800' : 'bg-[#0A122A] border-slate-800 text-slate-200'
           }`}>
-            <nav className={`mx-auto flex max-w-7xl flex-col gap-1 text-sm font-semibold ${
-              isLightMode ? 'text-slate-800' : 'text-slate-200'
-            }`}>
+            <nav className="mx-auto flex max-w-7xl flex-col gap-1 text-sm font-semibold">
               {[
                 ['Vehicle Inventory', '#inventory'],
                 ['Leasing Calculator', '#calculator'],
@@ -527,12 +577,28 @@ export default function PublicVehicleWebsite() {
                   setShowMobileNav(false);
                   setShowTradeInModal(true);
                 }}
-                className={`rounded-xl px-3 py-3 text-left transition-colors ${
+                className={`rounded-xl px-3 py-3 text-left transition-colors flex items-center justify-between ${
                   isLightMode ? 'hover:bg-slate-100 hover:text-emerald-600' : 'hover:bg-slate-800 hover:text-emerald-400'
                 }`}
               >
-                Sell / Trade-in
+                <span>Sell / Trade-in Valuation</span>
+                <TrendingUp className="w-4 h-4 text-emerald-400" />
               </button>
+              {compareIds.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowMobileNav(false);
+                    setShowCompareModal(true);
+                  }}
+                  className={`rounded-xl px-3 py-3 text-left transition-colors flex items-center justify-between ${
+                    isLightMode ? 'hover:bg-slate-100 hover:text-cyan-600' : 'hover:bg-slate-800 hover:text-cyan-400'
+                  }`}
+                >
+                  <span>Compare Vehicles ({compareIds.length})</span>
+                  <SlidersHorizontal className="w-4 h-4 text-cyan-400" />
+                </button>
+              )}
             </nav>
           </div>
         )}
@@ -877,7 +943,7 @@ export default function PublicVehicleWebsite() {
                       {/* Primary Contact Buttons */}
                       <div className="grid grid-cols-2 gap-2 text-xs mb-2.5">
                         <a
-                          href={`https://wa.me/94771234567?text=${encodeURIComponent(`Hello SalesPlus Team, I am interested in the ${v.make} ${v.model} (${v.year}) priced at ${formatLKR(v.price)}. Please share more details.`)}`}
+                          href={`https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(`Hello ${brand.dealershipName || 'SalesPlus'} Team, I am interested in the ${v.make} ${v.model} (${v.year}) priced at ${formatLKR(v.price)}. Please share more details.`)}`}
                           target="_blank"
                           rel="noreferrer"
                           className="py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl flex items-center justify-center gap-1.5 transition-colors shadow-md shadow-emerald-950"
@@ -1398,15 +1464,15 @@ export default function PublicVehicleWebsite() {
               <div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center">
                 <MapPin className="w-5 h-5" />
               </div>
-              <h3 className="font-extrabold text-white text-base">Colombo 07 Flagship</h3>
-              <p className="text-xs text-slate-400">No. 45, Ward Place, Colombo 07</p>
+              <h3 className="font-extrabold text-white text-base">{brand.city ? `${brand.city} Flagship` : 'Colombo Flagship'}</h3>
+              <p className="text-xs text-slate-400">{brand.address || 'No. 142/B, Baseline Road, Colombo 09'}</p>
               <div className="text-xs text-slate-300 space-y-1 pt-2 border-t border-slate-800">
-                <p><span className="text-slate-500">Phone:</span> 011-2345678</p>
-                <p><span className="text-slate-500">Hours:</span> Mon - Sat: 8:30 AM - 6:30 PM</p>
-                <p><span className="text-slate-500">Sunday:</span> 9:30 AM - 4:00 PM</p>
+                <p><span className="text-slate-500">Phone:</span> {brand.hotline || brand.phone || '+94 11 268 4900'}</p>
+                <p><span className="text-slate-500">Hours:</span> {brand.openingHours || 'Mon - Sat: 8:30 AM - 6:30 PM'}</p>
+                <p><span className="text-slate-500">Sunday:</span> 9:00 AM - 2:00 PM</p>
               </div>
               <a
-                href="https://maps.google.com"
+                href={brand.googleMapsUrl || "https://maps.google.com"}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 hover:text-emerald-300 pt-2"
@@ -1559,7 +1625,7 @@ export default function PublicVehicleWebsite() {
                   onClick={() => {
                     const savedCars = allVehicles.filter(v => wishlist.includes(v.id));
                     const carNames = savedCars.map(c => `${c.make} ${c.model}`).join(', ');
-                    const waUrl = `https://wa.me/94771234567?text=${encodeURIComponent(`Hello SalesPlus Team, I would like to inquire about my saved cars: ${carNames}`)}`;
+                    const waUrl = `https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(`Hello ${brand.dealershipName || 'SalesPlus'} Team, I would like to inquire about my saved cars: ${carNames}`)}`;
                     window.open(waUrl, '_blank');
                   }}
                   className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2"
@@ -1633,7 +1699,7 @@ export default function PublicVehicleWebsite() {
                   </button>
 
                   <a
-                    href={`https://wa.me/94771234567?text=${encodeURIComponent(`Inquiring about ${quickViewVehicle.make} ${quickViewVehicle.model}`)}`}
+                    href={`https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(`Hello ${brand.dealershipName || 'SalesPlus'} Team, I am inquiring about ${quickViewVehicle.make} ${quickViewVehicle.model}`)}`}
                     target="_blank"
                     rel="noreferrer"
                     className="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl flex items-center justify-center gap-1.5"
@@ -2001,18 +2067,51 @@ export default function PublicVehicleWebsite() {
           {/* Col 1: Brand Info */}
           <div className="space-y-3 md:col-span-1">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold shadow-md shadow-emerald-500/20">
-                <Car className="w-5 h-5 text-white" />
-              </div>
-              <span className={`font-extrabold text-base ${isLightMode ? 'text-slate-900' : 'text-white'}`}>Sales<span className="text-emerald-500">Plus</span> Vehicles</span>
+              {brand.logoUrl ? (
+                <div className="w-9 h-9 rounded-xl bg-white/10 p-1 flex items-center justify-center border border-slate-700/60 overflow-hidden shadow-md shadow-emerald-500/20">
+                  <img src={brand.logoUrl} alt={brand.dealershipName || 'Logo'} className="w-full h-full object-contain" />
+                </div>
+              ) : (
+                <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold shadow-md shadow-emerald-500/20">
+                  <Car className="w-5 h-5 text-white" />
+                </div>
+              )}
+              <span className={`font-extrabold text-base ${isLightMode ? 'text-slate-900' : 'text-white'}`}>
+                {brand.dealershipName || 'SalesPlus'}
+              </span>
             </div>
             <p className={`text-xs leading-relaxed ${isLightMode ? 'text-slate-700 font-medium' : 'text-slate-400'}`}>
-              Premier automotive dealership in Sri Lanka. Inspected Japanese & European imports, flexible leasing financing, and certified warranty protection.
+              {brand.tagline || 'Premier automotive dealership in Sri Lanka. Inspected Japanese & European imports, flexible leasing financing, and certified warranty protection.'}
             </p>
             <div className={`pt-2 text-xs font-semibold ${isLightMode ? 'text-slate-800' : 'text-slate-300'}`}>
-              <p className={isLightMode ? 'text-emerald-700 font-bold' : 'text-emerald-400 font-bold'}>Hotline: 011-2345678</p>
-              <p>Email: sales@salesplus.com</p>
+              {(brand.hotline || brand.phone) && (
+                <p className={isLightMode ? 'text-emerald-700 font-bold' : 'text-emerald-400 font-bold'}>
+                  Hotline: {brand.hotline || brand.phone}
+                </p>
+              )}
+              {(brand.email || brand.salesEmail) && (
+                <p>Email: {brand.email || brand.salesEmail}</p>
+              )}
             </div>
+            {(brand.facebook || brand.instagram || brand.youtube || brand.whatsapp) && (
+              <div className="flex items-center gap-3 pt-2 text-xs font-semibold">
+                {brand.facebook && (
+                  <a href={brand.facebook} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-emerald-400 transition-colors">
+                    Facebook
+                  </a>
+                )}
+                {brand.instagram && (
+                  <a href={brand.instagram} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-emerald-400 transition-colors">
+                    Instagram
+                  </a>
+                )}
+                {brand.youtube && (
+                  <a href={brand.youtube} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-emerald-400 transition-colors">
+                    YouTube
+                  </a>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Col 2: Quick Links */}
@@ -2045,7 +2144,7 @@ export default function PublicVehicleWebsite() {
             <p className={`text-xs ${isLightMode ? 'text-slate-700 font-medium' : 'text-slate-400'}`}>
               Subscribe to get notified whenever new Japanese or European shipments clear Colombo port.
             </p>
-            <form onSubmit={(e) => { e.preventDefault(); alert('Subscribed to SalesPlus Stock Alerts!'); }} className="space-y-2">
+            <form onSubmit={(e) => { e.preventDefault(); alert(`Subscribed to ${brand.dealershipName || 'SalesPlus'} Stock Alerts!`); }} className="space-y-2">
               <input
                 type="email"
                 required
@@ -2072,8 +2171,8 @@ export default function PublicVehicleWebsite() {
             ? 'border-slate-300 text-slate-600'
             : 'border-slate-800/80 text-slate-500'
         }`}>
-          <p>© 2026 Vehicle Sales Management System (VSMS SalesPlus). All rights reserved.</p>
-          <p>Head Office: No. 45, Baseline Road, Colombo 09 • Dealership Hotline: 011-2345678</p>
+          <p>{brand.footerText || `© 2026 ${brand.dealershipName || 'SalesPlus'}. All rights reserved.`}</p>
+          <p>Head Office: {brand.address || 'No. 142/B, Baseline Road, Colombo 09'} • Dealership Hotline: {brand.hotline || brand.phone || '011-2345678'}</p>
         </div>
       </footer>
     </div>

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { apiFetch } from '@/lib/api';
+import { buildBrandSettings } from '@/lib/useSettings';
 import {
   Settings,
   Store,
@@ -192,13 +193,7 @@ export default function SettingsPage() {
             };
 
             if (typeof window !== 'undefined') {
-              const brandData = {
-                ...merged.general,
-                phone: merged.contact?.phone || merged.contact?.hotline || '',
-                address: merged.contact?.address || '',
-                currency: merged.commerce?.currency || 'LKR',
-                currencySymbol: merged.commerce?.currencySymbol || 'Rs.',
-              };
+              const brandData = buildBrandSettings(merged);
               localStorage.setItem('dealership_brand', JSON.stringify(brandData));
               window.dispatchEvent(new CustomEvent('dealership-settings-updated', { detail: brandData }));
             }
@@ -300,13 +295,7 @@ export default function SettingsPage() {
 
       // Synchronize in real time with localStorage and custom event so Sidebar/Layout update instantly
       if (typeof window !== 'undefined') {
-        const brandData = {
-          ...settings.general,
-          phone: settings.contact?.phone || settings.contact?.hotline || '',
-          address: settings.contact?.address || '',
-          currency: settings.commerce?.currency || 'LKR',
-          currencySymbol: settings.commerce?.currencySymbol || 'Rs.',
-        };
+        const brandData = buildBrandSettings(settings);
         localStorage.setItem('dealership_brand', JSON.stringify(brandData));
         localStorage.setItem('dealership_settings', JSON.stringify(settings));
         window.dispatchEvent(new CustomEvent('dealership-settings-updated', { detail: brandData }));
@@ -330,13 +319,7 @@ export default function SettingsPage() {
       setShowResetConfirm(false);
 
       if (typeof window !== 'undefined') {
-        const brandData = {
-          ...(data.general || {}),
-          phone: data.contact?.phone || data.contact?.hotline || '',
-          address: data.contact?.address || '',
-          currency: data.commerce?.currency || 'LKR',
-          currencySymbol: data.commerce?.currencySymbol || 'Rs.',
-        };
+        const brandData = buildBrandSettings(data);
         localStorage.setItem('dealership_brand', JSON.stringify(brandData));
         window.dispatchEvent(new CustomEvent('dealership-settings-updated', { detail: brandData }));
       }

@@ -2,26 +2,15 @@ import mongoose from 'mongoose';
 import * as bcrypt from 'bcrypt';
 
 /**
- * Bootstrap only system roles and one administrator whose credentials are
- * supplied by the operator. Dealership records are always entered in the app.
- * This script refuses to run against a database that already contains data.
+ * Bootstrap the system roles and the five default staff accounts.
+ * Dealership records are always entered in the app.
  */
 async function seed() {
   const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/salesplus';
-  const adminName = process.env.BOOTSTRAP_ADMIN_NAME?.trim() || 'System Administrator';
-  const adminEmail = process.env.BOOTSTRAP_ADMIN_EMAIL?.trim().toLowerCase() || 'admin@salesplus.com';
-  const adminPassword = process.env.BOOTSTRAP_ADMIN_PASSWORD || 'AdminPass1234!';
 
   await mongoose.connect(mongoUri);
   try {
     const db = mongoose.connection.db!;
-    const collections = await db.listCollections().toArray();
-    for (const collection of collections) {
-      if (await db.collection(collection.name).estimatedDocumentCount()) {
-        console.log(`Note: Collection ${collection.name} contains data; skipping duplicate seed.`);
-      }
-    }
-
     const now = new Date();
     const rolesColl = db.collection('roles');
     const usersColl = db.collection('users');
@@ -45,31 +34,42 @@ async function seed() {
       rolesMap[r.name] = existing._id;
     }
 
-    // Default seed user accounts
+    // Keep only these default staff accounts and reset their passwords on each seed.
     const seedUsers = [
       { name: 'Admin', email: 'admin@salesplus.com', password: 'admin123', role: rolesMap['Admin / Owner'] },
       { name: 'Manager', email: 'manager@salesplus.com', password: 'manager123', role: rolesMap['Inventory Manager'] },
       { name: 'Sales Executive', email: 'executive@salesplus.com', password: 'ex123', role: rolesMap['Sales & Operations'] },
       { name: 'Accountant', email: 'accountant@salesplus.com', password: 'accountant123', role: rolesMap['Accountant / Finance Staff'] },
       { name: 'Sales Manager', email: 'manager2@salesplus.com', password: 'manag123', role: rolesMap['Sales & Operations'] },
-      { name: 'Sample Customer', email: 'customer@salesplus.com', password: 'CustomerPass1234!', role: rolesMap['Customer'] },
     ];
 
+    const allowedEmails = seedUsers.map((user) => user.email);
+    const removed = await usersColl.deleteMany({ email: { $nin: allowedEmails } });
+    if (removed.deletedCount > 0) {
+      console.log(`✓ Removed ${removed.deletedCount} account(s) outside the default staff list.`);
+    }
+
     for (const u of seedUsers) {
-      const existingUser = await usersColl.findOne({ email: u.email });
-      if (!existingUser) {
-        const passwordHash = await bcrypt.hash(u.password, 12);
-        await usersColl.insertOne({
-          name: u.name,
-          email: u.email,
-          passwordHash,
-          role: u.role,
-          isActive: true,
-          emailVerified: true,
-          createdAt: now,
-          updatedAt: now,
-        });
+      const passwordHash = await bcrypt.hash(u.password, 12);
+      const result = await usersColl.updateOne(
+        { email: u.email },
+        {
+          $set: {
+            name: u.name,
+            passwordHash,
+            role: u.role,
+            isActive: true,
+            emailVerified: true,
+            updatedAt: now,
+          },
+          $setOnInsert: { createdAt: now },
+        },
+        { upsert: true },
+      );
+      if (result.upsertedCount > 0) {
         console.log(`✓ Created account: ${u.email} (${u.name})`);
+      } else {
+        console.log(`✓ Updated account: ${u.email} (${u.name})`);
       }
     }
 
