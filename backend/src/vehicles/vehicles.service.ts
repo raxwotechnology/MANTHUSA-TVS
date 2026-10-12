@@ -39,7 +39,14 @@ export class VehiclesService {
   }
 
   findPublicListings() {
-    return this.vehicleModel.find({ status: 'Available' }).select('make model variant year manufacturingYear registeredYear vehicleType condition fuelType transmission driveType engineCapacity mileage color sellingPrice images mediaAngles horsepower torque seatingCapacity doors bodyType safetyFeatures entertainmentFeatures comfortFeatures customSpecifications status').sort({ createdAt: -1 }).lean().exec();
+    return this.vehicleModel
+      .find({
+        status: { $in: [/^available$/i, /^purchased$/i, /^under inspection$/i, /^in stock$/i] },
+      })
+      .select('make model variant year manufacturingYear registeredYear vehicleType condition fuelType transmission driveType engineCapacity mileage color sellingPrice images mediaAngles horsepower torque seatingCapacity doors bodyType dimensions weight fuelTankCapacity safetyFeatures entertainmentFeatures comfortFeatures customSpecifications status')
+      .sort({ createdAt: -1 })
+      .lean()
+      .exec();
   }
 
   async findOne(id: string): Promise<VehicleDocument> {

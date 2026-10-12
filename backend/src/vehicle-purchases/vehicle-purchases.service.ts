@@ -28,7 +28,7 @@ export class VehiclePurchasesService {
     const purchase = await new this.purchaseModel({ ...input, additionalCosts: costs, paidAmount, paymentStatus }).save();
     vehicle.purchasePrice = Number(input.purchasePrice);
     vehicle.totalInvestment = Number(input.purchasePrice) + costs;
-    if (vehicle.status === 'Available') vehicle.status = 'Purchased';
+    if (!vehicle.status || vehicle.status === 'Draft' || vehicle.status === 'Purchased') vehicle.status = 'Available';
     await vehicle.save();
     supplier.outstandingBalance = Number(supplier.outstandingBalance || 0) + total - paidAmount;
     await supplier.save();

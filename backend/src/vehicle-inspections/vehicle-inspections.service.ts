@@ -13,8 +13,7 @@ export class VehicleInspectionsService {
     const vehicle = await this.vehicles.findById(input.vehicle).exec();
     if (!vehicle) throw new NotFoundException('Vehicle not found.');
     const inspection = await new this.inspections(input).save();
-    vehicle.status = input.result === 'Failed' ? 'Under Repair' : 'Under Inspection';
-    if (input.result === 'Passed') vehicle.status = 'Available';
+    vehicle.status = input.result === 'Failed' ? 'Under Repair' : (input.result === 'Passed' || input.result === 'Passed with Issues') ? 'Available' : 'Under Inspection';
     await vehicle.save();
     return inspection;
   }
@@ -24,7 +23,10 @@ export class VehicleInspectionsService {
     if (!item) throw new NotFoundException(`Inspection ${id} not found.`);
     if (input.result) {
       const vehicle = await this.vehicles.findById(item.vehicle).exec();
-      if (vehicle) { vehicle.status = input.result === 'Passed' ? 'Available' : input.result === 'Failed' ? 'Under Repair' : 'Under Inspection'; await vehicle.save(); }
+      if (vehicle) {
+        vehicle.status = (input.result === 'Passed' || input.result === 'Passed with Issues') ? 'Available' : input.result === 'Failed' ? 'Under Repair' : 'Under Inspection';
+        await vehicle.save();
+      }
     }
     return item;
   }

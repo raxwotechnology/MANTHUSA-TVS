@@ -137,21 +137,7 @@ function applyFaviconAndTitle(settings: BrandSettings) {
 }
 
 export function useSettings() {
-  const [settings, setSettings] = useState<BrandSettings>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const cached = localStorage.getItem('dealership_brand');
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          return buildBrandSettings(parsed);
-        }
-      } catch (e) {
-        // ignore parse error
-      }
-    }
-    return DEFAULT_BRAND;
-  });
-
+  const [settings, setSettings] = useState<BrandSettings>(DEFAULT_BRAND);
   const [loading, setLoading] = useState(true);
 
   const fetchLatest = useCallback(async () => {
@@ -175,6 +161,23 @@ export function useSettings() {
 
   useEffect(() => {
     let isMounted = true;
+
+    // Load from cache on client mount without causing SSR hydration mismatch
+    try {
+      if (typeof window !== 'undefined') {
+        const cached = localStorage.getItem('dealership_brand');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          const merged = buildBrandSettings(parsed);
+          if (isMounted) {
+            setSettings(merged);
+            applyFaviconAndTitle(merged);
+          }
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
 
     fetchLatest();
 

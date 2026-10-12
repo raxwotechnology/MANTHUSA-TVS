@@ -102,7 +102,7 @@ export default function LoginPage() {
   const goToLogin = () => { setMode('login'); setError(''); setMessage(''); setMfaCode(''); };
 
   return <div className="min-h-screen bg-[#0B132B] flex flex-col justify-center py-12 sm:px-6 lg:px-8 text-slate-100">
-    <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
+    <div className="sm:mx-auto sm:w-full sm:max-w-md text-center" suppressHydrationWarning>
       {brand.logoUrl ? (
         <div className="w-16 h-16 rounded-2xl bg-white/10 p-1 flex items-center justify-center mx-auto mb-4 border border-slate-700/60 shadow-xl overflow-hidden">
           <img src={brand.logoUrl} alt={brand.dealershipName || 'Logo'} className="w-full h-full object-contain" />

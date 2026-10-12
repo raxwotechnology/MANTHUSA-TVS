@@ -135,15 +135,31 @@ export default function PublicVehicleWebsite() {
         if (!response.ok) throw new Error('Could not load vehicles from database.');
         const data = await response.json();
         if (Array.isArray(data)) {
-          const formatted = data.map((vehicle: any) => ({
-            ...vehicle,
-            id: vehicle._id || vehicle.id,
-            price: Number(vehicle.sellingPrice || 0),
-            image: vehicle.images?.[0] || '',
-            mileage: vehicle.mileage ? `${Number(vehicle.mileage).toLocaleString()} km` : 'Unregistered',
-            condition: vehicle.condition || 'Certified Dealership Stock',
-            warranty: '1-Year Certified Warranty'
-          }));
+          const formatted = data.map((vehicle: any) => {
+            const angleImages = [
+              vehicle.mediaAngles?.front,
+              vehicle.mediaAngles?.rear,
+              vehicle.mediaAngles?.left,
+              vehicle.mediaAngles?.right,
+              vehicle.mediaAngles?.interior,
+              vehicle.mediaAngles?.dashboard,
+              vehicle.mediaAngles?.engine,
+              vehicle.mediaAngles?.wheels,
+              ...(vehicle.mediaAngles?.damage || [])
+            ].filter((url): url is string => Boolean(url));
+            const images = Array.from(new Set([...(vehicle.images || []), ...angleImages]));
+
+            return {
+              ...vehicle,
+              id: vehicle._id || vehicle.id,
+              price: Number(vehicle.sellingPrice || 0),
+              images,
+              image: images[0] || '',
+              mileage: vehicle.mileage ? `${Number(vehicle.mileage).toLocaleString()} km` : 'Unregistered',
+              condition: vehicle.condition || 'Certified Dealership Stock',
+              warranty: '1-Year Certified Warranty'
+            };
+          });
           setDbVehicles(formatted);
         }
       })
@@ -377,7 +393,7 @@ export default function PublicVehicleWebsite() {
       <header className="h-[74px] bg-[#0A122A]/95 backdrop-blur-xl border-b border-slate-800/80 sticky top-0 z-40 px-4 md:px-8">
         <div className="max-w-7xl mx-auto h-full flex items-center justify-between gap-4">
           {/* Brand Logo & Name */}
-          <Link href="/" className="flex items-center gap-3 group flex-shrink-0">
+          <Link href="/" className="flex items-center gap-3 group flex-shrink-0" suppressHydrationWarning>
             {brand.logoUrl ? (
               <div className="w-10 h-10 rounded-xl bg-white/10 p-1 flex items-center justify-center border border-slate-700/60 overflow-hidden shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform duration-300 flex-shrink-0">
                 <img src={brand.logoUrl} alt={brand.dealershipName || 'Logo'} className="w-full h-full object-contain" />
@@ -821,6 +837,15 @@ export default function PublicVehicleWebsite() {
               return (
                 <div
                   key={v.id}
+                  onClick={() => setQuickViewVehicle(v)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      setQuickViewVehicle(v);
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
                   className="bg-[#0D1836] rounded-3xl overflow-hidden border border-slate-800/90 hover:border-emerald-500/50 transition-all duration-300 flex flex-col group shadow-xl hover:shadow-2xl hover:shadow-emerald-950/20"
                 >
                   {/* Vehicle Image Header */}
@@ -848,7 +873,10 @@ export default function PublicVehicleWebsite() {
                     {/* Action Overlay: Wishlist & Quick View */}
                     <div className="absolute top-3 right-3 flex items-center gap-1.5">
                       <button
-                        onClick={() => toggleWishlist(v.id)}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          toggleWishlist(v.id);
+                        }}
                         className={`p-2 rounded-xl backdrop-blur-md transition-all ${
                           isWishlisted
                             ? 'bg-rose-500 text-white'
@@ -861,7 +889,10 @@ export default function PublicVehicleWebsite() {
                       </button>
 
                       <button
-                        onClick={() => setQuickViewVehicle(v)}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setQuickViewVehicle(v);
+                        }}
                         className="p-2 rounded-xl bg-slate-900/70 hover:bg-slate-900 text-slate-300 hover:text-white border border-slate-700/60 backdrop-blur-md transition-all"
                         title="Quick View Vehicle Specs"
                         aria-label="Quick View"
@@ -1008,6 +1039,15 @@ export default function PublicVehicleWebsite() {
               return (
                 <div
                   key={v.id}
+                  onClick={() => setQuickViewVehicle(v)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      setQuickViewVehicle(v);
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
                   className="bg-[#0D1836] rounded-3xl overflow-hidden border border-slate-800/90 hover:border-emerald-500/40 p-4 sm:p-5 flex flex-col md:flex-row gap-5 items-center justify-between transition-all group"
                 >
                   <div className="flex flex-col sm:flex-row gap-5 items-center w-full md:w-auto">
@@ -1051,7 +1091,10 @@ export default function PublicVehicleWebsite() {
 
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => toggleWishlist(v.id)}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          toggleWishlist(v.id);
+                        }}
                         className={`p-2.5 rounded-xl border transition-all ${
                           isWishlisted
                             ? 'bg-rose-500 border-rose-500 text-white'
@@ -1063,7 +1106,10 @@ export default function PublicVehicleWebsite() {
                       </button>
 
                       <button
-                        onClick={() => toggleCompare(v.id)}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          toggleCompare(v.id);
+                        }}
                         className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all ${
                           isCompared
                             ? 'bg-cyan-600 border-cyan-500 text-white'
@@ -1074,7 +1120,8 @@ export default function PublicVehicleWebsite() {
                       </button>
 
                       <button
-                        onClick={() => {
+                        onClick={(event) => {
+                          event.stopPropagation();
                           setInterestVehicle(v);
                           setInterestType('Details');
                           setInterestSuccess(false);
@@ -1656,12 +1703,30 @@ export default function PublicVehicleWebsite() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div className="rounded-2xl overflow-hidden h-64 bg-slate-950">
-                <img
-                  src={quickViewVehicle.image}
-                  alt={quickViewVehicle.model}
-                  className="w-full h-full object-cover"
-                />
+              <div>
+                <div className="rounded-2xl overflow-hidden h-64 bg-slate-950">
+                  {quickViewVehicle.image ? (
+                    <img
+                      src={quickViewVehicle.image}
+                      alt={quickViewVehicle.model}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="h-full flex items-center justify-center text-slate-500">No vehicle image</div>
+                  )}
+                </div>
+                {quickViewVehicle.images?.length > 1 && (
+                  <div className="grid grid-cols-4 gap-2 mt-2">
+                    {quickViewVehicle.images.map((image: string, index: number) => (
+                      <img
+                        key={`${image}-${index}`}
+                        src={image}
+                        alt={`${quickViewVehicle.make} ${quickViewVehicle.model} view ${index + 1}`}
+                        className="w-full h-16 object-cover rounded-lg border border-slate-700"
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="flex flex-col justify-between">
@@ -1681,8 +1746,34 @@ export default function PublicVehicleWebsite() {
                     <div><span className="text-slate-500">Drive:</span> {quickViewVehicle.driveType || '2WD'}</div>
                     <div><span className="text-slate-500">Engine:</span> {quickViewVehicle.engineCapacity || 'Standard'}</div>
                     <div><span className="text-slate-500">Color:</span> {quickViewVehicle.color}</div>
+                    <div><span className="text-slate-500">Body:</span> {quickViewVehicle.bodyType || 'Not specified'}</div>
+                    <div><span className="text-slate-500">Seats:</span> {quickViewVehicle.seatingCapacity || 'Not specified'}</div>
+                    <div><span className="text-slate-500">Power:</span> {quickViewVehicle.horsepower ? `${quickViewVehicle.horsepower} hp` : 'Not specified'}</div>
+                    <div><span className="text-slate-500">Torque:</span> {quickViewVehicle.torque || 'Not specified'}</div>
                   </div>
                 </div>
+
+                {(quickViewVehicle.safetyFeatures?.length ||
+                  quickViewVehicle.entertainmentFeatures?.length ||
+                  quickViewVehicle.comfortFeatures?.length ||
+                  quickViewVehicle.customSpecifications &&
+                    Object.keys(quickViewVehicle.customSpecifications).length > 0) && (
+                  <div className="mt-4 pt-4 border-t border-slate-800 space-y-2">
+                    <span className="text-slate-400 font-bold">Features & specifications</span>
+                    <div className="flex flex-wrap gap-1.5">
+                    {[
+                      ...(quickViewVehicle.safetyFeatures || []),
+                      ...(quickViewVehicle.entertainmentFeatures || []),
+                      ...(quickViewVehicle.comfortFeatures || [])
+                    ].map((feature: string, index: number) => (
+                      <span key={`${feature}-${index}`} className="px-2 py-1 rounded-lg bg-slate-800 text-slate-300">{feature}</span>
+                    ))}
+                    {Object.entries(quickViewVehicle.customSpecifications || {}).map(([name, value]) => (
+                      <span key={name} className="px-2 py-1 rounded-lg bg-slate-800 text-slate-300">{name}: {String(value)}</span>
+                    ))}
+                    </div>
+                  </div>
+                )}
 
                 <div className="mt-4 pt-4 border-t border-slate-800 flex gap-2">
                   <button

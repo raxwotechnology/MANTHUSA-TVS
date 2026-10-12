@@ -16,9 +16,11 @@ export class DashboardService {
 
   async getDashboardStats() {
     const totalVehicles = await this.vehicleModel.countDocuments();
-    const availableVehicles = await this.vehicleModel.countDocuments({ status: 'Available' });
-    const reservedVehicles = await this.vehicleModel.countDocuments({ status: 'Reserved' });
-    const soldVehicles = await this.vehicleModel.countDocuments({ status: 'Sold' });
+    const availableVehicles = await this.vehicleModel.countDocuments({
+      status: { $in: [/^available$/i, /^purchased$/i, /^in stock$/i] }
+    });
+    const reservedVehicles = await this.vehicleModel.countDocuments({ status: /^reserved$/i });
+    const soldVehicles = await this.vehicleModel.countDocuments({ status: /^sold$/i });
     const totalCustomers = await this.customerModel.countDocuments();
     const newLeads = await this.leadModel.countDocuments({ status: 'New' });
 
@@ -86,7 +88,9 @@ export class DashboardService {
 
   async getCustomerStats(userId?: string, email?: string) {
     try {
-      const availableVehicles = await this.vehicleModel.countDocuments({ status: 'Available' });
+      const availableVehicles = await this.vehicleModel.countDocuments({
+        status: { $in: [/^available$/i, /^purchased$/i, /^in stock$/i] }
+      });
       let myReservations = 0;
       let myInquiries = 0;
 
