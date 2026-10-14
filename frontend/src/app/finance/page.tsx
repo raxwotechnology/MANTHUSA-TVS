@@ -23,24 +23,22 @@ import { InquiryDialog } from '@/components/public/InquiryDialog';
 import {
   PublicVehicle,
   fetchPublicVehicles,
-  fetchPublicSettings,
   formatLKR
 } from '@/lib/publicApi';
-import { BrandSettings, DEFAULT_BRAND } from '@/lib/useSettings';
+import { useSettings } from '@/lib/useSettings';
 
 export default function FinancePage() {
   const [vehicles, setVehicles] = useState<PublicVehicle[]>([]);
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>('');
-  const [brand, setBrand] = useState<BrandSettings>(DEFAULT_BRAND);
+  const { settings: brand } = useSettings();
 
   // Inquiry dialog state
   const [isInquiryOpen, setIsInquiryOpen] = useState(false);
   const [inquiryMsg, setInquiryMsg] = useState('');
 
   useEffect(() => {
-    Promise.all([fetchPublicVehicles(), fetchPublicSettings()]).then(([vList, s]) => {
+    fetchPublicVehicles().then((vList) => {
       setVehicles(vList);
-      setBrand(s);
       if (vList.length > 0) setSelectedVehicleId(vList[0]._id);
     });
   }, []);
@@ -61,7 +59,13 @@ export default function FinancePage() {
     setIsInquiryOpen(true);
   };
 
-  const partnerBanks = [
+  interface BankPartner {
+    name: string;
+    tag: string;
+    rate: string;
+  }
+
+  const partnerBanks: BankPartner[] = [
     { name: 'Commercial Bank of Ceylon', tag: 'Fast-Track Corporate & Personal Lease', rate: 'From 13.5%' },
     { name: 'Hatton National Bank (HNB)', tag: 'HNB Leasing with Doorstep Documentation', rate: 'From 13.75%' },
     { name: 'Sampath Bank PLC', tag: 'Flexible Terms for Professionals', rate: 'From 14.0%' },
@@ -69,6 +73,15 @@ export default function FinancePage() {
     { name: 'Central Finance Company', tag: 'Commercial & Multi-Vehicle Fleets', rate: 'From 14.25%' },
     { name: 'LB Finance PLC', tag: 'Customized Down Payment Structures', rate: 'From 14.5%' },
   ];
+
+  const displayedBanks: BankPartner[] =
+    brand.leasing?.preferredPartners && brand.leasing.preferredPartners.length > 0
+      ? brand.leasing.preferredPartners.map((name: any) => ({
+          name: String(name),
+          tag: 'Official Dealership Partner',
+          rate: brand.leasing?.defaultInterestRate ? `From ${brand.leasing.defaultInterestRate}%` : 'From 13.5%',
+        }))
+      : partnerBanks;
 
   const requiredDocuments = [
     'National Identity Card (NIC) / Valid Passport copy',
@@ -93,7 +106,8 @@ export default function FinancePage() {
             Vehicle Finance & Tailored Leasing
           </h1>
           <p className="text-sm text-slate-300 mt-3 leading-relaxed">
-            Drive away with confidence. We collaborate directly with premier financial institutions in Sri Lanka to deliver transparent interest rates, manageable down payments, and fast-track approvals.
+            {brand.website?.pages?.finance ||
+              'Drive away with confidence. We collaborate directly with premier financial institutions in Sri Lanka to deliver transparent interest rates, manageable down payments, and fast-track approvals.'}
           </p>
         </div>
 
@@ -146,7 +160,7 @@ export default function FinancePage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {partnerBanks.map((bank) => (
+            {displayedBanks.map((bank) => (
               <div
                 key={bank.name}
                 className="p-5 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition-colors space-y-2"

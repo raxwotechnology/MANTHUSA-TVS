@@ -424,304 +424,314 @@ export default function HomePage() {
       )}
 
       {/* 5. LATEST ARRIVALS */}
-      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-10">
-          <div>
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">
-              <Sparkles className="w-4 h-4" />
-              <span>Just Added To Showroom</span>
+      {brand.website?.sections?.showLatestArrivals !== false && (
+        <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-10">
+            <div>
+              <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">
+                <Sparkles className="w-4 h-4" />
+                <span>Just Added To Showroom</span>
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+                Latest Arrivals
+              </h2>
+              <p className="text-sm text-slate-400 mt-1 max-w-lg">
+                Freshly imported shipments with low mileage, complete auction sheets, and verified inspection records.
+              </p>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Latest Arrivals
-            </h2>
-            <p className="text-sm text-slate-400 mt-1 max-w-lg">
-              Freshly imported shipments with low mileage, complete auction sheets, and verified inspection records.
-            </p>
+
+            <Link
+              href="/vehicles?sort=newest"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-amber-400 hover:text-amber-300 transition-colors group"
+            >
+              <span>See Newest Arrivals</span>
+              <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
           </div>
 
-          <Link
-            href="/vehicles?sort=newest"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-amber-400 hover:text-amber-300 transition-colors group"
-          >
-            <span>See Newest Arrivals</span>
-            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </div>
-
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <VehicleCardSkeleton />
-            <VehicleCardSkeleton />
-            <VehicleCardSkeleton />
-          </div>
-        ) : latestArrivals.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {latestArrivals.map((vehicle) => (
-              <VehicleCard
-                key={vehicle._id}
-                vehicle={vehicle}
-                onQuickInquire={(v) => {
-                  setInquiryVehicle(v);
-                  setIsInquiryOpen(true);
-                }}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12 bg-slate-900/60 rounded-2xl border border-slate-800 p-8">
-            <Car className="w-12 h-12 text-slate-500 mx-auto mb-3" />
-            <p className="text-slate-300 font-semibold">Live inventory synchronized from VSMS.</p>
-          </div>
-        )}
-      </section>
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <VehicleCardSkeleton />
+              <VehicleCardSkeleton />
+              <VehicleCardSkeleton />
+            </div>
+          ) : latestArrivals.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {latestArrivals.map((vehicle) => (
+                <VehicleCard
+                  key={vehicle._id}
+                  vehicle={vehicle}
+                  onQuickInquire={(v) => {
+                    setInquiryVehicle(v);
+                    setIsInquiryOpen(true);
+                  }}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-slate-900/60 rounded-2xl border border-slate-800 p-8">
+              <Car className="w-12 h-12 text-slate-500 mx-auto mb-3" />
+              <p className="text-slate-300 font-semibold">Live inventory synchronized from VSMS.</p>
+            </div>
+          )}
+        </section>
+      )}
 
       {/* 6. WHY BUY FROM US */}
-      <section className="py-20 bg-slate-950 border-t border-slate-850">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
-              The SalesPlus Standard
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mt-1">
-              Why Discerning Drivers Choose Us
-            </h2>
-            <p className="text-sm text-slate-400 mt-3 leading-relaxed">
-              We eliminate uncertainty from automotive purchases through transparent inspections, clear revenue documentation, and tailored customer support.
-            </p>
-          </div>
+      {brand.website?.sections?.showWhyUs !== false && (
+        <section className="py-20 bg-slate-950 border-t border-slate-850">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-2xl mx-auto mb-16">
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
+                The SalesPlus Standard
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mt-1">
+                Why Discerning Drivers Choose Us
+              </h2>
+              <p className="text-sm text-slate-400 mt-3 leading-relaxed">
+                We eliminate uncertainty from automotive purchases through transparent inspections, clear revenue documentation, and tailored customer support.
+              </p>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {whyChooseUs.map((item) => {
-              const Icon = item.icon;
-              return (
-                <div
-                  key={item.title}
-                  className="p-6 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition-all flex flex-col justify-between"
-                >
-                  <div>
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center border mb-5 ${item.color}`}>
-                      <Icon className="w-6 h-6" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {whyChooseUs.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div
+                    key={item.title}
+                    className="p-6 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition-all flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center border mb-5 ${item.color}`}>
+                        <Icon className="w-6 h-6" />
+                      </div>
+                      <h3 className="text-lg font-bold text-white mb-2 tracking-tight">
+                        {item.title}
+                      </h3>
+                      <p className="text-xs text-slate-400 leading-relaxed">
+                        {item.desc}
+                      </p>
                     </div>
-                    <h3 className="text-lg font-bold text-white mb-2 tracking-tight">
-                      {item.title}
-                    </h3>
-                    <p className="text-xs text-slate-400 leading-relaxed">
-                      {item.desc}
-                    </p>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* 7. HOW THE BUYING PROCESS WORKS */}
-      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
-            Seamless & Transparent
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mt-1">
-            How The Buying Process Works
-          </h2>
-          <p className="text-sm text-slate-400 mt-2">
-            Four straightforward steps from browsing our digital showroom to driving home your certified vehicle.
-          </p>
-        </div>
+      {brand.website?.sections?.showHowItWorks !== false && (
+        <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
+              Seamless & Transparent
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mt-1">
+              How The Buying Process Works
+            </h2>
+            <p className="text-sm text-slate-400 mt-2">
+              Four straightforward steps from browsing our digital showroom to driving home your certified vehicle.
+            </p>
+          </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative">
-          {buyingSteps.map((step, idx) => (
-            <div
-              key={step.step}
-              className="relative p-6 rounded-2xl bg-slate-900/80 border border-slate-800 flex flex-col justify-between"
-            >
-              <div>
-                <span className="text-3xl font-black text-amber-400/80 font-mono block mb-3">
-                  {step.step}
-                </span>
-                <h3 className="text-lg font-bold text-white mb-2">
-                  {step.title}
-                </h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  {step.desc}
-                </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative">
+            {buyingSteps.map((step) => (
+              <div
+                key={step.step}
+                className="relative p-6 rounded-2xl bg-slate-900/80 border border-slate-800 flex flex-col justify-between"
+              >
+                <div>
+                  <span className="text-3xl font-black text-amber-400/80 font-mono block mb-3">
+                    {step.step}
+                  </span>
+                  <h3 className="text-lg font-bold text-white mb-2">
+                    {step.title}
+                  </h3>
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    {step.desc}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* 8. FINANCE & LEASING TEASER BANNER */}
-      <section className="dark-panel py-16 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-y border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-            <div className="lg:col-span-7 space-y-4">
-              <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-400">
-                <Calculator className="w-4 h-4" />
-                Tailored Auto Financing
-              </span>
-              <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
-                Flexible Leasing Packages with Major Banks
-              </h2>
-              <p className="text-sm text-slate-300 leading-relaxed">
-                Enjoy customized repayment periods from 12 to 84 months, competitive interest rates, and seamless paperwork assistance through our verified financial institution network.
-              </p>
-              <div className="flex flex-wrap gap-4 pt-2">
-                <Link
-                  href="/finance"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs uppercase tracking-wider transition-all shadow-md"
-                >
+      {brand.website?.sections?.showFinancePromo !== false && (
+        <section className="light-mode-section dark-panel py-16 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-y border-slate-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+              <div className="lg:col-span-7 space-y-4">
+                <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-400">
                   <Calculator className="w-4 h-4" />
-                  <span>Interactive Loan Calculator</span>
+                  Tailored Auto Financing
+                </span>
+                <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+                  Flexible Leasing Packages with Major Banks
+                </h2>
+                <p className="text-sm text-slate-300 leading-relaxed">
+                  {brand.website?.pages?.finance || "Enjoy customized repayment periods from 12 to 84 months, competitive interest rates, and seamless paperwork assistance through our verified financial institution network."}
+                </p>
+                <div className="flex flex-wrap gap-4 pt-2">
+                  <Link
+                    href="/finance"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs uppercase tracking-wider transition-all shadow-md"
+                  >
+                    <Calculator className="w-4 h-4" />
+                    <span>Interactive Loan Calculator</span>
+                  </Link>
+                  <Link
+                    href="/inquiry?type=Finance"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs uppercase tracking-wider transition-all border border-slate-700"
+                  >
+                    <span>Request Pre-Approval</span>
+                  </Link>
+                </div>
+              </div>
+
+              <div className="light-mode-surface lg:col-span-5 bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-3">
+                <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-2">
+                  Preferred Leasing Partners
+                </h4>
+                <ul className="space-y-2 text-xs text-slate-300">
+                  {(brand.leasing?.preferredPartners && brand.leasing.preferredPartners.length > 0
+                    ? brand.leasing.preferredPartners
+                    : [
+                        'Commercial Bank of Ceylon PLC',
+                        'Hatton National Bank (HNB)',
+                        'Sampath Bank PLC',
+                        'LOLC Finance PLC & Central Finance',
+                      ]
+                  ).map((partner: string, idx: number) => (
+                    <li key={idx} className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                      <span>{partner}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 9. SELL YOUR VEHICLE TRADE-IN BANNER */}
+      {brand.website?.sections?.showTradeInPromo !== false && (
+        <section className="light-mode-section dark-panel py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="light-mode-surface relative rounded-3xl bg-gradient-to-br from-amber-500/10 via-slate-900 to-slate-950 border border-amber-500/20 p-8 sm:p-12 overflow-hidden shadow-2xl">
+            <div className="relative z-10 max-w-2xl">
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-400 block mb-2">
+                Vehicle Trade-In & Direct Purchase
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-tight">
+                Looking to Sell or Upgrade Your Current Vehicle?
+              </h2>
+              <p className="mt-4 text-sm text-slate-300 leading-relaxed">
+                Submit your vehicle specifications and photos online. Our certified appraisers will evaluate market trends and offer a competitive cash offer or trade-in credit within 24 hours.
+              </p>
+
+              <div className="mt-8 flex flex-col sm:flex-row items-center gap-4">
+                <Link
+                  href="/sell-your-vehicle"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs uppercase tracking-wider transition-all shadow-md"
+                >
+                  <span>Get Instant Valuation</span>
+                  <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link
-                  href="/inquiry?type=Finance"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs uppercase tracking-wider transition-all border border-slate-700"
+                  href="/contact"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs uppercase tracking-wider transition-all border border-slate-700"
                 >
-                  <span>Request Pre-Approval</span>
+                  <span>Speak to Appraiser</span>
                 </Link>
               </div>
             </div>
-
-            <div className="lg:col-span-5 bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-3">
-              <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-2">
-                Preferred Leasing Partners
-              </h4>
-              <ul className="space-y-2 text-xs text-slate-300">
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>Commercial Bank of Ceylon PLC</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>Hatton National Bank (HNB)</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>Sampath Bank PLC</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>LOLC Finance PLC & Central Finance</span>
-                </li>
-              </ul>
-            </div>
           </div>
-        </div>
-      </section>
-
-      {/* 9. SELL YOUR VEHICLE TRADE-IN BANNER */}
-      <section className="dark-panel py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative rounded-3xl bg-gradient-to-br from-amber-500/10 via-slate-900 to-slate-950 border border-amber-500/20 p-8 sm:p-12 overflow-hidden shadow-2xl">
-          <div className="relative z-10 max-w-2xl">
-            <span className="text-xs font-bold uppercase tracking-wider text-amber-400 block mb-2">
-              Vehicle Trade-In & Direct Purchase
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-tight">
-              Looking to Sell or Upgrade Your Current Vehicle?
-            </h2>
-            <p className="mt-4 text-sm text-slate-300 leading-relaxed">
-              Submit your vehicle specifications and photos online. Our certified appraisers will evaluate market trends and offer a competitive cash offer or trade-in credit within 24 hours.
-            </p>
-
-            <div className="mt-8 flex flex-col sm:flex-row items-center gap-4">
-              <Link
-                href="/sell-your-vehicle"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs uppercase tracking-wider transition-all shadow-md"
-              >
-                <span>Get Instant Valuation</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                href="/contact"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs uppercase tracking-wider transition-all border border-slate-700"
-              >
-                <span>Speak to Appraiser</span>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* 10. LOCATION & SHOWROOM FACILITY */}
-      <section className="py-16 bg-slate-950 border-t border-slate-850">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-            <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
-                Visit Us In Person
-              </span>
-              <h2 className="text-3xl font-extrabold text-white tracking-tight mt-1 mb-4">
-                Colombo Flagship Showroom
-              </h2>
-              <p className="text-sm text-slate-400 mb-6 leading-relaxed">
-                Experience our curated inventory in an air-conditioned luxury lounge setting. Our automotive experts are ready to assist with vehicle inspections, test drives, and document transfers.
-              </p>
+      {brand.website?.sections?.showContact !== false && (
+        <section className="py-16 bg-slate-950 border-t border-slate-850">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
+                  Visit Us In Person
+                </span>
+                <h2 className="text-3xl font-extrabold text-white tracking-tight mt-1 mb-4">
+                  {brand.dealershipName || 'SalesPlus'} Flagship Showroom
+                </h2>
+                <p className="text-sm text-slate-400 mb-6 leading-relaxed">
+                  Experience our curated inventory in an air-conditioned luxury lounge setting. Our automotive experts are ready to assist with vehicle inspections, test drives, and document transfers.
+                </p>
 
-              <div className="space-y-3.5 text-sm text-slate-300 mb-8">
-                <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
-                  <span>{brand?.address || 'No. 142/B, Baseline Road, Colombo 09, Sri Lanka'}</span>
+                <div className="space-y-3.5 text-sm text-slate-300 mb-8">
+                  <div className="flex items-start gap-3">
+                    <MapPin className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+                    <span>{brand?.address || 'No. 142/B, Baseline Road, Colombo 09, Sri Lanka'}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Clock className="w-5 h-5 text-amber-400 shrink-0" />
+                    <span>{brand?.openingHours || 'Mon - Sat: 8:30 AM - 6:30 PM (Sun: 9:00 AM - 2:00 PM)'}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Phone className="w-5 h-5 text-amber-400 shrink-0" />
+                    <a href={`tel:${(brand?.hotline || '+94771234567').replace(/\s+/g, '')}`} className="hover:text-amber-400">
+                      Hotline: {brand?.hotline || brand?.phone || '+94 77 123 4567'}
+                    </a>
+                  </div>
                 </div>
+
                 <div className="flex items-center gap-3">
-                  <Clock className="w-5 h-5 text-amber-400 shrink-0" />
-                  <span>{brand?.openingHours || 'Mon - Sat: 8:30 AM - 6:30 PM (Sun: 9:00 AM - 2:00 PM)'}</span>
+                  <a
+                    href={`https://wa.me/${(brand?.whatsapp || '+94771234567').replace(/[^0-9]/g, '')}?text=Hello%20${encodeURIComponent(brand.dealershipName || 'SalesPlus')}%2C%20I%20would%20like%20to%20visit%20the%20showroom`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-sm"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    <span>Direct WhatsApp</span>
+                  </a>
+                  <Link
+                    href="/book-test-drive"
+                    className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs uppercase tracking-wider transition-colors border border-slate-700"
+                  >
+                    <CalendarCheck className="w-4 h-4" />
+                    <span>Book Test Drive</span>
+                  </Link>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Phone className="w-5 h-5 text-amber-400 shrink-0" />
-                  <a href={`tel:${(brand?.hotline || '+94771234567').replace(/\s+/g, '')}`} className="hover:text-amber-400">
-                    Hotline: {brand?.hotline || brand?.phone || '+94 77 123 4567'}
+              </div>
+
+              {/* Visual Showroom Preview Card */}
+              <div className="relative rounded-3xl overflow-hidden aspect-[16/10] bg-slate-900 border border-slate-800 shadow-2xl">
+                <img
+                  src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80"
+                  alt={`${brand.dealershipName || 'SalesPlus'} Flagship Showroom`}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+                <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between text-white">
+                  <div>
+                    <p className="font-bold text-base">{brand.dealershipName || 'SalesPlus Auto Mart'} Showroom</p>
+                    <p className="text-xs text-slate-300">{brand.address || 'Baseline Road, Colombo 09'}</p>
+                  </div>
+                  <a
+                    href={brand?.googleMapsUrl || 'https://maps.google.com/?q=Colombo+Sri+Lanka'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3.5 py-1.5 rounded-lg bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider hover:bg-amber-300 transition-colors"
+                  >
+                    Directions
                   </a>
                 </div>
               </div>
-
-              <div className="flex items-center gap-3">
-                <a
-                  href={`https://wa.me/${(brand?.whatsapp || '+94771234567').replace(/[^0-9]/g, '')}?text=Hello%20SalesPlus%2C%20I%20would%20like%20to%20visit%20the%20showroom`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-sm"
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  <span>Direct WhatsApp</span>
-                </a>
-                <Link
-                  href="/book-test-drive"
-                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs uppercase tracking-wider transition-colors border border-slate-700"
-                >
-                  <CalendarCheck className="w-4 h-4" />
-                  <span>Book Test Drive</span>
-                </Link>
-              </div>
-            </div>
-
-            {/* Visual Showroom Preview Card */}
-            <div className="relative rounded-3xl overflow-hidden aspect-[16/10] bg-slate-900 border border-slate-800 shadow-2xl">
-              <img
-                src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80"
-                alt="SalesPlus Flagship Showroom"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
-              <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between text-white">
-                <div>
-                  <p className="font-bold text-base">SalesPlus Auto Mart Showroom</p>
-                  <p className="text-xs text-slate-300">Baseline Road, Colombo 09</p>
-                </div>
-                <a
-                  href={brand?.googleMapsUrl || 'https://maps.google.com/?q=Colombo+Sri+Lanka'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3.5 py-1.5 rounded-lg bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider hover:bg-amber-300 transition-colors"
-                >
-                  Directions
-                </a>
-              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Inquiry Dialog Modal */}
       <InquiryDialog

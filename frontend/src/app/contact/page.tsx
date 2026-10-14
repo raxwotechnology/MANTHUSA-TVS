@@ -16,11 +16,11 @@ import {
 } from 'lucide-react';
 import { PublicLayout } from '@/components/public/PublicLayout';
 import { Breadcrumbs } from '@/components/public/Breadcrumbs';
-import { fetchPublicSettings, submitPublicInquiry } from '@/lib/publicApi';
-import { BrandSettings, DEFAULT_BRAND } from '@/lib/useSettings';
+import { submitPublicInquiry } from '@/lib/publicApi';
+import { useSettings } from '@/lib/useSettings';
 
 export default function ContactPage() {
-  const [brand, setBrand] = useState<BrandSettings>(DEFAULT_BRAND);
+  const { settings: brand } = useSettings();
 
   // Form State
   const [fullName, setFullName] = useState('');
@@ -33,10 +33,6 @@ export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
-
-  useEffect(() => {
-    fetchPublicSettings().then(setBrand).catch(() => {});
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

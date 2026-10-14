@@ -20,6 +20,8 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const getLandingPath = (user: { role?: string }) =>
+    /customer|client/i.test(user.role || '') ? '/account' : '/dashboard';
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -44,7 +46,7 @@ export default function LoginPage() {
       }
       if (!result.access_token || !result.user) throw new Error('The server returned an invalid login response.');
       localStorage.setItem('token', result.access_token); localStorage.setItem('user', JSON.stringify(result.user));
-      window.location.href = '/dashboard';
+      window.location.href = getLandingPath(result.user);
     } catch (err) { setError(err instanceof Error ? err.message : 'Cannot connect to the server.'); }
     finally { setLoading(false); }
   };
@@ -56,7 +58,7 @@ export default function LoginPage() {
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.message || 'Invalid MFA code');
       localStorage.setItem('token', result.access_token); localStorage.setItem('user', JSON.stringify(result.user));
-      window.location.href = '/dashboard';
+      window.location.href = getLandingPath(result.user);
     } catch (err) { setError(err instanceof Error ? err.message : 'Invalid MFA verification code.'); }
     finally { setLoading(false); }
   };
@@ -79,7 +81,7 @@ export default function LoginPage() {
       if (!result.access_token || !result.user) throw new Error('The server returned an invalid registration response.');
       localStorage.setItem('token', result.access_token);
       localStorage.setItem('user', JSON.stringify(result.user));
-      window.location.href = '/dashboard';
+      window.location.href = getLandingPath(result.user);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Cannot connect to the server.');
     } finally { setLoading(false); }

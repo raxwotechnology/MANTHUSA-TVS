@@ -63,7 +63,7 @@ export class AuthService {
         role: role._id,
         customerId: customer._id,
         isActive: true,
-        emailVerified: true,
+        emailVerified: false,
       }).save();
       customer.userId = user._id;
       await customer.save();

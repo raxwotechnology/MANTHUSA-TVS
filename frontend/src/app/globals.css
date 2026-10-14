@@ -210,6 +210,44 @@
   border-color: #334155 !important;
 }
 
+/* These promotional sections use dark artwork in dark mode but match the light
+   card surfaces used throughout the rest of the public site in light mode. */
+:root:not(.dark) .public-site .light-mode-section {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+:root:not(.dark) .public-site .light-mode-surface {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+  box-shadow: 0 10px 30px rgb(15 23 42 / 0.08) !important;
+}
+
+:root:not(.dark) .public-site .light-mode-section h1,
+:root:not(.dark) .public-site .light-mode-section h2,
+:root:not(.dark) .public-site .light-mode-section h3,
+:root:not(.dark) .public-site .light-mode-section h4,
+:root:not(.dark) .public-site .light-mode-surface h1,
+:root:not(.dark) .public-site .light-mode-surface h2,
+:root:not(.dark) .public-site .light-mode-surface h3,
+:root:not(.dark) .public-site .light-mode-surface h4 {
+  color: #0f172a !important;
+}
+
+:root:not(.dark) .public-site .light-mode-section [class*="text-white"],
+:root:not(.dark) .public-site .light-mode-surface [class*="text-white"] {
+  color: #0f172a !important;
+}
+
+:root:not(.dark) .public-site .light-mode-section [class*="text-slate-300"],
+:root:not(.dark) .public-site .light-mode-section [class*="text-slate-400"],
+:root:not(.dark) .public-site .light-mode-surface [class*="text-slate-300"],
+:root:not(.dark) .public-site .light-mode-surface [class*="text-slate-400"] {
+  color: #475569 !important;
+}
+
 /* Customer account pages use the same crisp dashboard surfaces as staff pages. */
 :root:not(.dark) .customer-account-page {
   background-color: #ffffff !important;
@@ -488,6 +526,87 @@ html:not(.dark) body,
   background-image: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.08), transparent 52%);
 }
 
+/* Public site dark mode: normalize light utility surfaces and text for readable contrast. */
+.dark .public-site {
+  background-color: #070d1e !important;
+  color: #e2e8f0 !important;
+}
+
+.dark .public-site [class~="bg-white"],
+.dark .public-site [class~="bg-slate-50"],
+.dark .public-site [class~="bg-gray-50"],
+.dark .public-site [class~="bg-gray-100"] {
+  background-color: #0f1b3e !important;
+}
+
+.dark .public-site [class~="bg-slate-100"] {
+  background-color: #172554 !important;
+}
+
+.dark .public-site [class~="text-slate-950"],
+.dark .public-site [class~="text-slate-900"],
+.dark .public-site [class~="text-slate-800"],
+.dark .public-site [class~="text-gray-900"],
+.dark .public-site [class~="text-gray-800"],
+.dark .public-site [class~="text-black"] {
+  color: #f8fafc !important;
+}
+
+.dark .public-site [class~="text-slate-700"],
+.dark .public-site [class~="text-gray-700"] {
+  color: #e2e8f0 !important;
+}
+
+.dark .public-site [class~="text-slate-600"],
+.dark .public-site [class~="text-gray-600"] {
+  color: #cbd5e1 !important;
+}
+
+.dark .public-site [class~="text-slate-500"],
+.dark .public-site [class~="text-gray-500"] {
+  color: #94a3b8 !important;
+}
+
+.dark .public-site [class~="text-slate-400"],
+.dark .public-site [class~="text-gray-400"] {
+  color: #cbd5e1 !important;
+}
+
+.dark .public-site [class~="border-slate-200"],
+.dark .public-site [class~="border-slate-300"],
+.dark .public-site [class~="border-gray-200"],
+.dark .public-site [class~="border-gray-300"] {
+  border-color: #334155 !important;
+}
+
+.dark .public-site input:not([type="range"]):not([type="checkbox"]):not([type="radio"]),
+.dark .public-site select,
+.dark .public-site textarea {
+  background-color: #0f1b3e !important;
+  border-color: #475569 !important;
+  color: #f8fafc !important;
+  -webkit-text-fill-color: #f8fafc !important;
+}
+
+.dark .public-site input::placeholder,
+.dark .public-site textarea::placeholder,
+.dark .public-site select::placeholder {
+  color: #94a3b8 !important;
+  opacity: 1 !important;
+}
+
+.dark .public-site select option {
+  background-color: #0f1b3e !important;
+  color: #f8fafc !important;
+}
+
+.dark .public-site [class~="hover:bg-slate-50"]:hover,
+.dark .public-site [class~="hover:bg-slate-100"]:hover,
+.dark .public-site [class~="hover:bg-gray-50"]:hover,
+.dark .public-site [class~="hover:bg-gray-100"]:hover {
+  background-color: #172554 !important;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -532,4 +651,38 @@ html:not(.dark) body,
 }
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(148, 163, 184, 0.5);
+}
+
+/* Dashboard light cards & settings form controls: ALWAYS black/dark text and clear placeholder */
+.bg-white input:not([type="checkbox"]):not([type="radio"]),
+.bg-white textarea,
+.bg-white select,
+.bg-slate-50 input:not([type="checkbox"]):not([type="radio"]),
+.bg-slate-50 textarea,
+.bg-slate-50 select,
+input.bg-slate-50,
+input.bg-white,
+textarea.bg-slate-50,
+textarea.bg-white,
+select.bg-slate-50,
+select.bg-white,
+.settings-form input:not([type="checkbox"]):not([type="radio"]),
+.settings-form textarea,
+.settings-form select {
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a !important;
+}
+
+.bg-white input::placeholder,
+.bg-white textarea::placeholder,
+.bg-slate-50 input::placeholder,
+.bg-slate-50 textarea::placeholder,
+input.bg-slate-50::placeholder,
+input.bg-white::placeholder,
+textarea.bg-slate-50::placeholder,
+textarea.bg-white::placeholder,
+.settings-form input::placeholder,
+.settings-form textarea::placeholder {
+  color: #94a3b8 !important;
+  -webkit-text-fill-color: #94a3b8 !important;
 }

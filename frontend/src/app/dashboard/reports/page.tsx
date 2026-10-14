@@ -15,27 +15,38 @@ export default function ReportsPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    Promise.all([
-      apiFetch('/reports/summary'),
-      apiFetch('/reports/sales-by-month'),
-      apiFetch('/reports/aging-stock'),
-      apiFetch('/reports/profit-loss'),
-      apiFetch('/reports/by-branch'),
-      apiFetch('/reports/sales-by-category'),
-      apiFetch('/reports/lead-conversion')
-    ]).then(async ([summaryResponse, monthlyResponse, agingResponse, pnlResponse, branchResponse, categoryResponse, conversionResponse]) => {
-      if ([summaryResponse, monthlyResponse, agingResponse, pnlResponse, branchResponse, categoryResponse, conversionResponse].some(response => !response.ok)) throw new Error('Could not load report data.');
-      const [summaryData, monthlyData, agingData, pnlData, branchData, categoryData, conversionData] = await Promise.all([
-        summaryResponse.json(), monthlyResponse.json(), agingResponse.json(), pnlResponse.json(), branchResponse.json(), categoryResponse.json(), conversionResponse.json()
-      ]);
-      setSummary(summaryData);
-      setMonthly(monthlyData);
-      setAging(agingData);
-      setProfitLoss(pnlData);
-      setBranches(branchData);
-      setCategories(categoryData);
-      setLeadConversion(conversionData);
-    }).catch((err) => setError(err instanceof Error ? err.message : 'Could not load report data.'));
+    const reports = [
+      ['summary', '/reports/summary'],
+      ['monthly', '/reports/sales-by-month'],
+      ['aging', '/reports/aging-stock'],
+      ['profitLoss', '/reports/profit-loss'],
+      ['branches', '/reports/by-branch'],
+      ['categories', '/reports/sales-by-category'],
+      ['leadConversion', '/reports/lead-conversion'],
+    ] as const;
+
+    Promise.allSettled(reports.map(async ([name, path]) => {
+      const response = await apiFetch(path);
+      if (!response.ok) throw new Error(`${name} report unavailable`);
+      return [name, await response.json()] as const;
+    })).then((results) => {
+      const failed: string[] = [];
+      results.forEach((result) => {
+        if (result.status === 'rejected') {
+          failed.push(result.reason instanceof Error ? result.reason.message : 'A report could not be loaded.');
+          return;
+        }
+        const [name, data] = result.value;
+        if (name === 'summary') setSummary(data);
+        if (name === 'monthly') setMonthly(data);
+        if (name === 'aging') setAging(data);
+        if (name === 'profitLoss') setProfitLoss(data);
+        if (name === 'branches') setBranches(data);
+        if (name === 'categories') setCategories(data);
+        if (name === 'leadConversion') setLeadConversion(data);
+      });
+      if (failed.length) setError(`Some reports could not be loaded: ${failed.join(', ')}`);
+    });
   }, []);
 
   const exportCsv = () => {

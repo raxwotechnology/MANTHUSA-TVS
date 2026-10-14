@@ -17,15 +17,10 @@ import {
 } from 'lucide-react';
 import { PublicLayout } from '@/components/public/PublicLayout';
 import { Breadcrumbs } from '@/components/public/Breadcrumbs';
-import { fetchPublicSettings } from '@/lib/publicApi';
-import { BrandSettings, DEFAULT_BRAND } from '@/lib/useSettings';
+import { useSettings } from '@/lib/useSettings';
 
 export default function AboutPage() {
-  const [brand, setBrand] = useState<BrandSettings>(DEFAULT_BRAND);
-
-  useEffect(() => {
-    fetchPublicSettings().then(setBrand).catch(() => {});
-  }, []);
+  const { settings: brand } = useSettings();
 
   const dealershipName = brand.dealershipName || 'SalesPlus Auto Mart';
 
@@ -68,7 +63,11 @@ export default function AboutPage() {
               Driven by Excellence. Dedicated to Quality.
             </h1>
             <p className="text-sm text-slate-300 leading-relaxed">
-              Founded on principles of trust and automotive craftsmanship, <span className="text-white font-bold">{dealershipName}</span> has established itself as one of Sri Lanka's leading automotive direct importers and certified vehicle dealerships.
+              {brand.website?.pages?.about || (
+                <>
+                  Founded on principles of trust and automotive craftsmanship, <span className="text-white font-bold">{dealershipName}</span> has established itself as one of Sri Lanka&apos;s leading automotive direct importers and certified vehicle dealerships.
+                </>
+              )}
             </p>
             <p className="text-sm text-slate-400 leading-relaxed">
               Whether you are acquiring a brand-new electric crossover, an executive sedan, or trading in your existing car, our seasoned automotive specialists provide unbiased guidance tailored to your lifestyle and budget.

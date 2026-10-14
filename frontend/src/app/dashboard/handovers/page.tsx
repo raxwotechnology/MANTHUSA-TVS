@@ -161,7 +161,8 @@ export default function HandoversPage() {
 
         {/* List of Handover Records */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-          <table className="w-full text-left text-xs">
+          <div className="overflow-x-auto">
+          <table className="min-w-[900px] w-full text-left text-xs">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase">
                 <th className="p-3.5">Invoice #</th>
@@ -218,6 +219,7 @@ export default function HandoversPage() {
               )}
             </tbody>
           </table>
+          </div>
         </div>
 
         {/* Handover Creation Modal */}

@@ -5,15 +5,10 @@ import Link from 'next/link';
 import { ShieldCheck, Lock, Eye, FileText, CheckCircle2 } from 'lucide-react';
 import { PublicLayout } from '@/components/public/PublicLayout';
 import { Breadcrumbs } from '@/components/public/Breadcrumbs';
-import { fetchPublicSettings } from '@/lib/publicApi';
-import { BrandSettings, DEFAULT_BRAND } from '@/lib/useSettings';
+import { useSettings } from '@/lib/useSettings';
 
 export default function PrivacyPolicyPage() {
-  const [brand, setBrand] = useState<BrandSettings>(DEFAULT_BRAND);
-
-  useEffect(() => {
-    fetchPublicSettings().then(setBrand).catch(() => {});
-  }, []);
+  const { settings: brand } = useSettings();
 
   const dealershipName = brand.dealershipName || 'SalesPlus Auto Mart';
   const email = brand.salesEmail || brand.email || 'privacy@salesplus.lk';
@@ -35,6 +30,12 @@ export default function PrivacyPolicyPage() {
               Last updated: October 2026 • Effective for all public inquiries, test drives, and vehicle valuation submissions.
             </p>
           </div>
+
+          {brand.website?.pages?.privacy && (
+            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-300">
+              <strong>Data Privacy Commitment:</strong> {brand.website.pages.privacy}
+            </div>
+          )}
 
           <section className="space-y-3">
             <h2 className="text-xl font-bold text-white">1. Information We Collect</h2>

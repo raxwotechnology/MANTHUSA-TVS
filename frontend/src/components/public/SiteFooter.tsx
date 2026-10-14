@@ -195,9 +195,21 @@ export function SiteFooter({ brand }: Props) {
 
         {/* Bottom Legal Bar */}
         <div className="mt-12 pt-8 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-          <p>
-            {brand?.footerText || `© ${currentYear} ${dealershipName}. All vehicle specifications and prices are subject to inventory confirmation.`}
-          </p>
+                  <div className="flex items-center gap-2.5 text-xs text-gray-400">
+          
+            <span>
+              © {new Date().getFullYear()}{' '}
+              <a
+                href="https://raxwo.net/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-400 hover:text-blue-300 font-semibold underline underline-offset-2 transition-colors"
+              >
+                Raxwo (Pvt) LTD
+              </a>
+            . All rights reserved.
+            </span>
+          </div>
           <div className="flex items-center gap-6">
             <Link href="/privacy" className="hover:text-slate-300 transition-colors">
               Privacy Policy

@@ -5,15 +5,10 @@ import Link from 'next/link';
 import { FileText, ShieldAlert, CheckCircle2, AlertCircle } from 'lucide-react';
 import { PublicLayout } from '@/components/public/PublicLayout';
 import { Breadcrumbs } from '@/components/public/Breadcrumbs';
-import { fetchPublicSettings } from '@/lib/publicApi';
-import { BrandSettings, DEFAULT_BRAND } from '@/lib/useSettings';
+import { useSettings } from '@/lib/useSettings';
 
 export default function TermsPage() {
-  const [brand, setBrand] = useState<BrandSettings>(DEFAULT_BRAND);
-
-  useEffect(() => {
-    fetchPublicSettings().then(setBrand).catch(() => {});
-  }, []);
+  const { settings: brand } = useSettings();
 
   const dealershipName = brand.dealershipName || 'SalesPlus Auto Mart';
 
@@ -34,6 +29,12 @@ export default function TermsPage() {
               Effective Date: October 2026 • Governing website access, vehicle listings, inquiries, test drives, and valuations.
             </p>
           </div>
+
+          {brand.website?.pages?.terms && (
+            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-300">
+              <strong>Dealership Policy Notice:</strong> {brand.website.pages.terms}
+            </div>
+          )}
 
           <section className="space-y-3">
             <h2 className="text-xl font-bold text-white">1. Scope of Public Website</h2>

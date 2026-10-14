@@ -48,7 +48,8 @@ export default function TransfersPage() {
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
-        <table className="w-full text-xs text-left">
+        <div className="overflow-x-auto">
+        <table className="min-w-[820px] w-full text-xs text-left">
           <thead>
             <tr className="bg-slate-50 border-b text-slate-700 font-semibold">
               <th className="py-3 px-4">Transfer #</th>
@@ -74,6 +75,7 @@ export default function TransfersPage() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     
       {showAddModal && (

@@ -18,15 +18,28 @@ async function bootstrap() {
     origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
       // Allow requests with no origin (like mobile apps, curl, server-to-server)
       if (!origin) return callback(null, true);
+      let isLocalDevelopmentOrigin = false;
+      try {
+        const url = new URL(origin);
+        const hostname = url.hostname;
+        const isPrivateIpv4 =
+          /^(10|192\.168)\.\d{1,3}\.\d{1,3}$/.test(hostname) ||
+          /^172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}$/.test(hostname);
+        isLocalDevelopmentOrigin =
+          url.protocol === 'http:' &&
+          url.port === '3000' &&
+          (hostname === 'localhost' || hostname === '127.0.0.1' || isPrivateIpv4);
+      } catch {
+        isLocalDevelopmentOrigin = false;
+      }
       if (
-        !rawOrigin ||
         rawOrigin === '*' ||
         allowedOrigins.includes(origin) ||
-        origin.endsWith('.vercel.app')
+        isLocalDevelopmentOrigin
       ) {
         return callback(null, true);
       }
-      return callback(null, true);
+      return callback(new Error('Origin is not allowed by CORS.'));
     },
     credentials: true,
   });

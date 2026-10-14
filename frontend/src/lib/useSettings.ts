@@ -181,17 +181,20 @@ export function buildBrandSettings(data: any): BrandSettings {
 function applyFaviconAndTitle(settings: BrandSettings) {
   if (typeof document === 'undefined') return;
 
-  // Dynamically sync favicon
-  const iconUrl = settings.faviconUrl || settings.logoUrl;
-  if (iconUrl) {
-    let link: HTMLLinkElement | null = document.querySelector("link[rel*='icon']");
-    if (!link) {
-      link = document.createElement('link');
-      link.rel = 'shortcut icon';
-      document.head.appendChild(link);
-    }
-    link.href = iconUrl;
+  const dealershipName = settings.dealershipName.trim() || DEFAULT_BRAND.dealershipName;
+  document.title = `${dealershipName} — Premier Vehicle Dealership & Direct Importer`;
+
+  // Dynamically sync the browser tab icon with the saved brand identity.
+  const iconUrl = settings.faviconUrl || settings.logoUrl || '/icon.svg';
+  let link = document.querySelector<HTMLLinkElement>('link[data-brand-favicon]');
+  if (!link) {
+    link = document.createElement('link');
+    link.rel = 'icon';
+    document.head.appendChild(link);
   }
+  link.dataset.brandFavicon = 'true';
+  link.type = iconUrl.startsWith('data:image/svg') || iconUrl.endsWith('.svg') ? 'image/svg+xml' : 'image/png';
+  link.href = iconUrl.startsWith('data:') ? iconUrl : `${iconUrl}${iconUrl.includes('?') ? '&' : '?'}brand=${Date.now()}`;
 }
 
 export function useSettings() {

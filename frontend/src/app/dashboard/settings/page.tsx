@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { apiFetch } from '@/lib/api';
-import { buildBrandSettings } from '@/lib/useSettings';
+import { buildBrandSettings, DEFAULT_WEBSITE_CMS } from '@/lib/useSettings';
 import {
   Settings,
   Store,
@@ -164,6 +164,7 @@ export default function SettingsPage() {
       sessionTimeoutMinutes: 60,
       timeZone: 'Asia/Colombo (GMT+5:30)',
     },
+    website: DEFAULT_WEBSITE_CMS,
   });
 
   const [newChecklistItem, setNewChecklistItem] = useState('');
@@ -190,6 +191,7 @@ export default function SettingsPage() {
               templates: { ...prev.templates, ...(data.templates || {}) },
               social: { ...prev.social, ...(data.social || {}) },
               system: { ...prev.system, ...(data.system || {}) },
+              website: { ...(prev.website || DEFAULT_WEBSITE_CMS), ...(data.website || {}) },
             };
 
             if (typeof window !== 'undefined') {
@@ -371,7 +373,7 @@ export default function SettingsPage() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-6xl mx-auto space-y-6 pb-16">
+      <div className="max-w-6xl mx-auto space-y-6 pb-16 settings-form text-slate-900">
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
           <div className="flex items-center gap-3.5">
@@ -524,7 +526,7 @@ export default function SettingsPage() {
                           placeholder="Or enter logo image URL directly (e.g. https://...)"
                           value={settings.general?.logoUrl || ''}
                           onChange={(e) => handleNestedChange('general', 'logoUrl', e.target.value)}
-                          className="w-full sm:w-96 text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus:bg-white focus:outline-none focus:border-blue-500"
+                          className="w-full sm:w-96 text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus:bg-white focus:outline-none focus:border-blue-500 text-slate-900 placeholder:text-slate-400 font-medium"
                         />
                       </div>
                     </div>
@@ -541,7 +543,7 @@ export default function SettingsPage() {
                         value={settings.general?.dealershipName || ''}
                         onChange={(e) => handleNestedChange('general', 'dealershipName', e.target.value)}
                         placeholder="Max Durakathana / SalesPlus Auto Mart"
-                        className="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:border-blue-500 font-medium"
+                        className="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:border-blue-500 font-semibold text-slate-900 placeholder:text-slate-400"
                       />
                     </div>
                     <div>
@@ -551,7 +553,7 @@ export default function SettingsPage() {
                         value={settings.general?.tagline || ''}
                         onChange={(e) => handleNestedChange('general', 'tagline', e.target.value)}
                         placeholder="Where style meets accessories / Sri Lanka's Premier Vehicle Dealership"
-                        className="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:border-blue-500 font-medium"
+                        className="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:border-blue-500 font-semibold text-slate-900 placeholder:text-slate-400"
                       />
                     </div>
                   </div>
@@ -567,7 +569,7 @@ export default function SettingsPage() {
                         value={settings.general?.registrationNumber || ''}
                         onChange={(e) => handleNestedChange('general', 'registrationNumber', e.target.value)}
                         placeholder="PV-89214/2024"
-                        className="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:border-blue-500"
+                        className="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:border-blue-500 font-semibold text-slate-900 placeholder:text-slate-400"
                       />
                     </div>
                     <div>
@@ -579,7 +581,7 @@ export default function SettingsPage() {
                         value={settings.general?.taxNumber || ''}
                         onChange={(e) => handleNestedChange('general', 'taxNumber', e.target.value)}
                         placeholder="VAT-119284729-7000"
-                        className="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:border-blue-500"
+                        className="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:border-blue-500 font-semibold text-slate-900 placeholder:text-slate-400"
                       />
                     </div>
                   </div>
@@ -600,7 +602,7 @@ export default function SettingsPage() {
                       value={settings.general?.footerText || ''}
                       onChange={(e) => handleNestedChange('general', 'footerText', e.target.value)}
                       placeholder="© 2026 SalesPlus. All rights reserved."
-                      className="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:border-blue-500 font-medium"
+                      className="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:border-blue-500 font-semibold text-slate-900 placeholder:text-slate-400"
                     />
                   </div>
                 </div>

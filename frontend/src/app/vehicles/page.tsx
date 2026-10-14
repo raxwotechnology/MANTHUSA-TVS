@@ -547,7 +547,7 @@ function VehiclesContent() {
               )}
             </div>
 
-            <FilterPanelContent />
+            {FilterPanelContent()}
           </div>
         </aside>
 
@@ -618,7 +618,7 @@ function VehiclesContent() {
               </button>
             </div>
 
-            <FilterPanelContent />
+            {FilterPanelContent()}
 
             <div className="mt-8 pt-4 border-t border-slate-800">
               <button
