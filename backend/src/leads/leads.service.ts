@@ -24,20 +24,48 @@ export class LeadsService {
   async createPublicInquiry(input: any): Promise<LeadDocument> {
     const fullName = String(input.fullName || '').trim();
     const phone = String(input.phone || '').trim();
-    if (fullName.length < 2 || phone.replace(/\D/g, '').length < 7 || !input.vehicle) {
-      throw new BadRequestException('Name, valid phone number and vehicle are required.');
+    if (fullName.length < 2 || phone.replace(/\D/g, '').length < 7) {
+      throw new BadRequestException('Name and a valid phone number are required.');
     }
-    const vehicleId = String(input.vehicle);
-    if (!isValidObjectId(vehicleId)) throw new BadRequestException('The selected vehicle ID is invalid.');
-    const vehicle = await this.vehicleModel.findById(vehicleId).exec();
-    if (!vehicle) throw new BadRequestException('The selected vehicle does not exist.');
+    let vehicleId: string | undefined = undefined;
+    if (input.vehicle) {
+      const vId = String(input.vehicle);
+      if (!isValidObjectId(vId)) {
+        throw new BadRequestException('The selected vehicle ID is invalid.');
+      }
+      const vehicle = await this.vehicleModel.findById(vId).exec();
+      if (!vehicle) {
+        throw new BadRequestException('The selected vehicle does not exist.');
+      }
+      vehicleId = String(vehicle._id);
+    }
     let customer = await this.customerModel.findOne({ phone }).exec();
-    if (!customer) customer = await new this.customerModel({ fullName, phone, email: input.email, customerType: 'Individual' }).save();
-    return this.create({ customer: customer._id, interestedVehicle: vehicleId, source: 'Website', status: 'New', priority: 'Medium', inquiryType: String(input.inquiryType || 'Details').slice(0, 40), inquiryMessage: String(input.message || '').slice(0, 1000), preferredDate: input.preferredDate || undefined });
+    if (!customer) {
+      customer = await new this.customerModel({
+        fullName,
+        phone,
+        email: input.email,
+        customerType: 'Individual',
+      }).save();
+    }
+    return this.create({
+      customer: customer._id,
+      interestedVehicle: vehicleId,
+      source: 'Website',
+      status: 'New',
+      priority: 'Medium',
+      inquiryType: String(input.inquiryType || 'General').slice(0, 40),
+      inquiryMessage: String(input.message || '').slice(0, 1000),
+      preferredDate: input.preferredDate || undefined,
+    });
   }
 
   async findAll(): Promise<LeadDocument[]> {
     return this.leadModel.find().populate('customer').populate('interestedVehicle', 'stockNumber make model year sellingPrice status').sort({ createdAt: -1 }).exec();
+  }
+
+  async findByCustomer(customerId: string): Promise<LeadDocument[]> {
+    return this.leadModel.find({ customer: customerId }).populate('interestedVehicle', 'stockNumber make model year sellingPrice status imageUrls').sort({ createdAt: -1 }).exec();
   }
 
   async findOne(id: string): Promise<LeadDocument> {

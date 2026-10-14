@@ -179,6 +179,9 @@ export function Topbar({ user, onToggleSidebar }: TopbarProps) {
           <span>Public Website</span>
         </button>
 
+
+
+
         {/* Notifications Popover */}
         <div className="relative">
           <button

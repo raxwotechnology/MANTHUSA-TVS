@@ -1,330 +1,335 @@
-# 🚗 SalesPlus — Vehicle Sales & Dealership Management System
+# SalesPlus — Vehicle Sales Management System
 
-[![Framework - NestJS](https://img.shields.io/badge/Backend-NestJS_11-E0234E?logo=nestjs&logoColor=white)](https://nestjs.com/)
-[![Framework - Next.js](https://img.shields.io/badge/Frontend-Next.js_16-000000?logo=next.js&logoColor=white)](https://nextjs.org/)
-[![Database - MongoDB](https://img.shields.io/badge/Database-MongoDB-47A248?logo=mongodb&logoColor=white)](https://www.mongodb.com/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Styling - Tailwind CSS](https://img.shields.io/badge/Styling-Tailwind_v4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+SalesPlus is a full-stack vehicle dealership management application. It provides
+one web interface for vehicle inventory, customer relationship management, sales,
+payments, expenses, reporting, and after-sales operations.
 
----
+> **Project status:** This is an active development implementation. It is not
+> production-ready until the security, deployment, database, storage, and
+> operational items in [Known limitations](#known-limitations) are completed.
 
-## 📌 Overview
+## Features
 
-**SalesPlus** is a full-featured, enterprise-grade **Vehicle Dealership & Sales Management ERP System**. Designed to streamline every aspect of automotive dealership operations, SalesPlus bridges the gap between lead acquisition, inventory tracking, financial accounting, vehicle servicing/handovers, and executive reporting.
+### Authentication and administration
 
-Whether managing single or multi-branch dealerships, SalesPlus delivers real-time visibility into vehicle investments, profit margins, sales performance, cash transactions, and post-sale customer management.
+- JWT-based login with bcrypt password hashing
+- Role and permission management
+- User, branch, settings, and audit-log management
+- Password reset and email verification token flows
+- Global request validation and protected dashboard routes
 
----
+### Inventory and vehicle operations
 
-## 🏗️ System Architecture
+- Vehicle stock records, specifications, media, and status tracking
+- Purchase/acquisition records and stock movements
+- Vehicle inspections, valuations, transfers, and leasing partners
+- Public vehicle listing and vehicle-interest enquiry forms
+- Vehicle handover and post-sale records
 
-SalesPlus is built with a modern decoupled full-stack architecture:
+### CRM and sales
 
+- Individual and corporate customer records
+- Leads, lead activities, follow-ups, and customer timelines
+- Test-drive scheduling and quotation management
+- Discount requests and approval workflow
+- Reservations, sales invoices, payments, installments, and refunds
+
+### Finance and reporting
+
+- Cash IN/OUT transactions and expense categories
+- Supplier records and supplier payments
+- Commissions and sales targets
+- Dashboard KPIs and branch-aware reporting
+- Aging-stock and profit/loss reports with CSV downloads
+- In-app notifications and document upload/download support
+
+## Architecture
+
+```text
+┌──────────────────────────────────────────────────────────┐
+│ Frontend                                                  │
+│ Next.js 16 + React 19 + Tailwind CSS 4                   │
+│ http://localhost:3000                                    │
+└───────────────────────────┬──────────────────────────────┘
+                            │ REST/JSON
+                            ▼
+┌──────────────────────────────────────────────────────────┐
+│ Backend                                                   │
+│ NestJS 11 + Mongoose 9 + Passport JWT                    │
+│ http://localhost:3001                                    │
+└───────────────────────────┬──────────────────────────────┘
+                            │
+                            ▼
+┌──────────────────────────────────────────────────────────┐
+│ MongoDB                                                    │
+│ Default database: salesplus                                │
+└──────────────────────────────────────────────────────────┘
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    Frontend Client                      │
-│     Next.js 16 (App Router) + React 19 + Tailwind v4    │
-└────────────────────────────┬────────────────────────────┘
-                             │ HTTP / REST API (Port 3001)
-                             ▼
-┌─────────────────────────────────────────────────────────┐
-│                     Backend API                         │
-│       NestJS 11 + Mongoose 9 + Passport JWT             │
-└────────────────────────────┬────────────────────────────┘
-                             │ Mongoose ODM
-                             ▼
-┌─────────────────────────────────────────────────────────┐
-│                     Database Layer                      │
-│                  MongoDB (salesplus)                    │
-└─────────────────────────────────────────────────────────┘
-```
 
----
+The frontend uses `NEXT_PUBLIC_API_URL` when it is configured. Otherwise it
+uses port `3001` on the current browser host during client-side requests.
 
-## 🚀 Key Features & Modules
+## Technology stack
 
-### 🔐 1. Authentication & Access Control (RBAC)
-- **JWT-Based Authentication**: Secure stateless authentication using Passport JWT.
-- **Role-Based Permissions**: Granular permissions per role (Admin, Sales & Operations, Accountant / Finance Staff).
-- **Multi-Branch Control**: Branch-level data partitioning for Colombo, Kandy, Kurunegala, Galle, etc.
-- **Audit Logging**: Tracks system activities for compliance and operational transparency.
+| Area | Technology |
+| --- | --- |
+| Frontend | Next.js 16, React 19, TypeScript |
+| UI | Tailwind CSS 4, Base UI, Shadcn components, Lucide React |
+| Backend | NestJS 11, TypeScript |
+| Database | MongoDB with Mongoose 9 |
+| Authentication | JWT, Passport, bcrypt |
+| Validation | `class-validator`, `class-transformer` |
+| Testing | Jest, Supertest, NestJS testing utilities |
 
-### 🚘 2. Vehicle Inventory Management
-- **Complete Vehicle Lifecycle**: Track vehicles from purchase, inspection, and detailing to sale and handover.
-- **Financial Investment Tracking**: Detailed breakdown of Purchase Price, Import Costs, Transport, Repairs, Detailing, Registration, Insurance, and Advertisement costs.
-- **Real-Time Margin Calculation**: Automatic calculation of Total Investment, Minimum Selling Price, and Expected Profit.
-- **Vehicle Status Management**: Status tracking (`Available`, `Reserved`, `Sold`, `Under Inspection`).
-- **Media & Features Gallery**: Support for vehicle imagery, technical specifications, and condition tags.
-- **Transfers & Valuations**: Multi-branch vehicle transfers and trade-in valuation workflows.
+## Repository structure
 
-### 👥 3. CRM & Lead Lifecycle
-- **Customer Directory**: Supports both **Individual** and **Corporate** profiles with NIC/Passport tracking.
-- **Lead Pipeline**: Stage tracking (`New`, `Contacted`, `Test Drive`, `Quotation`, `Negotiation`, `Closed-Won`, `Closed-Lost`).
-- **Test Drive Scheduling**: Track licenses, appointment slots, vehicle assignments, and customer feedback.
-- **Quotations & Discounts**: Generate formal quotations with expiration dates, discount requests, and manager approvals.
-
-### 💰 4. Sales, Reservations & Invoicing
-- **Vehicle Reservations**: Hold vehicles with advance deposits, receipt generation, and automatic expiration handling.
-- **Invoicing & Checkout**: Complete sales transaction processing with invoice numbers (`INV-YYYY-XXX`), payment method tracking, and balance calculations.
-- **Vehicle Handovers**: Pre-delivery checklist verification (keys, documentation, insurance, accessories) and customer digital signatures.
-
-### 💵 5. Finance, Cash Flow & Expenses
-- **Double-Entry Style Cash Transactions**: Real-time ledger recording incoming (`IN`) customer payments and outgoing (`OUT`) operational expenses.
-- **Supplier & Purchase Management**: Supplier directory, purchase orders, outstanding balance tracking, and supplier payments.
-- **Expense Categorization**: Track showroom utility, repair, transport, and administrative costs.
-- **Installments & Refunds**: Support for flexible customer payment plans and refund tracking.
-
-### 📊 6. Analytics, Reporting & Dashboard
-- **Executive Dashboard**: KPI metrics for total sales revenue, available inventory valuation, active leads, and monthly targets.
-- **Commissions & Targets**: Sales executive quota tracking and commission calculation.
-- **Exportable Reports**: Detailed financial summaries, inventory aging, and sales performance analytics.
-
----
-
-## 📁 Directory Structure
-
-```directory
+```text
 Vehicle Sales/
-├── backend/                  # NestJS REST API Server
+├── backend/
 │   ├── src/
-│   │   ├── after-sales/      # Post-sales & service history
-│   │   ├── audit-logs/       # Audit log recording module
-│   │   ├── auth/             # JWT Auth guards, strategies & auth services
-│   │   ├── branches/         # Showroom branch management
-│   │   ├── cash-transactions/# Cash IN/OUT financial ledger
-│   │   ├── commissions/      # Staff commission tracking
-│   │   ├── complaints/       # Customer complaint ticketing
-│   │   ├── customers/        # Customer CRM management
-│   │   ├── dashboard/        # Dashboard stats & analytics endpoints
-│   │   ├── discount-requests/# Manager approval workflows for discounts
-│   │   ├── expense-categories/# Expense category classification
-│   │   ├── expenses/         # Store & operational expense entries
-│   │   ├── follow-ups/       # Lead follow-up schedules
-│   │   ├── installments/     # Customer payment installment plans
-│   │   ├── lead-activities/  # CRM interaction logs
-│   │   ├── leads/            # Sales pipeline & lead management
-│   │   ├── payments/         # Payment receipt processing
-│   │   ├── permissions/      # Permission list & RBAC mapping
-│   │   ├── quotations/       # Vehicle quotation generation
-│   │   ├── refunds/          # Customer refund processing
-│   │   ├── reports/          # Financial & inventory report engines
-│   │   ├── reservations/     # Vehicle reservation deposits
-│   │   ├── roles/            # Role definitions (Admin, Sales, Finance)
-│   │   ├── sales/            # Sales invoicing & order management
-│   │   ├── sales-targets/    # Monthly/Quarterly quota targets
-│   │   ├── settings/         # System-wide configuration options
-│   │   ├── supplier-payments/# Supplier payout tracking
-│   │   ├── suppliers/        # Vehicle & parts supplier database
-│   │   ├── test-drives/      # Test drive scheduling & feedback
-│   │   ├── users/            # System user accounts & management
-│   │   ├── vehicle-handovers/# Pre-delivery inspection & handover checklists
-│   │   ├── vehicle-inspections/# Vehicle health & condition reports
-│   │   ├── vehicle-purchases/# Inventory stock acquisition logs
-│   │   ├── vehicle-transfers/# Inter-branch vehicle movement
-│   │   ├── vehicle-valuations/# Trade-in vehicle valuation
-│   │   ├── vehicles/         # Vehicle inventory core models & logic
-│   │   ├── app.module.ts     # Main application root Nest module
-│   │   ├── main.ts           # Backend entrypoint (Runs on port 3001)
-│   │   └── seed.ts           # Database initialization script
-│   ├── package.json
-│   └── tsconfig.json
-│
-└── frontend/                 # Next.js App Router Web UI
-    ├── src/
-    │   ├── app/
-    │   │   ├── dashboard/    # Main application dashboard layout & pages
-    │   │   │   ├── after-sales/
-    │   │   │   ├── audit-logs/
-    │   │   │   ├── commissions/
-    │   │   │   ├── complaints/
-    │   │   │   ├── customers/
-    │   │   │   ├── expenses/
-    │   │   │   ├── finance/
-    │   │   │   ├── handovers/
-    │   │   │   ├── inspections/
-    │   │   │   ├── installments/
-    │   │   │   ├── leads/
-    │   │   │   ├── quotations/
-    │   │   │   ├── reports/
-    │   │   │   ├── reservations/
-    │   │   │   ├── sales/
-    │   │   │   ├── suppliers/
-    │   │   │   ├── targets/
-    │   │   │   ├── test-drives/
-    │   │   │   ├── transfers/
-    │   │   │   ├── users/
-    │   │   │   ├── valuations/
-    │   │   │   └── vehicles/
-    │   │   ├── login/        # User authentication portal
-    │   │   ├── layout.tsx    # Root Next.js layout
-    │   │   └── page.tsx      # Landing & redirection page
-    │   ├── components/       # Shared UI components & Shadcn elements
-    │   ├── hooks/            # Custom React hooks
-    │   └── lib/              # API utilities & helpers
-    ├── package.json
-    └── tailwind.config.ts
+│   │   ├── auth/                 # Login, registration, JWT and recovery
+│   │   ├── users/ roles/         # Users, roles and permissions
+│   │   ├── branches/ settings/   # Administration and configuration
+│   │   ├── vehicles/             # Inventory and public vehicle listings
+│   │   ├── vehicle-purchases/    # Acquisitions and stock movements
+│   │   ├── vehicle-inspections/  # Inspection records
+│   │   ├── vehicle-transfers/    # Inter-branch transfers
+│   │   ├── vehicle-valuations/   # Trade-in valuations
+│   │   ├── customers/ leads/     # CRM and lead pipeline
+│   │   ├── test-drives/          # Test-drive records
+│   │   ├── quotations/           # Quotations and discounts
+│   │   ├── reservations/ sales/  # Reservations and completed sales
+│   │   ├── payments/ installments/# Customer payment workflows
+│   │   ├── refunds/              # Refund records
+│   │   ├── suppliers/            # Suppliers and supplier payments
+│   │   ├── expenses/             # Expenses and expense categories
+│   │   ├── cash-transactions/    # Cash ledger
+│   │   ├── reports/ dashboard/   # KPIs, reports and CSV exports
+│   │   ├── vehicle-handovers/    # Delivery and handover checklists
+│   │   ├── after-sales/          # Post-sale service records
+│   │   ├── complaints/           # Customer complaints
+│   │   ├── documents/            # File upload and download
+│   │   ├── notifications/        # In-app and optional external messages
+│   │   └── audit-logs/           # Activity audit records
+│   ├── scripts/                  # Database maintenance scripts
+│   └── package.json
+├── frontend/
+│   ├── src/app/                  # Next.js routes and dashboard screens
+│   ├── src/components/           # Shared UI components
+│   ├── src/hooks/                # React hooks
+│   ├── src/lib/                  # API client and shared helpers
+│   └── package.json
+├── STATUS.md                     # Current implementation status
+└── README.md
 ```
 
----
+## Prerequisites
 
-## 🛠️ Technology Stack
+- Node.js 20 or later
+- npm 10 or later
+- MongoDB 6 or later, running locally or available through MongoDB Atlas
 
-| Layer | Technology | Description |
-| :--- | :--- | :--- |
-| **Backend Framework** | NestJS 11 | Enterprise TypeScript framework for Node.js |
-| **Database** | MongoDB + Mongoose 9 | NoSQL Document Database with Object Data Modeling |
-| **Auth & Security** | JWT + Passport + Bcrypt | Secure token authentication & password hashing |
-| **Frontend Framework**| Next.js 16 | React Framework with App Router & Server Components |
-| **UI Library** | React 19 + Base UI | Modern, accessible component architecture |
-| **Styling** | Tailwind CSS v4 | Utility-first CSS framework |
-| **Icons** | Lucide React | Modern SVG icons set |
+## Local setup
 
----
+### 1. Configure the backend
 
-## ⚙️ Getting Started
-
-### Prerequisites
-
-Ensure you have the following installed on your local machine:
-- **Node.js**: `v20.x` or higher
-- **npm**: `v10.x` or higher (or `pnpm` / `yarn`)
-- **MongoDB**: `v6.0` or higher (running locally on port `27017` or via MongoDB Atlas connection string)
-
----
-
-### 1. Database Setup & Seeding
-
-Make sure your MongoDB server is running:
-
-```bash
-# Verify MongoDB connection
-mongod --version
+```powershell
+cd backend
+Copy-Item .env.example .env
 ```
 
-Navigate to the `backend` folder and populate sample seed data (Branches, Users, Vehicles, Customers, Sales, Cash Ledger entries):
+Update `backend/.env` before starting the API:
 
-```bash
+```dotenv
+MONGO_URI=mongodb://localhost:27017/salesplus
+JWT_SECRET=replace-with-a-unique-long-random-secret
+JWT_EXPIRES_IN=1d
+FRONTEND_ORIGIN=http://localhost:3000
+UPLOAD_DIR=./uploads
+
+# Optional email delivery for password recovery and verification
+RESEND_API_KEY=
+EMAIL_FROM=SalesPlus <no-reply@example.com>
+
+# Optional SMS gateway configuration
+SMS_API_KEY=
+SMS_GATEWAY_URL=
+SMS_SENDER_ID=SalesPlus
+```
+
+`PORT` is optional and defaults to `3001`. `FRONTEND_ORIGIN` can contain
+comma-separated origins. Never commit real secrets or production credentials.
+
+### 2. Install dependencies
+
+Run each install command in its own application directory:
+
+```powershell
 cd backend
 npm install
+
+cd ..\frontend
+npm install
+```
+
+### 3. Start MongoDB
+
+Ensure MongoDB is running and that the configured database URL is reachable.
+The application creates its collections as the relevant features are used.
+
+### 4. Seed development accounts
+
+The seed command creates or updates the system roles and the five development
+staff accounts. It does not create vehicles, customers, sales, or other
+dealership sample records. Running it also removes user accounts whose email is
+not in the built-in development account list, so do not run it against a
+production database.
+
+```powershell
+cd backend
 npm run seed
 ```
 
-> **Note**: `npm run seed` will initialize the `salesplus` database with demo accounts, sample stock vehicles, and operational records.
+Development accounts created by the current seed script:
 
----
+| Email | Password | Role |
+| --- | --- | --- |
+| `admin@salesplus.com` | `admin123` | Admin / Owner |
+| `manager@salesplus.com` | `manager123` | Inventory Manager |
+| `executive@salesplus.com` | `ex123` | Sales & Operations |
+| `accountant@salesplus.com` | `accountant123` | Accountant / Finance Staff |
+| `manager2@salesplus.com` | `manag123` | Sales & Operations |
 
-### 2. Backend API Setup
+These credentials are for local development only. Change or replace the seed
+behavior before deploying the application.
 
-From the `backend` directory:
+### 5. Start the applications
 
-```bash
-# Start backend server in development mode
+Start the backend:
+
+```powershell
+cd backend
 npm run start:dev
 ```
 
-The NestJS backend will start at:  
-👉 **`http://localhost:3001`**
+Start the frontend in a second terminal:
 
----
-
-### 3. Frontend UI Setup
-
-Open a new terminal window, navigate to the `frontend` directory:
-
-```bash
+```powershell
 cd frontend
-npm install
 npm run dev
 ```
 
-The Next.js frontend application will start at:  
-👉 **`http://localhost:3000`**
+Open <http://localhost:3000>. The API is available at
+<http://localhost:3001>.
 
----
+For a separately deployed API, create `frontend/.env.local` and set:
 
-## 🔐 Default Demo Accounts
-
-The database seed populates the following accounts for testing across various role permissions:
-
-| Name | Role | Email | Password | Access Level |
-| :--- | :--- | :--- | :--- | :--- |
-| **Saman Kumara** | Admin | `admin@salesplus.com` | `admin123` | Full System Access |
-| **Nimal Perera** | Manager | `manager@salesplus.com` | `manager123` | Manager & Approval Controls |
-| **Kasun Fernando**| Sales Executive | `executive@salesplus.com` | `ex123` | CRM, Leads, Vehicles & Sales |
-| **Dilini Silva** | Accountant | `accountant@salesplus.com` | `accountant123` | Finance, Expenses & Cash Ledger |
-| **Ruwan Jayasinghe**| Sales Manager | `manager2@salesplus.com` | `manag123` | Sales & Operations |
-
----
-
-## 📡 API Endpoints Overview
-
-The backend exposes RESTful endpoints under the following main routes:
-
-### Authentication & Users
-- `POST /auth/login` — Authenticate user and receive JWT token
-- `GET /users` — List system users
-- `POST /users` — Create user account
-- `GET /roles` — Retrieve defined user roles
-- `GET /branches` — Showroom branch details
-
-### Vehicles & Stock
-- `GET /vehicles` — Fetch inventory listing with filters (status, make, branch)
-- `POST /vehicles` — Register a new vehicle entry
-- `GET /vehicles/:id` — Vehicle details & investment cost breakdown
-- `POST /vehicle-inspections` — Record vehicle pre-purchase/sale inspection
-- `POST /vehicle-transfers` — Initiate inter-branch vehicle movement
-- `POST /vehicle-valuations` — Evaluate trade-in vehicles
-
-### CRM & Sales Pipeline
-- `GET /customers` — List customers (Individual/Corporate)
-- `GET /leads` — View lead pipeline status
-- `POST /test-drives` — Book test drive slot
-- `POST /quotations` — Create customer vehicle quotation
-- `POST /reservations` — Reserve vehicle with deposit
-
-### Sales & Financials
-- `POST /sales` — Create sale invoice & complete transaction
-- `GET /payments` — View payment transaction receipts
-- `GET /cash-transactions` — Audit cash ledger (IN/OUT entries)
-- `GET /expenses` — View operational expenses & category breakdown
-- `GET /dashboard/stats` — Executive dashboard overview metrics
-
----
-
-## 🧪 Testing & Code Quality
-
-### Backend Commands
-```bash
-cd backend
-
-# Run unit tests
-npm run test
-
-# Run e2e tests
-npm run test:e2e
-
-# Run code linter
-npm run lint
-
-# Format codebase
-npm run format
+```dotenv
+NEXT_PUBLIC_API_URL=https://api.example.com
 ```
 
-### Frontend Commands
-```bash
-cd frontend
+## Useful commands
 
-# Run ESLint validation
+### Backend
+
+Run these commands from `backend/`:
+
+| Command | Purpose |
+| --- | --- |
+| `npm run start:dev` | Start the API in watch mode |
+| `npm run start` | Start the API without watch mode |
+| `npm run start:prod` | Run the compiled API from `dist/` |
+| `npm run build` | Compile the NestJS application |
+| `npm run seed` | Create/update development roles and accounts |
+| `npm run migrate:reference-ids` | Migrate legacy reference IDs |
+| `npm run lint` | Run ESLint with autofix |
+| `npm run format` | Format backend TypeScript files |
+| `npm run test` | Run unit tests |
+| `npm run test:e2e` | Run end-to-end tests |
+| `npm run test:cov` | Run tests with coverage |
+
+### Frontend
+
+Run these commands from `frontend/`:
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the Next.js development server |
+| `npm run build` | Create the production build |
+| `npm run start` | Start the production build |
+| `npm run lint` | Run ESLint |
+
+## API overview
+
+The backend exposes REST endpoints under the following controller paths:
+
+| Area | Main routes |
+| --- | --- |
+| Auth | `/auth` |
+| Administration | `/users`, `/roles`, `/permissions`, `/branches`, `/settings` |
+| Inventory | `/vehicles`, `/vehicle-purchases`, `/stock-movements`, `/vehicle-inspections`, `/vehicle-transfers`, `/vehicle-valuations`, `/leasing-partners` |
+| CRM | `/customers`, `/leads`, `/lead-activities`, `/follow-ups`, `/test-drives` |
+| Sales | `/quotations`, `/discount-requests`, `/reservations`, `/sales`, `/payments`, `/installments`, `/refunds` |
+| Finance | `/suppliers`, `/supplier-payments`, `/expenses`, `/expense-categories`, `/cash-transactions`, `/commissions`, `/sales-targets` |
+| Operations | `/vehicle-handovers`, `/after-sales`, `/complaints`, `/documents`, `/notifications` |
+| Insights | `/dashboard`, `/reports`, `/audit-logs` |
+| Public | `/public/vehicles` and public enquiry actions |
+
+Most operational routes require a bearer token:
+
+```http
+Authorization: Bearer <jwt-token>
+```
+
+Login is available through `POST /auth/login`. The API uses JSON by default and
+supports multipart uploads for document workflows. Uploaded files are limited
+by the application and should be stored on durable production storage.
+
+## Validation checklist
+
+From the repository root:
+
+```powershell
+cd backend
+npm run build
+npm test -- --runInBand
+npm run test:e2e
+
+cd ..\frontend
 npm run lint
-
-# Build production bundle
 npm run build
 ```
 
----
+Database-backed tests and manual workflows require a reachable MongoDB instance.
 
-## 📄 License
+## Known limitations
 
-This project is proprietary software developed for vehicle dealership management. All rights reserved.
-#   V e h i c l e - S a l e s  
- 
+- Public reservation and test-drive requests are enquiries until staff confirm
+  them in CRM; automatic customer confirmation is not implemented.
+- Email delivery requires a valid Resend API key and verified sender.
+- SMS/WhatsApp delivery is optional and requires an external gateway.
+- Invoice PDFs are currently handled through browser printing rather than a
+  generated server-side PDF.
+- Multi-record financial workflows are not yet fully atomic/idempotent because
+  the local MongoDB configuration does not enable replica-set transactions.
+- Rate limiting is process-local; a shared store is needed for multi-process
+  deployments.
+- File storage must be made durable and backed up before production use.
+- DTO validation, permissions, audit coverage, seed repeatability, and
+  deployment configuration still need further production hardening.
+
+See [STATUS.md](STATUS.md) for the more detailed implementation status.
+
+## Security notes
+
+- Use a unique, high-entropy `JWT_SECRET` outside local development.
+- Do not expose the development accounts or run `npm run seed` in production.
+- Keep `.env` files and uploaded files out of source control and backups that
+  are not access-controlled.
+- Configure `FRONTEND_ORIGIN`, email, storage, and database access explicitly
+  for each deployment environment.
+
+## License
+
+This project is proprietary software for vehicle dealership management.
+All rights reserved.

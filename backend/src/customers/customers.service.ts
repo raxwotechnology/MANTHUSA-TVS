@@ -68,6 +68,22 @@ export class CustomersService {
     return existingCustomer;
   }
 
+  async findByUserId(userId: string): Promise<CustomerDocument | null> {
+    return this.customerModel.findOne({ userId }).exec();
+  }
+
+  async updateByUserId(userId: string, updateCustomerDto: any): Promise<CustomerDocument> {
+    const updated = await this.customerModel.findOneAndUpdate(
+      { userId },
+      { $set: updateCustomerDto },
+      { new: true }
+    ).exec();
+    if (!updated) {
+      throw new NotFoundException(`Customer profile for user ${userId} not found`);
+    }
+    return updated;
+  }
+
   async remove(id: string): Promise<any> {
     const deletedCustomer = await this.customerModel.findByIdAndDelete(id).exec();
     if (!deletedCustomer) {

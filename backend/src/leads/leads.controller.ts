@@ -25,7 +25,15 @@ export class LeadsController {
     return this.leadsService.createPublicInquiry(body);
   }
 
+  @Get('my')
+  async findMyLeads(@Req() req: any) {
+    const customerId = req.user?.customerId;
+    if (!customerId) return [];
+    return this.leadsService.findByCustomer(customerId);
+  }
+
   @Get()
+  @Roles('Admin / Owner', 'Sales & Operations')
   findAll() {
     return this.leadsService.findAll();
   }

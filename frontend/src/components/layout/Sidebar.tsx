@@ -32,6 +32,7 @@ import {
   LogOut,
   ChevronDown,
   Building2,
+  Globe,
   X
 } from 'lucide-react';
 import { useSettings } from '@/lib/useSettings';
@@ -78,6 +79,7 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
   const isInventory = cleanRole.includes('inventory') || isAdmin;
   const isCustomer = cleanRole.includes('customer') || cleanRole.includes('client');
   const isStaff = !isCustomer;
+  const isCustomerPortal = isCustomer && pathname.startsWith('/account');
 
   const userInitials = currentUser?.name ? currentUser.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2) : 'VS';
 
@@ -150,15 +152,15 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
         {/* DASHBOARD */}
         <div>
           <Link
-            href="/dashboard"
+            href={isCustomerPortal ? '/account' : '/dashboard'}
             className={`flex items-center gap-2.5 px-3 py-2 rounded-lg font-medium transition-colors ${
-              pathname === '/dashboard'
+              pathname === (isCustomerPortal ? '/account' : '/dashboard')
                 ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold'
                 : 'hover:bg-slate-800/60 text-slate-300'
             }`}
           >
             <LayoutDashboard className="w-4 h-4 text-emerald-400" />
-            <span>Main Dashboard</span>
+            <span>{isCustomerPortal ? 'Customer Dashboard' : 'Main Dashboard'}</span>
           </Link>
         </div>
 
@@ -316,13 +318,35 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
         {isCustomer && (
           <div>
             <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-3 mb-1">
-              My Appointments
+              Customer Portal
             </div>
             <div className="space-y-0.5">
               <Link
-                href="/dashboard/test-drives"
+                href="/account/profile"
                 className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
-                  pathname === '/dashboard/test-drives'
+                  pathname === '/account/profile'
+                    ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold'
+                    : 'hover:bg-slate-800/60 text-slate-300'
+                }`}
+              >
+                <UserCog className="w-4 h-4" />
+                <span>Personal Profile</span>
+              </Link>
+              <Link
+                href="/account/inquiries"
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
+                  pathname === '/account/inquiries'
+                    ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold'
+                    : 'hover:bg-slate-800/60 text-slate-300'
+                }`}
+              >
+                <MessageSquareWarning className="w-4 h-4" />
+                <span>My Inquiries</span>
+              </Link>
+              <Link
+                href={isCustomerPortal ? '/account/test-drives' : '/dashboard/test-drives'}
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
+                  pathname === (isCustomerPortal ? '/account/test-drives' : '/dashboard/test-drives')
                     ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold'
                     : 'hover:bg-slate-800/60 text-slate-300'
                 }`}
@@ -596,9 +620,24 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
               >
                 <div className="flex items-center gap-2.5">
                   <Settings className="w-4 h-4" />
-                  <span>Settings</span>
+                  <span>General Settings</span>
                 </div>
                 <ChevronDown className="w-3.5 h-3.5 -rotate-90 text-slate-500" />
+              </Link>
+
+              <Link
+                href="/admin/website"
+                className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
+                  pathname === '/admin/website' || pathname === '/dashboard/website'
+                    ? 'bg-emerald-950/60 text-emerald-400 border-l-4 border-emerald-500 font-semibold'
+                    : 'hover:bg-slate-800/60 text-slate-300'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Globe className="w-4 h-4" />
+                  <span>Public Website CMS</span>
+                </div>
+                <span className="text-[9px] bg-blue-500/20 text-blue-300 font-bold px-1.5 py-0.5 rounded">CMS</span>
               </Link>
             </div>
           </div>

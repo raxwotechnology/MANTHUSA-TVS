@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
 import { useSettings } from '@/lib/useSettings';
+import { useTheme } from 'next-themes';
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { settings: brand } = useSettings();
@@ -11,6 +12,20 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const { setTheme, theme } = useTheme();
+  const previousTheme = React.useRef<string | undefined>(undefined);
+
+  useEffect(() => {
+    previousTheme.current = theme;
+    setTheme('dark');
+
+    return () => {
+      if (previousTheme.current && previousTheme.current !== 'dark') {
+        setTheme(previousTheme.current);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem('token');

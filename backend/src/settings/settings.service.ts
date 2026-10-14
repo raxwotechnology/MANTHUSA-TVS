@@ -115,6 +115,39 @@ export const DEFAULT_SETTINGS: Record<string, any> = {
     sessionTimeoutMinutes: 60,
     timeZone: 'Asia/Colombo (GMT+5:30)',
   },
+  website: {
+    announcement: {
+      enabled: true,
+      text: 'Special March 2026 Import Clearance: Exclusive leasing rates starting from 13.5% with free 1-year comprehensive warranty!',
+      phone: '+94 11 268 4900',
+      hours: 'Mon - Sat: 8:30 AM - 6:30 PM',
+    },
+    hero: {
+      headline: 'Find the Right Vehicle for Your Next Journey.',
+      subheadline: 'Explore our curated inventory of brand-new and certified pre-owned Japanese and European luxury vehicles with verified auction sheets and full warranty.',
+      ctaPrimaryText: 'Browse Vehicles',
+      ctaPrimaryLink: '/vehicles',
+      ctaSecondaryText: 'Sell Your Vehicle',
+      ctaSecondaryLink: '/sell-your-vehicle',
+      backgroundImage: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1920&q=80',
+    },
+    sections: {
+      showFeatured: true,
+      showLatestArrivals: true,
+      showCategories: true,
+      showWhyUs: true,
+      showHowItWorks: true,
+      showFinancePromo: true,
+      showTradeInPromo: true,
+      showContact: true,
+    },
+    pages: {
+      about: 'SalesPlus Auto Mart has been Sri Lanka’s most trusted direct vehicle importer and dealership for over 15 years.',
+      finance: 'We partner with leading Sri Lankan commercial banks and financial institutes to offer seamless, low-rate leasing solutions.',
+      terms: 'All vehicle bookings are held for a maximum of 3 business days subject to official advance deposit verification.',
+      privacy: 'We take data confidentiality seriously and never sell or transfer your personal or financial data.',
+    },
+  },
 };
 
 @Injectable()
@@ -156,6 +189,7 @@ export class SettingsService {
       general: all.general,
       contact: all.contact,
       social: all.social,
+      website: all.website,
       commerce: {
         currency: all.commerce?.currency || 'LKR',
         currencySymbol: all.commerce?.currencySymbol || 'Rs.',

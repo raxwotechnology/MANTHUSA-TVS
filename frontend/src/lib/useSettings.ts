@@ -29,8 +29,10 @@ export interface BrandSettings {
   facebook?: string;
   instagram?: string;
   youtube?: string;
-  website?: string;
+  website?: any;
+  socialWebsite?: string;
   tiktok?: string;
+  websiteConfig?: Record<string, any>;
   vehicles?: Record<string, any>;
   leasing?: Record<string, any>;
   contact?: Record<string, any>;
@@ -39,6 +41,40 @@ export interface BrandSettings {
   general?: Record<string, any>;
   [key: string]: any;
 }
+
+export const DEFAULT_WEBSITE_CMS = {
+  announcement: {
+    enabled: true,
+    text: 'Special March 2026 Import Clearance: Exclusive leasing rates starting from 13.5% with free 1-year comprehensive warranty!',
+    phone: '+94 11 268 4900',
+    hours: 'Mon - Sat: 8:30 AM - 6:30 PM',
+  },
+  hero: {
+    headline: 'Find the Right Vehicle for Your Next Journey.',
+    subheadline: 'Explore our curated inventory of brand-new and certified pre-owned Japanese and European luxury vehicles with verified auction sheets and full warranty.',
+    ctaPrimaryText: 'Browse Vehicles',
+    ctaPrimaryLink: '/vehicles',
+    ctaSecondaryText: 'Sell Your Vehicle',
+    ctaSecondaryLink: '/sell-your-vehicle',
+    backgroundImage: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1920&q=80',
+  },
+  sections: {
+    showFeatured: true,
+    showLatestArrivals: true,
+    showCategories: true,
+    showWhyUs: true,
+    showHowItWorks: true,
+    showFinancePromo: true,
+    showTradeInPromo: true,
+    showContact: true,
+  },
+  pages: {
+    about: 'SalesPlus Auto Mart has been Sri Lanka’s most trusted direct vehicle importer and dealership for over 15 years.',
+    finance: 'We partner with leading Sri Lankan commercial banks and financial institutes to offer seamless, low-rate leasing solutions.',
+    terms: 'All vehicle bookings are held for a maximum of 3 business days subject to official advance deposit verification.',
+    privacy: 'We take data confidentiality seriously and never sell or transfer your personal or financial data.',
+  },
+};
 
 export const DEFAULT_BRAND: BrandSettings = {
   dealershipName: 'SalesPlus Auto Mart',
@@ -66,7 +102,8 @@ export const DEFAULT_BRAND: BrandSettings = {
   facebook: 'https://facebook.com/salesplusautomart',
   instagram: 'https://instagram.com/salesplusautomart',
   youtube: 'https://youtube.com/@salesplusautomart',
-  website: 'https://salesplus.lk',
+  socialWebsite: 'https://salesplus.lk',
+  website: DEFAULT_WEBSITE_CMS,
   tiktok: '',
   vehicles: {},
   leasing: {},
@@ -81,6 +118,26 @@ export function buildBrandSettings(data: any): BrandSettings {
   const social = data.social || {};
   const vehicles = data.vehicles || {};
   const leasing = data.leasing || {};
+
+  const rawWebsite = (data.website && typeof data.website === 'object') ? data.website : {};
+  const websiteConfig = {
+    announcement: {
+      ...DEFAULT_WEBSITE_CMS.announcement,
+      ...(rawWebsite.announcement || {}),
+    },
+    hero: {
+      ...DEFAULT_WEBSITE_CMS.hero,
+      ...(rawWebsite.hero || {}),
+    },
+    sections: {
+      ...DEFAULT_WEBSITE_CMS.sections,
+      ...(rawWebsite.sections || {}),
+    },
+    pages: {
+      ...DEFAULT_WEBSITE_CMS.pages,
+      ...(rawWebsite.pages || {}),
+    },
+  };
 
   return {
     ...DEFAULT_BRAND,
@@ -107,7 +164,8 @@ export function buildBrandSettings(data: any): BrandSettings {
     facebook: social.facebook || data.facebook || DEFAULT_BRAND.facebook,
     instagram: social.instagram || data.instagram || DEFAULT_BRAND.instagram,
     youtube: social.youtube || data.youtube || DEFAULT_BRAND.youtube,
-    website: social.website || data.website || DEFAULT_BRAND.website,
+    socialWebsite: social.website || data.socialWebsite || DEFAULT_BRAND.socialWebsite,
+    website: websiteConfig,
     tiktok: social.tiktok || data.tiktok || '',
     currency: commerce.currency || general.currency || data.currency || DEFAULT_BRAND.currency,
     currencySymbol: commerce.currencySymbol || general.currencySymbol || data.currencySymbol || DEFAULT_BRAND.currencySymbol,

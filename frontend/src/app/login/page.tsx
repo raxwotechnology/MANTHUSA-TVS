@@ -43,7 +43,8 @@ export default function LoginPage() {
         return;
       }
       if (!result.access_token || !result.user) throw new Error('The server returned an invalid login response.');
-      localStorage.setItem('token', result.access_token); localStorage.setItem('user', JSON.stringify(result.user)); window.location.href = '/dashboard';
+      localStorage.setItem('token', result.access_token); localStorage.setItem('user', JSON.stringify(result.user));
+      window.location.href = '/dashboard';
     } catch (err) { setError(err instanceof Error ? err.message : 'Cannot connect to the server.'); }
     finally { setLoading(false); }
   };
@@ -54,7 +55,8 @@ export default function LoginPage() {
       const response = await fetch(getApiUrl('/auth/mfa/login'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: mfaUserId, code: mfaCode }) });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.message || 'Invalid MFA code');
-      localStorage.setItem('token', result.access_token); localStorage.setItem('user', JSON.stringify(result.user)); window.location.href = '/dashboard';
+      localStorage.setItem('token', result.access_token); localStorage.setItem('user', JSON.stringify(result.user));
+      window.location.href = '/dashboard';
     } catch (err) { setError(err instanceof Error ? err.message : 'Invalid MFA verification code.'); }
     finally { setLoading(false); }
   };

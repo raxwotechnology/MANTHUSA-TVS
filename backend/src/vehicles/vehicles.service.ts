@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { isValidObjectId, Model } from 'mongoose';
 import { VehicleDocument } from './schemas/vehicle.schema';
 
 @Injectable()
@@ -47,6 +47,34 @@ export class VehiclesService {
       .sort({ createdAt: -1 })
       .lean()
       .exec();
+  }
+
+  async findOnePublic(idOrSlug: string): Promise<any> {
+    let vehicle: any = null;
+    if (isValidObjectId(idOrSlug)) {
+      vehicle = await this.vehicleModel.findById(idOrSlug).lean().exec();
+    }
+    if (!vehicle) {
+      vehicle = await this.vehicleModel.findOne({
+        $or: [
+          { stockNumber: idOrSlug },
+          { registrationNumber: idOrSlug },
+        ],
+      }).lean().exec();
+    }
+    if (!vehicle) {
+      const parts = idOrSlug.split('-');
+      if (parts.length >= 2) {
+        vehicle = await this.vehicleModel.findOne({
+          make: new RegExp(`^${parts[0]}$`, 'i'),
+          model: new RegExp(`^${parts[1]}$`, 'i'),
+        }).lean().exec();
+      }
+    }
+    if (!vehicle) {
+      throw new NotFoundException(`Vehicle #${idOrSlug} not found`);
+    }
+    return this.redactFinancials(vehicle, 'Customer');
   }
 
   async findOne(id: string): Promise<VehicleDocument> {

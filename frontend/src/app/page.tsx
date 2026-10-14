@@ -2,2270 +2,733 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   Car,
   Search,
-  MessageSquare,
-  Calendar,
+  ArrowRight,
   ShieldCheck,
   CheckCircle2,
-  Filter,
-  ArrowRight,
-  TrendingUp,
-  X,
-  Heart,
-  Calculator,
-  Star,
-  SlidersHorizontal,
-  Eye,
-  ChevronRight,
-  ChevronDown,
-  Check,
   Sparkles,
+  CalendarCheck,
+  Calculator,
+  BadgeDollarSign,
   MapPin,
   Clock,
-  Share2,
-  AlertCircle,
-  RefreshCw,
-  FileText,
-  Menu,
-  Sun,
-  Moon,
-  LogOut
+  Phone,
+  MessageCircle,
+  ChevronRight,
+  Zap,
+  SlidersHorizontal,
+  Flame,
+  Award,
+  FileCheck
 } from 'lucide-react';
-import { apiFetch } from '@/lib/api';
+import { PublicLayout } from '@/components/public/PublicLayout';
+import { VehicleCard } from '@/components/public/VehicleCard';
+import { VehicleCardSkeleton } from '@/components/public/VehicleCardSkeleton';
+import { InquiryDialog } from '@/components/public/InquiryDialog';
+import {
+  PublicVehicle,
+  fetchPublicVehicles,
+  formatLKR
+} from '@/lib/publicApi';
 import { useSettings } from '@/lib/useSettings';
 
-export default function PublicVehicleWebsite() {
+export default function HomePage() {
+  const router = useRouter();
+  const [vehicles, setVehicles] = useState<PublicVehicle[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { settings: brand } = useSettings();
-  const [loggedInUser, setLoggedInUser] = useState<any>(null);
-  const [dbVehicles, setDbVehicles] = useState<any[]>([]);
-  const [vehicleLoadError, setVehicleLoadError] = useState('');
-  const [isLoadingVehicles, setIsLoadingVehicles] = useState(true);
-  const [isLightMode, setIsLightMode] = useState(false);
 
-  // Search & Filter state
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedMake, setSelectedMake] = useState('ALL');
-  const [selectedFuel, setSelectedFuel] = useState('ALL');
-  const [selectedCategory, setSelectedCategory] = useState('ALL');
-  const [selectedPriceTier, setSelectedPriceTier] = useState('ALL');
-  const [sortBy, setSortBy] = useState('featured');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [showMobileNav, setShowMobileNav] = useState(false);
+  // Quick search form state
+  const [searchMake, setSearchMake] = useState('ALL');
+  const [searchCategory, setSearchCategory] = useState('ALL');
+  const [searchPriceMax, setSearchPriceMax] = useState('ALL');
+  const [searchFuel, setSearchFuel] = useState('ALL');
 
-  // Interactive engagement states
-  const [wishlist, setWishlist] = useState<string[]>([]);
-  const [showWishlistDrawer, setShowWishlistDrawer] = useState(false);
-  const [compareIds, setCompareIds] = useState<string[]>([]);
-  const [showCompareModal, setShowCompareModal] = useState(false);
-  const [quickViewVehicle, setQuickViewVehicle] = useState<any>(null);
-
-  // Lead / Enquiry modal state
-  const [interestVehicle, setInterestVehicle] = useState<any>(null);
-  const [interestType, setInterestType] = useState('Details');
-  const [interestName, setInterestName] = useState('');
-  const [interestPhone, setInterestPhone] = useState('');
-  const [interestDate, setInterestDate] = useState('');
-  const [interestMessage, setInterestMessage] = useState('');
-  const [interestLeaseDetails, setInterestLeaseDetails] = useState('');
-  const [interestError, setInterestError] = useState('');
-  const [interestSuccess, setInterestSuccess] = useState(false);
-  const [isSubmittingInterest, setIsSubmittingInterest] = useState(false);
-
-  // Sell / Trade-in modal state
-  const [showTradeInModal, setShowTradeInModal] = useState(false);
-  const [tradeInSuccess, setTradeInSuccess] = useState(false);
-  const [tradeInError, setTradeInError] = useState('');
-  const [isSubmittingTradeIn, setIsSubmittingTradeIn] = useState(false);
-  const [tradeInForm, setTradeInForm] = useState({
-    name: '',
-    phone: '',
-    make: '',
-    model: '',
-    year: '2020',
-    mileage: '',
-    askingPrice: '',
-    condition: 'Excellent'
-  });
-
-  // Interactive Lease Calculator State
-  const [calcPrice, setCalcPrice] = useState<number>(25000000);
-  const [calcDownPercent, setCalcDownPercent] = useState<number>(20);
-  const [calcTenureYears, setCalcTenureYears] = useState<number>(5);
-  const [calcInterestRate, setCalcInterestRate] = useState<number>(13.5);
-
-  // FAQ accordion state
-  const [openFaq, setOpenFaq] = useState<number | null>(0);
+  // Quick inquiry modal state
+  const [inquiryVehicle, setInquiryVehicle] = useState<PublicVehicle | null>(null);
+  const [isInquiryOpen, setIsInquiryOpen] = useState(false);
 
   useEffect(() => {
-    try {
-      const token = localStorage.getItem('token');
-      const savedUser = localStorage.getItem('user');
-      if (token && savedUser) setLoggedInUser(JSON.parse(savedUser));
-    } catch {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-    }
-  }, []);
-
-  useEffect(() => {
-    setIsLightMode(localStorage.getItem('salesplus_theme') === 'light');
-  }, []);
-
-  const toggleTheme = () => {
-    setIsLightMode((current) => {
-      const next = !current;
-      localStorage.setItem('salesplus_theme', next ? 'light' : 'dark');
-      return next;
-    });
-  };
-
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setLoggedInUser(null);
-  };
-
-  // Load vehicles from backend API
-  useEffect(() => {
-    setIsLoadingVehicles(true);
-    apiFetch('/public/vehicles')
-      .then(async (response) => {
-        if (!response.ok) throw new Error('Could not load vehicles from database.');
-        const data = await response.json();
-        if (Array.isArray(data)) {
-          const formatted = data.map((vehicle: any) => {
-            const angleImages = [
-              vehicle.mediaAngles?.front,
-              vehicle.mediaAngles?.rear,
-              vehicle.mediaAngles?.left,
-              vehicle.mediaAngles?.right,
-              vehicle.mediaAngles?.interior,
-              vehicle.mediaAngles?.dashboard,
-              vehicle.mediaAngles?.engine,
-              vehicle.mediaAngles?.wheels,
-              ...(vehicle.mediaAngles?.damage || [])
-            ].filter((url): url is string => Boolean(url));
-            const images = Array.from(new Set([...(vehicle.images || []), ...angleImages]));
-
-            return {
-              ...vehicle,
-              id: vehicle._id || vehicle.id,
-              price: Number(vehicle.sellingPrice || 0),
-              images,
-              image: images[0] || '',
-              mileage: vehicle.mileage ? `${Number(vehicle.mileage).toLocaleString()} km` : 'Unregistered',
-              condition: vehicle.condition || 'Certified Dealership Stock',
-              warranty: '1-Year Certified Warranty'
-            };
-          });
-          setDbVehicles(formatted);
-        }
-      })
-      .catch((err) => {
-        setVehicleLoadError(err instanceof Error ? err.message : 'API offline');
-      })
-      .finally(() => {
-        setIsLoadingVehicles(false);
-      });
-  }, []);
-
-  // Sync wishlist from localStorage
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem('salesplus_wishlist');
-      if (saved) setWishlist(JSON.parse(saved));
-    } catch {}
-  }, []);
-
-  const toggleWishlist = (id: string) => {
-    let next: string[];
-    if (wishlist.includes(id)) {
-      next = wishlist.filter((item) => item !== id);
-    } else {
-      next = [...wishlist, id];
-    }
-    setWishlist(next);
-    try {
-      localStorage.setItem('salesplus_wishlist', JSON.stringify(next));
-    } catch {}
-  };
-
-  const toggleCompare = (id: string) => {
-    if (compareIds.includes(id)) {
-      setCompareIds(compareIds.filter((i) => i !== id));
-    } else {
-      if (compareIds.length < 3) {
-        setCompareIds([...compareIds, id]);
-      } else {
-        alert('You can compare a maximum of 3 vehicles simultaneously.');
+    async function loadData() {
+      try {
+        const vehiclesData = await fetchPublicVehicles();
+        setVehicles(vehiclesData);
+      } catch (err) {
+        console.error('Failed to load home page data:', err);
+      } finally {
+        setIsLoading(false);
       }
     }
-  };
+    loadData();
+  }, []);
 
-  // Public inventory is sourced only from persisted API records.
-  const allVehicles = dbVehicles;
-
-  // Unique make list for filter dropdown
-  const uniqueMakes = useMemo(() => {
+  // Distinct makes and categories for quick search
+  const availableMakes = useMemo(() => {
     const set = new Set<string>();
-    allVehicles.forEach((v) => {
-      if (v.make) set.add(v.make);
+    vehicles.forEach((v) => {
+      if (v.make) set.add(v.make.trim());
     });
     return Array.from(set).sort();
-  }, [allVehicles]);
+  }, [vehicles]);
 
-  // Filter and sort vehicles
-  const filteredVehicles = useMemo(() => {
-    return allVehicles.filter((v) => {
-      // Make filter
-      if (selectedMake !== 'ALL' && v.make?.toLowerCase() !== selectedMake.toLowerCase()) return false;
-      // Fuel filter
-      if (selectedFuel !== 'ALL' && !v.fuelType?.toLowerCase().includes(selectedFuel.toLowerCase())) return false;
-      // Category filter
-      if (selectedCategory !== 'ALL') {
-        const cat = selectedCategory.toLowerCase();
-        const vType = (v.vehicleType || '').toLowerCase();
-        const modelStr = `${v.make} ${v.model} ${v.variant || ''}`.toLowerCase();
-        if (cat === 'suv' && !vType.includes('suv') && !modelStr.includes('prado') && !modelStr.includes('patrol')) return false;
-        if (cat === 'sedan' && !vType.includes('sedan') && !modelStr.includes('c200') && !modelStr.includes('520d') && !modelStr.includes('a6') && !modelStr.includes('premio')) return false;
-        if (cat === 'hybrid' && !v.fuelType?.toLowerCase().includes('hybrid') && !modelStr.includes('e:hev') && !modelStr.includes('aqua')) return false;
-        if (cat === 'luxury' && (v.price || 0) < 30000000) return false;
-        if (cat === 'budget' && (v.price || 0) > 20000000) return false;
-      }
-      // Price Tier filter
-      if (selectedPriceTier === 'Under15M' && (v.price || 0) >= 15000000) return false;
-      if (selectedPriceTier === '15M-30M' && ((v.price || 0) < 15000000 || (v.price || 0) > 30000000)) return false;
-      if (selectedPriceTier === '30M-50M' && ((v.price || 0) < 30000000 || (v.price || 0) > 50000000)) return false;
-      if (selectedPriceTier === '50M+' && (v.price || 0) <= 50000000) return false;
+  // Featured vehicles (first 3)
+  const featuredVehicles = useMemo(() => {
+    return vehicles.slice(0, 3);
+  }, [vehicles]);
 
-      // Keyword search
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase().trim();
-        const fullString = `${v.make} ${v.model} ${v.variant || ''} ${v.year || ''} ${v.color || ''} ${v.fuelType || ''}`.toLowerCase();
-        if (!fullString.includes(q)) return false;
-      }
-      return true;
-    }).sort((a, b) => {
-      if (sortBy === 'price-asc') return (a.price || 0) - (b.price || 0);
-      if (sortBy === 'price-desc') return (b.price || 0) - (a.price || 0);
-      if (sortBy === 'year-desc') return (b.year || 0) - (a.year || 0);
-      if (sortBy === 'mileage-asc') {
-        const mA = parseInt(String(a.mileage).replace(/\D/g, '')) || 0;
-        const mB = parseInt(String(b.mileage).replace(/\D/g, '')) || 0;
-        return mA - mB;
-      }
-      return 0; // default featured
-    });
-  }, [allVehicles, selectedMake, selectedFuel, selectedCategory, selectedPriceTier, searchQuery, sortBy]);
+  // Latest arrivals (next 6)
+  const latestArrivals = useMemo(() => {
+    return vehicles.slice(0, 6);
+  }, [vehicles]);
 
-  // Financial calculations
-  const calculateEMI = (principalPrice: number, downPct: number, years: number, annualRate: number) => {
-    const downAmount = principalPrice * (downPct / 100);
-    const loanAmount = Math.max(0, principalPrice - downAmount);
-    const monthlyRate = (annualRate / 100) / 12;
-    const months = years * 12;
-
-    if (loanAmount <= 0 || months <= 0) return { emi: 0, downAmount, loanAmount, totalPayable: 0, totalInterest: 0 };
-    if (monthlyRate === 0) {
-      const emi = Math.round(loanAmount / months);
-      return { emi, downAmount, loanAmount, totalPayable: loanAmount, totalInterest: 0 };
-    }
-
-    const emi = Math.round(
-      (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, months)) /
-      (Math.pow(1 + monthlyRate, months) - 1)
-    );
-    const totalPayable = emi * months;
-    const totalInterest = Math.max(0, totalPayable - loanAmount);
-
-    return { emi, downAmount, loanAmount, totalPayable, totalInterest };
-  };
-
-  const currentLoanSummary = useMemo(() => {
-    return calculateEMI(calcPrice, calcDownPercent, calcTenureYears, calcInterestRate);
-  }, [calcPrice, calcDownPercent, calcTenureYears, calcInterestRate]);
-
-  const formatPrice = (val: number) => {
-    const symbol = brand.currencySymbol || 'Rs.';
-    return `${symbol} ${(val || 0).toLocaleString('en-LK')}`;
-  };
-  const formatLKR = formatPrice;
-
-  const rawWa = brand.whatsapp || brand.hotline || brand.phone || '+94771234567';
-  const cleanWaNumber = rawWa.replace(/[^0-9]/g, '') || '94771234567';
-
-  const getEstMonthlyLease = (carPrice: number) => {
-    const { emi } = calculateEMI(carPrice, 25, 5, 13.5);
-    return `Est. ${formatLKR(emi)} / mo`;
-  };
-
-  // Submit Trade-in / Valuation
-  const handleTradeInSubmit = async (e: React.FormEvent) => {
+  const handleQuickSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmittingTradeIn(true);
-    setTradeInError('');
-    try {
-      const response = await apiFetch('/vehicle-valuations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          valuationId: `VAL-${Math.floor(1000 + Math.random() * 9000)}`,
-          customerName: tradeInForm.name,
-          customerPhone: tradeInForm.phone,
-          vehicleMake: tradeInForm.make,
-          vehicleModel: tradeInForm.model,
-          year: parseInt(tradeInForm.year) || 2020,
-          mileage: tradeInForm.mileage,
-          askingPrice: parseFloat(tradeInForm.askingPrice) || 0,
-          notes: `Condition: ${tradeInForm.condition}`,
-          status: 'Pending'
-        })
-      });
-      if (!response.ok) throw new Error('Could not submit valuation request. Please verify details.');
-      setTradeInSuccess(true);
-      setTradeInForm({
-        name: '',
-        phone: '',
-        make: '',
-        model: '',
-        year: '2020',
-        mileage: '',
-        askingPrice: '',
-        condition: 'Excellent'
-      });
-    } catch (err) {
-      setTradeInError(err instanceof Error ? err.message : 'Server connection failed.');
-    } finally {
-      setIsSubmittingTradeIn(false);
-    }
+    const params = new URLSearchParams();
+    if (searchMake !== 'ALL') params.set('make', searchMake);
+    if (searchCategory !== 'ALL') params.set('category', searchCategory);
+    if (searchPriceMax !== 'ALL') params.set('maxPrice', searchPriceMax);
+    if (searchFuel !== 'ALL') params.set('fuelType', searchFuel);
+    router.push(`/vehicles?${params.toString()}`);
   };
 
-  // Submit Public Lead / Interest Inquiry
-  const submitInterest = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmittingInterest(true);
-    setInterestError('');
-    try {
-      const response = await apiFetch('/leads/public', {
-        method: 'POST',
-        body: JSON.stringify({
-          fullName: interestName,
-          phone: interestPhone,
-          vehicle: interestVehicle?._id?.startsWith('demo') ? undefined : interestVehicle?._id,
-          inquiryType: interestType,
-          preferredDate: interestDate || undefined,
-          message: interestLeaseDetails
-            ? `${interestMessage}\n[Leasing Request Details]: ${interestLeaseDetails}`
-            : interestMessage
-        })
-      });
-      if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        throw new Error(data.message || 'Could not send enquiry. Please contact sales directly.');
-      }
-      setInterestSuccess(true);
-    } catch (error) {
-      setInterestError(error instanceof Error ? error.message : 'Could not send enquiry.');
-    } finally {
-      setIsSubmittingInterest(false);
-    }
-  };
+  const categories = [
+    { name: 'SUVs & Crossovers', key: 'SUV', count: 'High Clearance', img: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=600&q=80' },
+    { name: 'Executive Sedans', key: 'Sedan', count: 'Luxury & Comfort', img: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=600&q=80' },
+    { name: 'Electric & Hybrids', key: 'Electric', count: 'Eco Performance', img: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=600&q=80' },
+    { name: 'Premium Luxury', key: 'Luxury', count: 'Elite Prestige', img: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=600&q=80' },
+  ];
 
-  const handleOpenLeaseInquiry = () => {
-    setInterestVehicle({
-      make: 'Custom Vehicle Lease',
-      model: `Value: ${formatLKR(calcPrice)}`,
-      sellingPrice: calcPrice
-    });
-    setInterestType('Leasing Pre-Approval');
-    setInterestLeaseDetails(
-      `Price: ${formatLKR(calcPrice)} | Down Payment: ${calcDownPercent}% (${formatLKR(currentLoanSummary.downAmount)}) | Tenure: ${calcTenureYears} Years | Monthly Est: ${formatLKR(currentLoanSummary.emi)}`
-    );
-    setInterestSuccess(false);
-    setInterestError('');
-  };
+  const whyChooseUs = [
+    {
+      title: '150-Point Certified Inspection',
+      desc: 'Every vehicle undergoes comprehensive mechanical, chassis, electronics, and road-worthiness testing by certified technicians.',
+      icon: ShieldCheck,
+      color: 'text-amber-400 bg-amber-400/10 border-amber-400/20',
+    },
+    {
+      title: 'Verified Ownership & Revenue Records',
+      desc: 'Guaranteed clear titles, certified customs clearance, transparent previous owners, and verified revenue licenses.',
+      icon: FileCheck,
+      color: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20',
+    },
+    {
+      title: 'Competitive Leasing Partnerships',
+      desc: 'Exclusive lower interest rates with leading banks including Commercial Bank, HNB, Sampath, and premier finance institutions.',
+      icon: Calculator,
+      color: 'text-blue-400 bg-blue-400/10 border-blue-400/20',
+    },
+    {
+      title: 'Transparent Pricing & Fair Valuations',
+      desc: 'Strictly zero hidden dealer fees, direct market valuations for trade-ins, and realistic warranty protection packages.',
+      icon: Award,
+      color: 'text-purple-400 bg-purple-400/10 border-purple-400/20',
+    },
+  ];
+
+  const buyingSteps = [
+    {
+      step: '01',
+      title: 'Explore & Compare',
+      desc: 'Browse our dynamic showroom inventory, compare specifications, and calculate tailored leasing installments.',
+    },
+    {
+      step: '02',
+      title: 'Book Inspection or Test Drive',
+      desc: 'Schedule a private viewing at our showroom or request a test drive slot with one of our automotive consultants.',
+    },
+    {
+      step: '03',
+      title: 'Fast-Track Financing',
+      desc: 'Submit your leasing paperwork with our on-site bank liaison officers for same-day evaluation and pre-approval.',
+    },
+    {
+      step: '04',
+      title: 'Handover & Warranty Delivery',
+      desc: 'Receive your vehicle fully detailed with original documentation, service warranty booklet, and post-sale support.',
+    },
+  ];
 
   return (
-    <div className={`public-site min-h-screen bg-[#070D1E] text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-white ${isLightMode ? 'light-mode' : ''}`}>
-      {/* Main Header / Navigation */}
-      <header className="h-[74px] bg-[#0A122A]/95 backdrop-blur-xl border-b border-slate-800/80 sticky top-0 z-40 px-4 md:px-8">
-        <div className="max-w-7xl mx-auto h-full flex items-center justify-between gap-4">
-          {/* Brand Logo & Name */}
-          <Link href="/" className="flex items-center gap-3 group flex-shrink-0" suppressHydrationWarning>
-            {brand.logoUrl ? (
-              <div className="w-10 h-10 rounded-xl bg-white/10 p-1 flex items-center justify-center border border-slate-700/60 overflow-hidden shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform duration-300 flex-shrink-0">
-                <img src={brand.logoUrl} alt={brand.dealershipName || 'Logo'} className="w-full h-full object-contain" />
-              </div>
-            ) : (
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 text-white flex items-center justify-center font-bold shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform duration-300 flex-shrink-0">
-                <Car className="w-5 h-5 text-white" />
-              </div>
-            )}
-            <div className="flex flex-col justify-center">
-              <div className="flex items-center gap-2">
-                <span className={`font-black text-lg sm:text-xl tracking-tight whitespace-nowrap ${isLightMode ? 'text-slate-900' : 'text-white'}`}>
-                  {brand.dealershipName || 'SalesPlus Auto Mart'}
-                </span>
-                <span className={`text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-md whitespace-nowrap ${isLightMode ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'}`}>
-                  Certified
-                </span>
-              </div>
-              <p className={`hidden 2xl:block text-[10px] font-medium tracking-wide truncate max-w-[240px] ${isLightMode ? 'text-slate-500' : 'text-slate-400'}`}>
-                {brand.tagline || 'Official Automotive Dealership'}
-              </p>
-            </div>
-          </Link>
-
-          {/* Navigation links - with whitespace-nowrap and clean spacing */}
-          <nav className={`hidden xl:flex items-center gap-1.5 text-xs font-semibold ${isLightMode ? 'text-slate-700' : 'text-slate-300'}`}>
-            <a
-              href="#inventory"
-              className={`px-3 py-2 rounded-xl whitespace-nowrap transition-colors ${isLightMode ? 'hover:bg-slate-100 hover:text-emerald-700' : 'hover:bg-slate-800/80 hover:text-emerald-400'}`}
-            >
-              Vehicle Inventory
-            </a>
-            <a
-              href="#calculator"
-              className={`px-3 py-2 rounded-xl whitespace-nowrap transition-colors ${isLightMode ? 'hover:bg-slate-100 hover:text-emerald-700' : 'hover:bg-slate-800/80 hover:text-emerald-400'}`}
-            >
-              Leasing Calculator
-            </a>
-            <button
-              type="button"
-              onClick={() => setShowTradeInModal(true)}
-              className={`px-3 py-2 rounded-xl whitespace-nowrap transition-colors cursor-pointer ${isLightMode ? 'hover:bg-slate-100 hover:text-emerald-700' : 'hover:bg-slate-800/80 hover:text-emerald-400'}`}
-            >
-              Sell / Trade-in
-            </button>
-            <a
-              href="#inspection"
-              className={`px-3 py-2 rounded-xl whitespace-nowrap transition-colors ${isLightMode ? 'hover:bg-slate-100 hover:text-emerald-700' : 'hover:bg-slate-800/80 hover:text-emerald-400'}`}
-            >
-              120-Point Guarantee
-            </a>
-          </nav>
-
-          {/* Header Action Buttons */}
-          <div className="flex items-center gap-2 sm:gap-2.5 flex-shrink-0">
-            {/* Theme Toggle */}
-            <button
-              type="button"
-              onClick={toggleTheme}
-              className={`p-2.5 rounded-xl border transition-all cursor-pointer flex-shrink-0 ${
-                isLightMode
-                  ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-800 shadow-xs'
-                  : 'bg-slate-800/90 hover:bg-slate-700/90 border-slate-700/80 text-amber-300 shadow-md'
-              }`}
-              aria-label={isLightMode ? 'Switch to dark mode' : 'Switch to light mode'}
-              title={isLightMode ? 'Switch to dark mode' : 'Switch to light mode'}
-            >
-              {isLightMode ? <Moon className="w-4 h-4 text-slate-800" /> : <Sun className="w-4 h-4 text-amber-300" />}
-            </button>
-
-            {/* Wishlist Button */}
-            <button
-              type="button"
-              onClick={() => setShowWishlistDrawer(true)}
-              className={`relative p-2.5 rounded-xl border transition-all cursor-pointer flex-shrink-0 hover:scale-105 ${
-                isLightMode
-                  ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-800 shadow-xs'
-                  : 'bg-slate-800/90 hover:bg-slate-700/90 border-slate-700/80 text-slate-200 shadow-md'
-              }`}
-              title="Saved Vehicles"
-              aria-label="Wishlist"
-            >
-              <Heart className={`w-4 h-4 ${wishlist.length > 0 ? 'text-rose-500 fill-rose-500' : isLightMode ? 'text-slate-700' : 'text-slate-300'}`} />
-              {wishlist.length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center">
-                  {wishlist.length}
-                </span>
-              )}
-            </button>
-
-            {/* Compare Pill */}
-            {compareIds.length > 0 && (
-              <button
-                type="button"
-                onClick={() => setShowCompareModal(true)}
-                className={`hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex-shrink-0 ${
-                  isLightMode
-                    ? 'bg-cyan-50 border border-cyan-300 text-cyan-800 hover:bg-cyan-100 shadow-xs'
-                    : 'bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-900/60'
-                }`}
-              >
-                <SlidersHorizontal className="w-3.5 h-3.5" />
-                <span>Compare ({compareIds.length})</span>
-              </button>
-            )}
-
-            {/* Sell / Valuation Pill on wide screens */}
-            <button
-              type="button"
-              onClick={() => setShowTradeInModal(true)}
-              className={`hidden 2xl:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex-shrink-0 ${
-                isLightMode
-                  ? 'bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800 shadow-xs'
-                  : 'bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400'
-              }`}
-            >
-              <TrendingUp className="w-3.5 h-3.5" />
-              <span>Valuation</span>
-            </button>
-
-            {/* Authentication Buttons */}
-            {loggedInUser ? (
-              <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-                <Link
-                  href="/dashboard"
-                  className="whitespace-nowrap flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 px-3.5 py-2 text-xs font-bold text-white shadow-md shadow-emerald-950/40 transition-all flex-shrink-0"
-                >
-                  <span>Dashboard</span>
-                  <ArrowRight className="h-3.5 w-3.5 text-white" />
-                </Link>
-                <button
-                  type="button"
-                  onClick={logout}
-                  title="Sign out"
-                  className={`whitespace-nowrap flex items-center gap-1.5 rounded-xl border px-2.5 sm:px-3 py-2 text-xs font-semibold transition-colors cursor-pointer flex-shrink-0 ${
-                    isLightMode
-                      ? 'border-slate-300 text-slate-700 hover:border-red-500 hover:text-red-600 hover:bg-red-50'
-                      : 'border-slate-700/80 text-slate-300 hover:border-red-500/40 hover:text-red-300 hover:bg-red-500/10'
-                  }`}
-                >
-                  <LogOut className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Sign out</span>
-                </button>
-              </div>
-            ) : (
-              <Link
-                href="/login"
-                className="whitespace-nowrap flex items-center gap-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold shadow-md shadow-emerald-950/40 transition-all flex-shrink-0"
-              >
-                <span>Sign in</span>
-                <ArrowRight className="w-3.5 h-3.5 text-white" />
-              </Link>
-            )}
-
-            {/* Mobile Nav Toggle Button */}
-            <button
-              type="button"
-              onClick={() => setShowMobileNav((open) => !open)}
-              className={`inline-flex xl:hidden p-2.5 rounded-xl border transition-all cursor-pointer flex-shrink-0 ${
-                isLightMode
-                  ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-800 shadow-xs'
-                  : 'bg-slate-800/90 border-slate-700/80 text-slate-200 hover:bg-slate-700'
-              }`}
-              aria-label="Toggle website navigation"
-              aria-expanded={showMobileNav}
-            >
-              <Menu className="w-4 h-4" />
-            </button>
-          </div>
+    <PublicLayout>
+      {/* 1. HERO SECTION */}
+      <section className="dark-panel relative min-h-[85vh] lg:min-h-[90vh] flex items-center justify-center bg-slate-950 overflow-hidden">
+        {/* Background Luxury Vehicle Image with Dark Atmospheric Overlay */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src={brand.website?.hero?.backgroundImage || "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=2000&q=85"}
+            alt="Premium Vehicle Dealership Showroom"
+            className="w-full h-full object-cover object-center opacity-30 filter scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-slate-950/40" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent pointer-events-none" />
         </div>
 
-        {/* Mobile Nav Drawer */}
-        {showMobileNav && (
-          <div className={`xl:hidden absolute left-0 right-0 top-full border-b shadow-2xl px-4 py-4 animate-in fade-in slide-in-from-top-2 duration-200 ${
-            isLightMode ? 'bg-white border-slate-200 text-slate-800' : 'bg-[#0A122A] border-slate-800 text-slate-200'
-          }`}>
-            <nav className="mx-auto flex max-w-7xl flex-col gap-1 text-sm font-semibold">
-              {[
-                ['Vehicle Inventory', '#inventory'],
-                ['Leasing Calculator', '#calculator'],
-                ['120-Point Guarantee', '#inspection'],
-              ].map(([label, href]) => (
-                <a
-                  key={href}
-                  href={href}
-                  onClick={() => setShowMobileNav(false)}
-                  className={`rounded-xl px-3 py-3 transition-colors ${
-                    isLightMode ? 'hover:bg-slate-100 hover:text-emerald-600' : 'hover:bg-slate-800 hover:text-emerald-400'
-                  }`}
-                >
-                  {label}
-                </a>
-              ))}
-              <button
-                type="button"
-                onClick={() => {
-                  setShowMobileNav(false);
-                  setShowTradeInModal(true);
-                }}
-                className={`rounded-xl px-3 py-3 text-left transition-colors flex items-center justify-between ${
-                  isLightMode ? 'hover:bg-slate-100 hover:text-emerald-600' : 'hover:bg-slate-800 hover:text-emerald-400'
-                }`}
-              >
-                <span>Sell / Trade-in Valuation</span>
-                <TrendingUp className="w-4 h-4 text-emerald-400" />
-              </button>
-              {compareIds.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowMobileNav(false);
-                    setShowCompareModal(true);
-                  }}
-                  className={`rounded-xl px-3 py-3 text-left transition-colors flex items-center justify-between ${
-                    isLightMode ? 'hover:bg-slate-100 hover:text-cyan-600' : 'hover:bg-slate-800 hover:text-cyan-400'
-                  }`}
-                >
-                  <span>Compare Vehicles ({compareIds.length})</span>
-                  <SlidersHorizontal className="w-4 h-4 text-cyan-400" />
-                </button>
-              )}
-            </nav>
+        {/* Hero Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center flex flex-col items-center">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-400/10 border border-amber-400/20 text-amber-400 text-xs font-semibold tracking-wider uppercase mb-6 shadow-sm backdrop-blur-md">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>{brand.tagline || "Sri Lanka's Premier Vehicle Dealership & Direct Importer"}</span>
           </div>
-        )}
-      </header>
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden pt-7 sm:pt-10 pb-9 sm:pb-12 px-4 md:px-8 border-b border-slate-800/80 bg-radial-gradient">
-        {/* Glow ambient background elements */}
-        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-b from-emerald-500/15 via-teal-500/5 to-transparent blur-3xl pointer-events-none rounded-full" />
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold text-white tracking-tight leading-[1.1] max-w-4xl font-sans">
+            {brand.website?.hero?.headline || "Find the Right Vehicle for Your Next Journey."}
+          </h1>
 
-        <div className="relative max-w-7xl mx-auto w-full text-center">
-          <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-5 items-center text-left mb-7">
-            <div className="order-2 lg:order-1">
-              <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500/15 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-emerald-300 border border-emerald-400/25">
-                <Sparkles className="w-3.5 h-3.5" /> Drive with confidence
-              </span>
-              <h2 className="mt-4 text-3xl sm:text-5xl font-black tracking-tight text-white leading-[1.05]">
-                The right car for your <span className="text-emerald-400">next journey.</span>
-              </h2>
-              <p className="mt-4 max-w-xl text-sm sm:text-base leading-relaxed text-slate-300">
-                Explore carefully inspected vehicles with transparent pricing, trusted documentation, and support from enquiry to delivery.
-              </p>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <a href="#inventory" className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-3 text-xs font-black text-slate-950 shadow-lg shadow-emerald-900/30 hover:bg-emerald-400 transition-colors">
-                  Browse inventory <ArrowRight className="w-4 h-4" />
-                </a>
-                <button onClick={() => setShowTradeInModal(true)} className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-xs font-bold transition-colors ${
-                  isLightMode
-                    ? 'border-slate-300 bg-white text-slate-800 hover:border-emerald-500 hover:text-emerald-700 shadow-xs'
-                    : 'border-slate-600 bg-slate-900/50 text-slate-200 hover:border-emerald-400 hover:text-emerald-300'
-                }`}>
-                  Value my car <TrendingUp className="w-4 h-4" />
-                </button>
-              </div>
+          <p className="mt-6 text-base sm:text-xl text-slate-300 max-w-2xl leading-relaxed font-normal">
+            {brand.website?.hero?.subheadline || "Explore our vehicle collection, compare your options, and connect with our team to find a vehicle that suits your needs and budget."}
+          </p>
+
+          {/* Primary Action Buttons */}
+          <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+            <Link
+              href={brand.website?.hero?.ctaPrimaryLink || "/vehicles"}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-sm uppercase tracking-wider transition-all shadow-lg shadow-amber-400/20 hover:scale-102"
+            >
+              <span>{brand.website?.hero?.ctaPrimaryText || "Browse Vehicle Inventory"}</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+
+            <Link
+              href={brand.website?.hero?.ctaSecondaryLink || "/sell-your-vehicle"}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-white font-bold text-sm uppercase tracking-wider transition-all border border-slate-700/80 backdrop-blur-md"
+            >
+              <BadgeDollarSign className="w-4 h-4 text-amber-400" />
+              <span>{brand.website?.hero?.ctaSecondaryText || "Sell / Value Your Vehicle"}</span>
+            </Link>
+          </div>
+
+          {/* Key Trust Metrics */}
+          <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-10 border-t border-slate-800/80 pt-8 max-w-4xl w-full">
+            <div>
+              <p className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">100%</p>
+              <p className="text-xs text-slate-400 mt-1 uppercase tracking-wider">Title Inspected</p>
             </div>
-            <div className="order-1 lg:order-2 relative min-h-[245px] sm:min-h-[315px]">
-              <div className="absolute right-0 top-0 w-[78%] h-[78%] overflow-hidden rounded-[2rem] border border-white/15 shadow-2xl shadow-black/40 rotate-2">
-                <img src="https://images.unsplash.com/photo-1553440569-bcc63803a83d?auto=format&fit=crop&w=1200&q=85" alt="Premium vehicle on the road" className="h-full w-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#070D1E]/80 via-transparent to-transparent" />
-              </div>
-              <div className="absolute bottom-0 left-0 w-[52%] h-[55%] overflow-hidden rounded-[1.5rem] border-4 border-[#070D1E] shadow-xl -rotate-3">
-                <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=85" alt="Sports car detail" className="h-full w-full object-cover" />
-              </div>
-              <div className="absolute bottom-5 right-4 rounded-2xl border border-emerald-400/30 bg-[#0D1836]/90 px-4 py-3 text-left shadow-xl backdrop-blur">
-                <p className="text-[10px] font-black uppercase tracking-wider text-emerald-300">Certified selection</p>
-                <p className="mt-1 text-xs font-bold text-white">Inspected. Verified. Ready.</p>
-              </div>
+            <div>
+              <p className="text-2xl sm:text-3xl font-extrabold text-amber-400 tracking-tight">150+</p>
+              <p className="text-xs text-slate-400 mt-1 uppercase tracking-wider">Point Diagnostics</p>
+            </div>
+            <div>
+              <p className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">48 Hrs</p>
+              <p className="text-xs text-slate-400 mt-1 uppercase tracking-wider">Leasing Approval</p>
+            </div>
+            <div>
+              <p className="text-2xl sm:text-3xl font-extrabold text-amber-400 tracking-tight">24/7</p>
+              <p className="text-xs text-slate-400 mt-1 uppercase tracking-wider">Customer Support</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Vehicle Inventory Catalog Section */}
-      <section id="inventory" className="py-12 sm:py-16 px-4 md:px-8 max-w-7xl mx-auto w-full">
-        {/* Section Heading & Controls */}
-        <div className="mb-6">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-              <div className="inline-flex items-center gap-2 text-emerald-400 font-bold text-xs uppercase tracking-wider mb-2">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Certified Dealership Collection</span>
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                Available Vehicle Showroom Stock
-              </h2>
-              <p className="text-xs text-slate-400 mt-1">
-                Search and filter our currently available showroom vehicles.
-              </p>
-            </div>
-            <span className="text-xs font-bold text-emerald-400 bg-emerald-950/70 px-3.5 py-1.5 rounded-xl border border-emerald-800/60 shrink-0">
-              {filteredVehicles.length} Vehicles Found
-            </span>
+      {/* 2. ADVANCED QUICK VEHICLE SEARCH FORM */}
+      <section className="relative z-20 -mt-10 sm:-mt-14 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl">
+          <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider mb-4">
+            <Search className="w-4 h-4" />
+            <span>Search Our Live Showroom Inventory</span>
           </div>
 
-          {/* Showroom stock search and filters */}
-          <div className="mt-6 bg-[#0F1B3E] p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl border border-emerald-400/20 shadow-2xl shadow-black/30 text-xs text-left">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-3">
-              <div>
-                <p className="text-sm font-black text-white">Find your next vehicle</p>
-                <p className="text-[11px] text-slate-400">Search by make, model, fuel type, or budget</p>
-              </div>
-              <span className="text-[11px] font-semibold text-emerald-300">{isLoadingVehicles ? 'Loading inventory...' : `${filteredVehicles.length} vehicles available`}</span>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-3">
-              {/* Search keyword input */}
-              <div className="relative lg:col-span-2">
-                <Search className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="Search Make, Model, or Variant (e.g. Prado, C200)..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-[#070D1E] border border-slate-700/80 rounded-xl pl-10 pr-4 py-3.5 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15 text-xs font-medium transition-colors"
-                />
-                {searchQuery && (
-                  <button onClick={() => setSearchQuery('')} className="absolute right-3.5 top-3.5 text-slate-400 hover:text-white">
-                    <X className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-
-              {/* Brand / Make Filter */}
-              <div>
-                <select
-                  value={selectedMake}
-                  onChange={(e) => setSelectedMake(e.target.value)}
-                  className="w-full bg-[#070D1E] border border-slate-700/80 rounded-xl px-3.5 py-3.5 text-white focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15 font-semibold cursor-pointer text-xs"
-                >
-                  <option value="ALL">All Brands & Makes</option>
-                  {uniqueMakes.map((m) => (
-                    <option key={m} value={m}>{m}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Fuel Type Filter */}
-              <div>
-                <select
-                  value={selectedFuel}
-                  onChange={(e) => setSelectedFuel(e.target.value)}
-                  className="w-full bg-[#070D1E] border border-slate-700/80 rounded-xl px-3.5 py-3.5 text-white focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15 font-semibold cursor-pointer text-xs"
-                >
-                  <option value="ALL">All Fuel Types</option>
-                  <option value="Petrol">Petrol</option>
-                  <option value="Hybrid">Hybrid / e:HEV</option>
-                  <option value="Diesel">Diesel Turbo</option>
-                  <option value="Electric">Pure Electric (EV)</option>
-                </select>
-              </div>
-
-              {/* Price Range Filter */}
-              <div>
-                <select
-                  value={selectedPriceTier}
-                  onChange={(e) => setSelectedPriceTier(e.target.value)}
-                  className="w-full bg-[#070D1E] border border-slate-700/80 rounded-xl px-3.5 py-3.5 text-white focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15 font-semibold cursor-pointer text-xs"
-                >
-                  <option value="ALL">All Price Ranges</option>
-                  <option value="Under15M">Under LKR 15M</option>
-                  <option value="15M-30M">LKR 15M - 30M</option>
-                  <option value="30M-50M">LKR 30M - 50M</option>
-                  <option value="50M+">Above LKR 50M</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Quick Category Chips */}
-            <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-800/80">
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-[11px] font-bold text-slate-400 mr-1">Quick Select:</span>
-                {[
-                  { id: 'ALL', label: 'All Stock' },
-                  { id: 'SUV', label: '🚙 Premium SUVs' },
-                  { id: 'Sedan', label: '🏎️ Luxury Sedans' },
-                  { id: 'Hybrid', label: '⚡ Eco Hybrids' },
-                  { id: 'Luxury', label: '👑 Luxury 30M+' },
-                  { id: 'Budget', label: '🏷️ Under 20M' }
-                ].map((cat) => (
-                  <button
-                    key={cat.id}
-                    onClick={() => setSelectedCategory(cat.id)}
-                    className={`px-3 py-1.5 rounded-xl font-bold text-[11px] transition-all ${
-                      selectedCategory === cat.id
-                        ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
-                        : 'bg-[#070D1E] text-slate-300 hover:text-white hover:bg-slate-800/80 border border-slate-800'
-                    }`}
-                  >
-                    {cat.label}
-                  </button>
+          <form onSubmit={handleQuickSearch} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            {/* Make */}
+            <div>
+              <label className="block text-[11px] font-semibold uppercase text-slate-400 mb-1.5">
+                Vehicle Make
+              </label>
+              <select
+                value={searchMake}
+                onChange={(e) => setSearchMake(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm font-medium text-white focus:outline-none focus:border-amber-400"
+              >
+                <option value="ALL">All Makes (Toyota, Honda...)</option>
+                {availableMakes.map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
                 ))}
-              </div>
-
-              {/* Reset Filters button if any active */}
-              {(selectedMake !== 'ALL' || selectedFuel !== 'ALL' || selectedCategory !== 'ALL' || selectedPriceTier !== 'ALL' || searchQuery) && (
-                <button
-                  onClick={() => {
-                    setSelectedMake('ALL');
-                    setSelectedFuel('ALL');
-                    setSelectedCategory('ALL');
-                    setSelectedPriceTier('ALL');
-                    setSearchQuery('');
-                  }}
-                  className="flex items-center gap-1 text-[11px] font-semibold text-rose-400 hover:text-rose-300"
-                >
-                  <RefreshCw className="w-3 h-3" />
-                  <span>Reset Filters</span>
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Vehicles Display Grid or Empty State */}
-        {filteredVehicles.length === 0 ? (
-          <div className="bg-[#0F1B3E] border border-slate-800 rounded-3xl p-12 text-center max-w-lg mx-auto">
-            <Car className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-            <h3 className="text-lg font-bold text-white mb-2">No Matching Vehicles Found</h3>
-            <p className="text-xs text-slate-400 mb-6">
-              We couldn&apos;t find any vehicles matching your current search parameters. Try adjusting your make, fuel, or price filters.
-            </p>
-            <button
-              onClick={() => {
-                setSelectedMake('ALL');
-                setSelectedFuel('ALL');
-                setSelectedCategory('ALL');
-                setSelectedPriceTier('ALL');
-                setSearchQuery('');
-              }}
-              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-colors"
-            >
-              Reset Search & View All Vehicles
-            </button>
-          </div>
-        ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredVehicles.map((v) => {
-              const isWishlisted = wishlist.includes(v.id);
-              const isCompared = compareIds.includes(v.id);
-
-              return (
-                <div
-                  key={v.id}
-                  onClick={() => setQuickViewVehicle(v)}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter' || event.key === ' ') {
-                      event.preventDefault();
-                      setQuickViewVehicle(v);
-                    }
-                  }}
-                  role="button"
-                  tabIndex={0}
-                  className="bg-[#0D1836] rounded-3xl overflow-hidden border border-slate-800/90 hover:border-emerald-500/50 transition-all duration-300 flex flex-col group shadow-xl hover:shadow-2xl hover:shadow-emerald-950/20"
-                >
-                  {/* Vehicle Image Header */}
-                  <div className="relative h-56 overflow-hidden bg-slate-950">
-                    <img
-                      src={v.image}
-                      alt={`${v.make} ${v.model}`}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0D1836] via-transparent to-black/40" />
-
-                    {/* Top Badges */}
-                    <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 items-center">
-                      <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-emerald-500 text-slate-950 shadow-md">
-                        {v.status || 'Available'}
-                      </span>
-                      {v.condition && (
-                        <span className="px-2 py-1 rounded-full text-[10px] font-bold bg-slate-900/80 backdrop-blur-md text-slate-200 border border-slate-700/60">
-                          {v.condition}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Action Overlay: Wishlist & Quick View */}
-                    <div className="absolute top-3 right-3 flex items-center gap-1.5">
-                      <button
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          toggleWishlist(v.id);
-                        }}
-                        className={`p-2 rounded-xl backdrop-blur-md transition-all ${
-                          isWishlisted
-                            ? 'bg-rose-500 text-white'
-                            : 'bg-slate-900/70 hover:bg-slate-900 text-slate-300 hover:text-white border border-slate-700/60'
-                        }`}
-                        title={isWishlisted ? 'Remove from Saved' : 'Save to Favorites'}
-                        aria-label="Toggle Wishlist"
-                      >
-                        <Heart className={`w-3.5 h-3.5 ${isWishlisted ? 'fill-current' : ''}`} />
-                      </button>
-
-                      <button
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          setQuickViewVehicle(v);
-                        }}
-                        className="p-2 rounded-xl bg-slate-900/70 hover:bg-slate-900 text-slate-300 hover:text-white border border-slate-700/60 backdrop-blur-md transition-all"
-                        title="Quick View Vehicle Specs"
-                        aria-label="Quick View"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-
-                    {/* Inspection badge bottom left of image */}
-                    <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-slate-950/80 backdrop-blur-md px-2.5 py-1 rounded-xl border border-emerald-500/40 text-[11px] font-bold text-emerald-400">
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>{v.inspectionScore || '120-Pt Pass'}</span>
-                    </div>
-                  </div>
-
-                  {/* Vehicle Body Content */}
-                  <div className="p-5 flex-1 flex flex-col justify-between">
-                    <div>
-                      {/* Title & Year */}
-                      <div className="flex items-start justify-between gap-2 mb-1">
-                        <h3 className="font-extrabold text-white text-lg tracking-tight group-hover:text-emerald-400 transition-colors">
-                          {v.make} {v.model}
-                        </h3>
-                        <span className="text-xs font-bold text-slate-300 bg-slate-800/80 px-2 py-0.5 rounded-lg border border-slate-700">
-                          {v.year}
-                        </span>
-                      </div>
-                      <p className="text-xs text-slate-400 mb-4 line-clamp-1">
-                        {v.variant || 'Standard'} • {v.color || 'Pearl Finish'}
-                      </p>
-
-                      {/* Specs Matrix Grid */}
-                      <div className="grid grid-cols-2 gap-2 text-[11px] bg-[#070D1E] p-3 rounded-2xl border border-slate-800/80 mb-5 text-slate-300">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-slate-500 font-medium">Fuel:</span>
-                          <span className="font-semibold text-slate-200 truncate">{v.fuelType}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-slate-500 font-medium">Gear:</span>
-                          <span className="font-semibold text-slate-200 truncate">{v.transmission}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-slate-500 font-medium">Mileage:</span>
-                          <span className="font-semibold text-slate-200 truncate">{v.mileage}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-slate-500 font-medium">Engine:</span>
-                          <span className="font-semibold text-slate-200 truncate">{v.engineCapacity || 'Standard'}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Price and Action Hub */}
-                    <div>
-                      {/* Price Block */}
-                      <div className="flex items-end justify-between mb-4 pb-3 border-b border-slate-800/80">
-                        <div>
-                          <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">Cash Deal Price</span>
-                          <span className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">
-                            {formatLKR(v.price)}
-                          </span>
-                        </div>
-                        <button
-                          onClick={() => {
-                            setCalcPrice(v.price || 25000000);
-                            const el = document.getElementById('calculator');
-                            if (el) el.scrollIntoView({ behavior: 'smooth' });
-                          }}
-                          className="text-right hover:opacity-80 transition-opacity"
-                          title="Calculate customized lease installment"
-                        >
-                          <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">Lease Option</span>
-                          <span className="text-xs font-extrabold text-cyan-400 underline decoration-cyan-500/40 underline-offset-2">
-                            {getEstMonthlyLease(v.price)}
-                          </span>
-                        </button>
-                      </div>
-
-                      {/* Primary Contact Buttons */}
-                      <div className="grid grid-cols-2 gap-2 text-xs mb-2.5">
-                        <a
-                          href={`https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(`Hello ${brand.dealershipName || 'SalesPlus'} Team, I am interested in the ${v.make} ${v.model} (${v.year}) priced at ${formatLKR(v.price)}. Please share more details.`)}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl flex items-center justify-center gap-1.5 transition-colors shadow-md shadow-emerald-950"
-                        >
-                          <MessageSquare className="w-3.5 h-3.5" />
-                          <span>WhatsApp</span>
-                        </a>
-
-                        <button
-                          onClick={() => {
-                            setInterestVehicle(v);
-                            setInterestType('Test Drive');
-                            setInterestSuccess(false);
-                            setInterestError('');
-                          }}
-                          className="py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl border border-slate-700 flex items-center justify-center gap-1.5 transition-colors"
-                        >
-                          <Calendar className="w-3.5 h-3.5 text-emerald-400" />
-                          <span>Test Drive</span>
-                        </button>
-                      </div>
-
-                      {/* Secondary Buttons: Enquire & Compare */}
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => {
-                            setInterestVehicle(v);
-                            setInterestType('Details');
-                            setInterestSuccess(false);
-                            setInterestError('');
-                          }}
-                          className="flex-1 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 font-bold text-xs transition-colors"
-                        >
-                          Enquire / Reserve
-                        </button>
-
-                        <button
-                          onClick={() => toggleCompare(v.id)}
-                          className={`px-3 py-2 rounded-xl text-xs font-bold transition-all border ${
-                            isCompared
-                              ? 'bg-cyan-600 border-cyan-500 text-white'
-                              : 'border-slate-800 bg-[#070D1E] text-slate-400 hover:text-slate-200'
-                          }`}
-                          title="Add to comparison table"
-                        >
-                          {isCompared ? 'Comparing' : '+ Compare'}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          /* List View Mode */
-          <div className="space-y-4">
-            {filteredVehicles.map((v) => {
-              const isWishlisted = wishlist.includes(v.id);
-              const isCompared = compareIds.includes(v.id);
-
-              return (
-                <div
-                  key={v.id}
-                  onClick={() => setQuickViewVehicle(v)}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter' || event.key === ' ') {
-                      event.preventDefault();
-                      setQuickViewVehicle(v);
-                    }
-                  }}
-                  role="button"
-                  tabIndex={0}
-                  className="bg-[#0D1836] rounded-3xl overflow-hidden border border-slate-800/90 hover:border-emerald-500/40 p-4 sm:p-5 flex flex-col md:flex-row gap-5 items-center justify-between transition-all group"
-                >
-                  <div className="flex flex-col sm:flex-row gap-5 items-center w-full md:w-auto">
-                    <div className="relative w-full sm:w-48 h-36 rounded-2xl overflow-hidden shrink-0 bg-slate-950">
-                      <img
-                        src={v.image}
-                        alt={`${v.make} ${v.model}`}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                      />
-                      <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500 text-slate-950">
-                        {v.status || 'Available'}
-                      </span>
-                    </div>
-
-                    <div className="space-y-2 text-center sm:text-left">
-                      <div className="flex items-center justify-center sm:justify-start gap-2">
-                        <h3 className="font-extrabold text-white text-lg">
-                          {v.make} {v.model}
-                        </h3>
-                        <span className="text-xs font-bold text-slate-300 bg-slate-800 px-2 py-0.5 rounded-lg border border-slate-700">
-                          {v.year}
-                        </span>
-                      </div>
-                      <p className="text-xs text-slate-400">{v.variant} • {v.color} • {v.condition}</p>
-
-                      <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 text-xs text-slate-300 pt-1">
-                        <span className="bg-[#070D1E] px-2.5 py-1 rounded-lg border border-slate-800">⛽ {v.fuelType}</span>
-                        <span className="bg-[#070D1E] px-2.5 py-1 rounded-lg border border-slate-800">⚙️ {v.transmission}</span>
-                        <span className="bg-[#070D1E] px-2.5 py-1 rounded-lg border border-slate-800">📍 {v.mileage}</span>
-                        <span className="bg-[#070D1E] px-2.5 py-1 rounded-lg border border-slate-800">🛡️ {v.inspectionScore || 'Certified'}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto gap-4 shrink-0">
-                    <div className="text-center md:text-right">
-                      <span className="text-[10px] text-slate-400 uppercase font-bold block">Cash Price</span>
-                      <span className="text-2xl font-black text-emerald-400">{formatLKR(v.price)}</span>
-                      <span className="text-xs text-cyan-400 block font-semibold">{getEstMonthlyLease(v.price)}</span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          toggleWishlist(v.id);
-                        }}
-                        className={`p-2.5 rounded-xl border transition-all ${
-                          isWishlisted
-                            ? 'bg-rose-500 border-rose-500 text-white'
-                            : 'border-slate-700 bg-slate-800 text-slate-300 hover:text-white'
-                        }`}
-                        title="Save to favorites"
-                      >
-                        <Heart className="w-4 h-4" />
-                      </button>
-
-                      <button
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          toggleCompare(v.id);
-                        }}
-                        className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all ${
-                          isCompared
-                            ? 'bg-cyan-600 border-cyan-500 text-white'
-                            : 'border-slate-700 bg-slate-800 text-slate-300 hover:text-white'
-                        }`}
-                      >
-                        {isCompared ? 'Comparing' : '+ Compare'}
-                      </button>
-
-                      <button
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          setInterestVehicle(v);
-                          setInterestType('Details');
-                          setInterestSuccess(false);
-                          setInterestError('');
-                        }}
-                        className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md transition-all"
-                      >
-                        Enquire Now
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </section>
-
-      {/* Interactive Monthly Leasing & Loan EMI Calculator Section */}
-      <section id="calculator" className="py-16 px-4 md:px-8 border-t border-slate-800/80 bg-[#0A132C]">
-        <div className="max-w-7xl mx-auto w-full">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <div className="inline-flex items-center gap-2 text-cyan-400 font-bold text-xs uppercase tracking-wider mb-2">
-              <Calculator className="w-4 h-4" />
-              <span>Smart Financial Planning</span>
-            </div>
-            <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-              Interactive Vehicle Leasing & Installment Calculator
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-300 mt-2">
-              Calculate your exact monthly payments instantly with customized down payments, loan periods, and current bank leasing interest rates.
-            </p>
-          </div>
-
-          <div className={`grid grid-cols-1 lg:grid-cols-12 gap-8 items-center max-w-5xl mx-auto p-6 sm:p-8 rounded-3xl border shadow-2xl transition-colors duration-300 ${
-            isLightMode
-              ? 'bg-white border-slate-200 shadow-slate-200/50'
-              : 'bg-[#0F1B3E] border-slate-700/80 shadow-2xl'
-          }`}>
-            {/* Sliders Input Column */}
-            <div className="lg:col-span-7 space-y-6">
-              {/* Vehicle Price Slider */}
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <label className={`text-xs font-bold ${isLightMode ? 'text-slate-700' : 'text-slate-300'}`}>Vehicle Price (LKR)</label>
-                  <span className={`text-sm font-black px-3 py-1 rounded-xl border ${
-                    isLightMode
-                      ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
-                      : 'text-emerald-400 bg-[#070D1E] border-slate-700'
-                  }`}>
-                    {formatLKR(calcPrice)}
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min={5000000}
-                  max={60000000}
-                  step={500000}
-                  value={calcPrice}
-                  onChange={(e) => setCalcPrice(Number(e.target.value))}
-                  className={`w-full h-2 rounded-lg appearance-none cursor-pointer accent-emerald-500 ${
-                    isLightMode ? 'bg-slate-200' : 'bg-slate-800'
-                  }`}
-                />
-                <div className={`flex justify-between text-[10px] mt-1 ${isLightMode ? 'text-slate-500 font-medium' : 'text-slate-400'}`}>
-                  <span>5 Million</span>
-                  <span>30 Million</span>
-                  <span>60 Million</span>
-                </div>
-              </div>
-
-              {/* Down Payment Slider */}
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <label className={`text-xs font-bold ${isLightMode ? 'text-slate-700' : 'text-slate-300'}`}>
-                    Down Payment: <span className={isLightMode ? 'text-emerald-600 font-extrabold' : 'text-emerald-400 font-extrabold'}>{calcDownPercent}%</span>
-                  </label>
-                  <span className={`text-xs font-bold px-3 py-1 rounded-xl border ${
-                    isLightMode
-                      ? 'text-slate-700 bg-slate-100 border-slate-200'
-                      : 'text-slate-300 bg-[#070D1E] border-slate-700'
-                  }`}>
-                    {formatLKR(currentLoanSummary.downAmount)}
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min={10}
-                  max={60}
-                  step={5}
-                  value={calcDownPercent}
-                  onChange={(e) => setCalcDownPercent(Number(e.target.value))}
-                  className={`w-full h-2 rounded-lg appearance-none cursor-pointer accent-emerald-500 ${
-                    isLightMode ? 'bg-slate-200' : 'bg-slate-800'
-                  }`}
-                />
-                <div className={`flex justify-between text-[10px] mt-1 ${isLightMode ? 'text-slate-500 font-medium' : 'text-slate-400'}`}>
-                  <span>10% (Minimum)</span>
-                  <span>30% (Standard)</span>
-                  <span>60% (Low EMI)</span>
-                </div>
-              </div>
-
-              {/* Tenure Period Slider */}
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <label className={`text-xs font-bold ${isLightMode ? 'text-slate-700' : 'text-slate-300'}`}>
-                    Tenure Period: <span className={isLightMode ? 'text-emerald-600 font-extrabold' : 'text-emerald-400 font-extrabold'}>{calcTenureYears} Years</span> ({calcTenureYears * 12} Months)
-                  </label>
-                  <span className={`text-xs font-bold px-3 py-1 rounded-xl border ${
-                    isLightMode
-                      ? 'text-slate-700 bg-slate-100 border-slate-200'
-                      : 'text-slate-300 bg-[#070D1E] border-slate-700'
-                  }`}>
-                    {calcTenureYears * 12} Installments
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min={1}
-                  max={7}
-                  step={1}
-                  value={calcTenureYears}
-                  onChange={(e) => setCalcTenureYears(Number(e.target.value))}
-                  className={`w-full h-2 rounded-lg appearance-none cursor-pointer accent-cyan-500 ${
-                    isLightMode ? 'bg-slate-200' : 'bg-slate-800'
-                  }`}
-                />
-                <div className={`flex justify-between text-[10px] mt-1 ${isLightMode ? 'text-slate-500 font-medium' : 'text-slate-400'}`}>
-                  <span>1 Year</span>
-                  <span>3 Years</span>
-                  <span>5 Years</span>
-                  <span>7 Years</span>
-                </div>
-              </div>
-
-              {/* Annual Interest Rate Slider */}
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <label className={`text-xs font-bold ${isLightMode ? 'text-slate-700' : 'text-slate-300'}`}>
-                    Annual Interest Rate: <span className={isLightMode ? 'text-cyan-700 font-extrabold' : 'text-cyan-400 font-extrabold'}>{calcInterestRate}%</span>
-                  </label>
-                  <span className={`text-[11px] font-semibold ${isLightMode ? 'text-slate-500' : 'text-slate-400'}`}>Current Market: 12.5% - 15.0%</span>
-                </div>
-                <input
-                  type="range"
-                  min={10}
-                  max={18}
-                  step={0.5}
-                  value={calcInterestRate}
-                  onChange={(e) => setCalcInterestRate(Number(e.target.value))}
-                  className={`w-full h-2 rounded-lg appearance-none cursor-pointer accent-cyan-500 ${
-                    isLightMode ? 'bg-slate-200' : 'bg-slate-800'
-                  }`}
-                />
-                <div className={`flex justify-between text-[10px] mt-1 ${isLightMode ? 'text-slate-500 font-medium' : 'text-slate-400'}`}>
-                  <span>10.0%</span>
-                  <span>13.5% (Dealership Partner)</span>
-                  <span>18.0%</span>
-                </div>
-              </div>
+              </select>
             </div>
 
-            {/* Live Calculation Output Card */}
-            <div className={`lg:col-span-5 p-6 rounded-3xl border shadow-xl flex flex-col justify-between transition-colors ${
-              isLightMode
-                ? 'bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/70 border-emerald-300/60 shadow-emerald-100/50'
-                : 'bg-gradient-to-br from-[#070D1E] to-[#0A1838] border-emerald-500/30 shadow-xl'
-            }`}>
-              <div>
-                <div className={`flex items-center justify-between pb-4 border-b mb-5 ${
-                  isLightMode ? 'border-slate-200' : 'border-slate-800'
-                }`}>
-                  <span className={`text-xs font-extrabold uppercase tracking-wider ${
-                    isLightMode ? 'text-slate-600' : 'text-slate-400'
-                  }`}>
-                    Estimated Monthly Rental
-                  </span>
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
-                    isLightMode
-                      ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
-                      : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                  }`}>
-                    Official Formula
-                  </span>
-                </div>
-
-                <div className="mb-6">
-                  <span className={`text-3xl sm:text-4xl font-black block ${
-                    isLightMode
-                      ? 'text-emerald-700'
-                      : 'text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-300'
-                  }`}>
-                    {formatLKR(currentLoanSummary.emi)}
-                  </span>
-                  <span className={`text-[11px] mt-1 block font-medium ${
-                    isLightMode ? 'text-slate-500' : 'text-slate-400'
-                  }`}>
-                    Per month for {calcTenureYears * 12} consecutive months
-                  </span>
-                </div>
-
-                {/* Financial Summary Breakdown */}
-                <div className={`space-y-2.5 text-xs p-4 rounded-2xl border mb-6 ${
-                  isLightMode
-                    ? 'bg-white border-slate-200 shadow-sm'
-                    : 'bg-[#0F1B3E]/80 border-slate-800/90'
-                }`}>
-                  <div className="flex justify-between items-center">
-                    <span className={isLightMode ? 'text-slate-600 font-semibold' : 'text-slate-400'}>Down Payment ({calcDownPercent}%):</span>
-                    <span className={`font-bold ${isLightMode ? 'text-slate-900' : 'text-white'}`}>{formatLKR(currentLoanSummary.downAmount)}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className={isLightMode ? 'text-slate-600 font-semibold' : 'text-slate-400'}>Lease Financing Amount:</span>
-                    <span className={`font-bold ${isLightMode ? 'text-slate-900' : 'text-white'}`}>{formatLKR(currentLoanSummary.loanAmount)}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className={isLightMode ? 'text-slate-600 font-semibold' : 'text-slate-400'}>Total Interest Payable:</span>
-                    <span className={`font-bold ${isLightMode ? 'text-slate-900' : 'text-slate-300'}`}>{formatLKR(currentLoanSummary.totalInterest)}</span>
-                  </div>
-                  <div className={`flex justify-between items-center border-t pt-2 font-bold ${
-                    isLightMode ? 'border-slate-200' : 'border-slate-800'
-                  }`}>
-                    <span className={isLightMode ? 'text-slate-800 font-bold' : 'text-slate-300'}>Total Capital Outlay:</span>
-                    <span className={isLightMode ? 'text-emerald-700 font-extrabold text-sm' : 'text-emerald-400'}>
-                      {formatLKR(currentLoanSummary.totalPayable + currentLoanSummary.downAmount)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Button */}
-              <button
-                onClick={handleOpenLeaseInquiry}
-                className="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs uppercase tracking-wider rounded-2xl shadow-lg shadow-emerald-950/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <span>Apply for Leasing Pre-Approval</span>
-                <ArrowRight className="w-4 h-4 text-white" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 120-Point Certified Inspection Showcase */}
-      <section id="inspection" className="py-16 px-4 md:px-8 max-w-7xl mx-auto w-full">
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-2 text-emerald-400 font-bold text-xs uppercase tracking-wider mb-2">
-            <ShieldCheck className="w-4 h-4" />
-            <span>Zero Compromise Standards</span>
-          </div>
-          <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-            Our Multi-Stage 120-Point Inspection Process
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-300 mt-2">
-            Every vehicle that enters our showroom undergoes strict diagnostic testing and legal verification by senior automotive engineers.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-[#0D1836] p-6 rounded-3xl border border-slate-800/90 shadow-xl space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center font-bold text-lg">
-              01
-            </div>
-            <h3 className="text-base font-extrabold text-white">Engine & Transmission</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Diagnostic cylinder compression, OBD-II scanner code check, transmission shifting smoothness, hybrid battery health and cooling circuit performance.
-            </p>
-            <ul className="text-xs text-slate-300 space-y-1.5 pt-2 border-t border-slate-800">
-              <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-400" /> Zero oil/coolant leaks</li>
-              <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-400" /> Hybrid battery degradation &lt; 10%</li>
-            </ul>
-          </div>
-
-          <div className="bg-[#0D1836] p-6 rounded-3xl border border-slate-800/90 shadow-xl space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-cyan-500/15 text-cyan-400 flex items-center justify-center font-bold text-lg">
-              02
-            </div>
-            <h3 className="text-base font-extrabold text-white">Chassis & Body Integrity</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              360° laser structural alignment check, paint thickness gauge evaluation, zero flood water submersion guarantee and clear chassis stamp inspection.
-            </p>
-            <ul className="text-xs text-slate-300 space-y-1.5 pt-2 border-t border-slate-800">
-              <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-cyan-400" /> 100% Original factory pillars</li>
-              <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-cyan-400" /> Zero structural accident record</li>
-            </ul>
-          </div>
-
-          <div className="bg-[#0D1836] p-6 rounded-3xl border border-slate-800/90 shadow-xl space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-400 flex items-center justify-center font-bold text-lg">
-              03
-            </div>
-            <h3 className="text-base font-extrabold text-white">Braking & Safety Sensors</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              ABS actuator testing, brake rotor thickness, shock absorber rebound rates, radar cruise sensors and full multi-airbag electrical deployment verification.
-            </p>
-            <ul className="text-xs text-slate-300 space-y-1.5 pt-2 border-t border-slate-800">
-              <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-amber-400" /> Minimum 70% brake pad life</li>
-              <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-amber-400" /> Calibrated radar safety systems</li>
-            </ul>
-          </div>
-
-          <div className="bg-[#0D1836] p-6 rounded-3xl border border-slate-800/90 shadow-xl space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-teal-500/15 text-teal-400 flex items-center justify-center font-bold text-lg">
-              04
-            </div>
-            <h3 className="text-base font-extrabold text-white">Legal & RMV Clearance</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Direct verification with Department of Motor Traffic (RMV), absolute clear ownership title, valid emission test, finance encumbrance clearance and original log books.
-            </p>
-            <ul className="text-xs text-slate-300 space-y-1.5 pt-2 border-t border-slate-800">
-              <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-teal-400" /> Verified RMV registration</li>
-              <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-teal-400" /> Direct ownership transfer support</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* Interactive FAQ Accordion Section */}
-      <section className="py-16 px-4 md:px-8 max-w-4xl mx-auto w-full">
-        <div className="text-center mb-10">
-          <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            Frequently Asked Questions
-          </h2>
-          <p className="text-xs text-slate-400 mt-1">
-            Everything you need to know about buying, leasing, or trading in your car.
-          </p>
-        </div>
-
-        <div className="space-y-3">
-          {[
-            {
-              q: 'Can I obtain leasing pre-approval before choosing a vehicle?',
-              a: 'Yes! We collaborate directly with Commercial Bank, HNB, Sampath Bank, LB Finance, and Seylan Bank. You can apply for pre-approval using our leasing calculator or consultation form. Once approved, you can select any vehicle in our showroom.'
-            },
-            {
-              q: 'How does the 120-Point Mechanical Inspection guarantee work?',
-              a: 'Every certified car is inspected by our senior technicians covering engine compression, hybrid battery degradation, transmission, 360° laser chassis alignment, brakes, and electrical systems. You receive the complete printed diagnostic report prior to purchase.'
-            },
-            {
-              q: 'Do you accept vehicle trade-ins for existing cars?',
-              a: 'Absolutely. We accept Japanese and European trade-in vehicles. Submit your car details through our instant valuation form, and our valuation specialists will provide an immediate estimate and arrange physical inspection.'
-            },
-            {
-              q: 'How long does the vehicle registration and RMV transfer take?',
-              a: 'For in-stock registered vehicles, our dedicated document executive completes the RMV transfer within 3 to 5 business days. You receive all original certificates, revenue license, and official VIC clearance.'
-            }
-          ].map((faq, idx) => {
-            const isOpen = openFaq === idx;
-            return (
-              <div
-                key={idx}
-                className="bg-[#0D1836] border border-slate-800 rounded-2xl overflow-hidden transition-all"
-              >
-                <button
-                  onClick={() => setOpenFaq(isOpen ? null : idx)}
-                  className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-bold text-xs sm:text-sm text-white hover:text-emerald-400 transition-colors"
-                >
-                  <span>{faq.q}</span>
-                  <ChevronDown className={`w-4 h-4 shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180 text-emerald-400' : 'text-slate-400'}`} />
-                </button>
-                {isOpen && (
-                  <div className="px-5 pb-5 pt-1 text-xs text-slate-300 leading-relaxed border-t border-slate-800/80">
-                    {faq.a}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* Showroom Locations & Contact Section */}
-      <section id="contact" className="py-16 px-4 md:px-8 border-t border-slate-800/80 bg-[#0A132C]">
-        <div className="max-w-7xl mx-auto w-full">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-              Visit Our Dealership Showrooms
-            </h2>
-            <p className="text-xs text-slate-400 mt-1">
-              Experience the cars in person or schedule an exclusive private test drive at our branches.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-[#0F1B3E] p-6 rounded-3xl border border-slate-800/90 shadow-xl space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center">
-                <MapPin className="w-5 h-5" />
-              </div>
-              <h3 className="font-extrabold text-white text-base">{brand.city ? `${brand.city} Flagship` : 'Colombo Flagship'}</h3>
-              <p className="text-xs text-slate-400">{brand.address || 'No. 142/B, Baseline Road, Colombo 09'}</p>
-              <div className="text-xs text-slate-300 space-y-1 pt-2 border-t border-slate-800">
-                <p><span className="text-slate-500">Phone:</span> {brand.hotline || brand.phone || '+94 11 268 4900'}</p>
-                <p><span className="text-slate-500">Hours:</span> {brand.openingHours || 'Mon - Sat: 8:30 AM - 6:30 PM'}</p>
-                <p><span className="text-slate-500">Sunday:</span> 9:00 AM - 2:00 PM</p>
-              </div>
-              <a
-                href={brand.googleMapsUrl || "https://maps.google.com"}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 hover:text-emerald-300 pt-2"
-              >
-                <span>Get Directions</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </a>
-            </div>
-
-            <div className="bg-[#0F1B3E] p-6 rounded-3xl border border-slate-800/90 shadow-xl space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-cyan-500/15 text-cyan-400 flex items-center justify-center">
-                <MapPin className="w-5 h-5" />
-              </div>
-              <h3 className="font-extrabold text-white text-base">Kandy Royal View Branch</h3>
-              <p className="text-xs text-slate-400">No. 112, Peradeniya Road, Kandy</p>
-              <div className="text-xs text-slate-300 space-y-1 pt-2 border-t border-slate-800">
-                <p><span className="text-slate-500">Phone:</span> 081-2233445</p>
-                <p><span className="text-slate-500">Hours:</span> Mon - Sat: 9:00 AM - 6:00 PM</p>
-                <p><span className="text-slate-500">Sunday:</span> By Appointment Only</p>
-              </div>
-              <a
-                href="https://maps.google.com"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-cyan-400 hover:text-cyan-300 pt-2"
-              >
-                <span>Get Directions</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </a>
-            </div>
-
-            <div className="bg-[#0F1B3E] p-6 rounded-3xl border border-slate-800/90 shadow-xl space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-teal-500/15 text-teal-400 flex items-center justify-center">
-                <MapPin className="w-5 h-5" />
-              </div>
-              <h3 className="font-extrabold text-white text-base">Gampaha Express Center</h3>
-              <p className="text-xs text-slate-400">No. 78, Kandy Road, Yakkala, Gampaha</p>
-              <div className="text-xs text-slate-300 space-y-1 pt-2 border-t border-slate-800">
-                <p><span className="text-slate-500">Phone:</span> 033-2288990</p>
-                <p><span className="text-slate-500">Hours:</span> Mon - Sat: 8:30 AM - 6:00 PM</p>
-                <p><span className="text-slate-500">Sunday:</span> 9:00 AM - 2:00 PM</p>
-              </div>
-              <a
-                href="https://maps.google.com"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-teal-400 hover:text-teal-300 pt-2"
-              >
-                <span>Get Directions</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Floating Compare Action Bar */}
-      {compareIds.length > 0 && (
-        <aside aria-label="Compare bar" className="fixed bottom-6 right-6 z-40 bg-gradient-to-r from-emerald-600 to-teal-600 text-white p-3.5 rounded-2xl shadow-2xl flex items-center gap-3.5 border border-emerald-400/40">
-          <div className="flex items-center gap-2">
-            <SlidersHorizontal className="w-4 h-4 text-emerald-200" />
-            <span className="text-xs font-bold">{compareIds.length} Vehicles in Compare Dock</span>
-          </div>
-          <button
-            onClick={() => setShowCompareModal(true)}
-            className="bg-white text-emerald-950 font-black text-xs px-4 py-2 rounded-xl shadow-md hover:bg-slate-100 transition-all"
-          >
-            Compare Side-by-Side
-          </button>
-          <button
-            onClick={() => setCompareIds([])}
-            className="text-emerald-200 hover:text-white p-1 rounded-lg"
-            title="Clear all"
-            aria-label="Clear all"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </aside>
-      )}
-
-      {/* Wishlist Saved Slide-Over Drawer */}
-      {showWishlistDrawer && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex justify-end">
-          <div className="w-full max-w-md bg-[#0D1836] h-full p-6 flex flex-col justify-between border-l border-slate-800 shadow-2xl overflow-y-auto">
+            {/* Category */}
             <div>
-              <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-5">
-                <div className="flex items-center gap-2">
-                  <Heart className="w-5 h-5 text-rose-500 fill-rose-500" />
-                  <h3 className="font-extrabold text-base text-white">Your Saved Vehicles ({wishlist.length})</h3>
-                </div>
-                <button onClick={() => setShowWishlistDrawer(false)} className="text-slate-400 hover:text-white" aria-label="Close saved vehicles">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {wishlist.length === 0 ? (
-                <div className="text-center py-16 text-slate-400">
-                  <Heart className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-                  <p className="font-bold text-white mb-1">No Saved Vehicles Yet</p>
-                  <p className="text-xs text-slate-400">
-                    Click the heart icon on any vehicle card to save it for quick review.
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {allVehicles.filter((v) => wishlist.includes(v.id)).map((v) => (
-                    <div key={v.id} className="bg-[#070D1E] p-3 rounded-2xl border border-slate-800 flex gap-3 items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={v.image}
-                          alt={v.model}
-                          className="w-16 h-12 rounded-xl object-cover"
-                        />
-                        <div>
-                          <h4 className="font-bold text-xs text-white">{v.make} {v.model}</h4>
-                          <span className="text-[11px] font-black text-emerald-400">{formatLKR(v.price)}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          onClick={() => {
-                            setShowWishlistDrawer(false);
-                            setInterestVehicle(v);
-                            setInterestType('Details');
-                            setInterestSuccess(false);
-                          }}
-                          className="px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white text-[11px] font-bold"
-                        >
-                          Enquire
-                        </button>
-                        <button
-                          onClick={() => toggleWishlist(v.id)}
-                          className="p-1.5 text-slate-400 hover:text-rose-400"
-                          title="Remove"
-                          aria-label={`Remove ${v.make} ${v.model} from favorites`}
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <label className="block text-[11px] font-semibold uppercase text-slate-400 mb-1.5">
+                Body Category
+              </label>
+              <select
+                value={searchCategory}
+                onChange={(e) => setSearchCategory(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm font-medium text-white focus:outline-none focus:border-amber-400"
+              >
+                <option value="ALL">All Categories</option>
+                <option value="SUV">SUV & Crossover</option>
+                <option value="Sedan">Executive Sedan</option>
+                <option value="Hatchback">Hatchback</option>
+                <option value="Luxury">Luxury & Sports</option>
+                <option value="Van">Van & Commercial</option>
+              </select>
             </div>
 
-            {wishlist.length > 0 && (
-              <div className="pt-4 border-t border-slate-800">
-                <button
-                  onClick={() => {
-                    const savedCars = allVehicles.filter(v => wishlist.includes(v.id));
-                    const carNames = savedCars.map(c => `${c.make} ${c.model}`).join(', ');
-                    const waUrl = `https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(`Hello ${brand.dealershipName || 'SalesPlus'} Team, I would like to inquire about my saved cars: ${carNames}`)}`;
-                    window.open(waUrl, '_blank');
-                  }}
-                  className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2"
-                >
-                  <MessageSquare className="w-4 h-4" />
-                  <span>Enquire All on WhatsApp</span>
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Vehicle Quick View Modal */}
-      {quickViewVehicle && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#0F1B3E] border border-slate-700/80 rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 text-xs text-white">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-5">
-              <div>
-                <h3 className="text-xl font-extrabold text-white">
-                  {quickViewVehicle.make} {quickViewVehicle.model} ({quickViewVehicle.year})
-                </h3>
-                <p className="text-xs text-slate-400">{quickViewVehicle.variant} • {quickViewVehicle.condition}</p>
-              </div>
-              <button onClick={() => setQuickViewVehicle(null)} className="text-slate-400 hover:text-white" aria-label="Close quick view">
-                <X className="w-6 h-6" />
-              </button>
+            {/* Fuel Type */}
+            <div>
+              <label className="block text-[11px] font-semibold uppercase text-slate-400 mb-1.5">
+                Powertrain / Fuel
+              </label>
+              <select
+                value={searchFuel}
+                onChange={(e) => setSearchFuel(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm font-medium text-white focus:outline-none focus:border-amber-400"
+              >
+                <option value="ALL">All Fuel Types</option>
+                <option value="Petrol">Petrol</option>
+                <option value="Hybrid">Hybrid</option>
+                <option value="Electric">Pure Electric (EV)</option>
+                <option value="Diesel">Diesel</option>
+              </select>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <div className="rounded-2xl overflow-hidden h-64 bg-slate-950">
-                  {quickViewVehicle.image ? (
-                    <img
-                      src={quickViewVehicle.image}
-                      alt={quickViewVehicle.model}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="h-full flex items-center justify-center text-slate-500">No vehicle image</div>
-                  )}
-                </div>
-                {quickViewVehicle.images?.length > 1 && (
-                  <div className="grid grid-cols-4 gap-2 mt-2">
-                    {quickViewVehicle.images.map((image: string, index: number) => (
-                      <img
-                        key={`${image}-${index}`}
-                        src={image}
-                        alt={`${quickViewVehicle.make} ${quickViewVehicle.model} view ${index + 1}`}
-                        className="w-full h-16 object-cover rounded-lg border border-slate-700"
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div className="flex flex-col justify-between">
-                <div>
-                  <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">Price</span>
-                  <span className="text-2xl font-black text-emerald-400 block mb-1">
-                    {formatLKR(quickViewVehicle.price)}
-                  </span>
-                  <span className="text-xs text-cyan-400 font-semibold block mb-4">
-                    {getEstMonthlyLease(quickViewVehicle.price)}
-                  </span>
-
-                  <div className="grid grid-cols-2 gap-2 text-xs bg-[#070D1E] p-3.5 rounded-2xl border border-slate-800">
-                    <div><span className="text-slate-500">Fuel:</span> {quickViewVehicle.fuelType}</div>
-                    <div><span className="text-slate-500">Gearbox:</span> {quickViewVehicle.transmission}</div>
-                    <div><span className="text-slate-500">Mileage:</span> {quickViewVehicle.mileage}</div>
-                    <div><span className="text-slate-500">Drive:</span> {quickViewVehicle.driveType || '2WD'}</div>
-                    <div><span className="text-slate-500">Engine:</span> {quickViewVehicle.engineCapacity || 'Standard'}</div>
-                    <div><span className="text-slate-500">Color:</span> {quickViewVehicle.color}</div>
-                    <div><span className="text-slate-500">Body:</span> {quickViewVehicle.bodyType || 'Not specified'}</div>
-                    <div><span className="text-slate-500">Seats:</span> {quickViewVehicle.seatingCapacity || 'Not specified'}</div>
-                    <div><span className="text-slate-500">Power:</span> {quickViewVehicle.horsepower ? `${quickViewVehicle.horsepower} hp` : 'Not specified'}</div>
-                    <div><span className="text-slate-500">Torque:</span> {quickViewVehicle.torque || 'Not specified'}</div>
-                  </div>
-                </div>
-
-                {(quickViewVehicle.safetyFeatures?.length ||
-                  quickViewVehicle.entertainmentFeatures?.length ||
-                  quickViewVehicle.comfortFeatures?.length ||
-                  quickViewVehicle.customSpecifications &&
-                    Object.keys(quickViewVehicle.customSpecifications).length > 0) && (
-                  <div className="mt-4 pt-4 border-t border-slate-800 space-y-2">
-                    <span className="text-slate-400 font-bold">Features & specifications</span>
-                    <div className="flex flex-wrap gap-1.5">
-                    {[
-                      ...(quickViewVehicle.safetyFeatures || []),
-                      ...(quickViewVehicle.entertainmentFeatures || []),
-                      ...(quickViewVehicle.comfortFeatures || [])
-                    ].map((feature: string, index: number) => (
-                      <span key={`${feature}-${index}`} className="px-2 py-1 rounded-lg bg-slate-800 text-slate-300">{feature}</span>
-                    ))}
-                    {Object.entries(quickViewVehicle.customSpecifications || {}).map(([name, value]) => (
-                      <span key={name} className="px-2 py-1 rounded-lg bg-slate-800 text-slate-300">{name}: {String(value)}</span>
-                    ))}
-                    </div>
-                  </div>
-                )}
-
-                <div className="mt-4 pt-4 border-t border-slate-800 flex gap-2">
-                  <button
-                    onClick={() => {
-                      const v = quickViewVehicle;
-                      setQuickViewVehicle(null);
-                      setInterestVehicle(v);
-                      setInterestType('Details');
-                      setInterestSuccess(false);
-                    }}
-                    className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-center"
-                  >
-                    Enquire / Reserve
-                  </button>
-
-                  <a
-                    href={`https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(`Hello ${brand.dealershipName || 'SalesPlus'} Team, I am inquiring about ${quickViewVehicle.make} ${quickViewVehicle.model}`)}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl flex items-center justify-center gap-1.5"
-                  >
-                    <MessageSquare className="w-4 h-4 text-emerald-400" />
-                    <span>WhatsApp</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Side-by-Side Multi-Vehicle Comparison Modal */}
-      {showCompareModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#0F1B3E] border border-slate-700 rounded-3xl w-full max-w-5xl max-h-[90vh] overflow-y-auto p-6 text-xs text-white">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
-              <div>
-                <h3 className="text-xl font-extrabold text-white">Side-by-Side Vehicle Comparison</h3>
-                <p className="text-xs text-slate-400">Comparing technical specifications, pricing, and warranties</p>
-              </div>
-              <button onClick={() => setShowCompareModal(false)} className="text-slate-400 hover:text-white" aria-label="Close vehicle comparison">
-                <X className="w-6 h-6" />
-              </button>
+            {/* Price Max */}
+            <div>
+              <label className="block text-[11px] font-semibold uppercase text-slate-400 mb-1.5">
+                Max Budget
+              </label>
+              <select
+                value={searchPriceMax}
+                onChange={(e) => setSearchPriceMax(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm font-medium text-white focus:outline-none focus:border-amber-400"
+              >
+                <option value="ALL">Any Budget</option>
+                <option value="12000000">Under Rs. 12 Million</option>
+                <option value="18000000">Under Rs. 18 Million</option>
+                <option value="25000000">Under Rs. 25 Million</option>
+                <option value="40000000">Under Rs. 40 Million</option>
+              </select>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {allVehicles.filter((v) => compareIds.includes(v.id)).map((v) => (
-                <div key={v.id} className="bg-[#070D1E] p-4 rounded-2xl border border-slate-800 space-y-3 flex flex-col justify-between">
-                  <div>
-                    <div className="h-40 bg-slate-950 rounded-xl overflow-hidden mb-3">
-                      <img src={v.image} alt={v.model} className="w-full h-full object-cover" />
-                    </div>
-                    <h4 className="font-extrabold text-base text-white">{v.make} {v.model}</h4>
-                    <p className="text-[11px] text-slate-400">{v.variant} • {v.year}</p>
-                    <p className="text-emerald-400 font-black text-lg my-2">{formatLKR(v.price)}</p>
-
-                    <div className="space-y-1.5 text-xs text-slate-300 pt-2 border-t border-slate-800">
-                      <div className="flex justify-between"><span className="text-slate-500">Mileage:</span> {v.mileage}</div>
-                      <div className="flex justify-between"><span className="text-slate-500">Fuel:</span> {v.fuelType}</div>
-                      <div className="flex justify-between"><span className="text-slate-500">Transmission:</span> {v.transmission}</div>
-                      <div className="flex justify-between"><span className="text-slate-500">Drive Type:</span> {v.driveType || '2WD'}</div>
-                      <div className="flex justify-between"><span className="text-slate-500">Engine:</span> {v.engineCapacity || 'Standard'}</div>
-                      <div className="flex justify-between"><span className="text-slate-500">Inspection:</span> {v.inspectionScore || 'Certified'}</div>
-                      <div className="flex justify-between"><span className="text-slate-500">Est. Lease:</span> <span className="text-cyan-400 font-bold">{getEstMonthlyLease(v.price)}</span></div>
-                    </div>
-                  </div>
-
-                  <div className="pt-3 border-t border-slate-800 space-y-2">
-                    <button
-                      onClick={() => {
-                        setShowCompareModal(false);
-                        setInterestVehicle(v);
-                        setInterestType('Details');
-                        setInterestSuccess(false);
-                      }}
-                      className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 font-bold rounded-xl text-center text-white"
-                    >
-                      Enquire This Vehicle
-                    </button>
-                    <button
-                      onClick={() => toggleCompare(v.id)}
-                      className="w-full py-1.5 text-slate-400 hover:text-rose-400 text-[11px]"
-                    >
-                      Remove from Comparison
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Trade-In / Valuation Modal */}
-      {showTradeInModal && (
-        <div className="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0F1B3E] rounded-3xl max-w-lg w-full p-6 sm:p-7 border border-slate-700/80 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
-              <div>
-                <h3 className="text-lg font-black text-white">Sell / Trade-in Your Car</h3>
-                <p className="text-xs text-slate-400">Receive fair market appraisal within 2 hours</p>
-              </div>
-              <button onClick={() => setShowTradeInModal(false)} className="text-slate-400 hover:text-white" aria-label="Close sell or trade-in form">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {tradeInSuccess ? (
-              <div className="py-10 text-center space-y-3">
-                <CheckCircle2 className="w-14 h-14 text-emerald-400 mx-auto" />
-                <h4 className="font-extrabold text-white text-lg">Valuation Request Submitted!</h4>
-                <p className="text-xs text-slate-300 max-w-xs mx-auto">
-                  Our valuation team has received your vehicle specs. An appraisal officer will call your phone with an initial purchase offer.
-                </p>
-                <button
-                  onClick={() => {
-                    setTradeInSuccess(false);
-                    setShowTradeInModal(false);
-                  }}
-                  className="mt-4 px-6 py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs"
-                >
-                  Done
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleTradeInSubmit} className="space-y-3.5 text-xs">
-                {tradeInError && (
-                  <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 shrink-0" />
-                    <span>{tradeInError}</span>
-                  </div>
-                )}
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block font-semibold text-slate-300 mb-1">Your Full Name *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Kasun Kalhara"
-                      value={tradeInForm.name}
-                      onChange={(e) => setTradeInForm({ ...tradeInForm, name: e.target.value })}
-                      className="w-full p-2.5 bg-[#070D1E] border border-slate-700/80 rounded-xl text-white focus:outline-none focus:border-emerald-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-semibold text-slate-300 mb-1">Phone Number *</label>
-                    <input
-                      type="tel"
-                      required
-                      placeholder="e.g. 077 123 4567"
-                      value={tradeInForm.phone}
-                      onChange={(e) => setTradeInForm({ ...tradeInForm, phone: e.target.value })}
-                      className="w-full p-2.5 bg-[#070D1E] border border-slate-700/80 rounded-xl text-white focus:outline-none focus:border-emerald-500"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block font-semibold text-slate-300 mb-1">Make / Brand *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Toyota / Honda"
-                      value={tradeInForm.make}
-                      onChange={(e) => setTradeInForm({ ...tradeInForm, make: e.target.value })}
-                      className="w-full p-2.5 bg-[#070D1E] border border-slate-700/80 rounded-xl text-white focus:outline-none focus:border-emerald-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-semibold text-slate-300 mb-1">Model *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Axio / Vezel / Premio"
-                      value={tradeInForm.model}
-                      onChange={(e) => setTradeInForm({ ...tradeInForm, model: e.target.value })}
-                      className="w-full p-2.5 bg-[#070D1E] border border-slate-700/80 rounded-xl text-white focus:outline-none focus:border-emerald-500"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block font-semibold text-slate-300 mb-1">Year of Manufacture *</label>
-                    <input
-                      type="number"
-                      required
-                      min={2000}
-                      max={2026}
-                      value={tradeInForm.year}
-                      onChange={(e) => setTradeInForm({ ...tradeInForm, year: e.target.value })}
-                      className="w-full p-2.5 bg-[#070D1E] border border-slate-700/80 rounded-xl text-white focus:outline-none focus:border-emerald-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-semibold text-slate-300 mb-1">Mileage (km) *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. 45,000 km"
-                      value={tradeInForm.mileage}
-                      onChange={(e) => setTradeInForm({ ...tradeInForm, mileage: e.target.value })}
-                      className="w-full p-2.5 bg-[#070D1E] border border-slate-700/80 rounded-xl text-white focus:outline-none focus:border-emerald-500"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block font-semibold text-slate-300 mb-1">Asking / Expected Price (LKR) *</label>
-                  <input
-                    type="number"
-                    required
-                    placeholder="e.g. 14500000"
-                    value={tradeInForm.askingPrice}
-                    onChange={(e) => setTradeInForm({ ...tradeInForm, askingPrice: e.target.value })}
-                    className="w-full p-2.5 bg-[#070D1E] border border-slate-700/80 rounded-xl text-white font-bold focus:outline-none focus:border-emerald-500"
-                  />
-                </div>
-
-                <div className="flex justify-end gap-2.5 pt-4 border-t border-slate-800">
-                  <button
-                    type="button"
-                    onClick={() => setShowTradeInModal(false)}
-                    className="px-4 py-2.5 border border-slate-700 text-slate-300 rounded-xl font-semibold"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isSubmittingTradeIn}
-                    className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold shadow-md shadow-emerald-950 transition-all flex items-center gap-2"
-                  >
-                    {isSubmittingTradeIn && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
-                    <span>Submit for Appraisal</span>
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Customer Enquiry / Test Drive / Reservation Modal */}
-      {interestVehicle && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4">
-          <div className="w-full max-w-md rounded-3xl border border-slate-700/80 bg-[#0F1B3E] p-6 sm:p-7 shadow-2xl">
-            <div className="mb-4 flex items-center justify-between border-b border-slate-800 pb-3">
-              <div>
-                <h3 className="font-extrabold text-base text-white">
-                  Inquire: {interestVehicle.make} {interestVehicle.model}
-                </h3>
-                <p className="text-xs text-slate-400">Our dealership sales team will contact you shortly.</p>
-              </div>
-              <button onClick={() => setInterestVehicle(null)} className="text-slate-400 hover:text-white" aria-label="Close enquiry modal">
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            {interestSuccess ? (
-              <div className="py-8 text-center space-y-3">
-                <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-400" />
-                <p className="font-extrabold text-white text-base">Enquiry Sent Successfully!</p>
-                <p className="text-xs text-slate-400 max-w-xs mx-auto">
-                  A dedicated sales executive from our Colombo/Kandy showroom will call you within normal business hours.
-                </p>
-                <button
-                  onClick={() => setInterestVehicle(null)}
-                  className="mt-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 px-6 py-2.5 text-xs font-bold text-white"
-                >
-                  Close
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={submitInterest} className="space-y-3.5 text-xs">
-                {interestError && (
-                  <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300">
-                    {interestError}
-                  </div>
-                )}
-
-                <div>
-                  <label className="block font-semibold text-slate-300 mb-1">Inquiry Purpose</label>
-                  <select
-                    value={interestType}
-                    onChange={(e) => setInterestType(e.target.value)}
-                    className="w-full rounded-xl border border-slate-700 bg-[#070D1E] p-2.5 text-white font-semibold focus:outline-none focus:border-emerald-500"
-                  >
-                    <option value="Details">General Details & Pricing</option>
-                    <option value="Test Drive">Schedule Test Drive</option>
-                    <option value="Reservation Request">Vehicle Reservation Hold</option>
-                    <option value="Leasing Pre-Approval">Leasing Pre-Approval Support</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block font-semibold text-slate-300 mb-1">Your Full Name *</label>
-                  <input
-                    required
-                    placeholder="e.g. Kasun Kalhara"
-                    value={interestName}
-                    onChange={(e) => setInterestName(e.target.value)}
-                    className="w-full rounded-xl border border-slate-700 bg-[#070D1E] p-2.5 text-white focus:outline-none focus:border-emerald-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-semibold text-slate-300 mb-1">Phone Number (WhatsApp Preferred) *</label>
-                  <input
-                    required
-                    type="tel"
-                    placeholder="e.g. 077 123 4567"
-                    value={interestPhone}
-                    onChange={(e) => setInterestPhone(e.target.value)}
-                    className="w-full rounded-xl border border-slate-700 bg-[#070D1E] p-2.5 text-white focus:outline-none focus:border-emerald-500"
-                  />
-                </div>
-
-                {interestType === 'Test Drive' && (
-                  <div>
-                    <label className="block font-semibold text-slate-300 mb-1">Preferred Date and Time *</label>
-                    <input
-                      required
-                      type="datetime-local"
-                      value={interestDate}
-                      onChange={(e) => setInterestDate(e.target.value)}
-                      className="w-full rounded-xl border border-slate-700 bg-[#070D1E] p-2.5 text-white focus:outline-none focus:border-emerald-500"
-                    />
-                  </div>
-                )}
-
-                {interestLeaseDetails && (
-                  <div className="bg-[#070D1E] p-2.5 rounded-xl border border-cyan-500/30 text-[11px] text-cyan-300">
-                    <span className="font-bold block text-slate-300 mb-0.5">Calculated Lease Proposal Attached:</span>
-                    {interestLeaseDetails}
-                  </div>
-                )}
-
-                <div>
-                  <label className="block font-semibold text-slate-300 mb-1">Message / Additional Questions</label>
-                  <textarea
-                    rows={2}
-                    placeholder="e.g. Is it possible to inspect this vehicle this Saturday?"
-                    value={interestMessage}
-                    onChange={(e) => setInterestMessage(e.target.value)}
-                    className="w-full rounded-xl border border-slate-700 bg-[#070D1E] p-2.5 text-white focus:outline-none focus:border-emerald-500"
-                  />
-                </div>
-
-                <div className="flex gap-2 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setInterestVehicle(null)}
-                    className="w-1/3 rounded-xl border border-slate-700 py-2.5 font-bold text-slate-300"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isSubmittingInterest}
-                    className="w-2/3 rounded-xl bg-emerald-600 hover:bg-emerald-500 py-2.5 font-extrabold text-white flex items-center justify-center gap-2"
-                  >
-                    {isSubmittingInterest && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
-                    <span>Submit Enquiry</span>
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Modern High-Trust Footer */}
-      {/* Modern High-Trust Footer */}
-      <footer className={`mt-auto border-t pt-14 pb-8 px-4 md:px-8 text-xs transition-colors ${
-        isLightMode
-          ? 'bg-slate-100/90 border-slate-300 text-slate-700'
-          : 'bg-[#050A17] border-slate-800 text-slate-400'
-      }`}>
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-          {/* Col 1: Brand Info */}
-          <div className="space-y-3 md:col-span-1">
-            <div className="flex items-center gap-3">
-              {brand.logoUrl ? (
-                <div className="w-9 h-9 rounded-xl bg-white/10 p-1 flex items-center justify-center border border-slate-700/60 overflow-hidden shadow-md shadow-emerald-500/20">
-                  <img src={brand.logoUrl} alt={brand.dealershipName || 'Logo'} className="w-full h-full object-contain" />
-                </div>
-              ) : (
-                <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold shadow-md shadow-emerald-500/20">
-                  <Car className="w-5 h-5 text-white" />
-                </div>
-              )}
-              <span className={`font-extrabold text-base ${isLightMode ? 'text-slate-900' : 'text-white'}`}>
-                {brand.dealershipName || 'SalesPlus'}
-              </span>
-            </div>
-            <p className={`text-xs leading-relaxed ${isLightMode ? 'text-slate-700 font-medium' : 'text-slate-400'}`}>
-              {brand.tagline || 'Premier automotive dealership in Sri Lanka. Inspected Japanese & European imports, flexible leasing financing, and certified warranty protection.'}
-            </p>
-            <div className={`pt-2 text-xs font-semibold ${isLightMode ? 'text-slate-800' : 'text-slate-300'}`}>
-              {(brand.hotline || brand.phone) && (
-                <p className={isLightMode ? 'text-emerald-700 font-bold' : 'text-emerald-400 font-bold'}>
-                  Hotline: {brand.hotline || brand.phone}
-                </p>
-              )}
-              {(brand.email || brand.salesEmail) && (
-                <p>Email: {brand.email || brand.salesEmail}</p>
-              )}
-            </div>
-            {(brand.facebook || brand.instagram || brand.youtube || brand.whatsapp) && (
-              <div className="flex items-center gap-3 pt-2 text-xs font-semibold">
-                {brand.facebook && (
-                  <a href={brand.facebook} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-emerald-400 transition-colors">
-                    Facebook
-                  </a>
-                )}
-                {brand.instagram && (
-                  <a href={brand.instagram} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-emerald-400 transition-colors">
-                    Instagram
-                  </a>
-                )}
-                {brand.youtube && (
-                  <a href={brand.youtube} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-emerald-400 transition-colors">
-                    YouTube
-                  </a>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Col 2: Quick Links */}
-          <div className="space-y-2">
-            <h4 className={`font-extrabold text-sm mb-3 ${isLightMode ? 'text-slate-900' : 'text-white'}`}>Vehicle Categories</h4>
-            <ul className={`space-y-2 text-xs font-medium ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>
-              <li><a href="#inventory" className={`transition-colors ${isLightMode ? 'hover:text-emerald-700 font-semibold' : 'hover:text-emerald-400'}`}>Premium SUVs & 4WD</a></li>
-              <li><a href="#inventory" className={`transition-colors ${isLightMode ? 'hover:text-emerald-700 font-semibold' : 'hover:text-emerald-400'}`}>Executive Luxury Sedans</a></li>
-              <li><a href="#inventory" className={`transition-colors ${isLightMode ? 'hover:text-emerald-700 font-semibold' : 'hover:text-emerald-400'}`}>Hybrid & Electric Vehicles</a></li>
-              <li><a href="#inventory" className={`transition-colors ${isLightMode ? 'hover:text-emerald-700 font-semibold' : 'hover:text-emerald-400'}`}>Unregistered Brand New Imports</a></li>
-              <li><a href="#inventory" className={`transition-colors ${isLightMode ? 'hover:text-emerald-700 font-semibold' : 'hover:text-emerald-400'}`}>Budget Certified Cars Under 20M</a></li>
-            </ul>
-          </div>
-
-          {/* Col 3: Services & Trust */}
-          <div className="space-y-2">
-            <h4 className={`font-extrabold text-sm mb-3 ${isLightMode ? 'text-slate-900' : 'text-white'}`}>Customer Services</h4>
-            <ul className={`space-y-2 text-xs font-medium ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>
-              <li><button onClick={() => setShowTradeInModal(true)} className={`transition-colors text-left ${isLightMode ? 'hover:text-emerald-700 font-semibold' : 'hover:text-emerald-400'}`}>Sell or Trade-In Valuation</button></li>
-              <li><a href="#calculator" className={`transition-colors ${isLightMode ? 'hover:text-emerald-700 font-semibold' : 'hover:text-emerald-400'}`}>Leasing & Installment Calculator</a></li>
-              <li><a href="#inspection" className={`transition-colors ${isLightMode ? 'hover:text-emerald-700 font-semibold' : 'hover:text-emerald-400'}`}>120-Point Mechanical Inspection</a></li>
-              <li><a href="#contact" className={`transition-colors ${isLightMode ? 'hover:text-emerald-700 font-semibold' : 'hover:text-emerald-400'}`}>Showroom Branches & Test Drives</a></li>
-              <li><Link href="/login" className={`transition-colors ${isLightMode ? 'hover:text-emerald-700 font-semibold' : 'hover:text-emerald-400'}`}>Customer & Staff Portal</Link></li>
-            </ul>
-          </div>
-
-          {/* Col 4: New Stock Alerts */}
-          <div className="space-y-3">
-            <h4 className={`font-extrabold text-sm mb-1 ${isLightMode ? 'text-slate-900' : 'text-white'}`}>New Shipment Alerts</h4>
-            <p className={`text-xs ${isLightMode ? 'text-slate-700 font-medium' : 'text-slate-400'}`}>
-              Subscribe to get notified whenever new Japanese or European shipments clear Colombo port.
-            </p>
-            <form onSubmit={(e) => { e.preventDefault(); alert(`Subscribed to ${brand.dealershipName || 'SalesPlus'} Stock Alerts!`); }} className="space-y-2">
-              <input
-                type="email"
-                required
-                placeholder="Enter your email address..."
-                className={`w-full p-2.5 rounded-xl border text-xs focus:outline-none focus:border-emerald-500 font-medium ${
-                  isLightMode
-                    ? 'bg-white border-slate-300 text-slate-900 placeholder-slate-500 shadow-xs'
-                    : 'bg-[#070D1E] border-slate-700 text-white placeholder-slate-500'
-                }`}
-              />
+            {/* Submit Button */}
+            <div className="flex items-end">
               <button
                 type="submit"
-                className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition-colors shadow-md shadow-emerald-900/20"
+                className="w-full h-11 inline-flex items-center justify-center gap-2 px-5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs uppercase tracking-wider transition-all shadow-md shadow-amber-400/10"
               >
-                Subscribe for Arrivals
+                <Search className="w-4 h-4 text-slate-950" />
+                <span>Find Vehicles</span>
               </button>
-            </form>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      {/* 3. FEATURED VEHICLES */}
+      {brand.website?.sections?.showFeatured !== false && (
+        <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-10">
+            <div>
+              <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">
+                <Flame className="w-4 h-4" />
+                <span>Dealership Spotlight</span>
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+                Featured Inventory
+              </h2>
+              <p className="text-sm text-slate-400 mt-1 max-w-lg">
+                Handpicked vehicles offering exceptional value, verified condition, and instant showroom availability.
+              </p>
+            </div>
+
+            <Link
+              href="/vehicles"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-amber-400 hover:text-amber-300 transition-colors group"
+            >
+              <span>View All ({vehicles.length}) Vehicles</span>
+              <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
           </div>
+
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <VehicleCardSkeleton />
+              <VehicleCardSkeleton />
+              <VehicleCardSkeleton />
+            </div>
+          ) : featuredVehicles.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredVehicles.map((vehicle) => (
+                <VehicleCard
+                  key={vehicle._id}
+                  vehicle={vehicle}
+                  onQuickInquire={(v) => {
+                    setInquiryVehicle(v);
+                    setIsInquiryOpen(true);
+                  }}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-slate-900/60 rounded-2xl border border-slate-800 p-8">
+              <Car className="w-12 h-12 text-slate-500 mx-auto mb-3" />
+              <p className="text-slate-300 font-semibold">New inventory arriving soon.</p>
+              <p className="text-xs text-slate-400 mt-1">Contact our team to place a direct import order.</p>
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* 4. BROWSE BY CATEGORY */}
+      {brand.website?.sections?.showCategories !== false && (
+        <section className="py-16 bg-slate-950/60 border-y border-slate-850">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
+                Discover by Style
+              </span>
+              <h2 className="text-3xl font-extrabold text-white tracking-tight mt-1">
+                Explore Vehicle Categories
+              </h2>
+              <p className="text-sm text-slate-400 mt-2">
+                Filter through our diverse collection tailored for luxury commuting, family travel, and electric mobility.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {categories.map((cat) => (
+                <Link
+                  key={cat.key}
+                  href={`/vehicles?category=${cat.key}`}
+                  className="group relative rounded-2xl overflow-hidden aspect-[4/3] bg-slate-900 border border-slate-800 hover:border-amber-400/50 transition-all shadow-lg"
+                >
+                  <img
+                    src={cat.img}
+                    alt={cat.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/50 to-transparent" />
+                  <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
+                    <div>
+                      <span className="text-xs font-medium text-amber-400 block">
+                        {cat.count}
+                      </span>
+                      <h3 className="text-lg font-bold text-white group-hover:text-amber-400 transition-colors">
+                        {cat.name}
+                      </h3>
+                    </div>
+                    <div className="w-8 h-8 rounded-full bg-slate-900/80 border border-slate-700/80 flex items-center justify-center text-white group-hover:bg-amber-400 group-hover:text-slate-950 transition-colors">
+                      <ChevronRight className="w-4 h-4" />
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 5. LATEST ARRIVALS */}
+      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-10">
+          <div>
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">
+              <Sparkles className="w-4 h-4" />
+              <span>Just Added To Showroom</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+              Latest Arrivals
+            </h2>
+            <p className="text-sm text-slate-400 mt-1 max-w-lg">
+              Freshly imported shipments with low mileage, complete auction sheets, and verified inspection records.
+            </p>
+          </div>
+
+          <Link
+            href="/vehicles?sort=newest"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-amber-400 hover:text-amber-300 transition-colors group"
+          >
+            <span>See Newest Arrivals</span>
+            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </Link>
         </div>
 
-        {/* Bottom Bar */}
-        <div className={`max-w-7xl mx-auto pt-8 border-t flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left text-[11px] font-semibold ${
-          isLightMode
-            ? 'border-slate-300 text-slate-600'
-            : 'border-slate-800/80 text-slate-500'
-        }`}>
-          <p>{brand.footerText || `© 2026 ${brand.dealershipName || 'SalesPlus'}. All rights reserved.`}</p>
-          <p>Head Office: {brand.address || 'No. 142/B, Baseline Road, Colombo 09'} • Dealership Hotline: {brand.hotline || brand.phone || '011-2345678'}</p>
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <VehicleCardSkeleton />
+            <VehicleCardSkeleton />
+            <VehicleCardSkeleton />
+          </div>
+        ) : latestArrivals.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {latestArrivals.map((vehicle) => (
+              <VehicleCard
+                key={vehicle._id}
+                vehicle={vehicle}
+                onQuickInquire={(v) => {
+                  setInquiryVehicle(v);
+                  setIsInquiryOpen(true);
+                }}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12 bg-slate-900/60 rounded-2xl border border-slate-800 p-8">
+            <Car className="w-12 h-12 text-slate-500 mx-auto mb-3" />
+            <p className="text-slate-300 font-semibold">Live inventory synchronized from VSMS.</p>
+          </div>
+        )}
+      </section>
+
+      {/* 6. WHY BUY FROM US */}
+      <section className="py-20 bg-slate-950 border-t border-slate-850">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
+              The SalesPlus Standard
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mt-1">
+              Why Discerning Drivers Choose Us
+            </h2>
+            <p className="text-sm text-slate-400 mt-3 leading-relaxed">
+              We eliminate uncertainty from automotive purchases through transparent inspections, clear revenue documentation, and tailored customer support.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {whyChooseUs.map((item) => {
+              const Icon = item.icon;
+              return (
+                <div
+                  key={item.title}
+                  className="p-6 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition-all flex flex-col justify-between"
+                >
+                  <div>
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center border mb-5 ${item.color}`}>
+                      <Icon className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-lg font-bold text-white mb-2 tracking-tight">
+                      {item.title}
+                    </h3>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      {item.desc}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </footer>
-    </div>
+      </section>
+
+      {/* 7. HOW THE BUYING PROCESS WORKS */}
+      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
+            Seamless & Transparent
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mt-1">
+            How The Buying Process Works
+          </h2>
+          <p className="text-sm text-slate-400 mt-2">
+            Four straightforward steps from browsing our digital showroom to driving home your certified vehicle.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative">
+          {buyingSteps.map((step, idx) => (
+            <div
+              key={step.step}
+              className="relative p-6 rounded-2xl bg-slate-900/80 border border-slate-800 flex flex-col justify-between"
+            >
+              <div>
+                <span className="text-3xl font-black text-amber-400/80 font-mono block mb-3">
+                  {step.step}
+                </span>
+                <h3 className="text-lg font-bold text-white mb-2">
+                  {step.title}
+                </h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  {step.desc}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 8. FINANCE & LEASING TEASER BANNER */}
+      <section className="dark-panel py-16 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-y border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+            <div className="lg:col-span-7 space-y-4">
+              <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-400">
+                <Calculator className="w-4 h-4" />
+                Tailored Auto Financing
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+                Flexible Leasing Packages with Major Banks
+              </h2>
+              <p className="text-sm text-slate-300 leading-relaxed">
+                Enjoy customized repayment periods from 12 to 84 months, competitive interest rates, and seamless paperwork assistance through our verified financial institution network.
+              </p>
+              <div className="flex flex-wrap gap-4 pt-2">
+                <Link
+                  href="/finance"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs uppercase tracking-wider transition-all shadow-md"
+                >
+                  <Calculator className="w-4 h-4" />
+                  <span>Interactive Loan Calculator</span>
+                </Link>
+                <Link
+                  href="/inquiry?type=Finance"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs uppercase tracking-wider transition-all border border-slate-700"
+                >
+                  <span>Request Pre-Approval</span>
+                </Link>
+              </div>
+            </div>
+
+            <div className="lg:col-span-5 bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-3">
+              <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-2">
+                Preferred Leasing Partners
+              </h4>
+              <ul className="space-y-2 text-xs text-slate-300">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <span>Commercial Bank of Ceylon PLC</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <span>Hatton National Bank (HNB)</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <span>Sampath Bank PLC</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <span>LOLC Finance PLC & Central Finance</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 9. SELL YOUR VEHICLE TRADE-IN BANNER */}
+      <section className="dark-panel py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative rounded-3xl bg-gradient-to-br from-amber-500/10 via-slate-900 to-slate-950 border border-amber-500/20 p-8 sm:p-12 overflow-hidden shadow-2xl">
+          <div className="relative z-10 max-w-2xl">
+            <span className="text-xs font-bold uppercase tracking-wider text-amber-400 block mb-2">
+              Vehicle Trade-In & Direct Purchase
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-tight">
+              Looking to Sell or Upgrade Your Current Vehicle?
+            </h2>
+            <p className="mt-4 text-sm text-slate-300 leading-relaxed">
+              Submit your vehicle specifications and photos online. Our certified appraisers will evaluate market trends and offer a competitive cash offer or trade-in credit within 24 hours.
+            </p>
+
+            <div className="mt-8 flex flex-col sm:flex-row items-center gap-4">
+              <Link
+                href="/sell-your-vehicle"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs uppercase tracking-wider transition-all shadow-md"
+              >
+                <span>Get Instant Valuation</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link
+                href="/contact"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs uppercase tracking-wider transition-all border border-slate-700"
+              >
+                <span>Speak to Appraiser</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 10. LOCATION & SHOWROOM FACILITY */}
+      <section className="py-16 bg-slate-950 border-t border-slate-850">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
+                Visit Us In Person
+              </span>
+              <h2 className="text-3xl font-extrabold text-white tracking-tight mt-1 mb-4">
+                Colombo Flagship Showroom
+              </h2>
+              <p className="text-sm text-slate-400 mb-6 leading-relaxed">
+                Experience our curated inventory in an air-conditioned luxury lounge setting. Our automotive experts are ready to assist with vehicle inspections, test drives, and document transfers.
+              </p>
+
+              <div className="space-y-3.5 text-sm text-slate-300 mb-8">
+                <div className="flex items-start gap-3">
+                  <MapPin className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+                  <span>{brand?.address || 'No. 142/B, Baseline Road, Colombo 09, Sri Lanka'}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Clock className="w-5 h-5 text-amber-400 shrink-0" />
+                  <span>{brand?.openingHours || 'Mon - Sat: 8:30 AM - 6:30 PM (Sun: 9:00 AM - 2:00 PM)'}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Phone className="w-5 h-5 text-amber-400 shrink-0" />
+                  <a href={`tel:${(brand?.hotline || '+94771234567').replace(/\s+/g, '')}`} className="hover:text-amber-400">
+                    Hotline: {brand?.hotline || brand?.phone || '+94 77 123 4567'}
+                  </a>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <a
+                  href={`https://wa.me/${(brand?.whatsapp || '+94771234567').replace(/[^0-9]/g, '')}?text=Hello%20SalesPlus%2C%20I%20would%20like%20to%20visit%20the%20showroom`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-sm"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span>Direct WhatsApp</span>
+                </a>
+                <Link
+                  href="/book-test-drive"
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs uppercase tracking-wider transition-colors border border-slate-700"
+                >
+                  <CalendarCheck className="w-4 h-4" />
+                  <span>Book Test Drive</span>
+                </Link>
+              </div>
+            </div>
+
+            {/* Visual Showroom Preview Card */}
+            <div className="relative rounded-3xl overflow-hidden aspect-[16/10] bg-slate-900 border border-slate-800 shadow-2xl">
+              <img
+                src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80"
+                alt="SalesPlus Flagship Showroom"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+              <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between text-white">
+                <div>
+                  <p className="font-bold text-base">SalesPlus Auto Mart Showroom</p>
+                  <p className="text-xs text-slate-300">Baseline Road, Colombo 09</p>
+                </div>
+                <a
+                  href={brand?.googleMapsUrl || 'https://maps.google.com/?q=Colombo+Sri+Lanka'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3.5 py-1.5 rounded-lg bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider hover:bg-amber-300 transition-colors"
+                >
+                  Directions
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Inquiry Dialog Modal */}
+      <InquiryDialog
+        isOpen={isInquiryOpen}
+        onClose={() => setIsInquiryOpen(false)}
+        vehicle={inquiryVehicle}
+      />
+    </PublicLayout>
   );
 }
