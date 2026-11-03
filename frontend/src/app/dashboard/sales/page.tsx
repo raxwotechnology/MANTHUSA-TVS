@@ -54,7 +54,7 @@ export default function SalesPage() {
       setSales(data.map((sale: any) => ({
         _id: sale._id, invoiceNumber: sale.invoiceNumber, customerId: sale.customer?._id, vehicleId: sale.vehicle?._id,
         customerName: sale.customer?.fullName || '—',
-        vehicleName: [sale.vehicle?.make, sale.vehicle?.model, sale.vehicle?.year].filter(Boolean).join(' '),
+        vehicleName: sale.modelName || [sale.vehicle?.make, sale.vehicle?.model, sale.variantName || sale.vehicle?.variant].filter(Boolean).join(' ') || 'TVS Motorcycle',
         finalAmount: Number(sale.finalAmount || 0), paidAmount: Number(sale.paidAmount || 0),
         balance: Number(sale.balance || 0), saleStatus: sale.status, saleDate: sale.saleDate,
       })));
@@ -89,7 +89,7 @@ export default function SalesPage() {
                 <th className="py-3 px-4">Invoice #</th>
                 <th className="py-3 px-4">Date</th>
                 <th className="py-3 px-4">Customer</th>
-                <th className="py-3 px-4">Vehicle</th>
+                <th className="py-3 px-4">Motorcycle Model</th>
                 <th className="py-3 px-4">Final Amount</th>
                 <th className="py-3 px-4">Paid Amount</th>
                 <th className="py-3 px-4">Status</th>

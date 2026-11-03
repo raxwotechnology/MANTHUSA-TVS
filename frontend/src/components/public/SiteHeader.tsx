@@ -4,17 +4,16 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  Car,
-  Heart,
   Scale,
+  Heart,
+  CalendarCheck,
+  User,
   Menu,
   X,
-  Phone,
-  ShieldCheck,
   ChevronRight,
-  User,
-  ArrowRight,
-  CalendarCheck
+  LogOut,
+  Sparkles,
+  ArrowRight
 } from 'lucide-react';
 import { BrandSettings } from '@/lib/useSettings';
 import { useFavorites } from '@/hooks/useFavorites';
@@ -29,7 +28,7 @@ export function SiteHeader({ brand }: Props) {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<{ name?: string; role?: string; email?: string } | null>(null);
 
   const { count: favoritesCount } = useFavorites();
   const { count: comparisonCount } = useComparison();
@@ -64,7 +63,7 @@ export function SiteHeader({ brand }: Props) {
         .slice(0, 2)
         .join('')
         .toUpperCase()
-    : 'A';
+    : 'U';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -74,183 +73,184 @@ export function SiteHeader({ brand }: Props) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close mobile menu when pathname changes
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [pathname]);
 
+  // Center navigation items matching the reference design:
+  // Home, Browse, Compare, Finance, Sell, About, Contact
   const navLinks = [
     { label: 'Home', href: '/' },
-    { label: 'Browse', href: '/vehicles' },
-    { label: 'Compare', href: '/compare', badge: comparisonCount },
+    { label: 'Browse', href: '/bikes', matchSubpaths: ['/bikes', '/vehicles'] },
+    { label: 'Compare', href: '/compare' },
     { label: 'Finance', href: '/finance' },
     { label: 'Sell', href: '/sell-your-vehicle' },
     { label: 'About', href: '/about' },
     { label: 'Contact', href: '/contact' },
   ];
 
-  const dealershipName = brand?.dealershipName || 'SalesPlus Auto Mart';
-  const displayDealershipName = dealershipName.replace(/\s+Auto Mart$/i, '');
-  const phone = brand?.hotline || brand?.phone || '+94 77 123 4567';
-
   return (
     <header
       className={`site-header sticky top-0 z-50 w-full transition-all duration-300 ${
         isScrolled
-          ? 'bg-slate-950/95 backdrop-blur-md shadow-lg shadow-black/20 border-b border-slate-800'
-          : 'bg-slate-950 border-b border-slate-850'
+          ? 'bg-white/95 dark:bg-[#090e1a]/95 backdrop-blur-md shadow-md border-b border-slate-200 dark:border-slate-800/80'
+          : 'bg-white dark:bg-[#090e1a] border-b border-slate-200 dark:border-slate-800/70'
       }`}
     >
-      <div className="w-full px-3 sm:px-4 lg:px-5">
-        <div className="flex items-center justify-between min-h-24 gap-3 py-2">
-          {/* Logo & Brand */}
-          <Link href="/" className="flex items-center gap-3.5 group shrink-0">
-            {brand?.logoUrl ? (
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/5 border border-slate-700/60 p-1.5 flex items-center justify-center overflow-hidden shadow-md shadow-amber-500/10 group-hover:scale-105 transition-transform">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-18 sm:h-20">
+          {/* Left: Brand Identity (Logo + Name + Tagline) */}
+          <Link href="/" className="flex items-center gap-3 group shrink-0">
+            {/* Logo Icon Box */}
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-slate-100 dark:bg-[#111827] border border-slate-200 dark:border-slate-700/60 p-2 flex items-center justify-center shrink-0 shadow-inner group-hover:border-amber-400/50 group-hover:shadow-amber-400/10 transition-all">
+              {brand?.logoUrl ? (
                 <img
                   src={brand.logoUrl}
-                  alt={dealershipName}
+                  alt={brand?.dealershipName || 'SalesPlus'}
                   className="w-full h-full object-contain"
                 />
-              </div>
-            ) : (
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-300 flex items-center justify-center text-slate-950 font-black shadow-md shadow-amber-500/20 group-hover:scale-105 transition-transform">
-                <Car className="w-6 h-6 sm:w-7 sm:h-7 stroke-[2.2]" />
-              </div>
-            )}
-            <div className="min-w-0">
-              <span className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-1.5 font-sans leading-none">
-                {dealershipName}
-                <span className="w-2 h-2 rounded-full bg-amber-400 inline-block animate-pulse"></span>
+              ) : (
+                /* Dynamic swirl/spiral logo matching reference */
+                <svg
+                  viewBox="0 0 36 36"
+                  fill="none"
+                  className="w-6 h-6 shrink-0 group-hover:scale-105 transition-transform"
+                >
+                  <defs>
+                    <linearGradient id="header-logo-blue" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#38bdf8" />
+                      <stop offset="100%" stopColor="#0284c7" />
+                    </linearGradient>
+                    <linearGradient id="header-logo-orange" x1="0%" y1="100%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#f97316" />
+                      <stop offset="100%" stopColor="#fbbf24" />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    d="M18 4C10.268 4 4 10.268 4 18c0 4.28 1.9 8.118 4.908 10.72l4.137-4.137A9.957 9.957 0 0 1 10 18c0-4.418 3.582-8 8-8 2.378 0 4.516 1.037 5.986 2.684l4.24-4.24A13.934 13.934 0 0 0 18 4Z"
+                    fill="url(#header-logo-blue)"
+                  />
+                  <path
+                    d="M18 32c7.732 0 14-6.268 14-14 0-4.28-1.9-8.118-4.908-10.72l-4.137 4.137A9.957 9.957 0 0 1 26 18c0 4.418-3.582 8-8 8-2.378 0-4.516-1.037-5.986-2.684l-4.24 4.24A13.934 13.934 0 0 0 18 32Z"
+                    fill="url(#header-logo-orange)"
+                  />
+                </svg>
+              )}
+            </div>
+
+            {/* Brand Titles */}
+            <div className="flex flex-col">
+              <span className="text-[17px] sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight flex items-center leading-none">
+                <span>{brand?.dealershipName || 'SalesPlus'}</span>
+                {/* Yellow/Amber Dot from reference */}
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block ml-1 shadow-xs shadow-amber-400/50" />
               </span>
-              <p className="mt-1 max-w-[260px] text-[11px] font-medium tracking-wider uppercase leading-[1.3] text-slate-400 truncate">
-                {brand?.tagline || "Sri Lanka's Premier Vehicle Dealership"}
-              </p>
+              <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 tracking-wider uppercase mt-1">
+                {brand?.tagline || "SRI LANKA'S PREMIER VEHICLE DEALERSHIP"}
+              </span>
             </div>
           </Link>
 
-          {/* Desktop Nav Navigation */}
-          <nav className="hidden lg:flex flex-1 items-center justify-center gap-1 xl:gap-2 mx-2 xl:mx-5">
+          {/* Center: Desktop Navigation Links */}
+          <nav className="hidden lg:flex items-center gap-1.5">
             {navLinks.map((link) => {
-              const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
+              const active =
+                pathname === link.href ||
+                (link.matchSubpaths &&
+                  link.matchSubpaths.some((sub) => pathname.startsWith(sub)));
+
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`relative whitespace-nowrap px-3 py-2 text-[17px] leading-none font-medium rounded-lg transition-colors flex items-center gap-1.5 ${
-                    isActive
-                      ? 'text-amber-400 bg-white/5 font-semibold'
-                      : 'text-slate-300 hover:text-white hover:bg-white/5'
+                  className={`px-3.5 py-1.5 rounded-lg text-[13px] transition-all ${
+                    active
+                      ? 'bg-red-50 dark:bg-slate-800 text-red-600 dark:text-amber-400 font-bold border border-red-200 dark:border-slate-700/80 shadow-xs'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/40 font-medium'
                   }`}
                 >
                   {link.label}
-                  {typeof link.badge === 'number' && link.badge > 0 && (
-                    <span className="inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-amber-500 text-slate-950 ml-0.5">
-                      {link.badge}
-                    </span>
-                  )}
                 </Link>
               );
             })}
           </nav>
 
-          {/* Action CTAs */}
-          <div className="hidden sm:flex items-center gap-1 xl:gap-3 shrink-0">
-            {/* Compare Link */}
+          {/* Right: Quick Actions, BOOK Button, Theme & Auth */}
+          <div className="hidden sm:flex items-center gap-2.5">
+            {/* Compare vehicles */}
             <Link
               href="/compare"
-              aria-label="Compare Vehicles"
-              className="relative p-2 md:p-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-900 border border-transparent hover:border-slate-800 transition-colors"
+              className="p-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800/50 rounded-xl transition-colors relative"
               title="Compare Vehicles"
             >
               <Scale className="w-5 h-5" />
               {comparisonCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-amber-500 text-slate-950 text-xs font-bold flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-400 text-slate-950 text-[10px] font-extrabold flex items-center justify-center shadow-xs">
                   {comparisonCount}
                 </span>
               )}
             </Link>
 
-            {/* Saved Vehicles / Favorites */}
+            {/* Favorites / Saved Vehicles */}
             <Link
               href="/saved-vehicles"
-              aria-label="Saved Vehicles"
-              className="relative p-2 md:p-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-900 border border-transparent hover:border-slate-800 transition-colors"
+              className="p-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800/50 rounded-xl transition-colors relative"
               title="Saved Vehicles"
             >
               <Heart className="w-5 h-5" />
               {favoritesCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-400 text-slate-950 text-[10px] font-extrabold flex items-center justify-center shadow-xs">
                   {favoritesCount}
                 </span>
               )}
             </Link>
 
-            {/* Book Test Drive Button */}
+            {/* Prominent Golden Yellow BOOK Button */}
             <Link
               href="/book-test-drive"
-              className="site-header-cta hidden md:inline-flex h-16 w-[88px] xl:h-20 xl:w-[120px] flex-col items-center justify-center gap-1 px-2 xl:px-3 text-xs xl:text-sm font-semibold uppercase tracking-wider bg-amber-400 hover:bg-amber-300 rounded-xl shadow-sm hover:shadow-amber-500/20 transition-all text-center leading-tight"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 active:scale-95 text-slate-950 font-black text-xs uppercase tracking-wider shadow-md shadow-amber-400/20 transition-all cursor-pointer"
             >
-              <CalendarCheck className="w-4 h-4 text-slate-950" />
-              <span className="whitespace-nowrap text-black">Book</span>
+              <CalendarCheck className="w-4 h-4 text-slate-950 stroke-[2.5]" />
+              <span>BOOK</span>
             </Link>
 
-            {/* Theme Toggle */}
+            {/* Theme Toggle Button */}
             <ThemeToggle />
 
-            {/* Direct Dashboard / Sign In Link */}
+            {/* Sign In / User Pill Button */}
             {user ? (
               <Link
-                href="/dashboard"
-                className="hidden xl:inline-flex items-center gap-2 p-1.5 sm:px-3 sm:py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-200 hover:text-white transition-all shadow-xs group"
-                title="Go to VSMS Dashboard"
+                href={/customer|client/i.test(user.role || '') ? '/account' : '/dashboard'}
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-300 dark:border-slate-700 hover:border-amber-400/60 bg-slate-100 hover:bg-slate-200 dark:bg-slate-900/80 text-slate-800 dark:text-white text-xs font-semibold transition-all group"
               >
-                <div className="w-8 h-8 rounded-full bg-amber-500 text-slate-950 font-bold text-xs flex items-center justify-center overflow-hidden border border-amber-400">
-                  {user.avatar ? (
-                    <img src={user.avatar} alt={user.name || 'User'} className="w-full h-full object-cover" />
-                  ) : (
-                    userInitials
-                  )}
+                <div className="w-6 h-6 rounded-full bg-amber-400 text-slate-950 text-[11px] font-extrabold flex items-center justify-center">
+                  {userInitials}
                 </div>
-                <div className="hidden xl:block text-left">
-                  <p className="text-xs font-semibold text-slate-200 group-hover:text-white truncate max-w-[100px]">
-                    {user.name || 'Admin'}
-                  </p>
-                  <p className="text-[10px] text-amber-400 truncate max-w-[100px]">
-                    {user.role || 'Dashboard'}
-                  </p>
-                </div>
+                <span className="max-w-[80px] truncate">{user.name?.split(' ')[0] || 'Account'}</span>
               </Link>
             ) : (
               <Link
                 href="/login"
-                className="hidden xl:flex p-2 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-900 border border-slate-800 transition-colors items-center gap-1.5"
-                title="Staff Portal / Sign In"
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-slate-300 dark:border-slate-700/80 hover:border-slate-400 dark:hover:border-slate-500 bg-slate-100 hover:bg-slate-200 dark:bg-slate-900/60 dark:hover:bg-slate-800/90 text-slate-800 hover:text-slate-950 dark:text-slate-200 dark:hover:text-white text-xs font-semibold tracking-wide transition-all"
               >
-                <User className="w-4 h-4 text-amber-400" />
-                <span className="hidden sm:inline">Sign In</span>
+                <User className="w-3.5 h-3.5 text-amber-500" />
+                <span>Sign In</span>
               </Link>
             )}
           </div>
 
-          {/* Mobile menu hamburger toggle */}
-          <div className="flex items-center gap-2 lg:hidden">
+          {/* Mobile Right Controls: Book CTA + Menu Toggle */}
+          <div className="flex sm:hidden items-center gap-2">
             <Link
-              href="/saved-vehicles"
-              aria-label="Saved Vehicles"
-              className="relative p-2 rounded-lg text-slate-300"
+              href="/book-test-drive"
+              className="px-3 py-1.5 rounded-lg bg-amber-400 text-slate-950 font-black text-[11px] uppercase tracking-wider shadow-sm"
             >
-              <Heart className="w-5 h-5" />
-              {favoritesCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
-                  {favoritesCount}
-                </span>
-              )}
+              BOOK
             </Link>
-
+            <ThemeToggle />
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-900 focus:outline-none"
+              className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
               aria-label="Toggle navigation menu"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -259,62 +259,76 @@ export function SiteHeader({ brand }: Props) {
         </div>
       </div>
 
-      {/* Mobile Drawer Navigation */}
+      {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-slate-950 border-b border-slate-800 px-4 pt-3 pb-6 animate-in slide-in-from-top-2 duration-200">
-          <div className="space-y-1">
-            {navLinks.map((link) => {
-              const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`flex items-center justify-between px-3.5 py-2.5 text-base font-medium rounded-lg ${
-                    isActive
-                      ? 'text-amber-400 bg-slate-900'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-900/60'
-                  }`}
-                >
-                  <span className="flex items-center gap-2">
-                    {link.label}
-                  </span>
-                  {typeof link.badge === 'number' && link.badge > 0 ? (
-                    <span className="px-2 py-0.5 text-xs font-bold rounded-full bg-amber-500 text-slate-950">
-                      {link.badge}
-                    </span>
-                  ) : (
-                    <ChevronRight className="w-4 h-4 text-slate-600" />
-                  )}
-                </Link>
-              );
-            })}
-          </div>
+        <div className="lg:hidden bg-[#090e1a] border-b border-slate-800 px-4 pt-3 pb-6 space-y-2 animate-in slide-in-from-top-2 duration-200">
+          {navLinks.map((link) => {
+            const active =
+              pathname === link.href ||
+              (link.matchSubpaths &&
+                link.matchSubpaths.some((sub) => pathname.startsWith(sub)));
 
-          <div className="mt-5 pt-5 border-t border-slate-800/80 space-y-3">
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
+                  active
+                    ? 'bg-[#152033] text-amber-400 border border-slate-700/60'
+                    : 'text-slate-300 hover:bg-slate-900 hover:text-white'
+                }`}
+              >
+                <span>{link.label}</span>
+                <ChevronRight className="w-4 h-4 text-slate-500" />
+              </Link>
+            );
+          })}
+
+          {/* Mobile Quick Action Buttons */}
+          <div className="pt-3 border-t border-slate-800/80 grid grid-cols-2 gap-2">
             <Link
-              href="/book-test-drive"
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-slate-950 bg-amber-400 hover:bg-amber-300 rounded-lg shadow-sm"
+              href="/compare"
+              className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-xs font-semibold hover:border-slate-700"
             >
-              <CalendarCheck className="w-4 h-4 text-slate-950" />
-              Book Test Drive Request
+              <Scale className="w-4 h-4 text-slate-400" />
+              <span>Compare ({comparisonCount})</span>
             </Link>
 
-            <div className="flex items-center justify-between px-2 pt-2 text-xs text-slate-400">
-              <a
-                href={`tel:${phone.replace(/\s+/g, '')}`}
-                className="flex items-center gap-1.5 text-slate-300 hover:text-amber-400"
+            <Link
+              href="/saved-vehicles"
+              className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 text-xs font-semibold hover:border-slate-700"
+            >
+              <Heart className="w-4 h-4 text-slate-400" />
+              <span>Wishlist ({favoritesCount})</span>
+            </Link>
+          </div>
+
+          <div className="pt-2 flex flex-col gap-2">
+            <Link
+              href="/book-test-drive"
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs uppercase tracking-wider shadow-md shadow-amber-400/20"
+            >
+              <CalendarCheck className="w-4 h-4 stroke-[2.5]" />
+              <span>BOOK TEST DRIVE / APPOINTMENT</span>
+            </Link>
+
+            {user ? (
+              <Link
+                href={/customer|client/i.test(user.role || '') ? '/account' : '/dashboard'}
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-white font-semibold text-xs"
               >
-                <Phone className="w-3.5 h-3.5 text-amber-400" />
-                {phone}
-              </a>
-              <div className="flex items-center gap-2">
-                <ThemeToggle />
-                <Link href="/dashboard" className="flex items-center gap-1 text-slate-300 hover:text-amber-400 font-medium">
-                  <User className="w-3.5 h-3.5" />
-                  Dashboard
-                </Link>
-              </div>
-            </div>
+                <span>My Account ({user.name})</span>
+                <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
+              </Link>
+            ) : (
+              <Link
+                href="/login"
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-full border border-slate-700 bg-slate-900 text-white font-semibold text-xs"
+              >
+                <User className="w-3.5 h-3.5 text-amber-400" />
+                <span>Sign In to Account</span>
+              </Link>
+            )}
           </div>
         </div>
       )}

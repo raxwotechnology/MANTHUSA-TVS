@@ -8,6 +8,7 @@ import { useSettings } from '@/lib/useSettings';
 
 interface Props {
   children: React.ReactNode;
+  brand?: any;
 }
 
 export function PublicLayout({ children }: Props) {

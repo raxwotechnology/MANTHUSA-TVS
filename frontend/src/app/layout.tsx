@@ -18,27 +18,30 @@ const interFont = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "SalesPlus Auto Mart — Premier Vehicle Dealership & Direct Importer",
-    template: "%s | SalesPlus Auto Mart",
+    default: "TVS SalesPlus Motor Hub — Official TVS Motorcycle Dealership",
+    template: "%s | TVS SalesPlus Motor Hub",
   },
   description:
-    "Explore certified brand-new, reconditioned, and premium pre-owned vehicles in Sri Lanka. Multi-point inspected inventory, bespoke leasing, test drive booking, and trade-in valuations.",
+    "Explore official TVS motorcycles, Apache Racing series, NTORQ smart scooters, Jupiter commuter champions, and electric two-wheelers in Sri Lanka. Genuine warranty, leasing & service.",
   keywords: [
-    "Vehicle Dealership Colombo",
-    "Cars for Sale Sri Lanka",
-    "Japanese Direct Imports",
-    "Auto Leasing Sri Lanka",
-    "Toyota Premio Vezel BYD",
-    "Certified Pre-Owned Cars",
+    "TVS Motorcycles Sri Lanka",
+    "TVS Apache RTR 160 4V",
+    "TVS Apache RTR 200 4V",
+    "TVS Apache RR 310",
+    "TVS NTORQ 125 Race Edition",
+    "TVS Jupiter 125",
+    "TVS Raider 125",
+    "Motorcycle Leasing Sri Lanka",
+    "TVS Dealership Colombo",
   ],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://salesplus.lk"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://tvssalesplus.lk"),
   openGraph: {
-    title: "SalesPlus Auto Mart — Premier Vehicle Dealership",
+    title: "TVS SalesPlus Motor Hub — Official TVS Motorcycle Dealer",
     description:
-      "Explore certified vehicle inventory, compare specs, calculate monthly lease installments, and book private showroom viewings.",
+      "Explore official TVS motorcycles, compare specs, calculate monthly lease installments, and book private test rides.",
     type: "website",
     locale: "en_LK",
-    siteName: "SalesPlus Auto Mart",
+    siteName: "TVS SalesPlus Motor Hub",
   },
 };
 

@@ -6,12 +6,20 @@ import { LeadSchema } from './schemas/lead.schema';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { CustomerSchema } from '../customers/schemas/customer.schema';
 import { VehicleSchema } from '../vehicles/schemas/vehicle.schema';
+import { ReservationSchema } from '../reservations/schemas/reservation.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: 'Lead', schema: LeadSchema }, { name: 'Customer', schema: CustomerSchema }, { name: 'Vehicle', schema: VehicleSchema }]), NotificationsModule
+    MongooseModule.forFeature([
+      { name: 'Lead', schema: LeadSchema },
+      { name: 'Customer', schema: CustomerSchema },
+      { name: 'Vehicle', schema: VehicleSchema },
+      { name: 'Reservation', schema: ReservationSchema },
+    ]),
+    NotificationsModule,
   ],
   controllers: [LeadsController],
-  providers: [LeadsService]
+  providers: [LeadsService],
+  exports: [LeadsService],
 })
 export class LeadsModule {}

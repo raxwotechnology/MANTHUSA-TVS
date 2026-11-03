@@ -45,18 +45,18 @@ export interface BrandSettings {
 export const DEFAULT_WEBSITE_CMS = {
   announcement: {
     enabled: true,
-    text: 'Special March 2026 Import Clearance: Exclusive leasing rates starting from 13.5% with free 1-year comprehensive warranty!',
+    text: 'Special Season Offer: Get Free Registration, 2 Helmets & 3 Free Periodic Services on all TVS Apache & NTORQ bookings!',
     phone: '+94 11 268 4900',
     hours: 'Mon - Sat: 8:30 AM - 6:30 PM',
   },
   hero: {
-    headline: 'Find the Right Vehicle for Your Next Journey.',
-    subheadline: 'Explore our curated inventory of brand-new and certified pre-owned Japanese and European luxury vehicles with verified auction sheets and full warranty.',
-    ctaPrimaryText: 'Browse Vehicles',
-    ctaPrimaryLink: '/vehicles',
-    ctaSecondaryText: 'Sell Your Vehicle',
-    ctaSecondaryLink: '/sell-your-vehicle',
-    backgroundImage: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1920&q=80',
+    headline: 'Engineered for Thrill. Built for Life.',
+    subheadline: 'Explore the complete range of TVS Apache Racing series, high-tech NTORQ smart scooters, dependable commuter bikes, and eco-friendly electric two-wheelers.',
+    ctaPrimaryText: 'Explore TVS Motorcycles',
+    ctaPrimaryLink: '/bikes',
+    ctaSecondaryText: 'Configure & Book Online',
+    ctaSecondaryLink: '/configure',
+    backgroundImage: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1920&q=80',
   },
   sections: {
     showFeatured: true,
@@ -65,33 +65,33 @@ export const DEFAULT_WEBSITE_CMS = {
     showWhyUs: true,
     showHowItWorks: true,
     showFinancePromo: true,
-    showTradeInPromo: true,
+    showTradeInPromo: false,
     showContact: true,
   },
   pages: {
-    about: 'SalesPlus Auto Mart has been Sri Lanka’s most trusted direct vehicle importer and dealership for over 15 years.',
-    finance: 'We partner with leading Sri Lankan commercial banks and financial institutes to offer seamless, low-rate leasing solutions.',
-    terms: 'All vehicle bookings are held for a maximum of 3 business days subject to official advance deposit verification.',
-    privacy: 'We take data confidentiality seriously and never sell or transfer your personal or financial data.',
+    about: 'TVS SalesPlus Motor Hub is an authorized TVS dealership providing brand-new TVS motorcycles, scooters, certified maintenance, genuine spare parts, and low-rate financing.',
+    finance: 'We offer low-rate motorcycle leasing and installment plans starting from 10% down payment with instant approval.',
+    terms: 'All motorcycle bookings are held for up to 7 days upon reservation deposit confirmation.',
+    privacy: 'We take customer confidentiality seriously and protect your personal data according to applicable privacy standards.',
   },
 };
 
 export const DEFAULT_BRAND: BrandSettings = {
-  dealershipName: 'SalesPlus Auto Mart',
-  tagline: "Sri Lanka's Premier Vehicle Dealership & Direct Importer",
-  registrationNumber: 'PV-89214/2024',
+  dealershipName: 'TVS SalesPlus Motor Hub',
+  tagline: "Official TVS Motorcycles & Scooters Dealership, Service & Genuine Parts",
+  registrationNumber: 'TVS-LK-89214/2026',
   taxNumber: 'VAT-119284729-7000',
   logoUrl: '',
   faviconUrl: '',
-  footerText: '© 2026 SalesPlus Vehicle Sales. All rights reserved.',
+  footerText: '© 2026 TVS SalesPlus Motor Hub. All rights reserved. Official TVS Warranty & Genuine Spares.',
   defaultLanguage: 'en',
   currency: 'LKR',
   currencySymbol: 'Rs.',
   phone: '+94 11 268 4900',
   hotline: '+94 77 123 4567',
-  email: 'sales@salesplus.lk',
-  salesEmail: 'sales@salesplus.lk',
-  supportEmail: 'support@salesplus.lk',
+  email: 'sales@tvsmotorhub.lk',
+  salesEmail: 'sales@tvsmotorhub.lk',
+  supportEmail: 'service@tvsmotorhub.lk',
   address: 'No. 142/B, Baseline Road, Colombo 09, Sri Lanka',
   city: 'Colombo',
   province: 'Western Province',
@@ -99,10 +99,10 @@ export const DEFAULT_BRAND: BrandSettings = {
   openingHours: 'Mon - Sat: 8:30 AM - 6:30 PM (Sun: 9:00 AM - 2:00 PM)',
   googleMapsUrl: 'https://maps.google.com/?q=Colombo+Sri+Lanka',
   whatsapp: '+94771234567',
-  facebook: 'https://facebook.com/salesplusautomart',
-  instagram: 'https://instagram.com/salesplusautomart',
-  youtube: 'https://youtube.com/@salesplusautomart',
-  socialWebsite: 'https://salesplus.lk',
+  facebook: 'https://facebook.com/tvsmotorhub',
+  instagram: 'https://instagram.com/tvsmotorhub',
+  youtube: 'https://youtube.com/@tvsmotorhub',
+  socialWebsite: 'https://tvsmotorhub.lk',
   website: DEFAULT_WEBSITE_CMS,
   tiktok: '',
   vehicles: {},
@@ -181,8 +181,8 @@ export function buildBrandSettings(data: any): BrandSettings {
 function applyFaviconAndTitle(settings: BrandSettings) {
   if (typeof document === 'undefined') return;
 
-  const dealershipName = settings.dealershipName.trim() || DEFAULT_BRAND.dealershipName;
-  document.title = `${dealershipName} — Premier Vehicle Dealership & Direct Importer`;
+  const dealershipName = settings.dealershipName?.trim() || DEFAULT_BRAND.dealershipName;
+  document.title = `${dealershipName} — Official TVS Motorcycle Dealership & Service`;
 
   // Dynamically sync the browser tab icon with the saved brand identity.
   const iconUrl = settings.faviconUrl || settings.logoUrl || '/icon.svg';

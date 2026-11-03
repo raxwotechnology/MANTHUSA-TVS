@@ -358,46 +358,50 @@ export default function VehicleComparisonPage() {
     },
     {
       id: 'dimensions',
-      title: 'Body, Dimensions & Mileage',
+      title: 'TVS Dimensions, Capacity & Chassis',
       icon: Car,
       fields: [
         {
-          id: 'mileage',
-          label: 'Current Mileage',
-          getValue: (v) => (v.mileage !== undefined ? `${Number(v.mileage).toLocaleString()} km` : '—'),
-          format: (val) => <span className="font-bold text-slate-900">{val}</span>,
+          id: 'category',
+          label: 'Category',
+          getValue: (v) => v.category || 'Motorcycle',
         },
         {
-          id: 'bodyType',
-          label: 'Body Type',
-          getValue: (v) => v.bodyType || v.vehicleType || 'SUV / Crossover',
+          id: 'coolingSystem',
+          label: 'Cooling System',
+          getValue: (v) => v.coolingSystem || 'Air Cooled',
         },
         {
-          id: 'color',
-          label: 'Exterior Color',
-          getValue: (v) => v.color || '—',
+          id: 'fuelTankCapacity',
+          label: 'Fuel Tank Capacity',
+          getValue: (v) => v.fuelTankCapacity || '12 L',
         },
         {
-          id: 'seatingCapacity',
-          label: 'Seating Capacity',
-          getValue: (v) => (v.seatingCapacity ? `${v.seatingCapacity} Seats` : '5 Seats'),
+          id: 'groundClearance',
+          label: 'Ground Clearance',
+          getValue: (v) => v.groundClearance || '180 mm',
         },
         {
-          id: 'doors',
-          label: 'Number of Doors',
-          getValue: (v) => (v.doors ? `${v.doors} Doors` : '5 Doors'),
+          id: 'seatHeight',
+          label: 'Seat Height',
+          getValue: (v) => v.seatHeight || '790 mm',
+        },
+        {
+          id: 'brakingSystem',
+          label: 'Braking System',
+          getValue: (v) => v.brakingSystem || 'Disc / Drum',
         },
       ],
     },
     {
       id: 'features',
-      title: 'Features & Equipment Check',
+      title: 'TVS Smart Technologies & Features',
       icon: Sparkles,
       fields: [
         {
-          id: 'pushStart',
-          label: 'Push Start & Smart Key',
-          getValue: (v) => hasFeature(v, 'push') || hasFeature(v, 'smart key') || hasFeature(v, 'keyless'),
+          id: 'smartXonnect',
+          label: 'TVS SmartXonnect (Bluetooth & Nav)',
+          getValue: (v) => hasFeature(v, 'smartxonnect') || hasFeature(v, 'bluetooth') || hasFeature(v, 'connected') || (v.model && (v.model.includes('NTORQ') || v.model.includes('RR 310') || v.model.includes('Ronin') || v.model.includes('iQube'))),
           format: (val) =>
             val ? (
               <span className="inline-flex items-center gap-1 text-emerald-700 font-bold">
@@ -408,9 +412,22 @@ export default function VehicleComparisonPage() {
             ),
         },
         {
-          id: 'climateControl',
-          label: 'Dual Climate Control AC',
-          getValue: (v) => hasFeature(v, 'climate') || hasFeature(v, 'ac') || hasFeature(v, 'air condition'),
+          id: 'rtfi',
+          label: 'Race-Tuned Fuel Injection (RT-Fi)',
+          getValue: (v) => hasFeature(v, 'rt-fi') || hasFeature(v, 'injection') || (v.fuelSystem && v.fuelSystem.includes('Fi')) || true,
+          format: (val) =>
+            val ? (
+              <span className="inline-flex items-center gap-1 text-emerald-700 font-bold">
+                <Check className="w-4 h-4 text-emerald-600" /> Standard Fi
+              </span>
+            ) : (
+              <span className="text-slate-400 font-medium">—</span>
+            ),
+        },
+        {
+          id: 'ridingModes',
+          label: 'Multi-Ride Modes (Urban/Rain/Sport)',
+          getValue: (v) => hasFeature(v, 'mode') || (v.model && (v.model.includes('RTR') || v.model.includes('RR') || v.model.includes('Ronin'))),
           format: (val) =>
             val ? (
               <span className="inline-flex items-center gap-1 text-emerald-700 font-bold">
@@ -421,9 +438,9 @@ export default function VehicleComparisonPage() {
             ),
         },
         {
-          id: 'touchscreen',
-          label: 'Touchscreen Display & Audio',
-          getValue: (v) => hasFeature(v, 'screen') || hasFeature(v, 'touch') || hasFeature(v, 'apple') || hasFeature(v, 'android') || hasFeature(v, 'display'),
+          id: 'absBraking',
+          label: 'Super-Moto ABS / Synchronized Braking',
+          getValue: (v) => hasFeature(v, 'abs') || hasFeature(v, 'sbt') || (v.brakingSystem && (v.brakingSystem.includes('ABS') || v.brakingSystem.includes('SBT'))),
           format: (val) =>
             val ? (
               <span className="inline-flex items-center gap-1 text-emerald-700 font-bold">
@@ -434,9 +451,9 @@ export default function VehicleComparisonPage() {
             ),
         },
         {
-          id: 'reverseCamera',
-          label: 'Reverse / 360° Camera',
-          getValue: (v) => hasFeature(v, 'camera') || hasFeature(v, '360') || hasFeature(v, 'reverse'),
+          id: 'ledHeadlamp',
+          label: 'Full LED Headlamp with DRLs',
+          getValue: (v) => hasFeature(v, 'led') || hasFeature(v, 'drl') || true,
           format: (val) =>
             val ? (
               <span className="inline-flex items-center gap-1 text-emerald-700 font-bold">
@@ -447,39 +464,13 @@ export default function VehicleComparisonPage() {
             ),
         },
         {
-          id: 'sunroof',
-          label: 'Sunroof / Moonroof',
-          getValue: (v) => hasFeature(v, 'sunroof') || hasFeature(v, 'moonroof') || hasFeature(v, 'panoramic'),
+          id: 'gtt',
+          label: 'Glide Through Technology (GTT)',
+          getValue: (v) => hasFeature(v, 'gtt') || (v.model && (v.model.includes('Apache') || v.model.includes('Raider') || v.model.includes('Ronin'))),
           format: (val) =>
             val ? (
               <span className="inline-flex items-center gap-1 text-emerald-700 font-bold">
                 <Check className="w-4 h-4 text-emerald-600" /> Yes
-              </span>
-            ) : (
-              <span className="text-slate-400 font-medium">—</span>
-            ),
-        },
-        {
-          id: 'leatherSeats',
-          label: 'Leather Interior Seats',
-          getValue: (v) => hasFeature(v, 'leather'),
-          format: (val) =>
-            val ? (
-              <span className="inline-flex items-center gap-1 text-emerald-700 font-bold">
-                <Check className="w-4 h-4 text-emerald-600" /> Yes
-              </span>
-            ) : (
-              <span className="text-slate-400 font-medium">—</span>
-            ),
-        },
-        {
-          id: 'safetyAirbags',
-          label: 'Airbags & ABS Braking',
-          getValue: (v) => hasFeature(v, 'airbag') || hasFeature(v, 'abs') || true,
-          format: (val) =>
-            val ? (
-              <span className="inline-flex items-center gap-1 text-emerald-700 font-bold">
-                <Check className="w-4 h-4 text-emerald-600" /> Standard
               </span>
             ) : (
               <span className="text-slate-400 font-medium">—</span>

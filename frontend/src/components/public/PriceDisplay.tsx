@@ -29,11 +29,11 @@ export function PriceDisplay({
 
   return (
     <div className={`flex flex-col ${className}`}>
-      <span className={`text-white ${sizeClasses[size]}`}>
+      <span className={`text-white ${sizeClasses[size]} whitespace-nowrap`}>
         {formatLKR(price, currencySymbol)}
       </span>
       {showEstimate && price > 0 && monthlyPayment > 0 && (
-        <span className="text-xs text-amber-400/90 font-medium mt-0.5">
+        <span className="text-[11px] text-amber-800 dark:text-amber-400/90 font-semibold mt-0.5 truncate block">
           Est. Lease from {formatLKR(monthlyPayment, currencySymbol)} / mo
         </span>
       )}

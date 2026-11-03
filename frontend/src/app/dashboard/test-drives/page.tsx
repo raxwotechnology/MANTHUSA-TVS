@@ -260,9 +260,9 @@ export default function TestDrivesPage() {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Test Drive Bookings & Experience Log</h1>
+          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">TVS Test Ride Bookings & Experience Log</h1>
           <p className="text-xs text-slate-500">
-            Schedule customer vehicle test drives, verify driver licenses, and log customer driving feedback
+            Schedule customer TVS motorcycle test rides, verify riding licenses, and log customer experience feedback
           </p>
         </div>
 
@@ -271,7 +271,7 @@ export default function TestDrivesPage() {
           className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2.5 rounded-lg shadow-xs transition-colors"
         >
           <Plus className="w-4 h-4" />
-          <span>Schedule Test Drive</span>
+          <span>Schedule Test Ride</span>
         </button>
       </div>
 
@@ -360,7 +360,7 @@ export default function TestDrivesPage() {
             <thead>
               <tr className="bg-slate-50 text-slate-700 border-b border-slate-200 font-semibold">
                 <th className="py-3 px-4">Customer</th>
-                <th className="py-3 px-4">Showroom Vehicle</th>
+                <th className="py-3 px-4">TVS Motorcycle</th>
                 <th className="py-3 px-4">Salesperson</th>
                 <th className="py-3 px-4">Date & Time Slot</th>
                 <th className="py-3 px-4">Driving License</th>
@@ -520,7 +520,7 @@ export default function TestDrivesPage() {
             <div className="flex items-center justify-between p-5 border-b border-slate-100">
               <div>
                 <h3 className="text-base font-extrabold text-slate-900">
-                  {editingBooking ? 'Edit Test Drive Booking' : 'Schedule New Test Drive'}
+                  {editingBooking ? 'Edit Test Ride Booking' : 'Schedule New TVS Test Ride'}
                 </h3>
                 <p className="text-xs text-slate-500">
                   Select customer, showroom vehicle, assigned sales host, and time slot
@@ -557,7 +557,7 @@ export default function TestDrivesPage() {
 
                 {/* Vehicle */}
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Showroom Vehicle *</label>
+                  <label className="block font-semibold text-slate-700 mb-1">TVS Motorcycle *</label>
                   <select
                     required
                     value={form.vehicle}
@@ -605,7 +605,7 @@ export default function TestDrivesPage() {
 
                 {/* Test Drive Date */}
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Test Drive Date *</label>
+                  <label className="block font-semibold text-slate-700 mb-1">Test Ride Date *</label>
                   <input
                     type="date"
                     required

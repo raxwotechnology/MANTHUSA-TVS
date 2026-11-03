@@ -19,6 +19,10 @@ export class AuthService {
     const user = await this.userModel.findOne({ email: String(email || '').trim().toLowerCase(), isActive: { $ne: false } }).populate('role');
     if (user && await bcrypt.compare(pass, user.passwordHash)) {
       const { passwordHash, ...result } = user.toObject();
+      if (!result.customerId) {
+        const cust = await this.customerModel.findOne({ $or: [{ userId: result._id }, { email: result.email }] }).exec();
+        if (cust) result.customerId = cust._id;
+      }
       return result;
     }
     return null;
@@ -204,7 +208,13 @@ export class AuthService {
         message: 'MFA verification required.'
       };
     }
-    const payload = { email: user.email, sub: user._id, role: user.role?.name, roleId: user.role?._id };
+    const payload = {
+      email: user.email,
+      sub: user._id,
+      role: user.role?.name,
+      roleId: user.role?._id,
+      customerId: user.customerId,
+    };
     return {
       access_token: this.jwtService.sign(payload),
       user: {
@@ -224,7 +234,13 @@ export class AuthService {
     if (!user || !user.mfaEnabled) throw new BadRequestException('User invalid or MFA not enabled.');
     const isValid = await this.verifyMfaToken(userId, code);
     if (!isValid) throw new BadRequestException('Invalid MFA code.');
-    const payload = { email: user.email, sub: user._id, role: user.role?.name, roleId: user.role?._id };
+    const payload = {
+      email: user.email,
+      sub: user._id,
+      role: user.role?.name,
+      roleId: user.role?._id,
+      customerId: user.customerId,
+    };
     return {
       access_token: this.jwtService.sign(payload),
       user: {

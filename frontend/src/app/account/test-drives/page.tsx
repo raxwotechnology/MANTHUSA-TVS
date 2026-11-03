@@ -54,10 +54,10 @@ export default function CustomerTestDrivesPage() {
         <div>
           <h2 className="text-lg font-bold text-white flex items-center gap-2">
             <Calendar className="w-5 h-5 text-emerald-400" />
-            My Test Drive Appointments
+            My TVS Test Ride Appointments
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            Review upcoming vehicle viewings and scheduled road test appointments.
+            Review upcoming showroom viewings and scheduled TVS test ride appointments.
           </p>
         </div>
 
@@ -146,8 +146,8 @@ export default function CustomerTestDrivesPage() {
 
                 {vehicle?._id && (
                   <Link
-                    href={`/vehicles/${vehicle._id}`}
-                    className="self-start md:self-auto inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-850 text-xs font-semibold text-amber-400 border border-slate-800 transition-colors whitespace-nowrap"
+                    href={`/bikes/${vehicle._id}`}
+                    className="self-start md:self-auto inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-850 text-xs font-semibold text-red-400 border border-slate-800 transition-colors whitespace-nowrap"
                   >
                     View Specs
                   </Link>

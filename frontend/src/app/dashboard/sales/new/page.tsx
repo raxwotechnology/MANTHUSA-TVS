@@ -138,27 +138,27 @@ export default function NewSalePage() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Vehicle</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1">TVS Motorcycle Model</label>
               <select required name="vehicle" value={formData.vehicle} onChange={(event) => { const vehicle = vehicles.find((item) => item._id === event.target.value); setFormData((current) => ({ ...current, vehicle: event.target.value, vehiclePrice: vehicle?.sellingPrice || 0 })); }} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900">
-                <option value="">-- Choose a vehicle (e.g. Toyota Axio) --</option>
+                <option value="">-- Choose a TVS motorcycle (e.g. Apache RTR 160 4V) --</option>
                 {vehicles.map((vehicle) => (
-                  <option key={vehicle._id} value={vehicle._id}>{vehicle.make} {vehicle.model} {vehicle.year} · LKR {Number(vehicle.sellingPrice || 0).toLocaleString()}</option>
+                  <option key={vehicle._id} value={vehicle._id}>{vehicle.make} {vehicle.model} ({vehicle.variant || vehicle.engineCapacity || 'Standard'}) · LKR {Number(vehicle.sellingPrice || 0).toLocaleString()}</option>
                 ))}
               </select>
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Payment Method</label>
               <select name="paymentMethod" value={formData.paymentMethod} onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900">
-                <option value="Bank Transfer">Bank Transfer / Cash Deposit</option>
-                <option value="Cash">Cash Payment</option>
-                <option value="Cheque">Cheque Payment</option>
-                <option value="Card">Card Payment</option>
-                <option value="Leasing">Leasing / Bank Loan Finance</option>
+                <option value="Bank Transfer">Bank Transfer / Direct Deposit</option>
+                <option value="Cash">Showroom Cash</option>
+                <option value="Card">Credit / Debit Card</option>
+                <option value="Online Payment">Online Payment Gateway</option>
+                <option value="Leasing">Bike Leasing Finance</option>
               </select>
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Vehicle Price (LKR)</label>
-              <input required type="number" name="vehiclePrice" placeholder="e.g. 12,500,000" value={formData.vehiclePrice || ''} onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400 font-bold text-emerald-700" />
+              <label className="block text-xs font-bold text-slate-700 mb-1">Motorcycle Selling Price (LKR)</label>
+              <input required type="number" name="vehiclePrice" placeholder="e.g. 785,000" value={formData.vehiclePrice || ''} onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400 font-bold text-emerald-700" />
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Discount (LKR)</label>

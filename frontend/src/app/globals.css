@@ -139,8 +139,20 @@
 }
 
 .site-header .site-header-cta,
+.site-header .site-header-cta *,
+.site-header .site-header-cta:hover,
+.site-header .site-header-cta:hover * {
+  color: #020617 !important;
+  stroke: #020617 !important;
+}
+
+.site-header .site-header-cta {
+  background-color: #fbbf24 !important;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
+}
+
 .site-header .site-header-cta:hover {
-  color: #0f172a !important;
+  background-color: #f59e0b !important;
 }
 
 :root:not(.dark) .site-header {
@@ -158,6 +170,11 @@
 :root:not(.dark) .site-header a:hover,
 :root:not(.dark) .site-header button:hover {
   color: #0f172a;
+}
+
+:root:not(.dark) .site-header nav a[class*="text-amber-400"] {
+  color: #b45309 !important;
+  background-color: #f1f5f9 !important;
 }
 
 :root:not(.dark) .site-header .text-white {
@@ -379,75 +396,99 @@ html:not(.dark) body,
   border-color: #cbd5e1 !important;
 }
 
-/* HIGH-CONTRAST READABLE TEXT COLORS IN LIGHT MODE */
-:root:not(.dark) [class*="text-slate-100"],
-:root:not(.dark) [class*="text-slate-200"],
-.public-site.light-mode [class*="text-slate-100"],
-.public-site.light-mode [class*="text-slate-200"] {
+/* HIGH-CONTRAST READABLE TEXT COLORS IN LIGHT MODE (Safely Excludes Dark Panels, Hero, Footer, and Category Overlays) */
+:root:not(.dark) [class*="text-slate-100"]:not(.site-hero *):not(.site-footer *):not(.dark-panel *):not(.category-card *):not(.vehicle-floating-badge *),
+:root:not(.dark) [class*="text-slate-200"]:not(.site-hero *):not(.site-footer *):not(.dark-panel *):not(.category-card *):not(.vehicle-floating-badge *),
+.public-site.light-mode [class*="text-slate-100"]:not(.site-hero *):not(.site-footer *):not(.dark-panel *):not(.category-card *):not(.vehicle-floating-badge *),
+.public-site.light-mode [class*="text-slate-200"]:not(.site-hero *):not(.site-footer *):not(.dark-panel *):not(.category-card *):not(.vehicle-floating-badge *) {
   color: #0f172a !important;
   font-weight: 600;
 }
 
-:root:not(.dark) [class*="text-slate-300"],
-.public-site.light-mode [class*="text-slate-300"] {
+:root:not(.dark) [class*="text-slate-300"]:not(.site-hero *):not(.site-footer *):not(.dark-panel *):not(.category-card *):not(.vehicle-floating-badge *),
+.public-site.light-mode [class*="text-slate-300"]:not(.site-hero *):not(.site-footer *):not(.dark-panel *):not(.category-card *):not(.vehicle-floating-badge *) {
   color: #1e293b !important;
   font-weight: 500;
 }
 
-/* Previously washed-out descriptions & subtitles now crisp and readable */
-:root:not(.dark) [class*="text-slate-400"],
-.public-site.light-mode [class*="text-slate-400"] {
+/* Previously washed-out descriptions & subtitles now crisp and readable on light backgrounds */
+:root:not(.dark) [class*="text-slate-400"]:not(.site-hero *):not(.site-footer *):not(.dark-panel *):not(.category-card *):not(.vehicle-floating-badge *),
+.public-site.light-mode [class*="text-slate-400"]:not(.site-hero *):not(.site-footer *):not(.dark-panel *):not(.category-card *):not(.vehicle-floating-badge *) {
   color: #334155 !important;
 }
 
-:root:not(.dark) [class*="text-slate-500"],
-.public-site.light-mode [class*="text-slate-500"] {
+:root:not(.dark) [class*="text-slate-500"]:not(.site-hero *):not(.site-footer *):not(.dark-panel *):not(.category-card *):not(.vehicle-floating-badge *),
+.public-site.light-mode [class*="text-slate-500"]:not(.site-hero *):not(.site-footer *):not(.dark-panel *):not(.category-card *):not(.vehicle-floating-badge *) {
   color: #475569 !important;
 }
 
-/* Headings and generic white text to dark text */
-:root:not(.dark) h1,
-:root:not(.dark) h2,
-:root:not(.dark) h3,
-:root:not(.dark) h4,
-:root:not(.dark) h5,
-:root:not(.dark) h6,
-.public-site.light-mode h1,
-.public-site.light-mode h2,
-.public-site.light-mode h3,
-.public-site.light-mode h4,
-.public-site.light-mode h5,
-.public-site.light-mode h6 {
+/* Headings and generic white text to dark text ONLY outside dark panels, hero, footer, and colored buttons */
+:root:not(.dark) h1:not(.site-hero *):not(.site-hero):not(.site-footer *):not(.site-footer):not(.dark-panel *):not(.dark-panel):not(.category-card *):not(.category-card):not(.auth-card *),
+:root:not(.dark) h2:not(.site-hero *):not(.site-hero):not(.site-footer *):not(.site-footer):not(.dark-panel *):not(.dark-panel):not(.category-card *):not(.category-card):not(.auth-card *),
+:root:not(.dark) h3:not(.site-hero *):not(.site-hero):not(.site-footer *):not(.site-footer):not(.dark-panel *):not(.dark-panel):not(.category-card *):not(.category-card):not(.auth-card *),
+:root:not(.dark) h4:not(.site-hero *):not(.site-hero):not(.site-footer *):not(.site-footer):not(.dark-panel *):not(.dark-panel):not(.category-card *):not(.category-card):not(.auth-card *),
+:root:not(.dark) h5:not(.site-hero *):not(.site-hero):not(.site-footer *):not(.site-footer):not(.dark-panel *):not(.dark-panel):not(.category-card *):not(.category-card):not(.auth-card *),
+:root:not(.dark) h6:not(.site-hero *):not(.site-hero):not(.site-footer *):not(.site-footer):not(.dark-panel *):not(.dark-panel):not(.category-card *):not(.category-card):not(.auth-card *),
+.public-site.light-mode h1:not(.site-hero *):not(.site-hero):not(.site-footer *):not(.site-footer):not(.dark-panel *):not(.dark-panel):not(.category-card *):not(.category-card):not(.auth-card *),
+.public-site.light-mode h2:not(.site-hero *):not(.site-hero):not(.site-footer *):not(.site-footer):not(.dark-panel *):not(.dark-panel):not(.category-card *):not(.category-card):not(.auth-card *),
+.public-site.light-mode h3:not(.site-hero *):not(.site-hero):not(.site-footer *):not(.site-footer):not(.dark-panel *):not(.dark-panel):not(.category-card *):not(.category-card):not(.auth-card *),
+.public-site.light-mode h4:not(.site-hero *):not(.site-hero):not(.site-footer *):not(.site-footer):not(.dark-panel *):not(.dark-panel):not(.category-card *):not(.category-card):not(.auth-card *),
+.public-site.light-mode h5:not(.site-hero *):not(.site-hero):not(.site-footer *):not(.site-footer):not(.dark-panel *):not(.dark-panel):not(.category-card *):not(.category-card):not(.auth-card *),
+.public-site.light-mode h6:not(.site-hero *):not(.site-hero):not(.site-footer *):not(.site-footer):not(.dark-panel *):not(.dark-panel):not(.category-card *):not(.category-card):not(.auth-card *) {
   color: #0f172a !important;
 }
 
-:root:not(.dark) [class*="text-white"]:not([class*="bg-"]):not([class*="hover:"]),
-.public-site.light-mode [class*="text-white"]:not([class*="bg-emerald-"]):not([class*="bg-rose-"]):not([class*="bg-cyan-"]):not([class*="bg-teal-"]):not([class*="bg-gradient-to"]):not([class*="bg-emerald-500"]):not([class*="bg-emerald-600"]) {
+:root:not(.dark) [class*="text-white"]:not(.site-hero *):not(.site-hero):not(.site-footer *):not(.site-footer):not(.dark-panel *):not(.dark-panel):not(.category-card *):not(.category-card):not(.vehicle-floating-badge *):not(.auth-card *):not([class*="bg-red-"]):not([class*="bg-rose-"]):not([class*="bg-emerald-"]):not([class*="bg-amber-"]):not([class*="bg-blue-"]):not([class*="bg-cyan-"]):not([class*="bg-gradient-"]),
+.public-site.light-mode [class*="text-white"]:not(.site-hero *):not(.site-hero):not(.site-footer *):not(.site-footer):not(.dark-panel *):not(.dark-panel):not(.category-card *):not(.category-card):not(.vehicle-floating-badge *):not(.auth-card *):not([class*="bg-red-"]):not([class*="bg-rose-"]):not([class*="bg-emerald-"]):not([class*="bg-amber-"]):not([class*="bg-blue-"]):not([class*="bg-cyan-"]):not([class*="bg-gradient-"]) {
   color: #0f172a !important;
 }
 
-/* Footer links and text readability */
-.public-site.light-mode footer a,
-.public-site.light-mode footer button {
-  color: #334155 !important;
-  font-weight: 500;
+/* --- Hero Section Specific Overrides for 100% Crisp Visibility in Both Themes --- */
+.site-hero {
+  background-color: #020617 !important;
+  color: #ffffff !important;
 }
 
-.public-site.light-mode footer a:hover,
-.public-site.light-mode footer button:hover {
-  color: #059669 !important;
+:root:not(.dark) .site-hero {
+  background-color: #020617 !important;
+  color: #ffffff !important;
 }
 
-.public-site.light-mode footer p {
-  color: #334155 !important;
+:root:not(.dark) .site-hero h1,
+:root:not(.dark) .site-hero h1 span,
+:root:not(.dark) .site-hero .text-white,
+:root:not(.dark) .site-hero [class*="text-white"] {
+  color: #ffffff !important;
 }
 
-.public-site.light-mode footer h4 {
-  color: #0f172a !important;
-  font-weight: 800;
+:root:not(.dark) .site-hero p,
+:root:not(.dark) .site-hero [class*="text-slate-200"],
+:root:not(.dark) .site-hero [class*="text-slate-300"] {
+  color: #cbd5e1 !important;
 }
 
-/* Solid colored buttons and primary CTA gradients must KEEP white text and white icons */
+:root:not(.dark) .site-hero [class*="text-slate-400"] {
+  color: #94a3b8 !important;
+}
+
+:root:not(.dark) .site-hero div[class*="bg-gradient-"] {
+  background-color: transparent !important;
+}
+
+/* Solid red, emerald, rose, blue, amber buttons & badges: ALWAYS keep bright white text and white icons in both themes */
+button[class*="bg-red-"],
+a[class*="bg-red-"],
+span[class*="bg-red-"],
+:root:not(.dark) button[class*="bg-red-"],
+:root:not(.dark) a[class*="bg-red-"],
+:root:not(.dark) span[class*="bg-red-"],
+:root:not(.dark) [class*="bg-red-600"],
+:root:not(.dark) [class*="bg-red-500"],
+.public-site.light-mode button.bg-red-600,
+.public-site.light-mode button.bg-red-500,
+.public-site.light-mode a.bg-red-600,
+.public-site.light-mode a.bg-red-500,
+.public-site.light-mode span.bg-red-600,
 .public-site.light-mode button.bg-emerald-600,
 .public-site.light-mode button.bg-emerald-500,
 .public-site.light-mode button.bg-rose-500,
@@ -461,6 +502,18 @@ html:not(.dark) body,
   color: #ffffff !important;
 }
 
+button[class*="bg-red-"] *,
+a[class*="bg-red-"] *,
+span[class*="bg-red-"] *,
+:root:not(.dark) button[class*="bg-red-"] *,
+:root:not(.dark) a[class*="bg-red-"] *,
+:root:not(.dark) [class*="bg-red-600"] *,
+:root:not(.dark) [class*="bg-red-500"] *,
+.public-site.light-mode button.bg-red-600 *,
+.public-site.light-mode button.bg-red-500 *,
+.public-site.light-mode a.bg-red-600 *,
+.public-site.light-mode a.bg-red-500 *,
+.public-site.light-mode span.bg-red-600 *,
 .public-site.light-mode button.bg-emerald-600 *,
 .public-site.light-mode button.bg-emerald-500 *,
 .public-site.light-mode button.bg-rose-500 *,
@@ -515,10 +568,9 @@ html:not(.dark) body,
   color: #64748b !important;
 }
 
-/* SVG icons visibility guarantee in light mode */
-:root:not(.dark) [class*="bg-slate-"]:not([class*="bg-amber-"]):not([class*="bg-emerald-"]) svg,
-.public-site.light-mode [class*="bg-slate-"] svg {
-  color: #1e293b !important;
+/* SVG icons keep their colors, but neutral SVGs ensure adequate contrast */
+:root:not(.dark) [class*="text-slate-400"] svg,
+:root:not(.dark) [class*="text-slate-500"] svg {
   stroke: currentColor;
 }
 
@@ -543,12 +595,12 @@ html:not(.dark) body,
   background-color: #172554 !important;
 }
 
-.dark .public-site [class~="text-slate-950"],
-.dark .public-site [class~="text-slate-900"],
-.dark .public-site [class~="text-slate-800"],
-.dark .public-site [class~="text-gray-900"],
-.dark .public-site [class~="text-gray-800"],
-.dark .public-site [class~="text-black"] {
+.dark .public-site [class~="text-slate-950"]:not([class*="bg-amber-"]):not([class*="bg-yellow-"]):not([class*="site-header-cta"]):not([class*="btn-amber"]),
+.dark .public-site [class~="text-slate-900"]:not([class*="bg-amber-"]):not([class*="bg-yellow-"]):not([class*="site-header-cta"]):not([class*="btn-amber"]),
+.dark .public-site [class~="text-slate-800"]:not([class*="bg-amber-"]):not([class*="bg-yellow-"]):not([class*="site-header-cta"]):not([class*="btn-amber"]),
+.dark .public-site [class~="text-gray-900"]:not([class*="bg-amber-"]):not([class*="bg-yellow-"]):not([class*="site-header-cta"]):not([class*="btn-amber"]),
+.dark .public-site [class~="text-gray-800"]:not([class*="bg-amber-"]):not([class*="bg-yellow-"]):not([class*="site-header-cta"]):not([class*="btn-amber"]),
+.dark .public-site [class~="text-black"]:not([class*="bg-amber-"]):not([class*="bg-yellow-"]):not([class*="site-header-cta"]):not([class*="btn-amber"]) {
   color: #f8fafc !important;
 }
 
@@ -685,4 +737,406 @@ textarea.bg-white::placeholder,
 .settings-form textarea::placeholder {
   color: #94a3b8 !important;
   -webkit-text-fill-color: #94a3b8 !important;
+}
+
+/* Keep the homepage hero and public footer visually identical in both themes. */
+.public-site .site-hero,
+.public-site .site-footer {
+  background-color: #020617 !important;
+  color: #cbd5e1 !important;
+  border-color: #1e293b !important;
+}
+
+.public-site .site-hero [class*="bg-slate-950"],
+.public-site .site-hero [class*="bg-slate-900"],
+.public-site .site-footer [class*="bg-slate-950"],
+.public-site .site-footer [class*="bg-slate-900"],
+.public-site .site-footer [class*="bg-slate-800"] {
+  background-color: #0f172a !important;
+}
+
+.public-site .site-hero [class*="text-white"],
+.public-site .site-footer [class*="text-white"] {
+  color: #ffffff !important;
+}
+
+.public-site .site-hero [class*="text-slate-300"],
+.public-site .site-footer [class*="text-slate-300"] {
+  color: #cbd5e1 !important;
+}
+
+.public-site .site-hero [class*="text-slate-400"],
+.public-site .site-footer [class*="text-slate-400"] {
+  color: #94a3b8 !important;
+}
+
+.public-site .site-hero [class*="text-slate-600"],
+.public-site .site-footer [class*="text-slate-600"] {
+  color: #475569 !important;
+}
+
+.public-site .site-hero [class*="border-slate-800"],
+.public-site .site-footer [class*="border-slate-900"],
+.public-site .site-footer [class*="border-slate-800"],
+.public-site .site-footer [class*="border-slate-700"] {
+  border-color: #1e293b !important;
+}
+
+/* Light-mode selectors above are intentionally broad; these higher-specificity
+   rules keep the branded hero and footer unchanged when the theme toggles. */
+:root:not(.dark) .public-site .site-hero,
+:root:not(.dark) .public-site .site-footer {
+  background-color: #020617 !important;
+  color: #cbd5e1 !important;
+  border-color: #1e293b !important;
+}
+
+:root:not(.dark) .public-site .site-hero h1,
+:root:not(.dark) .public-site .site-hero h2,
+:root:not(.dark) .public-site .site-hero h3,
+:root:not(.dark) .public-site .site-hero h4,
+:root:not(.dark) .public-site .site-footer h1,
+:root:not(.dark) .public-site .site-footer h2,
+:root:not(.dark) .public-site .site-footer h3,
+:root:not(.dark) .public-site .site-footer h4,
+:root:not(.dark) .public-site .site-hero [class*="text-white"],
+:root:not(.dark) .public-site .site-footer [class*="text-white"] {
+  color: #ffffff !important;
+}
+
+:root:not(.dark) .public-site .site-hero [class*="text-slate-300"],
+:root:not(.dark) .public-site .site-footer [class*="text-slate-300"] {
+  color: #cbd5e1 !important;
+}
+
+:root:not(.dark) .public-site .site-hero [class*="text-slate-400"],
+:root:not(.dark) .public-site .site-footer [class*="text-slate-400"],
+:root:not(.dark) .public-site .site-footer p {
+  color: #94a3b8 !important;
+}
+
+:root:not(.dark) .public-site .site-hero [class*="bg-slate-950"],
+:root:not(.dark) .public-site .site-hero [class*="bg-slate-900"],
+:root:not(.dark) .public-site .site-footer [class*="bg-slate-950"],
+:root:not(.dark) .public-site .site-footer [class*="bg-slate-900"],
+:root:not(.dark) .public-site .site-footer [class*="bg-slate-800"] {
+  background-color: #0f172a !important;
+}
+
+:root:not(.dark) .public-site .site-hero [class*="border-slate-800"],
+:root:not(.dark) .public-site .site-footer [class*="border-slate-900"],
+:root:not(.dark) .public-site .site-footer [class*="border-slate-800"],
+:root:not(.dark) .public-site .site-footer [class*="border-slate-700"] {
+  border-color: #1e293b !important;
+}
+
+/* The inspection CTA uses a light surface in light mode while the footer stays dark. */
+:root:not(.dark) .public-site .site-footer .site-footer-cta {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
+}
+
+:root:not(.dark) .public-site .site-footer .site-footer-cta h3 {
+  color: #0f172a !important;
+}
+
+:root:not(.dark) .public-site .site-footer .site-footer-cta p {
+  color: #475569 !important;
+}
+
+:root:not(.dark) .public-site .site-footer .site-footer-cta [class*="bg-slate-800"] {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+:root:not(.dark) .public-site .site-footer .site-footer-cta [class*="hover:bg-slate-700"]:hover {
+  background-color: #f1f5f9 !important;
+}
+
+/* ==========================================================================
+   Comprehensive UI Contrast & Visibility Rules (Both Light & Dark Modes)
+   ========================================================================== */
+
+/* 1. Amber & Yellow Solid Buttons: ALWAYS high-contrast dark black text and icons */
+.public-site [class*="bg-amber-400"]:not([class*="/"]):not([class*="hover:"]),
+.public-site [class*="bg-amber-500"]:not([class*="/"]):not([class*="hover:"]),
+.public-site [class*="bg-amber-300"]:not([class*="/"]):not([class*="hover:"]),
+.public-site [class*="bg-yellow-400"]:not([class*="/"]):not([class*="hover:"]),
+.dark .public-site [class*="bg-amber-400"]:not([class*="/"]):not([class*="hover:"]),
+.dark .public-site [class*="bg-amber-500"]:not([class*="/"]):not([class*="hover:"]),
+.dark .public-site [class*="bg-amber-300"]:not([class*="/"]):not([class*="hover:"]),
+.dark .public-site [class*="bg-yellow-400"]:not([class*="/"]):not([class*="hover:"]),
+:root:not(.dark) .public-site [class*="bg-amber-400"]:not([class*="/"]):not([class*="hover:"]),
+:root:not(.dark) .public-site [class*="bg-amber-500"]:not([class*="/"]):not([class*="hover:"]),
+:root:not(.dark) .public-site [class*="bg-amber-300"]:not([class*="/"]):not([class*="hover:"]),
+:root:not(.dark) .public-site [class*="bg-yellow-400"]:not([class*="/"]):not([class*="hover:"]) {
+  color: #020617 !important;
+}
+
+.public-site [class*="bg-amber-400"]:not([class*="/"]) *,
+.public-site [class*="bg-amber-500"]:not([class*="/"]) *,
+.public-site [class*="bg-amber-300"]:not([class*="/"]) *,
+.public-site [class*="bg-yellow-400"]:not([class*="/"]) *,
+.dark .public-site [class*="bg-amber-400"]:not([class*="/"]) *,
+.dark .public-site [class*="bg-amber-500"]:not([class*="/"]) *,
+.dark .public-site [class*="bg-amber-300"]:not([class*="/"]) *,
+.dark .public-site [class*="bg-yellow-400"]:not([class*="/"]) *,
+:root:not(.dark) .public-site [class*="bg-amber-400"]:not([class*="/"]) *,
+:root:not(.dark) .public-site [class*="bg-amber-500"]:not([class*="/"]) *,
+:root:not(.dark) .public-site [class*="bg-amber-300"]:not([class*="/"]) *,
+:root:not(.dark) .public-site [class*="bg-yellow-400"]:not([class*="/"]) * {
+  color: #020617 !important;
+  stroke: #020617 !important;
+}
+
+.public-site [class*="bg-amber-400"]:hover *,
+.public-site [class*="bg-amber-500"]:hover *,
+.dark .public-site [class*="bg-amber-400"]:hover *,
+.dark .public-site [class*="bg-amber-500"]:hover *,
+:root:not(.dark) .public-site [class*="bg-amber-400"]:hover *,
+:root:not(.dark) .public-site [class*="bg-amber-500"]:hover * {
+  color: #020617 !important;
+  stroke: #020617 !important;
+}
+
+/* 2. Category Cards on Dark Photo Overlays: Always crisp white titles and amber/red subtitles */
+.category-card,
+.category-card *,
+.category-card h3,
+.category-card [class*="text-white"],
+.dark .category-card,
+.dark .category-card *,
+.dark .category-card h3,
+.dark .category-card [class*="text-white"],
+:root:not(.dark) .category-card,
+:root:not(.dark) .category-card *,
+:root:not(.dark) .category-card h3,
+:root:not(.dark) .category-card [class*="text-white"] {
+  color: #ffffff !important;
+}
+
+.category-card p,
+.dark .category-card p,
+:root:not(.dark) .category-card p,
+.category-card [class*="text-slate-400"],
+.dark .category-card [class*="text-slate-400"],
+:root:not(.dark) .category-card [class*="text-slate-400"] {
+  color: #cbd5e1 !important;
+}
+
+.category-card:hover h3,
+.dark .category-card:hover h3,
+:root:not(.dark) .category-card:hover h3 {
+  color: #fbbf24 !important;
+}
+
+/* Dark panel visibility guarantee in light and dark modes */
+.dark-panel,
+.dark-panel *,
+:root:not(.dark) .dark-panel,
+:root:not(.dark) .dark-panel * {
+  color: #ffffff !important;
+}
+
+.dark-panel p,
+.dark-panel [class*="text-slate-200"],
+.dark-panel [class*="text-slate-300"],
+:root:not(.dark) .dark-panel p,
+:root:not(.dark) .dark-panel [class*="text-slate-200"],
+:root:not(.dark) .dark-panel [class*="text-slate-300"] {
+  color: #cbd5e1 !important;
+}
+
+.dark-panel [class*="text-slate-400"],
+:root:not(.dark) .dark-panel [class*="text-slate-400"] {
+  color: #94a3b8 !important;
+}
+
+.dark-panel span[class*="text-red-"],
+:root:not(.dark) .dark-panel span[class*="text-red-"] {
+  color: #f87171 !important;
+}
+
+/* Floating bike image badges: always high contrast glass with bright text */
+.vehicle-floating-badge,
+:root:not(.dark) .vehicle-floating-badge {
+  background-color: rgba(2, 6, 23, 0.88) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+.vehicle-floating-badge span,
+:root:not(.dark) .vehicle-floating-badge span {
+  color: #ffffff !important;
+}
+
+.vehicle-floating-badge svg,
+:root:not(.dark) .vehicle-floating-badge svg {
+  color: #fbbf24 !important;
+  fill: #fbbf24 !important;
+}
+
+/* Site Footer: 100% crisp visible light text on dark background in both light & dark modes */
+.site-footer,
+:root:not(.dark) .site-footer {
+  background-color: #020617 !important;
+  color: #cbd5e1 !important;
+  border-color: #1e293b !important;
+}
+
+.site-footer h1, .site-footer h2, .site-footer h3, .site-footer h4,
+.site-footer [class*="text-white"],
+:root:not(.dark) .site-footer h1,
+:root:not(.dark) .site-footer h2,
+:root:not(.dark) .site-footer h3,
+:root:not(.dark) .site-footer h4,
+:root:not(.dark) .site-footer [class*="text-white"] {
+  color: #ffffff !important;
+}
+
+.site-footer a,
+.site-footer a span,
+.site-footer li,
+.site-footer li span,
+:root:not(.dark) .site-footer a,
+:root:not(.dark) .site-footer a span,
+:root:not(.dark) .site-footer li,
+:root:not(.dark) .site-footer li span {
+  color: #cbd5e1 !important;
+}
+
+.site-footer a:hover,
+.site-footer a:hover span,
+:root:not(.dark) .site-footer a:hover,
+:root:not(.dark) .site-footer a:hover span {
+  color: #ffffff !important;
+}
+
+.site-footer p,
+.site-footer [class*="text-slate-400"],
+:root:not(.dark) .site-footer p,
+:root:not(.dark) .site-footer [class*="text-slate-400"] {
+  color: #94a3b8 !important;
+}
+
+.site-footer [class*="text-slate-500"],
+:root:not(.dark) .site-footer [class*="text-slate-500"] {
+  color: #64748b !important;
+}
+
+.site-footer [class*="text-slate-300"],
+:root:not(.dark) .site-footer [class*="text-slate-300"] {
+  color: #cbd5e1 !important;
+}
+
+.site-footer svg,
+:root:not(.dark) .site-footer svg {
+  color: inherit;
+}
+
+.category-card .cat-badge,
+.dark .category-card .cat-badge,
+:root:not(.dark) .category-card .cat-badge {
+  color: #fbbf24 !important;
+}
+
+.category-card .cat-arrow-btn,
+.dark .category-card .cat-arrow-btn,
+:root:not(.dark) .category-card .cat-arrow-btn {
+  background-color: rgba(15, 23, 42, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff !important;
+}
+
+.category-card .cat-arrow-btn svg,
+.dark .category-card .cat-arrow-btn svg,
+:root:not(.dark) .category-card .cat-arrow-btn svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+.category-card:hover .cat-arrow-btn,
+.dark .category-card:hover .cat-arrow-btn,
+:root:not(.dark) .category-card:hover .cat-arrow-btn {
+  background-color: #fbbf24 !important;
+  border-color: #f59e0b !important;
+  color: #020617 !important;
+}
+
+.category-card:hover .cat-arrow-btn svg,
+.dark .category-card:hover .cat-arrow-btn svg,
+:root:not(.dark) .category-card:hover .cat-arrow-btn svg {
+  color: #020617 !important;
+  stroke: #020617 !important;
+}
+
+/* 3. Vehicle Card Floating Action Buttons (Compare & Heart over vehicle image) */
+.vehicle-card-action-btn,
+.dark .vehicle-card-action-btn,
+:root:not(.dark) .vehicle-card-action-btn {
+  background-color: rgba(15, 23, 42, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: #ffffff !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.vehicle-card-action-btn svg,
+.dark .vehicle-card-action-btn svg,
+:root:not(.dark) .vehicle-card-action-btn svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+.vehicle-card-action-btn:hover,
+.dark .vehicle-card-action-btn:hover,
+:root:not(.dark) .vehicle-card-action-btn:hover {
+  background-color: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.vehicle-card-action-btn.active-compare,
+.dark .vehicle-card-action-btn.active-compare,
+:root:not(.dark) .vehicle-card-action-btn.active-compare {
+  background-color: #fbbf24 !important;
+  border-color: #f59e0b !important;
+  color: #020617 !important;
+}
+
+.vehicle-card-action-btn.active-compare svg,
+.dark .vehicle-card-action-btn.active-compare svg,
+:root:not(.dark) .vehicle-card-action-btn.active-compare svg {
+  color: #020617 !important;
+  stroke: #020617 !important;
+}
+
+.vehicle-card-action-btn.active-favorite,
+.dark .vehicle-card-action-btn.active-favorite,
+:root:not(.dark) .vehicle-card-action-btn.active-favorite {
+  background-color: #f43f5e !important;
+  border-color: #e11d48 !important;
+  color: #ffffff !important;
+}
+
+.vehicle-card-action-btn.active-favorite svg,
+.dark .vehicle-card-action-btn.active-favorite svg,
+:root:not(.dark) .vehicle-card-action-btn.active-favorite svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+/* 4. Global Smooth Motion & Micro-interactions */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

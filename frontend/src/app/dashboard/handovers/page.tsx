@@ -147,8 +147,8 @@ export default function HandoversPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Vehicle Handover & Checklist</h1>
-            <p className="text-xs text-slate-500">Pre-delivery inspection verification, key handover & digital signatures</p>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Motorcycle Handover & PDI Checklist</h1>
+            <p className="text-xs text-slate-500">Pre-delivery inspection verification, key handover & digital customer signature</p>
           </div>
           <button
             onClick={() => { setShowModal(true); setSignatureData(''); }}

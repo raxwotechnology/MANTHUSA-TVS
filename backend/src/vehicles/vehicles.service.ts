@@ -21,7 +21,7 @@ export class VehiclesService {
     const other = Number(dto.otherCosts || 0);
 
     const calculatedInvestment = purchase + importCost + transport + repair + detailing + registration + insurance + ad + other;
-    const totalInvestment = calculatedInvestment;
+    const totalInvestment = calculatedInvestment > 0 ? calculatedInvestment : Number(dto.totalInvestment || purchase);
     const sellingPrice = Number(dto.sellingPrice || 0);
     const expectedProfit = sellingPrice > 0 ? sellingPrice - totalInvestment : Number(dto.expectedProfit || 0);
 
@@ -30,21 +30,32 @@ export class VehiclesService {
 
   async create(createVehicleDto: any): Promise<VehicleDocument> {
     const payload = this.calculateFinancials(createVehicleDto);
+    if (!payload.stockNumber) {
+      payload.stockNumber = `TVS-${Date.now().toString().slice(-6)}`;
+    }
+    if (!payload.make) {
+      payload.make = 'TVS';
+    }
     const createdVehicle = new this.vehicleModel(payload);
     return createdVehicle.save();
   }
 
   async findAll(): Promise<VehicleDocument[]> {
-    return this.vehicleModel.find().exec();
+    return this.vehicleModel.find().populate('branch').sort({ createdAt: -1 }).exec();
   }
 
   findPublicListings() {
     return this.vehicleModel
       .find({
-        status: { $in: [/^available$/i, /^purchased$/i, /^under inspection$/i, /^in stock$/i] },
+        $or: [
+          { status: { $in: [/^available$/i, /^in stock$/i, /^booking pending$/i] } },
+          { isPublished: true },
+        ],
       })
-      .select('make model variant year manufacturingYear registeredYear vehicleType condition fuelType transmission driveType engineCapacity mileage color sellingPrice images mediaAngles horsepower torque seatingCapacity doors bodyType dimensions weight fuelTankCapacity safetyFeatures entertainmentFeatures comfortFeatures customSpecifications status')
-      .sort({ createdAt: -1 })
+      .select(
+        'stockNumber make model variant category year manufacturingYear condition fuelType transmission engineCapacity engineType maxPower maxTorque coolingSystem fuelSystem startingSystem topSpeed mileage fuelTankCapacity frontBrake rearBrake brakingSystem frontSuspension rearSuspension wheelType tyreDimensions groundClearance seatHeight kerbWeight smartFeatures color variants colors branchStock sellingPrice images mediaAngles shortDescription description isFeatured status'
+      )
+      .sort({ isFeatured: -1, createdAt: -1 })
       .lean()
       .exec();
   }
@@ -64,30 +75,34 @@ export class VehiclesService {
     }
     if (!vehicle) {
       const parts = idOrSlug.split('-');
-      if (parts.length >= 2) {
+      // Try last part as potential mongo id
+      const possibleId = parts[parts.length - 1];
+      if (isValidObjectId(possibleId)) {
+        vehicle = await this.vehicleModel.findById(possibleId).lean().exec();
+      }
+      if (!vehicle && parts.length >= 2) {
         vehicle = await this.vehicleModel.findOne({
-          make: new RegExp(`^${parts[0]}$`, 'i'),
-          model: new RegExp(`^${parts[1]}$`, 'i'),
+          model: new RegExp(parts.join(' ').replace(/tvs/i, '').trim(), 'i'),
         }).lean().exec();
       }
     }
     if (!vehicle) {
-      throw new NotFoundException(`Vehicle #${idOrSlug} not found`);
+      throw new NotFoundException(`Motorcycle #${idOrSlug} not found`);
     }
     return this.redactFinancials(vehicle, 'Customer');
   }
 
   async findOne(id: string): Promise<VehicleDocument> {
-    const vehicle = await this.vehicleModel.findById(id).exec();
+    const vehicle = await this.vehicleModel.findById(id).populate('branch').exec();
     if (!vehicle) {
-      throw new NotFoundException(`Vehicle #${id} not found`);
+      throw new NotFoundException(`Motorcycle #${id} not found`);
     }
     return vehicle;
   }
 
   async update(id: string, updateVehicleDto: any): Promise<VehicleDocument> {
     const vehicle = await this.vehicleModel.findById(id).exec();
-    if (!vehicle) throw new NotFoundException(`Vehicle #${id} not found`);
+    if (!vehicle) throw new NotFoundException(`Motorcycle #${id} not found`);
     const { _id, createdAt, updatedAt, ...changes } = updateVehicleDto;
     Object.assign(vehicle, this.calculateFinancials({ ...vehicle.toObject(), ...changes }));
     return vehicle.save();
@@ -96,8 +111,9 @@ export class VehiclesService {
   redactFinancials(vehicle: any, role?: string) {
     if (!vehicle) return vehicle;
     const obj = typeof vehicle.toObject === 'function' ? vehicle.toObject() : { ...vehicle };
-    // Non-functional req B & Security: Sales Executives are restricted from viewing Buying Price / Profit Details
-    if (role && (role.toLowerCase().includes('sales') || role.toLowerCase().includes('executive') || role.toLowerCase().includes('customer'))) {
+    const r = (role || '').toLowerCase();
+    const isRestricted = !r || r.includes('sales') || r.includes('executive') || r.includes('customer') || r.includes('operations');
+    if (isRestricted) {
       delete obj.purchasePrice;
       delete obj.importCost;
       delete obj.transportCost;
@@ -110,20 +126,23 @@ export class VehiclesService {
       delete obj.totalInvestment;
       delete obj.expectedProfit;
       delete obj.actualProfit;
+      // Sensitive chassis and engine numbers hidden from customer and public
+      if (!r || r.includes('customer')) {
+        delete obj.chassisNumber;
+        delete obj.engineNumber;
+      }
     }
     return obj;
   }
 
   async getQrCode(id: string) {
     const vehicle = await this.findOne(id);
-    const text = `VEHICLE-VIN:${vehicle.chassisNumber || vehicle.stockNumber || vehicle._id}|MAKE:${vehicle.make}|MODEL:${vehicle.model}|PRICE:LKR ${vehicle.sellingPrice || 0}`;
-    // Generate clean SVG Data URL for QR Code representation
-    const encoded = encodeURIComponent(text);
+    const text = `TVS-MOTORCYCLE|VIN:${vehicle.chassisNumber || vehicle.stockNumber || vehicle._id}|MODEL:${vehicle.model}|PRICE:LKR ${vehicle.sellingPrice || 0}`;
     return {
       stockNumber: vehicle.stockNumber,
       vin: vehicle.chassisNumber,
       qrText: text,
-      qrDataUrl: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="100%" height="100%" fill="white"/><text x="100" y="30" font-family="monospace" font-size="12" text-anchor="middle" fill="black">VEHICLE QR TAG</text><rect x="40" y="40" width="120" height="120" fill="none" stroke="black" stroke-width="4"/><rect x="55" y="55" width="30" height="30" fill="black"/><rect x="115" y="55" width="30" height="30" fill="black"/><rect x="55" y="115" width="30" height="30" fill="black"/><path d="M95,65 H105 V95 H95 Z M65,95 H95 V105 H65 Z M105,105 H135 V135 H105 Z" fill="black"/><text x="100" y="180" font-family="monospace" font-size="10" text-anchor="middle" fill="black">${vehicle.chassisNumber || vehicle.stockNumber}</text></svg>`
+      qrDataUrl: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="100%" height="100%" fill="white"/><text x="100" y="30" font-family="monospace" font-size="12" text-anchor="middle" fill="black">TVS MOTORCYCLE QR</text><rect x="40" y="40" width="120" height="120" fill="none" stroke="black" stroke-width="4"/><rect x="55" y="55" width="30" height="30" fill="black"/><rect x="115" y="55" width="30" height="30" fill="black"/><rect x="55" y="115" width="30" height="30" fill="black"/><path d="M95,65 H105 V95 H95 Z M65,95 H95 V105 H65 Z M105,105 H135 V135 H105 Z" fill="black"/><text x="100" y="180" font-family="monospace" font-size="10" text-anchor="middle" fill="black">${vehicle.stockNumber}</text></svg>`
     };
   }
 
@@ -141,7 +160,7 @@ export class VehiclesService {
   async remove(id: string): Promise<any> {
     const deletedVehicle = await this.vehicleModel.findByIdAndDelete(id).exec();
     if (!deletedVehicle) {
-      throw new NotFoundException(`Vehicle #${id} not found`);
+      throw new NotFoundException(`Motorcycle #${id} not found`);
     }
     return deletedVehicle;
   }

@@ -11,14 +11,17 @@ export class Vehicle {
   @Prop()
   registrationNumber: string;
 
-  @Prop({ required: true })
-  make: string;
+  @Prop({ required: true, default: 'TVS' })
+  make: string; // Brand: TVS
 
   @Prop({ required: true })
-  model: string;
+  model: string; // e.g. Apache RTR 160 4V, NTORQ 125, Jupiter 125
 
   @Prop()
-  variant: string;
+  variant: string; // Default variant e.g. Disc, Special Edition
+
+  @Prop({ default: 'Sport Motorcycles' })
+  category: string; // 'Scooters', 'Commuter Motorcycles', 'Sport Motorcycles', 'Premium Motorcycles', 'Electric Two-Wheelers'
 
   @Prop()
   manufacturingYear: number;
@@ -26,23 +29,122 @@ export class Vehicle {
   @Prop()
   registeredYear: number;
 
-  @Prop()
+  @Prop({ default: 'Motorcycle' })
   vehicleType: string;
 
-  @Prop()
-  condition: string;
+  @Prop({ default: 'Brand New' })
+  condition: string; // 'Brand New', 'Pre-Owned'
+
+  @Prop({ default: 'Petrol' })
+  fuelType: string; // 'Petrol', 'Electric'
+
+  @Prop({ default: 'Manual' })
+  transmission: string; // '5-Speed Manual', '6-Speed Manual', 'CVT Automatic'
 
   @Prop()
-  fuelType: string;
+  engineCapacity: string; // e.g. '159.7 cc'
 
   @Prop()
-  transmission: string;
+  engineType: string; // e.g. 'SI, 4 stroke, Oil cooled, SOHC, Fuel Injection'
 
   @Prop()
-  driveType: string;
+  maxPower: string; // e.g. '17.55 PS @ 9250 rpm'
 
   @Prop()
-  engineCapacity: string;
+  maxTorque: string; // e.g. '14.73 Nm @ 7250 rpm'
+
+  @Prop()
+  coolingSystem: string; // 'Oil Cooled', 'Air Cooled', 'Liquid Cooled'
+
+  @Prop()
+  fuelSystem: string; // 'RT-Fi (Race Tuned Fuel Injection)', 'ET-Fi', 'Carburetor'
+
+  @Prop()
+  startingSystem: string; // 'Electric Start', 'Electric & Kick'
+
+  @Prop()
+  topSpeed: string; // e.g. '114 km/h'
+
+  @Prop()
+  mileage: number; // e.g. 45 km/l
+
+  @Prop()
+  fuelTankCapacity: string; // e.g. '12 L'
+
+  @Prop()
+  frontBrake: string; // e.g. '270mm Roto Petal Disc'
+
+  @Prop()
+  rearBrake: string; // e.g. '200mm Roto Petal Disc'
+
+  @Prop()
+  brakingSystem: string; // e.g. 'Single Channel Super-Moto ABS', 'Dual Channel ABS', 'SBT'
+
+  @Prop()
+  frontSuspension: string; // e.g. 'Telescopic Forks'
+
+  @Prop()
+  rearSuspension: string; // e.g. 'Monoshock', 'Gas Charged Shock'
+
+  @Prop()
+  wheelType: string; // 'Alloy', 'Spoke'
+
+  @Prop()
+  tyreDimensions: string; // e.g. 'Front: 90/90-17, Rear: 130/70-17'
+
+  @Prop()
+  groundClearance: string; // e.g. '180 mm'
+
+  @Prop()
+  seatHeight: string; // e.g. '800 mm'
+
+  @Prop()
+  kerbWeight: string; // e.g. '144 kg'
+
+  @Prop([String])
+  smartFeatures: string[]; // SmartXonnect, Ride Modes, GTT, etc.
+
+  @Prop()
+  color: string;
+
+  // TVS Model Variants list
+  @Prop({ type: [Object], default: [] })
+  variants: Array<{
+    name: string;
+    code?: string;
+    price: number;
+    colors?: string[];
+    specifications?: Record<string, string>;
+    isDefault?: boolean;
+  }>;
+
+  // TVS Model Colors with color codes & image URLs
+  @Prop({ type: [Object], default: [] })
+  colors: Array<{
+    name: string;
+    code?: string;
+    hex?: string;
+    imageUrl?: string;
+    available?: boolean;
+  }>;
+
+  // Branch Stock allocation
+  @Prop({ type: [Object], default: [] })
+  branchStock: Array<{
+    branchId?: Types.ObjectId;
+    branchName: string;
+    quantity: number;
+    availableColors?: string[];
+  }>;
+
+  @Prop({ default: 'In Stock' })
+  status: string; // 'In Stock', 'Reserved', 'Booking Pending', 'Sold', 'Delivered', 'Under Inspection', 'Available'
+
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Branch' })
+  location: Types.ObjectId;
+
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Branch' })
+  branch: Types.ObjectId;
 
   @Prop()
   engineNumber: string;
@@ -51,23 +153,19 @@ export class Vehicle {
   chassisNumber: string;
 
   @Prop()
-  mileage: number;
-
-  @Prop()
-  color: string;
-
-  @Prop({ default: 'Available' })
-  status: string;
-
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Branch' })
-  location: Types.ObjectId;
-
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Branch' })
-  branch: Types.ObjectId;
-
-  // Added to match frontend payload
-  @Prop()
   year: number;
+
+  @Prop({ default: true })
+  isPublished: boolean;
+
+  @Prop({ default: false })
+  isFeatured: boolean;
+
+  @Prop()
+  shortDescription: string;
+
+  @Prop()
+  description: string;
 
   // Financial Breakdown
   @Prop()
@@ -100,7 +198,7 @@ export class Vehicle {
   @Prop()
   totalInvestment: number;
 
-  @Prop()
+  @Prop({ required: true, default: 0 })
   sellingPrice: number;
 
   @Prop()
@@ -112,31 +210,7 @@ export class Vehicle {
   @Prop()
   actualProfit: number;
 
-  // Detailed Specifications
-  @Prop()
-  horsepower: number;
-
-  @Prop()
-  torque: string;
-
-  @Prop()
-  seatingCapacity: number;
-
-  @Prop()
-  doors: number;
-
-  @Prop()
-  bodyType: string;
-
-  @Prop()
-  dimensions: string;
-
-  @Prop()
-  weight: string;
-
-  @Prop()
-  fuelTankCapacity: string;
-
+  // Specifications fallback
   @Prop([String])
   safetyFeatures: string[];
 
@@ -149,7 +223,7 @@ export class Vehicle {
   @Prop({ type: Object })
   customSpecifications: Record<string, string>;
 
-  // Media & Angles
+  // Media
   @Prop([String])
   images: string[];
 

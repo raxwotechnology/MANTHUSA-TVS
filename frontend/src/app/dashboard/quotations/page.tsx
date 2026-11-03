@@ -12,6 +12,10 @@ interface Quotation {
   quotationNumber: string;
   customerName: string;
   vehicleName: string;
+  modelName?: string;
+  variantName?: string;
+  selectedColor?: string;
+  branch?: string;
   vehiclePrice: number;
   discount: number;
   additionalCharges: number;
@@ -132,6 +136,22 @@ export default function QuotationsPage() {
     setDeletingQuote(null);
   };
 
+  const convertToInvoice = async (q: Quotation) => {
+    if (!confirm(`Are you sure you want to convert Quotation ${q.quotationNumber} into an official Tax Invoice?`)) return;
+    try {
+      const res = await apiFetch(`/quotations/${q._id}/convert-to-invoice`, { method: 'POST' });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || 'Failed to convert quotation to invoice.');
+      }
+      const data = await res.json();
+      alert(`Invoice created successfully: ${data.invoiceNumber || 'New Invoice'}`);
+      loadQuotations();
+    } catch (e: any) {
+      alert(e.message || 'Error converting to invoice.');
+    }
+  };
+
   const formatLKR = (val: number) => {
     return 'LKR ' + (val || 0).toLocaleString('en-LK');
   };
@@ -159,8 +179,8 @@ export default function QuotationsPage() {
               <tr className="bg-slate-50 text-slate-700 border-b border-slate-200 font-semibold">
                 <th className="py-3 px-4">Quote #</th>
                 <th className="py-3 px-4">Customer</th>
-                <th className="py-3 px-4">Vehicle</th>
-                <th className="py-3 px-4">Vehicle Price</th>
+                <th className="py-3 px-4">Motorcycle Model</th>
+                <th className="py-3 px-4">Bike Price</th>
                 <th className="py-3 px-4">Discount</th>
                 <th className="py-3 px-4">Final Total</th>
                 <th className="py-3 px-4">Status</th>
@@ -190,6 +210,14 @@ export default function QuotationsPage() {
                     </button>
                     {!isCustomer && (
                       <>
+                        <button
+                          onClick={() => convertToInvoice(q)}
+                          className="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] rounded-lg shadow-xs flex items-center gap-1"
+                          title="Generate official invoice from this quotation"
+                        >
+                          <FileText className="w-3 h-3" />
+                          <span>Convert to Invoice</span>
+                        </button>
                         <button onClick={() => { 
                           setEditingQuote(q); 
                           setNewFormData({ 

@@ -16,13 +16,13 @@ export class PaymentsService {
   async create(input: any) {
     const amount = Number(input.amount);
     if (!input.sale || amount <= 0 || !Number.isFinite(amount) || !input.paymentMethod) {
-      throw new BadRequestException('Sale, positive payment amount and payment method are required.');
+      throw new BadRequestException('Invoice/Sale, positive payment amount and payment method are required.');
     }
     const sale = await this.saleModel.findById(input.sale).exec();
-    if (!sale) throw new NotFoundException('Sale not found.');
+    if (!sale) throw new NotFoundException('Invoice not found.');
     const balance = Number(sale.finalAmount || 0) - Number(sale.paidAmount || 0);
-    if (amount > balance) throw new BadRequestException(`Payment exceeds the outstanding balance of ${balance}.`);
-    const receiptNumber = input.receiptNumber || `RCP-${Date.now()}`;
+    if (amount > balance) throw new BadRequestException(`Payment exceeds the outstanding balance of LKR ${balance.toLocaleString()}.`);
+    const receiptNumber = input.receiptNumber || `TVS-RCP-${Date.now().toString().slice(-6)}`;
     const payment = await new this.paymentModel({
       ...input,
       customer: input.customer || sale.customer,
@@ -30,19 +30,41 @@ export class PaymentsService {
       paymentDate: input.paymentDate || new Date(),
       receiptNumber,
     }).save();
+
     sale.paidAmount = Number(sale.paidAmount || 0) + amount;
-    sale.balance = Number(sale.finalAmount || 0) - sale.paidAmount;
+    sale.balance = Math.max(0, Number(sale.finalAmount || 0) - sale.paidAmount);
+    if (sale.balance === 0) {
+      sale.status = 'Paid in Full';
+    } else {
+      sale.status = 'Partially Paid';
+    }
     await sale.save();
+
     await new this.cashModel({
-      transactionType: 'IN', amount, transactionDate: payment.paymentDate,
-      source: 'CustomerPayment', referenceId: payment._id,
-      description: `Receipt ${receiptNumber} for sale ${sale.invoiceNumber}`,
-    }).save();
-    await this.notifications.create({ title: 'Customer payment received', message: `Receipt ${receiptNumber} received for invoice ${sale.invoiceNumber}.`, channel: 'in-app', entityType: 'Payment', entityId: String(payment._id) }).catch(() => undefined);
+      transactionType: 'IN',
+      amount,
+      transactionDate: payment.paymentDate,
+      source: 'CustomerPayment',
+      referenceId: payment._id,
+      description: `Receipt ${receiptNumber} for TVS invoice ${sale.invoiceNumber}`,
+    }).save().catch(() => undefined);
+
+    await this.notifications.create({
+      title: 'TVS Payment Received',
+      message: `Receipt ${receiptNumber} of LKR ${amount.toLocaleString()} received for invoice ${sale.invoiceNumber}.`,
+      channel: 'in-app',
+      entityType: 'Payment',
+      entityId: String(payment._id),
+    }).catch(() => undefined);
+
     return payment;
   }
 
   findAll() {
     return this.paymentModel.find().populate('sale').populate('customer').sort({ createdAt: -1 }).exec();
+  }
+
+  findByCustomer(customerId: string) {
+    return this.paymentModel.find({ customer: customerId }).populate('sale').sort({ createdAt: -1 }).exec();
   }
 }

@@ -18,7 +18,22 @@ export class Lead {
   interestedVehicleText: string;
 
   @Prop()
-  source: string; // Facebook, Walk-in, Referral, etc.
+  modelName: string;
+
+  @Prop()
+  variantName: string;
+
+  @Prop()
+  selectedColor: string;
+
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Branch' })
+  preferredBranch: Types.ObjectId;
+
+  @Prop()
+  preferredBranchName: string;
+
+  @Prop({ default: 'Website Configurator' })
+  source: string;
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User' })
   assignedStaff: Types.ObjectId;
@@ -29,7 +44,7 @@ export class Lead {
   @Prop()
   expectedPurchaseDate: Date;
 
-  @Prop()
+  @Prop({ default: 'Motorcycle Booking Request' })
   inquiryType: string;
 
   @Prop()
@@ -38,11 +53,14 @@ export class Lead {
   @Prop()
   preferredDate: Date;
 
-  @Prop({ default: 'New' })
-  status: string; // New, Contacted, Interested, Test Drive, Quotation, Reserved, Won/Lost
+  @Prop({ default: 'New Request' })
+  status: string; // 'New Request', 'Under Review', 'Availability Checked', 'Converted to Booking', 'Closed'
 
   @Prop({ default: 'Medium' })
   priority: string; // High, Medium, Low
+
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Reservation' })
+  bookingId: Types.ObjectId;
 }
 
 export const LeadSchema = SchemaFactory.createForClass(Lead);

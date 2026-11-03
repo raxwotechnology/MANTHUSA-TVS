@@ -41,11 +41,11 @@ export default function ComparePage() {
   return (
     <PublicLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        <Breadcrumbs items={[{ label: 'Vehicle Comparison' }]} />
+        <Breadcrumbs items={[{ label: 'Motorcycle Comparison' }]} />
 
         {isLoading ? (
           <div className="py-20 text-center animate-pulse text-slate-400">
-            Loading vehicle comparison specifications...
+            Loading TVS motorcycle comparison specifications...
           </div>
         ) : comparedVehicles.length > 0 ? (
           <VehicleComparisonTable
@@ -60,10 +60,10 @@ export default function ComparePage() {
         ) : (
           <EmptyState
             icon="car"
-            title="No Vehicles in Comparison"
-            description="You have not selected any vehicles for comparison yet. Select up to 4 vehicles from our inventory to evaluate specifications and pricing side by side."
-            actionText="Browse Inventory to Compare"
-            actionHref="/vehicles"
+            title="No Motorcycles in Comparison"
+            description="You have not selected any TVS motorcycles for comparison yet. Select up to 4 models from our lineup to evaluate engine specs, power, torque, and pricing side by side."
+            actionText="Browse TVS Motorcycles"
+            actionHref="/bikes"
           />
         )}
       </div>

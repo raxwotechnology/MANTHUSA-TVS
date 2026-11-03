@@ -1,28 +1,50 @@
 "use client";
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { UserCheck, Plus, Search, PhoneCall, Calendar, Tag, CheckCircle2, Clock, X } from 'lucide-react';
+import {
+  UserCheck,
+  Plus,
+  Search,
+  PhoneCall,
+  Calendar,
+  CheckCircle2,
+  Clock,
+  X,
+  ArrowRight,
+  Flame,
+  MapPin,
+  SlidersHorizontal
+} from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 
 interface Lead {
   _id: string;
   leadId: string;
   customerName: string;
+  customerPhone?: string;
   interestedVehicle: string;
+  modelName?: string;
+  variantName?: string;
+  selectedColor?: string;
+  preferredBranchName?: string;
   source: string;
   budget: number;
   status: string;
   priority: string;
-  customer?: { _id: string };
+  customer?: { _id: string; fullName?: string; phone?: string };
   interestedVehicleId?: string;
   inquiryType?: string;
   inquiryMessage?: string;
   preferredDate?: string;
+  bookingId?: any;
 }
 
 export default function LeadsPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [convertingId, setConvertingId] = useState<string | null>(null);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
@@ -32,154 +54,238 @@ export default function LeadsPage() {
   const [newLead, setNewLead] = useState({
     customerName: '',
     customerPhone: '',
-    interestedVehicle: '',
-    source: 'Website',
-    budget: '',
-    status: 'New',
-    priority: 'Medium'
+    modelName: 'Apache RTR 160 4V',
+    variantName: 'Special Edition Disc',
+    selectedColor: 'Matte Black',
+    preferredBranchName: 'Colombo Central Flagship Hub',
+    source: 'Showroom Walk-in',
+    budget: '1025000',
+    status: 'New Request',
+    priority: 'Medium',
+    inquiryMessage: ''
   });
 
   const loadLeads = async () => {
     try {
       const response = await apiFetch('/leads');
-      if (!response.ok) throw new Error('Could not load leads.');
+      if (!response.ok) throw new Error('Could not load requests.');
       const data = await response.json();
-      setLeads(data.map((lead: any) => ({
-        ...lead,
-        customerName: lead.customer?.fullName || lead.customerName || 'Customer',
-        interestedVehicleId: typeof lead.interestedVehicle === 'object' ? lead.interestedVehicle?._id : undefined,
-        interestedVehicle: lead.interestedVehicleText || (typeof lead.interestedVehicle === 'object' ? `${lead.interestedVehicle?.make || ''} ${lead.interestedVehicle?.model || ''}`.trim() : (lead.interestedVehicle || '—')),
-        budget: Number(lead.budget || 0),
-      })));
+      setLeads(
+        data.map((lead: any) => ({
+          ...lead,
+          customerName: lead.customer?.fullName || lead.customerName || 'Customer',
+          customerPhone: lead.customer?.phone || '',
+          interestedVehicleId: typeof lead.interestedVehicle === 'object' ? lead.interestedVehicle?._id : undefined,
+          interestedVehicle:
+            lead.interestedVehicleText ||
+            (lead.modelName ? `${lead.modelName} ${lead.variantName || ''} (${lead.selectedColor || ''})`.trim() : 'TVS Motorcycle'),
+          budget: Number(lead.budget || 0),
+        }))
+      );
       setError('');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not load leads.');
+      setError(err instanceof Error ? err.message : 'Could not load requests.');
     }
   };
 
-  React.useEffect(() => { void loadLeads(); }, []);
+  useEffect(() => {
+    void loadLeads();
+  }, []);
 
   const handleAddLead = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     try {
       const customerResponse = await apiFetch('/customers', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fullName: newLead.customerName, phone: newLead.customerPhone, customerType: 'Individual' }),
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName: newLead.customerName,
+          phone: newLead.customerPhone,
+          customerType: 'Individual',
+        }),
       });
-      if (!customerResponse.ok) throw new Error('Could not save customer. Check the customer details and try again.');
+      if (!customerResponse.ok) throw new Error('Could not save customer.');
       const customer = await customerResponse.json();
+
       const response = await apiFetch('/leads', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ customer: customer._id, interestedVehicleText: newLead.interestedVehicle, source: newLead.source, budget: newLead.budget, status: newLead.status, priority: newLead.priority }),
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customer: customer._id,
+          modelName: newLead.modelName,
+          variantName: newLead.variantName,
+          selectedColor: newLead.selectedColor,
+          preferredBranchName: newLead.preferredBranchName,
+          interestedVehicleText: `${newLead.modelName} ${newLead.variantName} (${newLead.selectedColor})`,
+          source: newLead.source,
+          budget: Number(newLead.budget || 0),
+          status: newLead.status,
+          priority: newLead.priority,
+          inquiryMessage: newLead.inquiryMessage,
+        }),
       });
-      if (!response.ok) throw new Error('Customer was saved, but lead creation failed.');
+      if (!response.ok) throw new Error('Could not create request.');
       await loadLeads();
+      setSuccess('New TVS customer request created successfully!');
       setShowAddModal(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not save lead.');
+      setError(err instanceof Error ? err.message : 'Could not save request.');
     }
   };
 
-  const saveFollowUp = async (event: React.FormEvent) => {
-    event.preventDefault();
-    if (!selectedLead?.customer?._id) { setError('This lead has no linked customer record.'); return; }
+  // STAFF CONVERT REQUEST TO OFFICIAL BOOKING
+  const handleConvertToBooking = async (lead: Lead) => {
+    setConvertingId(lead._id);
+    setError('');
+    setSuccess('');
+
     try {
-      let response: Response;
-      if (followUp.type === 'Test Drive') {
-        if (!selectedLead.interestedVehicleId) throw new Error('This lead has no linked vehicle for a test drive.');
-        const token = window.localStorage.getItem('token') || '';
-        const encodedPayload = token.split('.')[1]?.replace(/-/g, '+').replace(/_/g, '/');
-        const claims = encodedPayload ? JSON.parse(window.atob(encodedPayload)) : {};
-        if (!claims.sub) throw new Error('Could not identify the signed-in salesperson.');
-        response = await apiFetch('/test-drives', { method: 'POST', body: JSON.stringify({ customer: selectedLead.customer._id, vehicle: selectedLead.interestedVehicleId, salesperson: claims.sub, date: followUp.followUpDate, startTime: followUp.followUpTime, status: 'Scheduled', feedback: `Website request: ${selectedLead.inquiryMessage || ''}` }) });
-      } else response = await apiFetch('/follow-ups', {
+      const res = await apiFetch(`/leads/${lead._id}/convert-to-booking`, {
         method: 'POST',
-        body: JSON.stringify({ ...followUp, customer: selectedLead.customer._id, lead: selectedLead._id, status: 'Scheduled' }),
+        headers: { 'Content-Type': 'application/json' },
       });
-      if (!response.ok) throw new Error((await response.json()).message || 'Could not save the follow-up.');
-      setSelectedLead(null);
-      setFollowUp({ followUpDate: '', followUpTime: '', type: 'Phone', notes: '' });
-      setError('');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not save the follow-up.');
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || 'Could not convert request to booking.');
+      }
+      const data = await res.json();
+      setSuccess(`Request ${lead.leadId} successfully converted into Booking ${data.booking?.bookingNumber || ''}!`);
+      await loadLeads();
+    } catch (err: any) {
+      setError(err.message || 'Failed to convert request to booking.');
+    } finally {
+      setConvertingId(null);
     }
-  };
-
-  const convertToReservation = async (lead: Lead) => {
-    if (!lead.customer?._id || !lead.interestedVehicleId) { setError('This lead needs a linked customer and vehicle before it can be reserved.'); return; }
-    if (!window.confirm(`Reserve ${lead.interestedVehicle} for ${lead.customerName}? This will mark the vehicle Reserved.`)) return;
-    const depositText = window.prompt('Reservation deposit (LKR)', '0');
-    if (depositText === null) return;
-    const deposit = Number(depositText);
-    if (!Number.isFinite(deposit) || deposit < 0) { setError('Enter a valid non-negative deposit amount.'); return; }
-    const expiryDate = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
-    try {
-      const response = await apiFetch('/reservations', { method: 'POST', body: JSON.stringify({ customer: lead.customer._id, vehicle: lead.interestedVehicleId, reservationDeposit: deposit, expiryDate, notes: `Converted from lead ${lead.leadId}` }) });
-      if (!response.ok) throw new Error((await response.json()).message || 'Could not convert lead to reservation.');
-      await apiFetch(`/leads/${lead._id}`, { method: 'PUT', body: JSON.stringify({ status: 'Reserved' }) });
-      await loadLeads(); setError('');
-    } catch (err) { setError(err instanceof Error ? err.message : 'Could not create reservation.'); }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'New': return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">New</span>;
-      case 'Test Drive': return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-800">Test Drive</span>;
-      case 'Quotation': return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">Quotation</span>;
-      case 'Reserved': return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Reserved</span>;
-      default: return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-800">{status}</span>;
+      case 'New Request':
+        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">New Request</span>;
+      case 'Converted to Booking':
+        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Converted to Booking</span>;
+      case 'Under Review':
+        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">Under Review</span>;
+      default:
+        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-800">{status}</span>;
     }
   };
+
+  const filteredLeads = leads.filter((l) => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      (l.customerName || '').toLowerCase().includes(q) ||
+      (l.leadId || '').toLowerCase().includes(q) ||
+      (l.interestedVehicle || '').toLowerCase().includes(q) ||
+      (l.preferredBranchName || '').toLowerCase().includes(q)
+    );
+  });
 
   return (
     <DashboardLayout>
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900">CRM & Sales Leads Pipeline</h1>
-          <p className="text-xs text-slate-500">Track inquiries from Facebook, TikTok, Website, WhatsApp, Walk-ins and manage follow-ups</p>
+          <h1 className="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+            <UserCheck className="w-6 h-6 text-red-600" />
+            <span>TVS Customer Requests & CRM</span>
+          </h1>
+          <p className="text-xs text-slate-500">
+            Track inquiries from Website Configurator, Showroom Walk-ins, WhatsApp & convert to confirmed bookings
+          </p>
         </div>
 
         <button
           onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-4 py-2.5 rounded-lg shadow-xs transition-colors"
+          className="flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white font-semibold text-xs px-4 py-2.5 rounded-xl shadow-xs transition-colors"
         >
           <Plus className="w-4 h-4" />
-          <span>Create Sales Lead</span>
+          <span>New Customer Request</span>
         </button>
       </div>
 
-      {error && <div role="alert" className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
+      {error && <div role="alert" className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">{error}</div>}
+      {success && <div role="status" className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs text-emerald-700">{success}</div>}
 
-      {/* Leads Table */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs">
+      {/* Search Bar */}
+      <div className="mb-4">
+        <div className="relative max-w-sm">
+          <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search by customer, model, ref..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-red-500"
+          />
+        </div>
+      </div>
+
+      {/* Requests Table */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left border-collapse">
             <thead>
               <tr className="bg-slate-50 text-slate-700 border-b border-slate-200 font-semibold">
-                <th className="py-3 px-4">Lead ID</th>
-                <th className="py-3 px-4">Customer Name</th>
-                <th className="py-3 px-4">Interested Vehicle</th>
-                <th className="py-3 px-4">Source</th>
+                <th className="py-3 px-4">Request #</th>
+                <th className="py-3 px-4">Customer</th>
+                <th className="py-3 px-4">TVS Model & Variant</th>
+                <th className="py-3 px-4">Color</th>
+                <th className="py-3 px-4">Branch</th>
                 <th className="py-3 px-4">Budget</th>
-                <th className="py-3 px-4">Priority</th>
                 <th className="py-3 px-4">Status</th>
                 <th className="py-3 px-4 text-center">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {leads.length === 0 && <tr><td className="p-6 text-center text-slate-500" colSpan={8}>No leads found.</td></tr>}
-              {leads.map((l) => (
+              {filteredLeads.length === 0 && (
+                <tr>
+                  <td className="p-8 text-center text-slate-400" colSpan={8}>
+                    No requests found matching your query.
+                  </td>
+                </tr>
+              )}
+              {filteredLeads.map((l) => (
                 <tr key={l._id} className="hover:bg-slate-50/80">
-                  <td className="py-3 px-4 font-bold text-slate-900">{l.leadId}</td>
-                  <td className="py-3 px-4 font-bold text-slate-900">{l.customerName}</td>
-                  <td className="py-3 px-4 text-slate-700 font-medium">{l.interestedVehicle}</td>
-                  <td className="py-3 px-4 text-slate-600">{l.source}</td>
-                  <td className="py-3 px-4 font-bold text-emerald-600">LKR {l.budget.toLocaleString()}</td>
-                  <td className="py-3 px-4 font-semibold text-rose-600">{l.priority}</td>
-                  <td className="py-3 px-4">{getStatusBadge(l.status)}</td>
-                  <td className="py-3 px-4 text-center">
-                    <div className="flex justify-center gap-1"><button onClick={() => { setFollowUp({ followUpDate: l.preferredDate?.slice(0, 10) || '', followUpTime: '', type: l.inquiryType === 'Test Drive' ? 'Test Drive' : 'Phone', notes: l.inquiryType === 'Test Drive' ? `Public test drive request: ${l.inquiryMessage || ''}` : '' }); setSelectedLead(l); }} className="px-2 py-1 bg-blue-50 text-blue-700 font-semibold text-[11px] rounded-lg border border-blue-200">Follow-up / test drive</button>{l.interestedVehicleId && l.status !== 'Reserved' && <button onClick={() => void convertToReservation(l)} className="px-2 py-1 bg-emerald-50 text-emerald-700 font-semibold text-[11px] rounded-lg border border-emerald-200">Reserve</button>}</div>
+                  <td className="py-3.5 px-4 font-mono font-bold text-slate-900">{l.leadId}</td>
+                  <td className="py-3.5 px-4">
+                    <div className="font-bold text-slate-900">{l.customerName}</div>
+                    {l.customerPhone && <div className="text-[11px] text-slate-500">{l.customerPhone}</div>}
+                  </td>
+                  <td className="py-3.5 px-4">
+                    <div className="font-bold text-slate-800">{l.modelName || l.interestedVehicle}</div>
+                    {l.variantName && <div className="text-[11px] text-slate-500">{l.variantName}</div>}
+                  </td>
+                  <td className="py-3.5 px-4 font-medium text-slate-700">{l.selectedColor || '—'}</td>
+                  <td className="py-3.5 px-4 text-slate-600">{l.preferredBranchName || 'Colombo Hub'}</td>
+                  <td className="py-3.5 px-4 font-bold text-slate-900">
+                    LKR {Number(l.budget || 0).toLocaleString()}
+                  </td>
+                  <td className="py-3.5 px-4">{getStatusBadge(l.status)}</td>
+                  <td className="py-3.5 px-4 text-center">
+                    <div className="flex justify-center items-center gap-1.5">
+                      {l.status !== 'Converted to Booking' ? (
+                        <button
+                          type="button"
+                          onClick={() => handleConvertToBooking(l)}
+                          disabled={convertingId === l._id}
+                          className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold text-[11px] rounded-lg transition-colors shadow-xs flex items-center gap-1 disabled:opacity-50"
+                        >
+                          <Flame className="w-3 h-3 fill-white" />
+                          <span>{convertingId === l._id ? 'Converting...' : 'Convert to Booking'}</span>
+                        </button>
+                      ) : (
+                        <Link
+                          href="/dashboard/reservations"
+                          className="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold text-[11px] rounded-lg hover:bg-emerald-100 flex items-center gap-1"
+                        >
+                          <span>View Booking</span>
+                          <ArrowRight className="w-3 h-3" />
+                        </Link>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -191,65 +297,152 @@ export default function LeadsPage() {
       {/* Add Lead Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-xl border border-slate-200">
             <div className="flex items-center justify-between border-b pb-3 mb-4">
-              <h3 className="text-base font-bold text-slate-900">Create Sales Lead</h3>
-              <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-slate-600"><X className="w-5 h-5" /></button>
+              <h3 className="text-base font-bold text-slate-900">New TVS Motorcycle Request</h3>
+              <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-slate-600">
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
             <form onSubmit={handleAddLead} className="space-y-3 text-xs">
               <div>
-                <label className="block font-semibold mb-1">Customer Name</label>
-                <input type="text" required placeholder="e.g. Ruwan Gunawardena" value={newLead.customerName} onChange={(e) => setNewLead({ ...newLead, customerName: e.target.value })} className="w-full p-2 border rounded-lg bg-slate-50 placeholder:text-slate-400" />
+                <label className="block font-semibold mb-1">Customer Full Name</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Ruwan Gunawardena"
+                  value={newLead.customerName}
+                  onChange={(e) => setNewLead({ ...newLead, customerName: e.target.value })}
+                  className="w-full p-2.5 border rounded-xl bg-slate-50"
+                />
               </div>
+
               <div>
-                <label className="block font-semibold mb-1">Customer Phone</label>
-                <input type="tel" required placeholder="e.g. +94 77 123 4567" value={newLead.customerPhone} onChange={(e) => setNewLead({ ...newLead, customerPhone: e.target.value })} className="w-full p-2 border rounded-lg bg-slate-50 placeholder:text-slate-400" />
+                <label className="block font-semibold mb-1">Customer Phone Number</label>
+                <input
+                  type="tel"
+                  required
+                  placeholder="e.g. 0771234567"
+                  value={newLead.customerPhone}
+                  onChange={(e) => setNewLead({ ...newLead, customerPhone: e.target.value })}
+                  className="w-full p-2.5 border rounded-xl bg-slate-50"
+                />
               </div>
-              <div>
-                <label className="block font-semibold mb-1">Interested Vehicle</label>
-                <input type="text" required placeholder="e.g. Toyota Premio / Vezel RS" value={newLead.interestedVehicle} onChange={(e) => setNewLead({ ...newLead, interestedVehicle: e.target.value })} className="w-full p-2 border rounded-lg bg-slate-50 placeholder:text-slate-400" />
-              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold mb-1">Lead Source</label>
-                  <select value={newLead.source} onChange={(e) => setNewLead({ ...newLead, source: e.target.value })} className="w-full p-2 border rounded-lg bg-slate-50">
-                    <option value="Facebook">Facebook</option>
-                    <option value="Instagram">Instagram</option>
-                    <option value="TikTok">TikTok</option>
-                    <option value="Website">Website</option>
-                    <option value="WhatsApp">WhatsApp</option>
-                    <option value="Walk-in">Walk-in</option>
-                    <option value="Phone">Phone</option>
-                    <option value="Referral">Referral</option>
+                  <label className="block font-semibold mb-1">TVS Model</label>
+                  <select
+                    value={newLead.modelName}
+                    onChange={(e) => setNewLead({ ...newLead, modelName: e.target.value })}
+                    className="w-full p-2.5 border rounded-xl bg-slate-50"
+                  >
+                    <option value="Apache RTR 160 4V">Apache RTR 160 4V</option>
+                    <option value="Apache RTR 200 4V">Apache RTR 200 4V</option>
+                    <option value="Apache RR 310">Apache RR 310</option>
+                    <option value="NTORQ 125">NTORQ 125</option>
+                    <option value="Jupiter 125">Jupiter 125</option>
+                    <option value="Raider 125">Raider 125</option>
+                    <option value="Ronin 225">Ronin 225</option>
+                    <option value="XL 100 Heavy Duty">XL 100 Heavy Duty</option>
+                    <option value="iQube Electric">iQube Electric</option>
                   </select>
                 </div>
+
                 <div>
-                  <label className="block font-semibold mb-1">Budget (LKR)</label>
-                  <input type="number" placeholder="e.g. 12,000,000" value={newLead.budget} onChange={(e) => setNewLead({ ...newLead, budget: e.target.value })} className="w-full p-2 border rounded-lg bg-slate-50 placeholder:text-slate-400" />
+                  <label className="block font-semibold mb-1">Variant</label>
+                  <input
+                    type="text"
+                    value={newLead.variantName}
+                    onChange={(e) => setNewLead({ ...newLead, variantName: e.target.value })}
+                    className="w-full p-2.5 border rounded-xl bg-slate-50"
+                  />
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2 pt-3 border-t">
-                <button type="button" onClick={() => setShowAddModal(false)} className="px-4 py-2 border rounded-lg">Cancel</button>
-                <button type="submit" className="px-5 py-2 bg-blue-600 text-white rounded-lg font-semibold">Save Lead</button>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold mb-1">Color</label>
+                  <input
+                    type="text"
+                    value={newLead.selectedColor}
+                    onChange={(e) => setNewLead({ ...newLead, selectedColor: e.target.value })}
+                    className="w-full p-2.5 border rounded-xl bg-slate-50"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold mb-1">Branch</label>
+                  <select
+                    value={newLead.preferredBranchName}
+                    onChange={(e) => setNewLead({ ...newLead, preferredBranchName: e.target.value })}
+                    className="w-full p-2.5 border rounded-xl bg-slate-50"
+                  >
+                    <option value="Colombo Central Flagship Hub">Colombo Central Flagship Hub</option>
+                    <option value="Kandy City TVS Showroom">Kandy City TVS Showroom</option>
+                    <option value="Galle Coastal TVS Center">Galle Coastal TVS Center</option>
+                    <option value="Kurunegala North TVS Sales Hub">Kurunegala North TVS Sales Hub</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold mb-1">Source</label>
+                  <select
+                    value={newLead.source}
+                    onChange={(e) => setNewLead({ ...newLead, source: e.target.value })}
+                    className="w-full p-2.5 border rounded-xl bg-slate-50"
+                  >
+                    <option value="Website Configurator">Website Configurator</option>
+                    <option value="Showroom Walk-in">Showroom Walk-in</option>
+                    <option value="Hotline Phone Call">Hotline Phone Call</option>
+                    <option value="WhatsApp Inquiry">WhatsApp Inquiry</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-semibold mb-1">Price / Budget</label>
+                  <input
+                    type="number"
+                    value={newLead.budget}
+                    onChange={(e) => setNewLead({ ...newLead, budget: e.target.value })}
+                    className="w-full p-2.5 border rounded-xl bg-slate-50"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-semibold mb-1">Inquiry / Customer Notes</label>
+                <textarea
+                  rows={2}
+                  value={newLead.inquiryMessage}
+                  onChange={(e) => setNewLead({ ...newLead, inquiryMessage: e.target.value })}
+                  placeholder="Notes on customer preference or leasing requirement..."
+                  className="w-full p-2.5 border rounded-xl bg-slate-50"
+                />
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="flex-1 p-2.5 border rounded-xl bg-slate-100 font-semibold"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 p-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold"
+                >
+                  Create Request
+                </button>
               </div>
             </form>
           </div>
         </div>
       )}
-
-      {selectedLead && <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4">
-        <form onSubmit={saveFollowUp} className="w-full max-w-md space-y-3 rounded-2xl bg-white p-6 shadow-xl">
-          <div className="flex items-center justify-between"><h3 className="font-bold">Follow up with {selectedLead.customerName}</h3><button type="button" onClick={() => setSelectedLead(null)}><X className="h-5 w-5" /></button></div>
-          <label className="block text-xs font-semibold">Date<input required type="date" value={followUp.followUpDate} onChange={(e) => setFollowUp({ ...followUp, followUpDate: e.target.value })} className="mt-1 w-full rounded-lg border p-2" /></label>
-          <label className="block text-xs font-semibold">Time<input type="time" value={followUp.followUpTime} onChange={(e) => setFollowUp({ ...followUp, followUpTime: e.target.value })} className="mt-1 w-full rounded-lg border p-2" /></label>
-          <label className="block text-xs font-semibold">Type<select value={followUp.type} onChange={(e) => setFollowUp({ ...followUp, type: e.target.value })} className="mt-1 w-full rounded-lg border p-2"><option>Phone</option><option>WhatsApp</option><option>Email</option><option>Meeting</option><option>Test Drive</option></select></label>
-          <label className="block text-xs font-semibold">Notes<textarea value={followUp.notes} onChange={(e) => setFollowUp({ ...followUp, notes: e.target.value })} className="mt-1 w-full rounded-lg border p-2" /></label>
-          <button className="w-full rounded-lg bg-blue-600 p-2 font-semibold text-white">{followUp.type === 'Test Drive' ? 'Confirm Test Drive Appointment' : 'Save Follow-up'}</button>
-        </form>
-      </div>}
     </DashboardLayout>
   );
 }
-

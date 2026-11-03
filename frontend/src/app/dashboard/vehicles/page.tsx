@@ -81,16 +81,17 @@ export default function VehicleInventoryPage() {
   const defaultVehicleForm = {
     stockNumber: '',
     registrationNumber: '',
-    make: '',
+    make: 'TVS',
     model: '',
     variant: '',
-    year: '',
+    year: '2026',
+    category: 'Sport Motorcycles',
     fuelType: 'Petrol',
-    transmission: 'Automatic',
+    transmission: '5-Speed Manual',
     engineCapacity: '',
     chassisNumber: '',
-    mileage: '',
-    color: '',
+    mileage: '0',
+    color: 'Racing Red',
     purchasePrice: '',
     transportCost: '',
     repairCost: '',
@@ -139,6 +140,7 @@ export default function VehicleInventoryPage() {
       model: v.model || '',
       variant: v.variant || '',
       year: v.year ? String(v.year) : (v as any).manufacturingYear ? String((v as any).manufacturingYear) : '',
+      category: (v as any).category || 'Sport Motorcycles',
       fuelType: v.fuelType || 'Petrol',
       transmission: v.transmission || 'Automatic',
       engineCapacity: v.engineCapacity !== undefined && v.engineCapacity !== null ? String(v.engineCapacity) : '',
@@ -434,9 +436,9 @@ export default function VehicleInventoryPage() {
       {/* Top Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900">Vehicle Inventory & Stock Master</h1>
+          <h1 className="text-2xl font-extrabold text-slate-900">TVS Motorcycle Inventory & Stock Master</h1>
           <p className="text-xs text-slate-500">
-            Real-time stock valuation, cost-sheet breakdown, and Multi-Angle Media Management
+            Real-time TVS motorcycle stock, variants, specifications, branch stock, and media galleries
           </p>
         </div>
 
@@ -445,7 +447,7 @@ export default function VehicleInventoryPage() {
           className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2.5 rounded-lg shadow-xs transition-colors"
         >
           <Plus className="w-4 h-4" />
-          <span>Add New Vehicle</span>
+          <span>Add TVS Motorcycle</span>
         </button>
       </div>
 
@@ -562,38 +564,38 @@ export default function VehicleInventoryPage() {
             </div>
 
             <form onSubmit={handleAddVehicle} className="space-y-4 text-xs">
-              <div className="font-bold text-slate-900 border-b pb-1">1. Basic Vehicle Identification</div>
+              <div className="font-bold text-slate-900 border-b pb-1">1. TVS Motorcycle Identification</div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Make</label>
+                  <label className="block font-semibold text-slate-700 mb-1">Brand / Make</label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Toyota / Honda / Nissan"
+                    placeholder="TVS"
                     value={newVehicle.make}
                     onChange={(e) => setNewVehicle({ ...newVehicle, make: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg placeholder:text-slate-400"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg placeholder:text-slate-400 font-bold"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Model</label>
+                  <label className="block font-semibold text-slate-700 mb-1">Model Name</label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Premio / Vezel / Grace"
+                    placeholder="e.g. Apache RTR 160 4V / NTORQ 125 / Jupiter 125"
                     value={newVehicle.model}
                     onChange={(e) => setNewVehicle({ ...newVehicle, model: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg placeholder:text-slate-400"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg placeholder:text-slate-400 font-bold"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Variant / Grade</label>
+                  <label className="block font-semibold text-slate-700 mb-1">Variant Name</label>
                   <input
                     type="text"
-                    placeholder="e.g. F EX Package"
+                    placeholder="e.g. Disc / SmartXonnect / Race Edition"
                     value={newVehicle.variant}
                     onChange={(e) => setNewVehicle({ ...newVehicle, variant: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg placeholder:text-slate-400"
@@ -842,14 +844,14 @@ export default function VehicleInventoryPage() {
                   ))}
                 </div>
 
-                {/* Interior & Parts Angles */}
-                <div className="font-semibold text-slate-700 pt-1">Interior & Parts Angles</div>
+                {/* Cockpit & Mechanical Angles */}
+                <div className="font-semibold text-slate-700 pt-1">Console & Mechanical Angles</div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {[
-                    ['interior', 'Interior View'],
-                    ['dashboard', 'Dashboard View'],
-                    ['engine', 'Engine Bay'],
-                    ['wheels', 'Wheels View'],
+                    ['interior', 'Handlebars & Controls'],
+                    ['dashboard', 'Digital Speedometer / Console'],
+                    ['engine', 'Engine Block & Exhaust'],
+                    ['wheels', 'Alloy Wheels & Disc Brakes'],
                   ].map(([field, label]) => (
                     <div key={field} className="flex gap-1.5 items-center bg-white p-1.5 rounded-lg border border-slate-200">
                       <input

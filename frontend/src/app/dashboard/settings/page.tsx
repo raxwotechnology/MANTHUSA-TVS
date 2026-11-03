@@ -54,13 +54,13 @@ export default function SettingsPage() {
   // Settings state initialized with rich defaults
   const [settings, setSettings] = useState<any>({
     general: {
-      dealershipName: 'SalesPlus Auto Mart',
-      tagline: "Sri Lanka's Premier Vehicle Dealership & Direct Importer",
-      registrationNumber: 'PV-89214/2024',
+      dealershipName: 'TVS SalesPlus Motor Hub',
+      tagline: 'Official TVS Motorcycle Dealer — Sri Lanka',
+      registrationNumber: 'PV-89214/2026',
       taxNumber: 'VAT-119284729-7000',
       logoUrl: '',
       faviconUrl: '',
-      footerText: '© 2026 SalesPlus Vehicle Sales. All rights reserved.',
+      footerText: '© 2026 TVS SalesPlus Motor Hub. All rights reserved.',
       defaultLanguage: 'en',
     },
     contact: {
@@ -82,10 +82,10 @@ export default function SettingsPage() {
       quotationValidityDays: 14,
       reservationHoldDays: 3,
       minDownpaymentPercentage: 20,
-      invoicePrefix: 'INV-',
-      quotationPrefix: 'QUO-',
-      agreementPrefix: 'AGR-',
-      purchasePrefix: 'PUR-',
+      invoicePrefix: 'TVS-INV-',
+      quotationPrefix: 'TVS-QT-',
+      agreementPrefix: 'TVS-AGR-',
+      purchasePrefix: 'TVS-PUR-',
       allowDiscountsWithoutApproval: false,
       maxStaffDiscountPercentage: 5,
     },
@@ -96,14 +96,18 @@ export default function SettingsPage() {
       defaultTestDriveDurationMinutes: 30,
       requireDrivingLicenseForTestDrive: true,
       inspectionChecklistItems: [
-        'Engine & Transmission Health',
-        'Brake System & ABS Diagnostics',
-        'Tire Tread Depth & Suspension',
-        'Chassis & Frame Structural Alignment',
-        'Battery & Electrical Systems Check',
-        'Interior Cabin & AC Climate Control',
-        'Exterior Body & Original Paint Condition',
-        'Clear Documentation & Revenue License Check',
+        'Engine Oil Level & Condition Check',
+        'Brake System — Front & Rear Disc/Drum Check',
+        'Tyre Pressure & Tread Depth Inspection',
+        'Chain Tension, Lubrication & Drive Sprocket',
+        'Battery Charge & Electrical Systems',
+        'Clutch & Throttle Cable Free-Play Adjustment',
+        'Headlamp Aim & All Lights Functionality',
+        'Fuel System & Fuel Tank Cap Seal',
+        'Suspension — Front Fork & Rear Shock Condition',
+        'Frame & Chassis Integrity Visual Check',
+        'Instrument Cluster & Speedometer Calibration',
+        'Documentation — Revenue License & Insurance',
       ],
     },
     leasing: {
@@ -123,36 +127,36 @@ export default function SettingsPage() {
       termsAndNotes: 'Leasing facilities subject to credit appraisal and CBSL lending regulations.',
     },
     receiptDesigner: {
-      invoiceHeader: 'VEHICLE SALES INVOICE & DELIVERY ORDER',
-      quotationHeader: 'OFFICIAL VEHICLE SALES QUOTATION',
+      invoiceHeader: 'TVS MOTORCYCLE SALES INVOICE & DELIVERY ORDER',
+      quotationHeader: 'OFFICIAL TVS MOTORCYCLE SALES QUOTATION',
       bankName: 'Commercial Bank of Ceylon PLC',
-      bankAccountName: 'SalesPlus Auto Mart (Pvt) Ltd',
+      bankAccountName: 'TVS SalesPlus Motor Hub (Pvt) Ltd',
       bankAccountNumber: '1000 4829 3819',
       bankBranch: 'Colombo Main Branch',
       bankSwift: 'CCEYLKAX',
       authorizedSignatory: 'Director / General Manager',
       termsConditions:
-        '1. All vehicles undergo comprehensive pre-delivery inspection.\n2. Reservations remain valid during the stipulated period; token advances subject to dealership policy.\n3. Complete balance settlement is required prior to issuance of registration transfer documents and vehicle handover.\n4. Standard warranty terms apply as detailed in the vehicle handover booklet.',
-      footerNote: 'Thank you for choosing SalesPlus Auto Mart! Safe driving and seamless journeys.',
+        '1. All motorcycles undergo a comprehensive Pre-Delivery Inspection (PDI) prior to handover.\n2. Booking deposits are non-refundable if the customer cancels after the reservation hold period.\n3. Full balance settlement is required before issuance of registration documents and motorcycle handover.\n4. Standard TVS manufacturer warranty terms apply as detailed in the owner\'s manual and warranty booklet.',
+      footerNote: 'Thank you for choosing TVS SalesPlus Motor Hub! Ride safe and enjoy every kilometre.',
     },
     templates: {
       quotationTemplate:
-        'Dear {customer_name}, your official vehicle quotation for {vehicle_name} ({reg_no}) of Rs. {price} is ready. Valid until {expiry_date}. For details, contact {sales_phone}.',
+        'Dear {customer_name}, your official TVS motorcycle quotation for {motorcycle_name} of Rs. {price} is ready. Valid until {expiry_date}. For details, contact {sales_phone}.',
       reservationTemplate:
-        'Dear {customer_name}, {vehicle_name} has been successfully reserved for you until {expiry_date}. Reference ID: {ref_id}. Thank you for choosing {dealership_name}.',
+        'Dear {customer_name}, {motorcycle_name} has been successfully booked for you until {expiry_date}. Booking ID: {ref_id}. Thank you for choosing {dealership_name}.',
       testDriveTemplate:
-        'Dear {customer_name}, your test drive for {vehicle_name} is confirmed for {scheduled_date} at {dealership_address}. Please carry your driving license.',
+        'Dear {customer_name}, your TVS test ride for {motorcycle_name} is confirmed for {scheduled_date} at {dealership_address}. Please carry your riding license.',
       handoverTemplate:
-        'Congratulations {customer_name}! Your vehicle {vehicle_name} is scheduled for handover. We look forward to seeing you at {dealership_name}.',
+        'Congratulations {customer_name}! Your TVS motorcycle {motorcycle_name} is ready for handover. We look forward to seeing you at {dealership_name}. Ride safe!',
       paymentReminderTemplate:
-        'Dear {customer_name}, friendly reminder that payment of Rs. {amount} for {vehicle_name} is due on {due_date}. Beneficiary account: {bank_name} A/C {account_no}.',
+        'Dear {customer_name}, friendly reminder that payment of Rs. {amount} for {motorcycle_name} is due on {due_date}. Beneficiary account: {bank_name} A/C {account_no}.',
     },
     social: {
       whatsapp: '+94771234567',
-      facebook: 'https://facebook.com/salesplusautomart',
-      instagram: 'https://instagram.com/salesplusautomart',
-      youtube: 'https://youtube.com/@salesplusautomart',
-      website: 'https://salesplus.lk',
+      facebook: 'https://facebook.com/tvssalesplusmotorhub',
+      instagram: 'https://instagram.com/tvssalesplus.lk',
+      youtube: 'https://youtube.com/@tvssalesplusmotorhub',
+      website: 'https://tvssalesplus.lk',
       tiktok: '',
     },
     system: {
@@ -362,7 +366,7 @@ export default function SettingsPage() {
     { id: 'general', label: 'General', icon: Store },
     { id: 'contact', label: 'Contact', icon: Phone },
     { id: 'commerce', label: 'Commerce', icon: DollarSign },
-    { id: 'vehicles', label: 'Vehicles & Standards', icon: Car },
+    { id: 'vehicles', label: 'Motorcycles & Stock', icon: Car },
     { id: 'leasing', label: 'Loyalty & Finance', icon: Landmark },
     { id: 'receiptDesigner', label: 'Receipt/A4 Designer', icon: FileText },
     { id: 'templates', label: 'Templates', icon: Mail },
@@ -385,7 +389,7 @@ export default function SettingsPage() {
                 Brand Settings
               </h1>
               <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-                Manage your vehicle dealership storefront configuration, sales policies, and system preferences
+                Manage your TVS motorcycle dealership storefront configuration, sales policies, and system preferences
               </p>
             </div>
           </div>
@@ -477,7 +481,7 @@ export default function SettingsPage() {
                   <div>
                     <h2 className="text-base font-bold text-slate-900">Shop Branding</h2>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      Configure your vehicle dealership name, visual logo, and storefront tagline
+                      Configure your TVS motorcycle dealership name, visual logo, and storefront tagline
                     </p>
                   </div>
 
@@ -542,7 +546,7 @@ export default function SettingsPage() {
                         type="text"
                         value={settings.general?.dealershipName || ''}
                         onChange={(e) => handleNestedChange('general', 'dealershipName', e.target.value)}
-                        placeholder="Max Durakathana / SalesPlus Auto Mart"
+                        placeholder="TVS SalesPlus Motor Hub"
                         className="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:border-blue-500 font-semibold text-slate-900 placeholder:text-slate-400"
                       />
                     </div>
@@ -552,7 +556,7 @@ export default function SettingsPage() {
                         type="text"
                         value={settings.general?.tagline || ''}
                         onChange={(e) => handleNestedChange('general', 'tagline', e.target.value)}
-                        placeholder="Where style meets accessories / Sri Lanka's Premier Vehicle Dealership"
+                        placeholder="Official TVS Motorcycle Dealer — Sri Lanka"
                         className="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:border-blue-500 font-semibold text-slate-900 placeholder:text-slate-400"
                       />
                     </div>
@@ -897,9 +901,9 @@ export default function SettingsPage() {
             {activeTab === 'vehicles' && (
               <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-6">
                 <div>
-                  <h2 className="text-base font-bold text-slate-900">Vehicles & Inspection Standards</h2>
+                  <h2 className="text-base font-bold text-slate-900">Motorcycles & PDI Inspection Standards</h2>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Warranty standards, test drive booking rules, and standard pre-delivery inspection checklists
+                    Warranty standards, test ride booking rules, and standard Pre-Delivery Inspection (PDI) checklists for TVS motorcycles
                   </p>
                 </div>
 
@@ -1194,7 +1198,7 @@ export default function SettingsPage() {
                         type="text"
                         value={settings.receiptDesigner?.bankAccountName || ''}
                         onChange={(e) => handleNestedChange('receiptDesigner', 'bankAccountName', e.target.value)}
-                        placeholder="SalesPlus Auto Mart (Pvt) Ltd"
+                        placeholder="TVS SalesPlus Motor Hub (Pvt) Ltd"
                         className="w-full text-xs bg-white border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
                       />
                     </div>
@@ -1249,7 +1253,7 @@ export default function SettingsPage() {
                     rows={4}
                     value={settings.receiptDesigner?.termsConditions || ''}
                     onChange={(e) => handleNestedChange('receiptDesigner', 'termsConditions', e.target.value)}
-                    placeholder="1. All vehicles undergo comprehensive pre-delivery inspection..."
+                    placeholder="1. All motorcycles undergo comprehensive PDI inspection..."
                     className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl p-3.5 focus:bg-white focus:outline-none focus:border-blue-500 font-mono"
                   />
                 </div>
@@ -1262,7 +1266,7 @@ export default function SettingsPage() {
                     type="text"
                     value={settings.receiptDesigner?.footerNote || ''}
                     onChange={(e) => handleNestedChange('receiptDesigner', 'footerNote', e.target.value)}
-                    placeholder="Thank you for choosing SalesPlus Auto Mart! Safe driving."
+                    placeholder="Thank you for choosing TVS SalesPlus Motor Hub! Ride safe."
                     className="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:border-blue-500"
                   />
                 </div>
@@ -1287,8 +1291,8 @@ export default function SettingsPage() {
                   <div className="flex flex-wrap gap-1.5">
                     {[
                       '{customer_name}',
-                      '{vehicle_name}',
-                      '{reg_no}',
+                      '{motorcycle_name}',
+                      '{ref_id}',
                       '{price}',
                       '{expiry_date}',
                       '{dealership_name}',
@@ -1322,7 +1326,7 @@ export default function SettingsPage() {
 
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                      Vehicle Reservation Confirmation Template
+                      Motorcycle Booking Confirmation Template
                     </label>
                     <textarea
                       rows={3}
@@ -1334,7 +1338,7 @@ export default function SettingsPage() {
 
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                      Test Drive Booking Confirmation Template
+                      TVS Test Ride Booking Confirmation Template
                     </label>
                     <textarea
                       rows={3}
@@ -1346,7 +1350,7 @@ export default function SettingsPage() {
 
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                      Vehicle Handover Ready Template
+                      Motorcycle Handover Ready Template
                     </label>
                     <textarea
                       rows={3}
@@ -1395,7 +1399,7 @@ export default function SettingsPage() {
                     <thead className="bg-slate-50 text-slate-700 uppercase font-bold border-b border-slate-200">
                       <tr>
                         <th className="p-3">Role</th>
-                        <th className="p-3">Vehicles</th>
+                        <th className="p-3">Motorcycles</th>
                         <th className="p-3">Sales & Invoicing</th>
                         <th className="p-3">Finance & Ledgers</th>
                         <th className="p-3">CRM & Leads</th>
@@ -1572,7 +1576,7 @@ export default function SettingsPage() {
                           Auto-expire reservations when the hold duration passes without full deposit
                         </span>
                         <span className="text-[11px] text-slate-500">
-                          Automatically marks vehicles as Available in inventory when reservation expires.
+                          Automatically marks motorcycles as Available in inventory when booking reservation expires.
                         </span>
                       </div>
                     </label>

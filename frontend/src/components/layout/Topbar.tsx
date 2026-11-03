@@ -127,7 +127,7 @@ export function Topbar({ user, onToggleSidebar }: TopbarProps) {
           <Search className="w-4 h-4 absolute left-3 top-2.5 text-gray-400" />
           <input
             type="text"
-            placeholder="Global search: Vehicle ID, Chassis, Customer, Reg #..."
+            placeholder="Global search: TVS Model, Booking ID, Customer, Reg #..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-gray-50 text-xs text-gray-800 placeholder-gray-400 pl-9 pr-4 py-2 rounded-lg border border-gray-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"

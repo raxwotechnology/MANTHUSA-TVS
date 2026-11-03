@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Car, SearchX, RotateCcw, ArrowRight } from 'lucide-react';
+import { Bike, SearchX, RotateCcw, ArrowRight } from 'lucide-react';
 
 interface Props {
   title?: string;
@@ -12,14 +12,14 @@ interface Props {
 }
 
 export function EmptyState({
-  title = 'No Vehicles Found',
-  description = 'We could not find any vehicles matching your selected criteria. Try adjusting your search filters.',
-  actionText = 'Browse All Vehicles',
-  actionHref = '/vehicles',
+  title = 'No Motorcycles Found',
+  description = 'We could not find any TVS motorcycles matching your selected criteria. Try adjusting your search filters.',
+  actionText = 'Browse All Motorcycles',
+  actionHref = '/bikes',
   onReset,
   icon = 'search',
 }: Props) {
-  const Icon = icon === 'car' ? Car : SearchX;
+  const Icon = icon === 'car' ? Bike : SearchX;
 
   return (
     <div className="p-12 text-center rounded-2xl bg-slate-900/60 border border-slate-800 max-w-lg mx-auto my-8">

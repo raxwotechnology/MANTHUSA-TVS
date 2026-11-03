@@ -14,11 +14,35 @@ export class Sale {
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Vehicle', required: true })
   vehicle: Types.ObjectId;
 
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Quotation' })
+  quotation: Types.ObjectId;
+
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Reservation' })
+  booking: Types.ObjectId;
+
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User' })
   salesperson: Types.ObjectId;
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Branch' })
   branch: Types.ObjectId;
+
+  @Prop()
+  branchName: string;
+
+  @Prop()
+  modelName: string;
+
+  @Prop()
+  variantName: string;
+
+  @Prop()
+  selectedColor: string;
+
+  @Prop()
+  chassisNumber: string;
+
+  @Prop()
+  engineNumber: string;
 
   @Prop({ default: 0 })
   vehiclePrice: number;
@@ -27,28 +51,10 @@ export class Sale {
   discount: number;
 
   @Prop({ default: 0 })
-  tradeInAllowance: number;
-
-  @Prop({ type: Object })
-  tradeInVehicleDetails: {
-    make?: string;
-    model?: string;
-    year?: number;
-    regNumber?: string;
-    valuationAmount?: number;
-  };
-
-  @Prop()
-  leasingProvider: string;
+  registrationFee: number;
 
   @Prop({ default: 0 })
-  leasingAmount: number;
-
-  @Prop()
-  paymentMethod: string; // 'Cash', 'Bank Transfer', 'Cheque', 'Card', 'Leasing'
-
-  @Prop()
-  salesContractNumber: string;
+  insuranceFee: number;
 
   @Prop({ default: 0 })
   additionalCharges: number;
@@ -62,8 +68,26 @@ export class Sale {
   @Prop({ default: 0 })
   balance: number;
 
+  @Prop({ default: 'Cash' })
+  paymentMethod: string; // 'Cash', 'Bank Transfer', 'Card', 'Leasing'
+
+  @Prop()
+  leasingProvider: string;
+
+  @Prop({ default: 0 })
+  leasingAmount: number;
+
+  @Prop()
+  salesContractNumber: string;
+
   @Prop({ default: 'Pending' })
-  status: string; // 'Pending', 'Confirmed', 'Completed', 'Cancelled', 'Refunded'
+  status: string; // 'Pending', 'Partially Paid', 'Paid in Full', 'Ready for Delivery', 'Delivered', 'Cancelled'
+
+  @Prop({ default: 'Pending' })
+  deliveryStatus: string; // 'Pending', 'PDI Completed', 'Scheduled', 'Delivered'
+
+  @Prop()
+  deliveredAt: Date;
 
   @Prop()
   saleDate: Date;

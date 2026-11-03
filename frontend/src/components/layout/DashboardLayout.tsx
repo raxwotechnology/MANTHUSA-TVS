@@ -47,8 +47,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center text-white text-sm">
         <div className="flex items-center gap-3 font-medium">
-          <div className="w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-          <span>Loading Vehicle Sales System...</span>
+          <div className="w-5 h-5 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+          <span>Loading TVS Motorcycle Sales System...</span>
         </div>
       </div>
     );
@@ -69,7 +69,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         <main className="flex-1 min-w-0 p-3 sm:p-4 md:p-6 overflow-y-auto flex flex-col justify-between">
           <div className="flex-1">{children}</div>
           <footer className="mt-8 pt-4 pb-2 border-t border-slate-200/80 text-center text-xs text-slate-400 font-medium">
-            {brand.footerText || '© 2026 SalesPlus Vehicle Sales. All rights reserved.'}
+            {brand.footerText || '© 2026 TVS SalesPlus Motor Hub. All rights reserved.'}
           </footer>
         </main>
       </div>

@@ -34,18 +34,18 @@ export function VehicleComparisonTable({
   if (vehicles.length === 0) return null;
 
   const comparisonAttributes = [
-    { label: 'Condition', getValue: (v: PublicVehicle) => v.condition || 'Reconditioned' },
-    { label: 'Model Year', getValue: (v: PublicVehicle) => v.year || v.manufacturingYear || '2024' },
-    { label: 'Mileage', getValue: (v: PublicVehicle) => v.mileage ? `${v.mileage.toLocaleString()} km` : 'Unregistered' },
-    { label: 'Fuel Type', getValue: (v: PublicVehicle) => v.fuelType || 'Petrol' },
-    { label: 'Transmission', getValue: (v: PublicVehicle) => v.transmission || 'Automatic' },
-    { label: 'Engine Capacity', getValue: (v: PublicVehicle) => v.engineCapacity || '1500cc' },
-    { label: 'Drive Layout', getValue: (v: PublicVehicle) => v.driveType || 'FWD' },
-    { label: 'Body Style', getValue: (v: PublicVehicle) => v.bodyType || v.vehicleType || 'Sedan' },
-    { label: 'Seating Capacity', getValue: (v: PublicVehicle) => v.seatingCapacity ? `${v.seatingCapacity} Seats` : '5 Seats' },
-    { label: 'Doors', getValue: (v: PublicVehicle) => v.doors ? `${v.doors} Doors` : '5 Doors' },
-    { label: 'Color', getValue: (v: PublicVehicle) => v.color || 'Standard' },
-    { label: 'Stock Number', getValue: (v: PublicVehicle) => v.stockNumber || 'STK-GEN' },
+    { label: 'Category', getValue: (v: PublicVehicle) => v.category || 'Motorcycle' },
+    { label: 'Engine Capacity', getValue: (v: PublicVehicle) => v.engineCapacity || '—' },
+    { label: 'Max Power', getValue: (v: PublicVehicle) => v.maxPower || '—' },
+    { label: 'Max Torque', getValue: (v: PublicVehicle) => v.maxTorque || '—' },
+    { label: 'Fuel System', getValue: (v: PublicVehicle) => v.fuelSystem || 'RT-Fi' },
+    { label: 'Cooling System', getValue: (v: PublicVehicle) => v.coolingSystem || 'Air Cooled' },
+    { label: 'Transmission', getValue: (v: PublicVehicle) => v.transmission || 'Manual' },
+    { label: 'Braking Technology', getValue: (v: PublicVehicle) => v.brakingSystem || 'ABS / SBT' },
+    { label: 'Fuel Tank Capacity', getValue: (v: PublicVehicle) => v.fuelTankCapacity || '—' },
+    { label: 'Ground Clearance', getValue: (v: PublicVehicle) => v.groundClearance || '—' },
+    { label: 'Seat Height', getValue: (v: PublicVehicle) => v.seatHeight || '—' },
+    { label: 'Color', getValue: (v: PublicVehicle) => v.color || 'Racing Red' },
   ];
 
   return (
@@ -53,28 +53,28 @@ export function VehicleComparisonTable({
       {/* Top action header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2">
         <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
+          <span className="text-xs font-bold uppercase tracking-wider text-red-600 dark:text-amber-400">
             Side-By-Side Evaluation
           </span>
-          <h2 className="text-2xl font-bold text-white tracking-tight">
-            Comparing {vehicles.length} Vehicle{vehicles.length > 1 ? 's' : ''}
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+            Comparing {vehicles.length} TVS Motorcycle{vehicles.length > 1 ? 's' : ''}
           </h2>
         </div>
 
         <div className="flex items-center gap-3">
           {vehicles.length < 4 && (
             <Link
-              href="/vehicles"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-colors"
+              href="/bikes"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold border border-slate-300 dark:border-slate-700 transition-colors shadow-sm"
             >
-              <Plus className="w-4 h-4 text-amber-400" />
-              <span>Add Vehicle</span>
+              <Plus className="w-4 h-4 text-red-600 dark:text-amber-400" />
+              <span>Add Motorcycle</span>
             </Link>
           )}
 
           <button
             onClick={onClearAll}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs font-semibold border border-rose-500/20 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-300 text-xs font-semibold border border-rose-300 dark:border-rose-500/20 transition-colors"
           >
             <X className="w-4 h-4" />
             <span>Clear Comparison</span>
@@ -83,32 +83,32 @@ export function VehicleComparisonTable({
       </div>
 
       {/* Comparison Grid Table */}
-      <div className="overflow-x-auto pb-6 scrollbar-thin scrollbar-thumb-slate-700">
+      <div className="overflow-x-auto pb-6 scrollbar-thin scrollbar-thumb-slate-400 dark:scrollbar-thumb-slate-700 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm">
         <table className="w-full border-collapse min-w-[700px]">
           <thead>
             <tr>
-              <th className="p-4 text-left w-52 bg-slate-950/80 rounded-tl-2xl border-b border-slate-800 text-xs font-bold uppercase text-slate-400">
-                Vehicle Overview
+              <th className="p-4 text-left w-52 bg-slate-100 dark:bg-slate-950/80 rounded-tl-2xl border-b border-slate-200 dark:border-slate-800 text-xs font-bold uppercase text-slate-600 dark:text-slate-400">
+                Motorcycle Overview
               </th>
               {vehicles.map((v) => {
                 const slug = getVehicleSlug(v);
                 return (
                   <th
                     key={v._id}
-                    className="p-4 text-left bg-slate-900 border-b border-slate-800 min-w-[220px]"
+                    className="p-4 text-left bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 min-w-[220px]"
                   >
                     <div className="relative group">
                       {/* Remove Button */}
                       <button
                         onClick={() => onRemoveVehicle(v._id)}
-                        className="absolute -top-1 -right-1 z-10 p-1.5 rounded-full bg-slate-800 text-slate-400 hover:text-rose-400 hover:bg-slate-700 border border-slate-700 transition-colors"
-                        title="Remove vehicle"
+                        className="absolute -top-1 -right-1 z-10 p-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 transition-colors shadow-sm"
+                        title="Remove motorcycle"
                       >
                         <X className="w-3.5 h-3.5" />
                       </button>
 
                       {/* Image */}
-                      <div className="aspect-[16/10] rounded-xl overflow-hidden bg-slate-950 border border-slate-800 mb-3">
+                      <div className="aspect-[16/10] rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 mb-3">
                         <img
                           src={v.images?.[0] || 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=400&q=80'}
                           alt={v.model}
@@ -119,8 +119,8 @@ export function VehicleComparisonTable({
                       {/* Title & Badge */}
                       <AvailabilityBadge status={v.status} className="mb-2" />
                       <Link
-                        href={`/vehicles/${slug}`}
-                        className="block font-bold text-base text-white hover:text-amber-400 transition-colors line-clamp-1"
+                        href={`/bikes/${slug}`}
+                        className="block font-bold text-base text-slate-900 dark:text-white hover:text-red-600 dark:hover:text-amber-400 transition-colors line-clamp-1"
                       >
                         {v.year} {v.make} {v.model}
                       </Link>
@@ -134,16 +134,16 @@ export function VehicleComparisonTable({
                       <div className="space-y-1.5">
                         <Link
                           href={`/book-test-drive?vehicle=${v._id}`}
-                          className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs uppercase tracking-wider transition-all"
+                          className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-sm"
                         >
                           <CalendarCheck className="w-3.5 h-3.5" />
-                          <span>Test Drive</span>
+                          <span>Book Test Ride</span>
                         </Link>
                         {onOpenInquiry && (
                           <button
                             type="button"
                             onClick={() => onOpenInquiry(v)}
-                            className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition-colors border border-slate-700"
+                            className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-300 font-semibold text-xs transition-colors border border-slate-300 dark:border-slate-700"
                           >
                             <MessageCircle className="w-3.5 h-3.5" />
                             <span>Inquire</span>
@@ -157,17 +157,17 @@ export function VehicleComparisonTable({
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-slate-800/80">
+          <tbody className="divide-y divide-slate-200 dark:divide-slate-800/80">
             {comparisonAttributes.map((attr, idx) => (
               <tr
                 key={attr.label}
-                className={idx % 2 === 0 ? 'bg-slate-950/40' : 'bg-slate-900/40'}
+                className={idx % 2 === 0 ? 'bg-slate-50 dark:bg-slate-950/40' : 'bg-white dark:bg-slate-900/40'}
               >
-                <td className="p-4 text-xs font-semibold text-slate-400">
+                <td className="p-4 text-xs font-semibold text-slate-600 dark:text-slate-400">
                   {attr.label}
                 </td>
                 {vehicles.map((v) => (
-                  <td key={`${v._id}-${attr.label}`} className="p-4 text-sm font-medium text-slate-200">
+                  <td key={`${v._id}-${attr.label}`} className="p-4 text-sm font-medium text-slate-900 dark:text-slate-200">
                     {attr.getValue(v)}
                   </td>
                 ))}

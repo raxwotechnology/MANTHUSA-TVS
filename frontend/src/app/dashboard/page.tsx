@@ -116,203 +116,10 @@ export default function DashboardPage() {
   // CUSTOMER PORTAL VIEW
   // ==========================================
   if (isCustomer) {
-    const availableCount = stats.availableVehicles || stockVehicles.filter(v => v.status === 'Available').length;
-    const featuredVehicles = inventory.filter(v => v.status === 'Available').slice(0, 6);
-
-    return (
-      <DashboardLayout>
-        {/* Customer Welcome Header */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0B132B] via-[#1C2541] to-[#3A506B] p-6 text-white mb-6 shadow-sm">
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-semibold mb-2 border border-emerald-500/30">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Customer Portal</span>
-              </div>
-              <h1 className="text-2xl font-black tracking-tight text-white">
-                Welcome, {currentUser?.name || 'Valued Customer'}!
-              </h1>
-              <p className="text-xs text-slate-300 mt-1 max-w-xl leading-relaxed">
-                Explore our verified showroom inventory, compare vehicle specifications, and review vehicle pricing with complete transparency.
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                onClick={() => router.push('/dashboard/vehicles')}
-                className="flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-600 text-slate-950 px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-sm"
-              >
-                <Car className="w-4 h-4" />
-                <span>Browse Showroom</span>
-              </button>
-              <button
-                onClick={() => router.push('/dashboard/vehicles/compare')}
-                className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white px-4 py-2.5 rounded-xl text-xs font-semibold backdrop-blur-xs transition-all border border-white/15"
-              >
-                <span>Compare Models</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {loadError && (
-          <div role="alert" className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {loadError}
-          </div>
-        )}
-
-        {/* Customer KPI Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs">
-            <div className="flex items-center justify-between text-slate-400 mb-2">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Available Vehicles</span>
-              <Car className="w-5 h-5 text-emerald-500" />
-            </div>
-            <p className="text-3xl font-extrabold text-slate-900">{availableCount}</p>
-            <span className="text-xs text-emerald-600 font-medium">Ready in Colombo Showroom</span>
-          </div>
-
-          <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs">
-            <div className="flex items-center justify-between text-slate-400 mb-2">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">My Reservations</span>
-              <Clock className="w-5 h-5 text-amber-500" />
-            </div>
-            <p className="text-3xl font-extrabold text-amber-600">{stats.myReservations || 0}</p>
-            <span className="text-xs text-slate-500">Active vehicle holds</span>
-          </div>
-
-          <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs">
-            <div className="flex items-center justify-between text-slate-400 mb-2">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">My Inquiries</span>
-              <UserCheck className="w-5 h-5 text-blue-500" />
-            </div>
-            <p className="text-3xl font-extrabold text-blue-600">{stats.myInquiries || 0}</p>
-            <span className="text-xs text-slate-500">Showroom follow-up requests</span>
-          </div>
-
-          <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs">
-            <div className="flex items-center justify-between text-slate-400 mb-2">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Buyer Protection</span>
-              <ShieldCheck className="w-5 h-5 text-indigo-500" />
-            </div>
-            <p className="text-base font-bold text-slate-900 mt-2">100% Certified</p>
-            <span className="text-xs text-indigo-600 font-medium">Clear Titles & RMV Forms</span>
-          </div>
-        </div>
-
-        {/* Featured Vehicles Grid */}
-        <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs mb-6">
-          <div className="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
-            <div>
-              <h2 className="text-base font-bold text-slate-900">Featured Vehicles on Display</h2>
-              <p className="text-xs text-slate-500">Select any vehicle to view full specifications, photos, and QR codes</p>
-            </div>
-            <button
-              onClick={() => router.push('/dashboard/vehicles')}
-              className="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1"
-            >
-              <span>View All ({inventory.length})</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          {featuredVehicles.length === 0 ? (
-            <div className="py-12 text-center text-slate-400 text-xs">
-              No showroom vehicles currently available. Please check back shortly.
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {featuredVehicles.map((vehicle) => {
-                const photo = vehicle.images?.[0] || vehicle.featuredImage || '/car-placeholder.png';
-                return (
-                  <div
-                    key={vehicle._id}
-                    className="group rounded-xl border border-slate-200/80 hover:border-emerald-400 hover:shadow-md transition-all overflow-hidden flex flex-col bg-slate-50/40"
-                  >
-                    <div className="relative h-40 bg-slate-200 overflow-hidden flex items-center justify-center">
-                      {photo.startsWith('/') || photo.startsWith('http') ? (
-                        <img
-                          src={photo}
-                          alt={`${vehicle.make} ${vehicle.model}`}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          onError={(e) => {
-                            (e.target as HTMLElement).style.display = 'none';
-                          }}
-                        />
-                      ) : (
-                        <Car className="w-12 h-12 text-slate-400" />
-                      )}
-                      <span className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-md bg-slate-900/80 text-white text-[10px] font-bold backdrop-blur-xs">
-                        {vehicle.condition || 'Registered'}
-                      </span>
-                    </div>
-
-                    <div className="p-3.5 flex-1 flex flex-col justify-between">
-                      <div>
-                        <div className="flex items-center justify-between gap-1 mb-1">
-                          <h3 className="font-bold text-slate-900 text-sm truncate">
-                            {vehicle.make} {vehicle.model}
-                          </h3>
-                          <span className="text-xs font-semibold text-slate-500">{vehicle.manufacturingYear || vehicle.year}</span>
-                        </div>
-                        <p className="text-[11px] text-slate-500 mb-2 truncate">
-                          {vehicle.variant || ''} {vehicle.fuelType ? `· ${vehicle.fuelType}` : ''} {vehicle.transmission ? `· ${vehicle.transmission}` : ''}
-                        </p>
-                      </div>
-
-                      <div className="pt-2 border-t border-slate-200/80 flex items-center justify-between">
-                        <div>
-                          <p className="text-[10px] text-slate-400 font-medium uppercase">Price</p>
-                          <p className="text-sm font-extrabold text-emerald-600">{formatLKR(vehicle.sellingPrice)}</p>
-                        </div>
-                        <button
-                          onClick={() => router.push(`/dashboard/vehicles`)}
-                          className="px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold transition-colors"
-                        >
-                          View Details
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* Customer Assistance Services Banner */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs">
-            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center mb-2.5">
-              <BadgePercent className="w-4 h-4" />
-            </div>
-            <h4 className="text-xs font-bold text-slate-900 mb-1">Trade-In & Vehicle Exchange</h4>
-            <p className="text-[11px] text-slate-500 leading-relaxed">
-              Bring your existing vehicle for certified valuation and deduct its value towards any vehicle in our showroom.
-            </p>
-          </div>
-
-          <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs">
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center mb-2.5">
-              <FileText className="w-4 h-4" />
-            </div>
-            <h4 className="text-xs font-bold text-slate-900 mb-1">RMV & MTA Documentation</h4>
-            <p className="text-[11px] text-slate-500 leading-relaxed">
-              We take care of all RMV transfer documents (MTA 6, MTA 8 forms), clearance paperwork, and revenue license renewals.
-            </p>
-          </div>
-
-          <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs">
-            <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center mb-2.5">
-              <HelpCircle className="w-4 h-4" />
-            </div>
-            <h4 className="text-xs font-bold text-slate-900 mb-1">Showroom Inquiry Desk</h4>
-            <p className="text-[11px] text-slate-500 leading-relaxed">
-              Have questions or need assistance? Reach out to our customer care team or submit an inquiry through your portal.
-            </p>
-          </div>
-        </div>
-      </DashboardLayout>
-    );
+    if (typeof window !== 'undefined') {
+      router.push('/account');
+    }
+    return null;
   }
 
   // ==========================================
@@ -323,9 +130,9 @@ export default function DashboardPage() {
       {/* Top Page Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Main Dashboard</h1>
+          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">TVS Dealership Operations Hub</h1>
           <p className="text-xs text-slate-500">
-            Real-time overview of vehicle inventory, sales revenue, CRM leads, and cash flow ledger.
+            Real-time overview of TVS motorcycle stock, sales revenue, customer booking requests, and branch allocations.
           </p>
         </div>
 
@@ -336,7 +143,7 @@ export default function DashboardPage() {
             className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow-xs transition-colors"
           >
             <PlusCircle className="w-4 h-4" />
-            <span>Add New Vehicle</span>
+            <span>Add TVS Motorcycle</span>
           </button>
 
           <button
@@ -344,7 +151,7 @@ export default function DashboardPage() {
             className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow-xs transition-colors"
           >
             <UserCheck className="w-4 h-4" />
-            <span>Create Sales Lead</span>
+            <span>Customer Requests</span>
           </button>
 
           <button
@@ -352,7 +159,7 @@ export default function DashboardPage() {
             className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow-xs transition-colors"
           >
             <Car className="w-4 h-4" />
-            <span>Compare Vehicles</span>
+            <span>Compare TVS Models</span>
           </button>
 
           {isAdminOrFinance && (
@@ -378,41 +185,41 @@ export default function DashboardPage() {
         {/* Total Vehicles */}
         <div className="bg-white p-3.5 rounded-xl border border-slate-200/80 shadow-xs">
           <div className="flex items-center justify-between text-slate-400 mb-1">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Total Vehicles</span>
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">TVS Motorcycles</span>
             <Car className="w-4 h-4 text-blue-500" />
           </div>
           <p className="text-2xl font-bold text-slate-900">{stats.totalVehicles}</p>
-          <span className="text-[10px] text-slate-400">Total in stock</span>
+          <span className="text-[10px] text-slate-400">Total models & stock</span>
         </div>
 
         {/* Available Vehicles */}
         <div className="bg-white p-3.5 rounded-xl border border-slate-200/80 shadow-xs">
           <div className="flex items-center justify-between text-slate-400 mb-1">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Available</span>
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Available Stock</span>
             <CheckCircle2 className="w-4 h-4 text-emerald-500" />
           </div>
           <p className="text-2xl font-bold text-emerald-600">{stats.availableVehicles}</p>
-          <span className="text-[10px] text-emerald-600 font-medium">Ready for sale</span>
+          <span className="text-[10px] text-emerald-600 font-medium">Ready for delivery</span>
         </div>
 
         {/* Reserved Vehicles */}
         <div className="bg-white p-3.5 rounded-xl border border-slate-200/80 shadow-xs">
           <div className="flex items-center justify-between text-slate-400 mb-1">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Reserved</span>
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Bookings Held</span>
             <Clock className="w-4 h-4 text-amber-500" />
           </div>
           <p className="text-2xl font-bold text-amber-600">{stats.reservedVehicles}</p>
-          <span className="text-[10px] text-amber-600 font-medium">Deposit paid</span>
+          <span className="text-[10px] text-amber-600 font-medium">Customer deposit paid</span>
         </div>
 
         {/* Sold Vehicles */}
         <div className="bg-white p-3.5 rounded-xl border border-slate-200/80 shadow-xs">
           <div className="flex items-center justify-between text-slate-400 mb-1">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Sold Vehicles</span>
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Delivered Bikes</span>
             <TrendingUp className="w-4 h-4 text-indigo-500" />
           </div>
           <p className="text-2xl font-bold text-indigo-600">{stats.soldVehicles}</p>
-          <span className="text-[10px] text-slate-400">Completed sales</span>
+          <span className="text-[10px] text-slate-400">Completed deliveries</span>
         </div>
 
         {/* Total Customers */}
@@ -422,17 +229,17 @@ export default function DashboardPage() {
             <Users className="w-4 h-4 text-cyan-500" />
           </div>
           <p className="text-2xl font-bold text-slate-900">{stats.totalCustomers}</p>
-          <span className="text-[10px] text-slate-400">Registered profiles</span>
+          <span className="text-[10px] text-slate-400">Registered TVS buyers</span>
         </div>
 
         {/* New Leads */}
         <div className="bg-white p-3.5 rounded-xl border border-slate-200/80 shadow-xs">
           <div className="flex items-center justify-between text-slate-400 mb-1">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">New Leads</span>
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Bike Requests</span>
             <UserCheck className="w-4 h-4 text-blue-600" />
           </div>
           <p className="text-2xl font-bold text-blue-600">{stats.newLeads}</p>
-          <span className="text-[10px] text-blue-600 font-medium">Active inquiries</span>
+          <span className="text-[10px] text-blue-600 font-medium">Configurator & web leads</span>
         </div>
 
         {/* Today's Sales */}

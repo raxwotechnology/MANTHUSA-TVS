@@ -4,7 +4,7 @@ import { Roles } from '../auth/roles.decorator';
 import { Public } from '../auth/public.decorator';
 
 @Controller('leads')
-@Roles('Sales & Operations', 'Customer')
+@Roles('Sales & Operations', 'Customer', 'Admin / Owner', 'Inventory Manager')
 export class LeadsController {
   private readonly publicAttempts = new Map<string, number[]>();
   constructor(private readonly leadsService: LeadsService) {}
@@ -20,8 +20,9 @@ export class LeadsController {
     const key = `${req.ip || 'unknown'}:${String(body.phone || '').slice(0, 40)}`;
     const now = Date.now();
     const recent = (this.publicAttempts.get(key) || []).filter((timestamp) => now - timestamp < 600_000);
-    if (recent.length >= 3) throw new HttpException('Too many website enquiries from this phone. Please try again later.', HttpStatus.TOO_MANY_REQUESTS);
-    recent.push(now); this.publicAttempts.set(key, recent);
+    if (recent.length >= 10) throw new HttpException('Too many requests. Please try again later.', HttpStatus.TOO_MANY_REQUESTS);
+    recent.push(now);
+    this.publicAttempts.set(key, recent);
     return this.leadsService.createPublicInquiry(body);
   }
 
@@ -32,8 +33,14 @@ export class LeadsController {
     return this.leadsService.findByCustomer(customerId);
   }
 
-  @Get()
+  @Post(':id/convert-to-booking')
   @Roles('Admin / Owner', 'Sales & Operations')
+  convertToBooking(@Param('id') id: string, @Req() req: any) {
+    return this.leadsService.convertToBooking(id, req.user);
+  }
+
+  @Get()
+  @Roles('Admin / Owner', 'Sales & Operations', 'Inventory Manager')
   findAll() {
     return this.leadsService.findAll();
   }

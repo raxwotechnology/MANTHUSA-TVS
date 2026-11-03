@@ -45,10 +45,10 @@ export default function CustomerSavedVehiclesPage() {
         <div>
           <h2 className="text-lg font-bold text-white flex items-center gap-2">
             <Heart className="w-5 h-5 text-rose-500 fill-rose-500" />
-            Saved Vehicles Wishlist ({favoriteIds.length})
+            Saved Motorcycles Wishlist ({favoriteIds.length})
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            Compare and monitor stock availability for vehicles you’ve saved.
+            Compare and monitor stock availability for TVS motorcycles you&apos;ve saved.
           </p>
         </div>
 
@@ -141,10 +141,10 @@ export default function CustomerSavedVehiclesPage() {
 
                 <div className="p-4 pt-0">
                   <Link
-                    href={`/vehicles/${v._id}`}
-                    className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-slate-900 hover:bg-amber-400 hover:text-slate-950 text-amber-400 text-xs font-bold border border-slate-800 transition-colors"
+                    href={`/bikes/${v._id}`}
+                    className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-slate-900 hover:bg-red-600 hover:text-white text-red-400 text-xs font-bold border border-slate-800 transition-colors"
                   >
-                    <span>Inspect Details & Book Test Drive</span>
+                    <span>Inspect Details & Book Test Ride</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>

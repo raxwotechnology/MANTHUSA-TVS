@@ -172,7 +172,7 @@ export function CustomerAuthMenu() {
               className="flex items-center gap-2.5 px-4 py-2 text-slate-300 hover:text-white hover:bg-slate-900"
             >
               <Calendar className="w-4 h-4 text-slate-400" />
-              My Test Drives
+              My Test Rides
             </Link>
 
             <Link
@@ -181,7 +181,7 @@ export function CustomerAuthMenu() {
               className="flex items-center gap-2.5 px-4 py-2 text-slate-300 hover:text-white hover:bg-slate-900"
             >
               <Heart className="w-4 h-4 text-slate-400" />
-              Saved Vehicles
+              Saved Motorcycles
             </Link>
           </div>
 

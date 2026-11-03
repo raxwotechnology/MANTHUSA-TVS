@@ -229,10 +229,10 @@ export default function SellYourVehiclePage() {
 
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
-              href="/vehicles"
+              href="/bikes"
               className="w-full sm:w-auto px-6 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs uppercase tracking-wider transition-all"
             >
-              Browse Inventory for Trade-In
+              Browse TVS Motorcycles
             </Link>
             <Link
               href="/"
@@ -249,20 +249,20 @@ export default function SellYourVehiclePage() {
   return (
     <PublicLayout>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Breadcrumbs items={[{ label: 'Sell Your Vehicle' }]} />
+        <Breadcrumbs items={[{ label: 'Sell / Exchange Your Old Bike' }]} />
 
         <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl mt-6">
           {/* Header */}
           <div className="mb-8 pb-6 border-b border-slate-800">
             <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider mb-1">
               <BadgeDollarSign className="w-4 h-4" />
-              <span>Direct Dealership Purchase</span>
+              <span>Bike Exchange & Trade-In</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
-              Sell or Trade-In Your Vehicle
+              Sell or Exchange Your Old Motorcycle
             </h1>
             <p className="text-xs sm:text-sm text-slate-400 mt-2 leading-relaxed">
-              Get an accurate, market-aligned valuation from Sri Lanka's leading automotive specialists. Complete the 5-step appraisal wizard below to get started.
+              Get a fair market valuation for your current bike and use it towards a brand new TVS motorcycle. Complete the 5-step form below to submit your bike exchange request.
             </p>
           </div>
 
@@ -377,19 +377,19 @@ export default function SellYourVehiclePage() {
           {/* STEP 2: Vehicle Information */}
           {currentStep === 2 && (
             <div className="space-y-4 animate-in fade-in duration-200">
-              <h3 className="text-lg font-bold text-white mb-2">Step 2: Vehicle Specifications</h3>
+              <h3 className="text-lg font-bold text-white mb-2">Step 2: Motorcycle Details</h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
-                    Make <span className="text-rose-400">*</span>
+                    Brand <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="text"
                     required
                     value={make}
                     onChange={(e) => setMake(e.target.value)}
-                    placeholder="Toyota, Honda, Mercedes..."
+                    placeholder="TVS, Honda, Bajaj, Yamaha..."
                     className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-amber-400"
                   />
                 </div>
