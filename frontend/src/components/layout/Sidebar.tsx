@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -66,7 +66,6 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
   const isAdmin = cleanRole.includes('admin') || cleanRole.includes('owner');
   const isSales = cleanRole.includes('sales') || cleanRole.includes('operations') || cleanRole.includes('executive') || isAdmin;
   const isFinance = cleanRole.includes('accountant') || cleanRole.includes('finance') || isAdmin;
-  const isInventory = cleanRole.includes('inventory') || cleanRole.includes('manager') || isAdmin;
   const isCustomer = cleanRole.includes('customer') || cleanRole.includes('client');
   const isCustomerPortal = isCustomer || pathname.startsWith('/account');
 
@@ -78,6 +77,81 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
         .substring(0, 2)
         .toUpperCase()
     : 'TVS';
+
+  // Structured staff navigation configuration
+  const staffNavSections = useMemo(
+    () => [
+      {
+        id: 'main',
+        group: 'MAIN DASHBOARD',
+        items: [
+          { href: '/dashboard', label: 'TVS Sales Dashboard', icon: LayoutDashboard, color: 'text-red-400' },
+        ],
+      },
+      {
+        id: 'stock',
+        group: 'MOTORCYCLES & STOCK',
+        items: [
+          { href: '/dashboard/vehicles', label: 'TVS Bike Models & Specs', icon: Flame, color: 'text-red-500' },
+          ...(isAdmin
+            ? [
+                { href: '/dashboard/branches', label: 'Dealership Branches', icon: Building2, color: 'text-amber-400' },
+                { href: '/dashboard/transfers', label: 'Branch Stock Transfers', icon: Truck, color: 'text-sky-400' },
+              ]
+            : []),
+        ],
+      },
+      {
+        id: 'workflow',
+        group: 'SALES & ORDERS WORKFLOW',
+        items: [
+          { href: '/dashboard/leads', label: 'Customer Requests (CRM)', icon: UserCheck, color: 'text-blue-400' },
+          { href: '/dashboard/reservations', label: 'Bookings & Allocations', icon: Calendar, color: 'text-amber-400' },
+          { href: '/dashboard/quotations', label: 'Quotations', icon: FileText, color: 'text-red-400' },
+          { href: '/dashboard/sales', label: 'Invoices & Sales', icon: Receipt, color: 'text-emerald-400' },
+          ...(isFinance
+            ? [{ href: '/dashboard/finance', label: 'Payments & Cash', icon: CreditCard, color: 'text-cyan-400' }]
+            : []),
+          { href: '/dashboard/handovers', label: 'PDI & Handover Delivery', icon: Truck, color: 'text-indigo-400' },
+          { href: '/dashboard/customers', label: 'Customer Database', icon: Users, color: 'text-slate-400' },
+        ],
+      },
+      {
+        id: 'management',
+        group: 'MANAGEMENT & SYSTEM',
+        items: [
+          { href: '/dashboard/reports', label: 'Reports & Sales Summaries', icon: BarChart3, color: 'text-slate-400' },
+          ...(isAdmin
+            ? [
+                { href: '/dashboard/website', label: 'Website Banners & CMS', icon: Globe, color: 'text-slate-400' },
+                { href: '/dashboard/users', label: 'Staff Accounts & Roles', icon: UserCog, color: 'text-slate-400' },
+                { href: '/dashboard/settings', label: 'Dealership Settings', icon: Settings, color: 'text-slate-400' },
+              ]
+            : []),
+        ],
+      },
+    ],
+    [isAdmin, isFinance]
+  );
+
+  // Search filtering logic
+  const query = searchQuery.trim().toLowerCase();
+  const searchResults = useMemo(() => {
+    if (!query) return null;
+    const matches: Array<{ href: string; label: string; icon: any; color: string; group: string }> = [];
+    staffNavSections.forEach((section) => {
+      section.items.forEach((item) => {
+        if (
+          item.label.toLowerCase().includes(query) ||
+          item.href.toLowerCase().includes(query) ||
+          section.group.toLowerCase().includes(query)
+        ) {
+          matches.push({ ...item, group: section.group });
+        }
+      });
+    });
+    return matches;
+  }, [query, staffNavSections]);
 
   return (
     <>
@@ -131,13 +205,24 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
               placeholder="Quick navigation..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#131F3F] text-xs text-slate-200 placeholder-slate-400 pl-9 pr-3 py-2 rounded-xl border border-slate-700/60 focus:outline-none focus:border-red-500"
+              className="w-full bg-[#131F3F] text-xs text-slate-200 placeholder-slate-400 pl-9 pr-8 py-2 rounded-xl border border-slate-700/60 focus:outline-none focus:border-red-500"
             />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2.5 top-2.5 text-slate-400 hover:text-white"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
         </div>
 
         {/* Navigation Links */}
-        <nav onClick={handleLinkClick} className="flex-1 overflow-y-auto px-3 py-2 space-y-4 text-xs">
+        <nav
+          onClick={handleLinkClick}
+          className="flex-1 overflow-y-auto px-3 py-2 space-y-4 text-xs scrollbar-thin scrollbar-thumb-slate-700/60 hover:scrollbar-thumb-slate-600"
+        >
           {/* CUSTOMER PORTAL NAVIGATION */}
           {isCustomerPortal ? (
             <div className="space-y-4">
@@ -243,211 +328,79 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
                 </div>
               </div>
             </div>
-          ) : (
-            /* STAFF DEALERSHIP NAVIGATION */
-            <div className="space-y-4">
-              {/* Dashboard */}
-              <div>
-                <Link
-                  href="/dashboard"
-                  className={`flex items-center gap-2.5 px-3 py-2 rounded-xl font-medium transition-colors ${
-                    pathname === '/dashboard'
-                      ? 'bg-red-950/60 text-red-400 border-l-4 border-red-500 font-semibold'
-                      : 'hover:bg-slate-800/60 text-slate-300'
-                  }`}
+          ) : searchResults !== null ? (
+            /* SEARCH RESULTS VIEW */
+            <div className="space-y-2">
+              <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-3 mb-1 flex items-center justify-between">
+                <span>Matching ({searchResults.length})</span>
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="text-red-400 hover:text-red-300 text-[10px] font-medium"
                 >
-                  <LayoutDashboard className="w-4 h-4 text-red-400" />
-                  <span>TVS Sales Dashboard</span>
-                </Link>
+                  Clear
+                </button>
               </div>
 
-              {/* Showroom Models & Stock */}
-              <div>
-                <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-3 mb-1">
-                  Motorcycles & Stock
+              {searchResults.length === 0 ? (
+                <div className="p-4 text-center text-slate-400 text-xs">
+                  No menu items found for &quot;{searchQuery}&quot;
                 </div>
+              ) : (
                 <div className="space-y-0.5">
-                  <Link
-                    href="/dashboard/vehicles"
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors ${
-                      pathname === '/dashboard/vehicles'
-                        ? 'bg-red-950/60 text-red-400 border-l-4 border-red-500 font-semibold'
-                        : 'hover:bg-slate-800/60 text-slate-300'
-                    }`}
-                  >
-                    <Flame className="w-4 h-4 text-red-500" />
-                    <span>TVS Bike Models & Specs</span>
-                  </Link>
-
-                  {isAdmin && (
-                    <Link
-                      href="/dashboard/transfers"
-                      className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors ${
-                        pathname === '/dashboard/transfers'
-                          ? 'bg-red-950/60 text-red-400 border-l-4 border-red-500 font-semibold'
-                          : 'hover:bg-slate-800/60 text-slate-300'
-                      }`}
-                    >
-                      <Building2 className="w-4 h-4 text-amber-400" />
-                      <span>Dealership Branches</span>
-                    </Link>
-                  )}
-                </div>
-              </div>
-
-              {/* Sales Workflow */}
-              <div>
-                <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-3 mb-1">
-                  Sales & Orders Workflow
-                </div>
-                <div className="space-y-0.5">
-                  <Link
-                    href="/dashboard/leads"
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors ${
-                      pathname === '/dashboard/leads'
-                        ? 'bg-red-950/60 text-red-400 border-l-4 border-red-500 font-semibold'
-                        : 'hover:bg-slate-800/60 text-slate-300'
-                    }`}
-                  >
-                    <UserCheck className="w-4 h-4 text-blue-400" />
-                    <span>Customer Requests (CRM)</span>
-                  </Link>
-
-                  <Link
-                    href="/dashboard/reservations"
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors ${
-                      pathname === '/dashboard/reservations'
-                        ? 'bg-red-950/60 text-red-400 border-l-4 border-red-500 font-semibold'
-                        : 'hover:bg-slate-800/60 text-slate-300'
-                    }`}
-                  >
-                    <Calendar className="w-4 h-4 text-amber-400" />
-                    <span>Bookings & Allocations</span>
-                  </Link>
-
-                  <Link
-                    href="/dashboard/quotations"
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors ${
-                      pathname === '/dashboard/quotations'
-                        ? 'bg-red-950/60 text-red-400 border-l-4 border-red-500 font-semibold'
-                        : 'hover:bg-slate-800/60 text-slate-300'
-                    }`}
-                  >
-                    <FileText className="w-4 h-4 text-red-400" />
-                    <span>Quotations</span>
-                  </Link>
-
-                  <Link
-                    href="/dashboard/sales"
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors ${
-                      pathname === '/dashboard/sales'
-                        ? 'bg-red-950/60 text-red-400 border-l-4 border-red-500 font-semibold'
-                        : 'hover:bg-slate-800/60 text-slate-300'
-                    }`}
-                  >
-                    <Receipt className="w-4 h-4 text-emerald-400" />
-                    <span>Invoices & Sales</span>
-                  </Link>
-
-                  {isFinance && (
-                    <Link
-                      href="/dashboard/finance"
-                      className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors ${
-                        pathname === '/dashboard/finance'
-                          ? 'bg-red-950/60 text-red-400 border-l-4 border-red-500 font-semibold'
-                          : 'hover:bg-slate-800/60 text-slate-300'
-                      }`}
-                    >
-                      <CreditCard className="w-4 h-4 text-cyan-400" />
-                      <span>Payments & Cash</span>
-                    </Link>
-                  )}
-
-                  <Link
-                    href="/dashboard/handovers"
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors ${
-                      pathname === '/dashboard/handovers'
-                        ? 'bg-red-950/60 text-red-400 border-l-4 border-red-500 font-semibold'
-                        : 'hover:bg-slate-800/60 text-slate-300'
-                    }`}
-                  >
-                    <Truck className="w-4 h-4 text-indigo-400" />
-                    <span>PDI & Handover Delivery</span>
-                  </Link>
-
-                  <Link
-                    href="/dashboard/customers"
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors ${
-                      pathname === '/dashboard/customers'
-                        ? 'bg-red-950/60 text-red-400 border-l-4 border-red-500 font-semibold'
-                        : 'hover:bg-slate-800/60 text-slate-300'
-                    }`}
-                  >
-                    <Users className="w-4 h-4 text-slate-400" />
-                    <span>Customer Database</span>
-                  </Link>
-                </div>
-              </div>
-
-              {/* Reports & Website CMS */}
-              <div>
-                <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-3 mb-1">
-                  Management & System
-                </div>
-                <div className="space-y-0.5">
-                  <Link
-                    href="/dashboard/reports"
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors ${
-                      pathname === '/dashboard/reports'
-                        ? 'bg-red-950/60 text-red-400 border-l-4 border-red-500 font-semibold'
-                        : 'hover:bg-slate-800/60 text-slate-300'
-                    }`}
-                  >
-                    <BarChart3 className="w-4 h-4 text-slate-400" />
-                    <span>Reports & Sales Summaries</span>
-                  </Link>
-
-                  {isAdmin && (
-                    <>
+                  {searchResults.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = pathname === item.href;
+                    return (
                       <Link
-                        href="/dashboard/website"
-                        className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors ${
-                          pathname === '/dashboard/website'
+                        key={item.href}
+                        href={item.href}
+                        className={`flex items-center justify-between px-3 py-2 rounded-xl transition-colors ${
+                          isActive
                             ? 'bg-red-950/60 text-red-400 border-l-4 border-red-500 font-semibold'
                             : 'hover:bg-slate-800/60 text-slate-300'
                         }`}
                       >
-                        <Globe className="w-4 h-4 text-slate-400" />
-                        <span>Website Banners & CMS</span>
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <Icon className={`w-4 h-4 flex-shrink-0 ${item.color}`} />
+                          <span className="truncate">{item.label}</span>
+                        </div>
+                        <span className="text-[9px] text-slate-500 uppercase">{item.group.split(' ')[0]}</span>
                       </Link>
-
-                      <Link
-                        href="/dashboard/users"
-                        className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors ${
-                          pathname === '/dashboard/users'
-                            ? 'bg-red-950/60 text-red-400 border-l-4 border-red-500 font-semibold'
-                            : 'hover:bg-slate-800/60 text-slate-300'
-                        }`}
-                      >
-                        <UserCog className="w-4 h-4 text-slate-400" />
-                        <span>Staff Accounts & Roles</span>
-                      </Link>
-
-                      <Link
-                        href="/dashboard/settings"
-                        className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors ${
-                          pathname === '/dashboard/settings'
-                            ? 'bg-red-950/60 text-red-400 border-l-4 border-red-500 font-semibold'
-                            : 'hover:bg-slate-800/60 text-slate-300'
-                        }`}
-                      >
-                        <Settings className="w-4 h-4 text-slate-400" />
-                        <span>Dealership Settings</span>
-                      </Link>
-                    </>
-                  )}
+                    );
+                  })}
                 </div>
-              </div>
+              )}
+            </div>
+          ) : (
+            /* STANDARD STAFF DEALERSHIP NAVIGATION */
+            <div className="space-y-4">
+              {staffNavSections.map((section) => (
+                <div key={section.id}>
+                  <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-3 mb-1">
+                    {section.group}
+                  </div>
+                  <div className="space-y-0.5">
+                    {section.items.map((item) => {
+                      const Icon = item.icon;
+                      const isActive = pathname === item.href;
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors ${
+                            isActive
+                              ? 'bg-red-950/60 text-red-400 border-l-4 border-red-500 font-semibold'
+                              : 'hover:bg-slate-800/60 text-slate-300'
+                          }`}
+                        >
+                          <Icon className={`w-4 h-4 flex-shrink-0 ${item.color}`} />
+                          <span>{item.label}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </nav>
@@ -456,15 +409,19 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
         <div className="p-3 border-t border-slate-800/80 bg-[#0E1738]">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-xl bg-red-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
-                {userInitials}
+              <div className="w-8 h-8 rounded-xl bg-red-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 overflow-hidden shadow-sm shadow-red-900/50">
+                {currentUser?.avatar ? (
+                  <img src={currentUser.avatar} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  userInitials
+                )}
               </div>
               <div className="min-w-0">
                 <div className="font-bold text-white text-xs truncate">
-                  {currentUser?.name || 'Staff User'}
+                  {currentUser?.name || 'Admin'}
                 </div>
                 <div className="text-[10px] text-red-400 font-medium truncate">
-                  {currentUser?.role || 'Authorized User'}
+                  {currentUser?.role || 'Admin / Owner'}
                 </div>
               </div>
             </div>

@@ -21,10 +21,10 @@ export default function HandoversPage() {
     handoverDate: new Date().toISOString().split('T')[0],
     status: 'Pending',
     checklist: {
-      vehicleInspected: true,
+      vehicleInspection: true,
       keys: true,
       spareKey: true,
-      registrationDocs: true,
+      cr: true,
       insurance: true,
       serviceBook: true,
       userManual: true,
@@ -114,13 +114,24 @@ export default function HandoversPage() {
     e.preventDefault();
     const selectedSale = sales.find((s) => s._id === form.saleId);
 
+    const customerId = selectedSale?.customer?._id || (typeof selectedSale?.customer === 'string' && selectedSale.customer.length === 24 ? selectedSale.customer : null);
+    const vehicleId = selectedSale?.vehicle?._id || (typeof selectedSale?.vehicle === 'string' && selectedSale.vehicle.length === 24 ? selectedSale.vehicle : null);
+
+    if (!selectedSale || !customerId || !vehicleId) {
+      alert('Please select a valid sale invoice with an associated vehicle and customer.');
+      return;
+    }
+
     const payload = {
       sale: form.saleId,
-      vehicle: selectedSale?.vehicle?._id || selectedSale?.vehicle,
-      customer: selectedSale?.customer?.fullName || selectedSale?.customer,
+      vehicle: vehicleId,
+      customer: customerId,
       handoverDate: form.handoverDate,
       status: form.status,
-      checklist: form.checklist,
+      checklist: {
+        ...form.checklist,
+        customerSignature: Boolean(form.checklist.customerSignature || signatureData),
+      },
       customerSignatureData: signatureData,
       notes: form.notes,
     };
@@ -135,10 +146,43 @@ export default function HandoversPage() {
         setShowModal(false);
         loadData();
       } else {
-        alert('Could not save handover record.');
+        const errData = await res.json().catch(() => ({}));
+        alert(errData.message || 'Could not save handover record.');
       }
-    } catch (err) {
-      alert('Network error.');
+    } catch (err: any) {
+      alert(err.message || 'Network error.');
+    }
+  };
+
+  const handleUpdateStatus = async (handoverId: string, newStatus: string, currentChecklist: any) => {
+    try {
+      const allChecklist = {
+        vehicleInspection: true,
+        keys: true,
+        spareKey: true,
+        cr: true,
+        insurance: true,
+        serviceBook: true,
+        userManual: true,
+        accessories: true,
+        numberPlates: true,
+        customerSignature: true,
+        ...(currentChecklist || {}),
+      };
+
+      const res = await apiFetch(`/vehicle-handovers/${handoverId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus, checklist: allChecklist }),
+      });
+      if (res.ok) {
+        loadData();
+      } else {
+        const err = await res.json().catch(() => ({}));
+        alert(err.message || 'Could not update handover status.');
+      }
+    } catch (e: any) {
+      alert(e.message || 'Network error.');
     }
   };
 
@@ -202,12 +246,22 @@ export default function HandoversPage() {
                       }`}>{h.status}</span>
                     </td>
                     <td className="p-3.5 text-right">
-                      <button
-                        onClick={() => window.print()}
-                        className="px-2.5 py-1.5 border border-slate-300 hover:bg-slate-100 rounded-lg text-xs font-semibold inline-flex items-center gap-1"
-                      >
-                        <Printer className="w-3.5 h-3.5" /> Print Delivery Note
-                      </button>
+                      <div className="flex items-center justify-end gap-2">
+                        {h.status !== 'Completed' && (
+                          <button
+                            onClick={() => handleUpdateStatus(h._id, 'Completed', h.checklist)}
+                            className="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold inline-flex items-center gap-1 transition-colors"
+                          >
+                            <CheckCircle2 className="w-3.5 h-3.5" /> Mark Completed
+                          </button>
+                        )}
+                        <button
+                          onClick={() => window.print()}
+                          className="px-2.5 py-1.5 border border-slate-300 hover:bg-slate-100 rounded-lg text-xs font-semibold inline-flex items-center gap-1 text-slate-700"
+                        >
+                          <Printer className="w-3.5 h-3.5" /> Print Delivery Note
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -277,7 +331,18 @@ export default function HandoversPage() {
                 <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
                   <h4 className="font-bold text-slate-900 border-b pb-1">Pre-Delivery Handover Checklist</h4>
                   <div className="grid grid-cols-2 gap-2 text-slate-800">
-                    {Object.keys(form.checklist).map((key) => (
+                    {[
+                      { key: 'vehicleInspection', label: 'PDI Technical Inspection' },
+                      { key: 'keys', label: 'Primary Ignition Key' },
+                      { key: 'spareKey', label: 'Spare Key' },
+                      { key: 'cr', label: 'Registration Book (CR / Docs)' },
+                      { key: 'insurance', label: 'Insurance Certificate' },
+                      { key: 'serviceBook', label: 'Warranty & Service Book' },
+                      { key: 'userManual', label: 'TVS User Manual' },
+                      { key: 'accessories', label: 'Standard Tool Kit & Mirrors' },
+                      { key: 'numberPlates', label: 'Number Plates / Temp Tag' },
+                      { key: 'customerSignature', label: 'Customer Signed Approval' },
+                    ].map(({ key, label }) => (
                       <label key={key} className="flex items-center gap-2 cursor-pointer">
                         <input
                           type="checkbox"
@@ -290,7 +355,7 @@ export default function HandoversPage() {
                           }
                           className="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4"
                         />
-                        <span className="capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
+                        <span>{label}</span>
                       </label>
                     ))}
                   </div>
