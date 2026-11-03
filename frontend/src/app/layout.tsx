@@ -50,6 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       suppressHydrationWarning
+      data-scroll-behavior="smooth"
       className={`${jakartaSans.variable} ${interFont.variable} h-full antialiased selection:bg-amber-400 selection:text-slate-950`}
     >
       <body className="min-h-full flex flex-col font-sans bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased overflow-x-hidden transition-colors duration-200">

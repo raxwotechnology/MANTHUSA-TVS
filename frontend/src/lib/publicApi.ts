@@ -143,16 +143,22 @@ export function getBikeSlug(bike: { _id: string; make?: string; model: string; y
  * Fetch public vehicle listings
  */
 export async function fetchPublicVehicles(): Promise<PublicVehicle[]> {
-  try {
-    const res = await fetch(getApiUrl('/public/vehicles'), {
-      next: { revalidate: 30 },
-    });
-    if (!res.ok) return [];
-    return (await res.json()) || [];
-  } catch (err) {
-    console.error('Error fetching public motorcycles:', err);
-    return [];
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const res = await fetch(getApiUrl('/public/vehicles'), {
+        cache: 'no-store',
+      });
+      if (!res.ok) return [];
+      return (await res.json()) || [];
+    } catch (err) {
+      if (attempt === 2) {
+        console.error('Error fetching public motorcycles:', err);
+        return [];
+      }
+      await new Promise((r) => setTimeout(r, 1000 * (attempt + 1)));
+    }
   }
+  return [];
 }
 
 /**
@@ -161,7 +167,7 @@ export async function fetchPublicVehicles(): Promise<PublicVehicle[]> {
 export async function fetchPublicVehicle(idOrSlug: string): Promise<PublicVehicle | null> {
   try {
     const res = await fetch(getApiUrl(`/public/vehicles/${encodeURIComponent(idOrSlug)}`), {
-      next: { revalidate: 30 },
+      cache: 'no-store',
     });
     if (!res.ok) return null;
     return await res.json();
