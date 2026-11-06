@@ -11,14 +11,33 @@ export class LeadsService {
     @InjectModel('Customer') private customerModel: Model<any>,
     @InjectModel('Vehicle') private vehicleModel: Model<any>,
     @InjectModel('Reservation') private reservationModel: Model<any>,
+    @InjectModel('Sale') private saleModel: Model<any>,
     private readonly notifications: NotificationsService,
   ) {}
 
   async create(createLeadDto: any): Promise<LeadDocument> {
     const leadId = createLeadDto.leadId || `TVS-REQ-${Date.now().toString().slice(-6)}`;
+    let category = createLeadDto.category;
+    let vehicleType = createLeadDto.vehicleType;
+    let engineCapacity = createLeadDto.engineCapacity;
+
+    if (createLeadDto.interestedVehicle && (!category || !vehicleType || !engineCapacity)) {
+      if (isValidObjectId(createLeadDto.interestedVehicle)) {
+        const v = await this.vehicleModel.findById(createLeadDto.interestedVehicle).exec();
+        if (v) {
+          if (!category) category = v.category;
+          if (!vehicleType) vehicleType = v.vehicleType;
+          if (!engineCapacity) engineCapacity = v.engineCapacity;
+        }
+      }
+    }
+
     const createdLead = new this.leadModel({
       ...createLeadDto,
       leadId,
+      category: category || 'Sport Motorcycles',
+      vehicleType: vehicleType || 'Motorcycle',
+      engineCapacity: engineCapacity || '',
       status: createLeadDto.status || 'New Request',
     });
     const saved = await createdLead.save();
@@ -43,6 +62,9 @@ export class LeadsService {
     let modelName = String(input.modelName || input.model || '').trim();
     let variantName = String(input.variantName || input.variant || '').trim();
     let selectedColor = String(input.selectedColor || input.color || '').trim();
+    let category = String(input.category || '').trim();
+    let vehicleType = String(input.vehicleType || '').trim();
+    let engineCapacity = String(input.engineCapacity || '').trim();
 
     if (input.vehicle || input.vehicleId) {
       const vId = String(input.vehicle || input.vehicleId);
@@ -53,6 +75,9 @@ export class LeadsService {
           if (!modelName) modelName = vehicle.model;
           if (!variantName && vehicle.variant) variantName = vehicle.variant;
           if (!selectedColor && vehicle.color) selectedColor = vehicle.color;
+          if (!category && vehicle.category) category = vehicle.category;
+          if (!vehicleType && vehicle.vehicleType) vehicleType = vehicle.vehicleType;
+          if (!engineCapacity && vehicle.engineCapacity) engineCapacity = vehicle.engineCapacity;
         }
       }
     }
@@ -69,6 +94,7 @@ export class LeadsService {
         email: input.email ? input.email.trim().toLowerCase() : undefined,
         city: input.city || input.preferredBranchName || undefined,
         customerType: 'Individual',
+        customerSource: 'Online',
       }).save();
     }
 
@@ -79,6 +105,9 @@ export class LeadsService {
       modelName,
       variantName,
       selectedColor,
+      category: category || 'Sport Motorcycles',
+      vehicleType: vehicleType || 'Motorcycle',
+      engineCapacity: engineCapacity || '',
       preferredBranch: input.preferredBranch && isValidObjectId(input.preferredBranch) ? input.preferredBranch : undefined,
       preferredBranchName: input.preferredBranchName || input.branch || '',
       source: input.source || 'Website Configurator',
@@ -139,13 +168,133 @@ export class LeadsService {
     return { lead, booking: savedBooking };
   }
 
+  async convertToInvoice(id: string, invoiceData?: any, staffUser?: any): Promise<any> {
+    const lead = await this.leadModel
+      .findById(id)
+      .populate('customer')
+      .populate('interestedVehicle')
+      .exec();
+    if (!lead) throw new NotFoundException(`Request #${id} not found.`);
+
+    if (lead.invoiceId) {
+      const existing = await this.saleModel.findById(lead.invoiceId).exec();
+      if (existing) return { lead, sale: existing, message: 'Already converted to invoice.' };
+    }
+
+    const customer = lead.customer as any;
+    if (!customer) throw new BadRequestException('Request does not have a linked customer record.');
+
+    let vehicle = lead.interestedVehicle as any;
+    if (invoiceData?.vehicle && isValidObjectId(invoiceData.vehicle)) {
+      const selectedV = await this.vehicleModel.findById(invoiceData.vehicle).exec();
+      if (selectedV) vehicle = selectedV;
+    }
+
+    // If still no vehicle, try to find an available matching motorcycle in stock
+    if (!vehicle) {
+      const matched = await this.vehicleModel
+        .findOne({
+          status: { $in: ['Available', 'In Stock'] },
+          ...(lead.modelName ? { model: new RegExp(lead.modelName, 'i') } : {}),
+        })
+        .exec();
+      if (matched) vehicle = matched;
+    }
+
+    // If still no vehicle in stock, find any available vehicle or create a mock/fallback vehicle
+    if (!vehicle) {
+      vehicle = await this.vehicleModel.findOne({ status: { $in: ['Available', 'In Stock'] } }).exec();
+    }
+
+    if (!vehicle) {
+      throw new BadRequestException('No available motorcycle found in inventory to assign to this invoice. Please add or make available a motorcycle first.');
+    }
+
+    const invoiceNumber = invoiceData?.invoiceNumber || `TVS-INV-${Date.now().toString().slice(-6)}`;
+    const contractNumber = invoiceData?.salesContractNumber || `TVS-CNT-${Date.now().toString().slice(-6)}`;
+
+    const vehiclePrice = Number(invoiceData?.vehiclePrice ?? vehicle.sellingPrice ?? lead.budget ?? 850000);
+    const discount = Number(invoiceData?.discount || 0);
+    const registrationFee = Number(invoiceData?.registrationFee || 0);
+    const insuranceFee = Number(invoiceData?.insuranceFee || 0);
+    const additionalCharges = Number(invoiceData?.additionalCharges || 0);
+    const finalAmount = Math.max(0, vehiclePrice - discount + registrationFee + insuranceFee + additionalCharges);
+    const paidAmount = Number(invoiceData?.paidAmount ?? finalAmount);
+    const balance = Math.max(0, finalAmount - paidAmount);
+
+    const sale = new this.saleModel({
+      invoiceNumber,
+      salesContractNumber: contractNumber,
+      customer: customer._id || customer,
+      vehicle: vehicle._id || vehicle,
+      salesperson: staffUser?._id || staffUser?.sub,
+      branch: lead.preferredBranch || vehicle.branch || vehicle.location,
+      branchName: lead.preferredBranchName || vehicle.branch || 'Colombo Flagship Hub',
+      modelName: lead.modelName || vehicle.model,
+      variantName: lead.variantName || vehicle.variant,
+      selectedColor: lead.selectedColor || vehicle.color,
+      chassisNumber: vehicle.chassisNumber || '',
+      engineNumber: vehicle.engineNumber || '',
+      vehiclePrice,
+      discount,
+      registrationFee,
+      insuranceFee,
+      additionalCharges,
+      finalAmount,
+      paidAmount,
+      balance,
+      paymentMethod: invoiceData?.paymentMethod || 'Cash',
+      status: paidAmount >= finalAmount ? 'Paid in Full' : paidAmount > 0 ? 'Partially Paid' : 'Pending',
+      saleDate: new Date(),
+    });
+
+    const savedSale = await sale.save();
+
+    // Mark vehicle as Sold
+    await this.vehicleModel.findByIdAndUpdate(vehicle._id, { status: 'Sold' }).exec();
+
+    // Update lead status to Purchased and link invoice
+    lead.status = 'Purchased';
+    lead.invoiceId = savedSale._id;
+    await lead.save();
+
+    await this.notifications.create({
+      title: 'Request Converted to Invoice',
+      message: `Customer Request ${lead.leadId} converted to Invoice ${invoiceNumber}. Status marked as Purchased.`,
+      channel: 'in-app',
+      entityType: 'Sale',
+      entityId: String(savedSale._id),
+    }).catch(() => undefined);
+
+    return { lead, sale: savedSale };
+  }
+
+  async markLostSale(id: string, lostReason?: string): Promise<LeadDocument> {
+    const lead = await this.leadModel.findById(id).exec();
+    if (!lead) throw new NotFoundException(`Request #${id} not found.`);
+    lead.status = 'Lost Sale';
+    if (lostReason) lead.lostReason = lostReason;
+    await lead.save();
+    return lead;
+  }
+
+  async updateStatus(id: string, status: string, lostReason?: string): Promise<LeadDocument> {
+    const lead = await this.leadModel.findById(id).exec();
+    if (!lead) throw new NotFoundException(`Request #${id} not found.`);
+    lead.status = status;
+    if (lostReason) lead.lostReason = lostReason;
+    await lead.save();
+    return lead;
+  }
+
   async findAll(): Promise<LeadDocument[]> {
     return this.leadModel
       .find()
       .populate('customer')
-      .populate('interestedVehicle', 'stockNumber make model year sellingPrice status images')
+      .populate('interestedVehicle', 'stockNumber make model year sellingPrice status images category vehicleType engineCapacity')
       .populate('preferredBranch')
       .populate('bookingId')
+      .populate('invoiceId')
       .sort({ createdAt: -1 })
       .exec();
   }
@@ -153,9 +302,10 @@ export class LeadsService {
   async findByCustomer(customerId: string): Promise<LeadDocument[]> {
     return this.leadModel
       .find({ customer: customerId })
-      .populate('interestedVehicle', 'stockNumber make model year sellingPrice status images')
+      .populate('interestedVehicle', 'stockNumber make model year sellingPrice status images category vehicleType engineCapacity')
       .populate('preferredBranch')
       .populate('bookingId')
+      .populate('invoiceId')
       .sort({ createdAt: -1 })
       .exec();
   }
@@ -167,6 +317,7 @@ export class LeadsService {
       .populate('interestedVehicle')
       .populate('preferredBranch')
       .populate('bookingId')
+      .populate('invoiceId')
       .exec();
     if (!lead) {
       throw new NotFoundException(`Request #${id} not found`);

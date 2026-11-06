@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId, Model } from 'mongoose';
 import { SaleDocument } from './schemas/sale.schema';
@@ -64,6 +64,13 @@ export class SalesService {
       entityId: String(createdSale._id)
     }).catch(() => undefined);
 
+    // Send SMS notification to customer
+    const dealershipName = process.env.DEALERSHIP_NAME || 'MANTHUSA TVS';
+    if (customer.phone) {
+      const smsMessage = `Dear ${customer.fullName}, thank you for purchasing ${vehicle.model} from ${dealershipName}! Invoice No: ${invoiceNumber}. Total: LKR ${finalAmount}. Paid: LKR ${paidAmount}. Balance: LKR ${Math.max(0, finalAmount - paidAmount)}. We appreciate your trust. Ride safe! - ${dealershipName}`;
+      this.notifications.sendSms(customer.phone, smsMessage, 'Sale').catch(() => undefined);
+    }
+
     return createdSale;
   }
 
@@ -90,7 +97,7 @@ export class SalesService {
       .exec();
   }
 
-  async findOne(id: string): Promise<SaleDocument> {
+  async findOne(id: string, user?: any): Promise<SaleDocument> {
     const sale = await this.saleModel
       .findById(id)
       .populate('customer')
@@ -101,6 +108,13 @@ export class SalesService {
       .exec();
     if (!sale) {
       throw new NotFoundException(`Invoice #${id} not found`);
+    }
+    const role = (user?.role || '').toLowerCase();
+    if (role.includes('customer') || role.includes('client')) {
+      const custId = sale.customer?._id ? String(sale.customer._id) : String(sale.customer);
+      if (user.customerId && String(user.customerId) !== custId) {
+        throw new ForbiddenException('You do not have permission to view this invoice.');
+      }
     }
     return sale;
   }
@@ -140,8 +154,8 @@ export class SalesService {
     return existingSale;
   }
 
-  async getSalesContract(id: string) {
-    const sale = await this.findOne(id);
+  async getSalesContract(id: string, user?: any) {
+    const sale = await this.findOne(id, user);
     const customer = (sale.customer || {}) as any;
     const vehicle = (sale.vehicle || {}) as any;
 

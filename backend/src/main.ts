@@ -5,6 +5,18 @@ import { json, urlencoded } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const expressApp = app.getHttpAdapter().getInstance();
+  expressApp.disable('x-powered-by');
+
+  // Security headers middleware
+  app.use((_req: any, res: any, next: any) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    next();
+  });
+
   // Increase payload limit to 20MB for image uploads and base64 assets
   app.use(json({ limit: '20mb' }));
   app.use(urlencoded({ extended: true, limit: '20mb' }));

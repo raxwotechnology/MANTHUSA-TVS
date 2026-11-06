@@ -1,9 +1,11 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { FileText, Plus, Printer, Download, CheckCircle2, XCircle, Clock, X } from 'lucide-react';
+import { FileText, Plus, Printer, Download, CheckCircle2, XCircle, Clock, X, FileDown, FileSpreadsheet, Search } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { useSettings } from '@/lib/useSettings';
+import { exportPdf, exportExcel } from '@/lib/exportUtils';
+import { DateFilterControl, isWithinDateRange } from '@/components/dashboard/DateFilterControl';
 
 interface Quotation {
   _id: string;
@@ -29,6 +31,9 @@ interface Quotation {
 export default function QuotationsPage() {
   const { settings: brand } = useSettings();
   const [quotations, setQuotations] = useState<Quotation[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [newFormData, setNewFormData] = useState({});
 
@@ -156,6 +161,19 @@ export default function QuotationsPage() {
     return 'LKR ' + (val || 0).toLocaleString('en-LK');
   };
 
+  const filteredQuotations = quotations.filter((q) => {
+    if (searchQuery.trim()) {
+      const needle = searchQuery.toLowerCase();
+      const matchNum = q.quotationNumber?.toLowerCase().includes(needle);
+      const matchCust = q.customerName?.toLowerCase().includes(needle);
+      const matchVeh = q.vehicleName?.toLowerCase().includes(needle);
+      const matchStatus = q.status?.toLowerCase().includes(needle);
+      if (!matchNum && !matchCust && !matchVeh && !matchStatus) return false;
+    }
+    if (!isWithinDateRange(q.validUntil || (q as any).createdAt, startDate, endDate)) return false;
+    return true;
+  });
+
   return (
     <DashboardLayout>
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -164,12 +182,61 @@ export default function QuotationsPage() {
           <p className="text-xs text-slate-500">{isCustomer ? 'View official quotations and download PDF estimates provided for you' : 'Generate quotation breakdowns, handle manager discount approval, and export PDF invoices'}</p>
         </div>
 
-        {!isCustomer && (
-          <button className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2.5 rounded-lg shadow-xs" onClick={() => setShowAddModal(true)}>
-            <Plus className="w-4 h-4" />
-            <span>Create New Quotation</span>
-          </button>
-        )}
+        <div className="flex items-center gap-2 flex-wrap">
+          {(() => {
+            const cols = [
+              { label: 'Quote #', value: (r: any) => r.quotationNumber },
+              { label: 'Customer', value: (r: any) => r.customerName },
+              { label: 'Motorcycle Model', value: (r: any) => r.vehicleName },
+              { label: 'Bike Price (LKR)', value: (r: any) => r.vehiclePrice },
+              { label: 'Discount (LKR)', value: (r: any) => r.discount },
+              { label: 'Final Total (LKR)', value: (r: any) => r.totalAmount },
+              { label: 'Status', value: (r: any) => r.status },
+            ];
+            return (
+              <>
+                <button onClick={() => exportPdf('Quotations & Discount Approval', 'quotations.pdf', cols, filteredQuotations)} disabled={!filteredQuotations.length} className="flex items-center gap-1.5 rounded-lg bg-red-600 hover:bg-red-700 disabled:opacity-40 px-3.5 py-2 text-xs font-semibold text-white shadow-xs cursor-pointer">
+                  <FileDown className="w-4 h-4" /><span>PDF</span>
+                </button>
+                <button onClick={() => exportExcel('quotations.xlsx', cols, filteredQuotations)} disabled={!filteredQuotations.length} className="flex items-center gap-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 disabled:opacity-40 px-3.5 py-2 text-xs font-semibold text-white shadow-xs cursor-pointer">
+                  <FileSpreadsheet className="w-4 h-4" /><span>Excel</span>
+                </button>
+              </>
+            );
+          })()}
+          {!isCustomer && (
+            <button className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2.5 rounded-lg shadow-xs cursor-pointer" onClick={() => setShowAddModal(true)}>
+              <Plus className="w-4 h-4" />
+              <span>Create New Quotation</span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Search Bar with Date Filter */}
+      <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs mb-6">
+        <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center">
+          <div className="relative w-full sm:w-80">
+            <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search quotation #, customer, model..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-hidden focus:border-emerald-500 placeholder:text-slate-400"
+            />
+          </div>
+
+          <DateFilterControl
+            startDate={startDate}
+            endDate={endDate}
+            onDateChange={(start, end) => {
+              setStartDate(start);
+              setEndDate(end);
+            }}
+            label="Date / Valid Until:"
+          />
+        </div>
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs">
@@ -188,7 +255,7 @@ export default function QuotationsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {quotations.map((q) => (
+              {filteredQuotations.map((q) => (
                 <tr key={q._id} className="hover:bg-slate-50/80">
                   <td className="py-3 px-4 font-bold text-slate-900">{q.quotationNumber}</td>
                   <td className="py-3 px-4 font-bold text-slate-900">{q.customerName}</td>
@@ -252,7 +319,7 @@ export default function QuotationsPage() {
             <div className="flex items-center justify-between border-b pb-4 mb-6">
               <div className="flex items-center gap-3">
                 {brand.logoUrl ? (
-                  <img src={brand.logoUrl} alt={brand.dealershipName || 'Logo'} className="w-12 h-12 object-contain" />
+                  <img src={brand.logoUrl} alt={brand.dealershipName || 'Logo'} className="h-12 w-24 object-contain rounded-lg" />
                 ) : (
                   <div className="w-12 h-12 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-bold">
                     <FileText className="w-6 h-6" />

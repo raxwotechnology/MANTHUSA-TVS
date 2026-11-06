@@ -1,11 +1,16 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { Building2, Plus, Phone, Mail, FileText } from 'lucide-react';
+import { Building2, Plus, Phone, Mail, FileText, FileDown, FileSpreadsheet, Search } from 'lucide-react';
+import { exportPdf, exportExcel } from '@/lib/exportUtils';
 import { apiFetch } from '@/lib/api';
+import { DateFilterControl, isWithinDateRange } from '@/components/dashboard/DateFilterControl';
 
 export default function SuppliersPage() {
   const [suppliers, setSuppliers] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [newFormData, setNewFormData] = useState({});
 
@@ -30,6 +35,20 @@ export default function SuppliersPage() {
   };
 
 
+  const filteredSuppliers = suppliers.filter((s) => {
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      const matchId = s.supplierId?.toLowerCase().includes(q);
+      const matchName = s.supplierName?.toLowerCase().includes(q);
+      const matchContact = s.contactPerson?.toLowerCase().includes(q);
+      const matchPhone = s.phone?.includes(q);
+      const matchType = s.supplierType?.toLowerCase().includes(q);
+      if (!matchId && !matchName && !matchContact && !matchPhone && !matchType) return false;
+    }
+    if (!isWithinDateRange(s.createdAt, startDate, endDate)) return false;
+    return true;
+  });
+
   return (
     <DashboardLayout>
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -38,10 +57,36 @@ export default function SuppliersPage() {
           <p className="text-xs text-slate-500">Track supplier profiles, vehicle purchase history, payments, and ledger statement</p>
         </div>
 
-        <button className="flex items-center gap-1.5 bg-emerald-600 text-white font-semibold text-xs px-4 py-2.5 rounded-lg" onClick={() => setShowAddModal(true)}>
+        <button className="flex items-center gap-1.5 bg-emerald-600 text-white font-semibold text-xs px-4 py-2.5 rounded-lg hover:bg-emerald-700 transition-colors cursor-pointer" onClick={() => setShowAddModal(true)}>
           <Plus className="w-4 h-4" />
           <span>Add Supplier</span>
         </button>
+      </div>
+
+      {/* Search Bar with Date Filter */}
+      <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs mb-6">
+        <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center">
+          <div className="relative w-full sm:w-80">
+            <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search supplier by name, id, contact, phone..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-hidden focus:border-emerald-500 placeholder:text-slate-400"
+            />
+          </div>
+
+          <DateFilterControl
+            startDate={startDate}
+            endDate={endDate}
+            onDateChange={(start, end) => {
+              setStartDate(start);
+              setEndDate(end);
+            }}
+            label="Created Date:"
+          />
+        </div>
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
@@ -58,13 +103,13 @@ export default function SuppliersPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {suppliers.map((s) => (
+            {filteredSuppliers.map((s) => (
               <tr key={s._id} className="hover:bg-slate-50">
                 <td className="py-3 px-4 font-bold text-slate-900">{s.supplierId}</td>
                 <td className="py-3 px-4 font-bold text-slate-900">{s.supplierName}</td>
                 <td className="py-3 px-4"><span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700">{s.supplierType}</span></td>
                 <td className="py-3 px-4 font-medium text-slate-700">{s.contactPerson}</td>
-                <td className="py-3 px-4 text-slate-600">{s.phone} • {s.email}</td>
+                <td className="py-3 px-4 text-slate-600">{s.phone} â€¢ {s.email}</td>
                 <td className="py-3 px-4 font-extrabold text-rose-600">LKR {s.outstandingBalance.toLocaleString()}</td>
               </tr>
             ))}

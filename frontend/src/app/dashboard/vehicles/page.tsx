@@ -22,8 +22,17 @@ import {
   AlertTriangle,
   Upload,
   Paperclip,
-  Image as ImageIcon
+  Image as ImageIcon,
+  FileDown,
+  FileSpreadsheet,
+  Package,
+  Layers,
+  Calendar,
+  Hash
 } from 'lucide-react';
+import { exportPdf, exportExcel } from '@/lib/exportUtils';
+import { DateFilterControl, isWithinDateRange } from '@/components/dashboard/DateFilterControl';
+import { TVSStockRequisitionPlanner } from '@/components/dashboard/TVSStockRequisitionPlanner';
 
 interface MediaAngles {
   front?: string;
@@ -45,6 +54,10 @@ interface Vehicle {
   _id: string;
   stockNumber: string;
   registrationNumber: string;
+  roundNumber?: string;
+  category?: string;
+  createdAt?: string;
+  updatedAt?: string;
   make: string;
   model: string;
   variant: string;
@@ -77,10 +90,14 @@ export default function VehicleInventoryPage() {
   const [activeTab, setActiveTab] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterMake, setFilterMake] = useState('ALL');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [showTVSRequisition, setShowTVSRequisition] = useState(false);
 
   const defaultVehicleForm = {
     stockNumber: '',
     registrationNumber: '',
+    roundNumber: '',
     make: 'TVS',
     model: '',
     variant: '',
@@ -121,6 +138,10 @@ export default function VehicleInventoryPage() {
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [deletingVehicle, setDeletingVehicle] = useState<Vehicle | null>(null);
+  const [assignPlateVehicle, setAssignPlateVehicle] = useState<Vehicle | null>(null);
+  const [assignPlateValue, setAssignPlateValue] = useState('');
+  const [assignPlateLoading, setAssignPlateLoading] = useState(false);
+  const [vehicleNotification, setVehicleNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Form State
   const [newVehicle, setNewVehicle] = useState(defaultVehicleForm);
@@ -136,6 +157,7 @@ export default function VehicleInventoryPage() {
     setNewVehicle({
       stockNumber: v.stockNumber || '',
       registrationNumber: v.registrationNumber || '',
+      roundNumber: (v as any).roundNumber || '',
       make: v.make || '',
       model: v.model || '',
       variant: v.variant || '',
@@ -302,6 +324,8 @@ export default function VehicleInventoryPage() {
       _id: Date.now().toString(),
       stockNumber: newVehicle.stockNumber || `STK-${new Date().getFullYear()}-${Date.now()}`,
       registrationNumber: newVehicle.registrationNumber,
+      roundNumber: newVehicle.roundNumber || '',
+      category: (newVehicle as any).category || 'Sport Motorcycles',
       make: newVehicle.make,
       model: newVehicle.model,
       variant: newVehicle.variant,
@@ -376,9 +400,11 @@ export default function VehicleInventoryPage() {
       const matchMake = v.make?.toLowerCase().includes(q);
       const matchModel = v.model?.toLowerCase().includes(q);
       const matchChassis = v.chassisNumber?.toLowerCase().includes(q);
-      if (!matchStock && !matchReg && !matchMake && !matchModel && !matchChassis) return false;
+      const matchRound = (v as any).roundNumber?.toLowerCase().includes(q);
+      if (!matchStock && !matchReg && !matchMake && !matchModel && !matchChassis && !matchRound) return false;
     }
     if (filterMake !== 'ALL' && v.make !== filterMake) return false;
+    if (!isWithinDateRange(v.createdAt || (v as any).year, startDate, endDate)) return false;
     return true;
   });
 
@@ -433,6 +459,29 @@ export default function VehicleInventoryPage() {
 
   return (
     <DashboardLayout>
+      {/* Vehicle Notification Toast */}
+      {vehicleNotification && (
+        <div
+          role="alert"
+          className={`mb-4 p-4 rounded-xl text-xs font-bold flex items-center justify-between shadow-sm transition-all ${
+            vehicleNotification.type === 'success'
+              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+              : 'bg-rose-50 text-rose-800 border border-rose-200'
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            {vehicleNotification.type === 'success' ? (
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            ) : (
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+            )}
+            <span>{vehicleNotification.message}</span>
+          </div>
+          <button onClick={() => setVehicleNotification(null)} className="text-slate-400 hover:text-slate-600">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
       {/* Top Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
@@ -442,13 +491,69 @@ export default function VehicleInventoryPage() {
           </p>
         </div>
 
-        <button
-          onClick={handleOpenAddModal}
-          className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2.5 rounded-lg shadow-xs transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add TVS Motorcycle</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={() => setShowTVSRequisition(true)}
+            className="flex items-center gap-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 px-3.5 py-2 text-xs font-semibold text-white shadow-xs transition-colors cursor-pointer"
+            title="Category & Model Wise Stock Count & TVS Requisition Generator"
+          >
+            <Package className="w-4 h-4" />
+            <span>TVS Stock & Requisition List</span>
+          </button>
+          <button
+            onClick={() => {
+              const cols = [
+                { label: 'Stock #', value: (r: any) => r.stockNumber },
+                { label: 'Round #', value: (r: any) => r.roundNumber || '—' },
+                { label: 'Make & Model', value: (r: any) => `${r.make} ${r.model} ${r.variant || ''}`.trim() },
+                { label: 'Year', value: (r: any) => r.year },
+                { label: 'Reg #', value: (r: any) => r.registrationNumber },
+                { label: 'Chassis #', value: (r: any) => r.chassisNumber },
+                { label: 'Color', value: (r: any) => r.color },
+                { label: 'Mileage', value: (r: any) => r.mileage },
+                { label: 'Investment (LKR)', value: (r: any) => r.totalInvestment || r.purchasePrice || 0 },
+                { label: 'Selling Price (LKR)', value: (r: any) => r.sellingPrice || 0 },
+                { label: 'Status', value: (r: any) => r.status }
+              ];
+              exportPdf('Vehicle Inventory & Stock Master', 'vehicles-inventory.pdf', cols, vehicles);
+            }}
+            disabled={!vehicles.length}
+            className="flex items-center gap-1.5 rounded-lg bg-red-600 hover:bg-red-700 disabled:opacity-40 px-3.5 py-2 text-xs font-semibold text-white shadow-xs"
+          >
+            <FileDown className="w-4 h-4" />
+            <span>PDF</span>
+          </button>
+          <button
+            onClick={() => {
+              const cols = [
+                { label: 'Stock #', value: (r: any) => r.stockNumber },
+                { label: 'Round #', value: (r: any) => r.roundNumber || '—' },
+                { label: 'Make & Model', value: (r: any) => `${r.make} ${r.model} ${r.variant || ''}`.trim() },
+                { label: 'Year', value: (r: any) => r.year },
+                { label: 'Reg #', value: (r: any) => r.registrationNumber },
+                { label: 'Chassis #', value: (r: any) => r.chassisNumber },
+                { label: 'Color', value: (r: any) => r.color },
+                { label: 'Mileage', value: (r: any) => r.mileage },
+                { label: 'Investment (LKR)', value: (r: any) => r.totalInvestment || r.purchasePrice || 0 },
+                { label: 'Selling Price (LKR)', value: (r: any) => r.sellingPrice || 0 },
+                { label: 'Status', value: (r: any) => r.status }
+              ];
+              exportExcel('vehicles-inventory.xlsx', cols, vehicles);
+            }}
+            disabled={!vehicles.length}
+            className="flex items-center gap-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 disabled:opacity-40 px-3.5 py-2 text-xs font-semibold text-white shadow-xs"
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            <span>Excel</span>
+          </button>
+          <button
+            onClick={handleOpenAddModal}
+            className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2.5 rounded-lg shadow-xs transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add TVS Motorcycle</span>
+          </button>
+        </div>
       </div>
 
       {apiError && (
@@ -457,26 +562,39 @@ export default function VehicleInventoryPage() {
         </div>
       )}
 
-      {/* Filter Bar */}
+      {/* Filter Bar with Search and Date Filter */}
       <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs mb-6">
-        <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
-          <div className="relative w-full md:w-80">
-            <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search make, model, stock #, chassis..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-emerald-500 placeholder:text-slate-400"
+        <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
+          <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+            <div className="relative w-full sm:w-72">
+              <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search make, model, stock #, round #..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-emerald-500 placeholder:text-slate-400"
+              />
+            </div>
+
+            {/* Date Filter Option attached to Search */}
+            <DateFilterControl
+              startDate={startDate}
+              endDate={endDate}
+              onDateChange={(start, end) => {
+                setStartDate(start);
+                setEndDate(end);
+              }}
+              label="Date Filter:"
             />
           </div>
 
-          <div className="flex items-center gap-3 w-full md:w-auto overflow-x-auto text-xs font-semibold">
+          <div className="flex items-center gap-2 w-full lg:w-auto overflow-x-auto text-xs font-semibold">
             {['ALL', 'AVAILABLE', 'RESERVED', 'SOLD', 'UNDER INSPECTION'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-3 py-1.5 rounded-lg border transition-colors ${
+                className={`px-3 py-1.5 rounded-lg border transition-colors shrink-0 ${
                   activeTab === tab
                     ? 'bg-slate-900 text-white border-slate-900'
                     : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
@@ -495,7 +613,7 @@ export default function VehicleInventoryPage() {
           <table className="w-full text-xs text-left border-collapse">
             <thead>
               <tr className="bg-slate-50 text-slate-700 border-b border-slate-200 font-semibold">
-                <th className="py-3 px-4">Stock #</th>
+                <th className="py-3 px-4">Stock & Round #</th>
                 <th className="py-3 px-4">Vehicle Details</th>
                 <th className="py-3 px-4">Reg #</th>
                 <th className="py-3 px-4">Cost Investment</th>
@@ -508,7 +626,14 @@ export default function VehicleInventoryPage() {
             <tbody className="divide-y divide-slate-100">
               {filteredVehicles.map((v) => (
                 <tr key={v._id} className="hover:bg-slate-50/80">
-                  <td className="py-3 px-4 font-bold text-slate-900 font-mono">{v.stockNumber}</td>
+                  <td className="py-3 px-4 font-bold text-slate-900 font-mono">
+                    <div>{v.stockNumber}</div>
+                    {(v as any).roundNumber && (
+                      <span className="inline-block mt-1 px-1.5 py-0.5 rounded-md bg-indigo-50 border border-indigo-200 text-indigo-700 font-sans text-[10px] font-bold">
+                        Round #{(v as any).roundNumber}
+                      </span>
+                    )}
+                  </td>
                   <td className="py-3 px-4">
                     <div className="font-bold text-slate-900">{v.make} {v.model} {v.variant}</div>
                     <div className="text-[11px] text-slate-500">{v.year} • {v.fuelType} • {v.transmission} • {v.color}</div>
@@ -529,6 +654,15 @@ export default function VehicleInventoryPage() {
                     <div className="mt-2 flex justify-center gap-2">
                       <button onClick={() => handleOpenEditModal(v)} className="rounded-lg border border-emerald-200 px-3 py-1.5 text-[11px] font-semibold text-emerald-700 hover:bg-emerald-50">Edit</button>
                       <button onClick={() => setDeletingVehicle(v)} className="rounded-lg border border-rose-200 px-3 py-1.5 text-[11px] font-semibold text-rose-700 hover:bg-rose-50">Delete</button>
+                    </div>
+                    <div className="mt-2 flex justify-center">
+                      <button
+                        onClick={() => { setAssignPlateVehicle(v); setAssignPlateValue(v.registrationNumber || ''); }}
+                        className="rounded-lg border border-indigo-200 px-3 py-1.5 text-[11px] font-semibold text-indigo-700 hover:bg-indigo-50 flex items-center gap-1"
+                      >
+                        <Hash className="w-3 h-3" />
+                        <span>Assign Plate</span>
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -623,7 +757,7 @@ export default function VehicleInventoryPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                 <div>
                   <label className="block font-semibold text-slate-700 mb-1">Stock Number</label>
                   <input
@@ -632,6 +766,18 @@ export default function VehicleInventoryPage() {
                     value={newVehicle.stockNumber}
                     onChange={(e) => setNewVehicle({ ...newVehicle, stockNumber: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg placeholder:text-slate-400 font-mono text-[11px]"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">
+                    Round Number <span className="text-[10px] text-indigo-600 font-bold">(Round No)</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. RND-042 / Round 12"
+                    value={newVehicle.roundNumber}
+                    onChange={(e) => setNewVehicle({ ...newVehicle, roundNumber: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 border border-indigo-200 rounded-lg placeholder:text-slate-400 font-mono text-[11px] focus:border-indigo-500 focus:bg-white"
                   />
                 </div>
                 <div>
@@ -1076,6 +1222,7 @@ export default function VehicleInventoryPage() {
                 <div><span className="text-slate-500 block">Color:</span> <span className="font-bold">{selectedVehicle.color}</span></div>
                 <div><span className="text-slate-500 block">Mileage:</span> <span className="font-bold">{selectedVehicle.mileage.toLocaleString()} km</span></div>
                 <div><span className="text-slate-500 block">Chassis #:</span> <span className="font-mono text-[11px]">{selectedVehicle.chassisNumber}</span></div>
+                <div><span className="text-slate-500 block">Round #:</span> <span className="font-mono text-[11px] font-bold text-indigo-700">{selectedVehicle.roundNumber || '—'}</span></div>
                 <div><span className="text-slate-500 block">Status:</span> {getStatusBadge(selectedVehicle.status)}</div>
               </div>
 
@@ -1132,6 +1279,94 @@ export default function VehicleInventoryPage() {
         </div>
       )}
       {deletingVehicle && <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/50 p-4"><section role="alertdialog" aria-modal="true" className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"><h2 className="text-lg font-bold">Delete {deletingVehicle.make} {deletingVehicle.model}?</h2><p className="mt-2 text-sm text-slate-600">This removes the vehicle from inventory and cannot be undone.</p><div className="mt-6 flex justify-end gap-2"><button onClick={() => setDeletingVehicle(null)} className="rounded-lg border px-4 py-2 text-sm">Cancel</button><button onClick={deleteVehicle} className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white">Delete vehicle</button></div></section></div>}
+
+      {/* TVS Stock Requisition Modal */}
+      <TVSStockRequisitionPlanner
+        vehicles={vehicles}
+        isOpen={showTVSRequisition}
+        onClose={() => setShowTVSRequisition(false)}
+      />
+
+      {/* Assign Number Plate Modal */}
+      {assignPlateVehicle && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-[65] p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full mx-4 p-6 shadow-xl border border-slate-200 max-h-[90vh] overflow-y-auto text-slate-900">
+            <div className="flex items-center justify-between border-b pb-3 mb-4">
+              <div className="flex items-center gap-2">
+                <Hash className="w-5 h-5 text-indigo-600" />
+                <h3 className="text-base font-extrabold text-slate-900">Assign Number Plate</h3>
+              </div>
+              <button onClick={() => setAssignPlateVehicle(null)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="bg-slate-50 rounded-xl p-3 border border-slate-200 mb-4 text-xs">
+              <div className="font-bold text-slate-900">{assignPlateVehicle.make} {assignPlateVehicle.model} {assignPlateVehicle.variant}</div>
+              <div className="text-slate-500 mt-0.5">Chassis: <span className="font-mono font-semibold text-slate-700">{assignPlateVehicle.chassisNumber}</span></div>
+              <div className="text-slate-500 mt-0.5">Stock #: <span className="font-mono font-semibold text-slate-700">{assignPlateVehicle.stockNumber}</span></div>
+            </div>
+            <div className="space-y-3 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Number Plate (Registration No.)</label>
+                <input
+                  type="text"
+                  placeholder="e.g. ABC-1234"
+                  value={assignPlateValue}
+                  onChange={(e) => setAssignPlateValue(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 font-mono font-bold placeholder:text-slate-400 focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+              <div className="flex flex-col sm:flex-row justify-end gap-2 pt-3 border-t">
+                <button
+                  type="button"
+                  onClick={() => setAssignPlateVehicle(null)}
+                  className="px-4 py-2 border rounded-lg text-slate-600 font-semibold text-xs cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={assignPlateLoading || !assignPlateValue.trim()}
+                  onClick={async () => {
+                    if (!assignPlateVehicle || !assignPlateValue.trim()) return;
+                    setAssignPlateLoading(true);
+                    try {
+                      const res = await apiFetch(`/vehicles/${assignPlateVehicle._id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ registrationNumber: assignPlateValue.trim() })
+                      });
+                      if (res.ok) {
+                        const updated = await res.json();
+                        setVehicles((current) => current.map((v) => v._id === assignPlateVehicle._id ? { ...v, registrationNumber: assignPlateValue.trim() } : v));
+                        setAssignPlateVehicle(null);
+                        setAssignPlateValue('');
+                        setVehicleNotification({ type: 'success', message: '✅ Number plate assigned and customer SMS sent!' });
+                        setTimeout(() => setVehicleNotification(null), 4000);
+                      } else {
+                        const err = await res.json().catch(() => ({}));
+                        setVehicleNotification({ type: 'error', message: err.message || 'Could not assign number plate.' });
+                        setTimeout(() => setVehicleNotification(null), 5000);
+                        setAssignPlateVehicle(null);
+                      }
+                    } catch {
+                      setVehicleNotification({ type: 'error', message: 'Network error. Could not assign plate.' });
+                      setTimeout(() => setVehicleNotification(null), 5000);
+                      setAssignPlateVehicle(null);
+                    } finally {
+                      setAssignPlateLoading(false);
+                    }
+                  }}
+                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Hash className="w-3.5 h-3.5" />
+                  <span>{assignPlateLoading ? 'Assigning...' : 'Assign & Notify Customer'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }

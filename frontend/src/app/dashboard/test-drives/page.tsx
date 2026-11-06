@@ -17,8 +17,12 @@ import {
   XCircle,
   Edit,
   Trash2,
-  CalendarCheck
+  CalendarCheck,
+  FileDown,
+  FileSpreadsheet
 } from 'lucide-react';
+import { exportPdf, exportExcel } from '@/lib/exportUtils';
+import { DateFilterControl, isWithinDateRange } from '@/components/dashboard/DateFilterControl';
 
 interface TestDrive {
   _id: string;
@@ -43,6 +47,8 @@ export default function TestDrivesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
 
   // Modal States
@@ -218,7 +224,7 @@ export default function TestDrivesPage() {
   };
 
   const getVehicleTitle = (v: any) => {
-    if (!v) return '—';
+    if (!v) return 'â€”';
     if (typeof v === 'string') return v;
     const name = `${v.make || ''} ${v.model || ''} ${v.year || ''}`.trim();
     return name || v.registrationNumber || v.stockNumber || 'Vehicle';
@@ -244,10 +250,11 @@ export default function TestDrivesPage() {
         license.toLowerCase().includes(q);
 
       const matchesStatus = statusFilter === 'ALL' || b.status === statusFilter;
+      const matchesDate = isWithinDateRange(b.date || (b as any).createdAt, startDate, endDate);
 
-      return matchesSearch && matchesStatus;
+      return matchesSearch && matchesStatus && matchesDate;
     });
-  }, [bookings, searchQuery, statusFilter]);
+  }, [bookings, searchQuery, statusFilter, startDate, endDate]);
 
   // Statistics
   const totalCount = bookings.length;
@@ -321,21 +328,33 @@ export default function TestDrivesPage() {
         </div>
       </div>
 
-      {/* Filter and Search Bar */}
+      {/* Filter and Search Bar with Date Filter */}
       <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs mb-6">
-        <div className="flex flex-col md:flex-row gap-3 justify-between items-center">
-          <div className="relative w-full md:w-80">
-            <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search customer, vehicle, license, staff..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-emerald-500 placeholder:text-slate-400"
+        <div className="flex flex-col lg:flex-row gap-3 justify-between items-start lg:items-center">
+          <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+            <div className="relative w-full sm:w-72">
+              <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search customer, vehicle, license, staff..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-emerald-500 placeholder:text-slate-400"
+              />
+            </div>
+
+            <DateFilterControl
+              startDate={startDate}
+              endDate={endDate}
+              onDateChange={(start, end) => {
+                setStartDate(start);
+                setEndDate(end);
+              }}
+              label="Test Drive Date:"
             />
           </div>
 
-          <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto">
+          <div className="flex items-center gap-1.5 overflow-x-auto w-full lg:w-auto">
             {['ALL', 'Scheduled', 'Completed', 'Cancelled', 'No Show'].map((status) => (
               <button
                 key={status}
@@ -399,7 +418,7 @@ export default function TestDrivesPage() {
                   <td className="py-3 px-4">
                     <div className="text-slate-800 font-semibold flex items-center gap-1">
                       <User className="w-3.5 h-3.5 text-slate-400" />
-                      <span>{typeof b.salesperson === 'object' ? b.salesperson?.name || b.salesperson?.fullName || b.salesperson?.email || '—' : '—'}</span>
+                      <span>{typeof b.salesperson === 'object' ? b.salesperson?.name || b.salesperson?.fullName || b.salesperson?.email || 'â€”' : 'â€”'}</span>
                     </div>
                   </td>
 
@@ -412,7 +431,7 @@ export default function TestDrivesPage() {
                     {(b.startTime || b.endTime) && (
                       <div className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5 ml-4.5">
                         <Clock className="w-3 h-3 text-slate-400" />
-                        <span>{b.startTime || '—'} {b.endTime ? `to ${b.endTime}` : ''}</span>
+                        <span>{b.startTime || 'â€”'} {b.endTime ? `to ${b.endTime}` : ''}</span>
                       </div>
                     )}
                   </td>
@@ -459,7 +478,7 @@ export default function TestDrivesPage() {
                         {b.feedback}
                       </span>
                     ) : (
-                      <span className="text-slate-400 italic">—</span>
+                      <span className="text-slate-400 italic">â€”</span>
                     )}
                   </td>
 

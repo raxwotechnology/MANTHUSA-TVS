@@ -7,6 +7,7 @@ import { VehicleSchema } from '../vehicles/schemas/vehicle.schema';
 import { ExpenseSchema } from '../expenses/schemas/expense.schema';
 import { BranchSchema } from '../branches/schemas/branch.schema';
 import { LeadSchema } from '../leads/schemas/lead.schema';
+import { CustomerSchema } from '../customers/schemas/customer.schema';
 
 @Module({
   imports: [MongooseModule.forFeature([
@@ -15,6 +16,7 @@ import { LeadSchema } from '../leads/schemas/lead.schema';
     { name: 'Expense', schema: ExpenseSchema },
     { name: 'Branch', schema: BranchSchema },
     { name: 'Lead', schema: LeadSchema },
+    { name: 'Customer', schema: CustomerSchema },
   ])],
   controllers: [ReportsController],
   providers: [ReportsService]

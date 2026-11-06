@@ -9,9 +9,12 @@ import {
   User,
   PlusCircle,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  FileDown,
+  FileSpreadsheet
 } from 'lucide-react';
 import { getApiUrl } from '@/lib/api';
+import { exportPdf, exportExcel } from '@/lib/exportUtils';
 
 export default function CustomerTestDrivesPage() {
   const [testDrives, setTestDrives] = useState<any[]>([]);
@@ -61,13 +64,51 @@ export default function CustomerTestDrivesPage() {
           </p>
         </div>
 
-        <Link
-          href="/book-test-drive"
-          className="self-start sm:self-auto inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-all shadow-sm"
-        >
-          <PlusCircle className="w-4 h-4" />
-          <span>Book Test Drive</span>
-        </Link>
+        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+          <button
+            onClick={() => {
+              const cols = [
+                { label: 'Booking #', value: (r: any) => r.bookingNumber || r._id },
+                { label: 'Vehicle', value: (r: any) => r.vehicle?.make ? `${r.vehicle.make} ${r.vehicle.model}` : r.vehicleName || '—' },
+                { label: 'Date', value: (r: any) => r.appointmentDate ? new Date(r.appointmentDate).toLocaleDateString() : '—' },
+                { label: 'Time Slot', value: (r: any) => r.timeSlot || '—' },
+                { label: 'Branch', value: (r: any) => r.branch?.name || r.branchName || '—' },
+                { label: 'Status', value: (r: any) => r.status || 'Scheduled' }
+              ];
+              exportPdf('My Test Drives', 'my-test-drives.pdf', cols, testDrives);
+            }}
+            disabled={!testDrives.length}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 disabled:opacity-40 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-xs"
+          >
+            <FileDown className="w-3.5 h-3.5" />
+            <span>PDF</span>
+          </button>
+          <button
+            onClick={() => {
+              const cols = [
+                { label: 'Booking #', value: (r: any) => r.bookingNumber || r._id },
+                { label: 'Vehicle', value: (r: any) => r.vehicle?.make ? `${r.vehicle.make} ${r.vehicle.model}` : r.vehicleName || '—' },
+                { label: 'Date', value: (r: any) => r.appointmentDate ? new Date(r.appointmentDate).toLocaleDateString() : '—' },
+                { label: 'Time Slot', value: (r: any) => r.timeSlot || '—' },
+                { label: 'Branch', value: (r: any) => r.branch?.name || r.branchName || '—' },
+                { label: 'Status', value: (r: any) => r.status || 'Scheduled' }
+              ];
+              exportExcel('my-test-drives.xlsx', cols, testDrives);
+            }}
+            disabled={!testDrives.length}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 disabled:opacity-40 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-xs"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5" />
+            <span>Excel</span>
+          </button>
+          <Link
+            href="/book-test-drive"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-all shadow-sm"
+          >
+            <PlusCircle className="w-4 h-4" />
+            <span>Book Test Drive</span>
+          </Link>
+        </div>
       </div>
 
       {loading ? (

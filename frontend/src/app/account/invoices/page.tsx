@@ -11,10 +11,13 @@ import {
   ShieldCheck,
   CheckCircle2,
   Truck,
-  CreditCard
+  CreditCard,
+  FileDown,
+  FileSpreadsheet
 } from 'lucide-react';
 import { getApiUrl } from '@/lib/api';
 import { formatLKR } from '@/lib/publicApi';
+import { exportPdf, exportExcel } from '@/lib/exportUtils';
 
 export default function MyInvoicesPage() {
   const [invoices, setInvoices] = useState<any[]>([]);
@@ -52,13 +55,53 @@ export default function MyInvoicesPage() {
           </p>
         </div>
 
-        <Link
-          href="/account/payments"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs uppercase tracking-wider transition-all self-start sm:self-auto border border-slate-700"
-        >
-          <CreditCard className="w-3.5 h-3.5 text-red-400" />
-          <span>Payment History</span>
-        </Link>
+        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+          <button
+            onClick={() => {
+              const cols = [
+                { label: 'Invoice #', value: (r: any) => r.invoiceNumber },
+                { label: 'Vehicle', value: (r: any) => r.vehicle?.make ? `${r.vehicle.make} ${r.vehicle.model}` : r.vehicleName || '—' },
+                { label: 'Date', value: (r: any) => r.saleDate ? new Date(r.saleDate).toLocaleDateString() : '—' },
+                { label: 'Total (LKR)', value: (r: any) => r.finalAmount || 0 },
+                { label: 'Paid (LKR)', value: (r: any) => r.paidAmount || 0 },
+                { label: 'Balance (LKR)', value: (r: any) => r.balance || 0 },
+                { label: 'Status', value: (r: any) => r.saleStatus || r.status || 'Issued' },
+              ];
+              exportPdf('My Invoices', 'my-invoices.pdf', cols, invoices);
+            }}
+            disabled={!invoices.length}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-red-600 hover:bg-red-700 disabled:opacity-40 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-xs"
+          >
+            <FileDown className="w-3.5 h-3.5" />
+            <span>PDF</span>
+          </button>
+          <button
+            onClick={() => {
+              const cols = [
+                { label: 'Invoice #', value: (r: any) => r.invoiceNumber },
+                { label: 'Vehicle', value: (r: any) => r.vehicle?.make ? `${r.vehicle.make} ${r.vehicle.model}` : r.vehicleName || '—' },
+                { label: 'Date', value: (r: any) => r.saleDate ? new Date(r.saleDate).toLocaleDateString() : '—' },
+                { label: 'Total (LKR)', value: (r: any) => r.finalAmount || 0 },
+                { label: 'Paid (LKR)', value: (r: any) => r.paidAmount || 0 },
+                { label: 'Balance (LKR)', value: (r: any) => r.balance || 0 },
+                { label: 'Status', value: (r: any) => r.saleStatus || r.status || 'Issued' },
+              ];
+              exportExcel('my-invoices.xlsx', cols, invoices);
+            }}
+            disabled={!invoices.length}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 disabled:opacity-40 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-xs"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5" />
+            <span>Excel</span>
+          </button>
+          <Link
+            href="/account/payments"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs uppercase tracking-wider transition-all border border-slate-700"
+          >
+            <CreditCard className="w-3.5 h-3.5 text-red-400" />
+            <span>Payment History</span>
+          </Link>
+        </div>
       </div>
 
       {loading ? (
@@ -181,7 +224,7 @@ export default function MyInvoicesPage() {
             {/* Header */}
             <div className="flex items-center justify-between border-b pb-4">
               <div>
-                <h2 className="text-xl font-black text-red-600">TVS SALESPLUS MOTOR HUB</h2>
+                <h2 className="text-xl font-black text-red-600">MANTHUSA TVS</h2>
                 <p className="text-xs text-slate-500">Official Dealership Commercial Invoice</p>
               </div>
               <div className="text-right">

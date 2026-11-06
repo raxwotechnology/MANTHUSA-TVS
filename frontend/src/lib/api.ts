@@ -25,6 +25,7 @@ export function apiFetch(path: string, init: RequestInit = {}): Promise<Response
       if (!isAuthRoute && window.location.pathname.startsWith('/dashboard')) {
         window.localStorage.removeItem('token');
         window.localStorage.removeItem('user');
+        // eslint-disable-next-line @next/next/no-location-assign-relative-destination
         window.location.href = '/login?expired=1';
       }
     }

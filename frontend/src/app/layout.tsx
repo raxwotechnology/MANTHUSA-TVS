@@ -18,12 +18,14 @@ const interFont = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "TVS SalesPlus Motor Hub — Official TVS Motorcycle Dealership",
-    template: "%s | TVS SalesPlus Motor Hub",
+    default: "MANTHUSA TVS — Official TVS Motorcycle Dealership",
+    template: "%s | MANTHUSA TVS",
   },
   description:
-    "Explore official TVS motorcycles, Apache Racing series, NTORQ smart scooters, Jupiter commuter champions, and electric two-wheelers in Sri Lanka. Genuine warranty, leasing & service.",
+    "Explore official TVS motorcycles, Apache Racing series, NTORQ smart scooters, Jupiter commuter champions, and electric two-wheelers at MANTHUSA TVS in Weliweriya, Sri Lanka. Genuine warranty, leasing & service.",
   keywords: [
+    "MANTHUSA TVS",
+    "TVS Weliweriya",
     "TVS Motorcycles Sri Lanka",
     "TVS Apache RTR 160 4V",
     "TVS Apache RTR 200 4V",
@@ -32,16 +34,15 @@ export const metadata: Metadata = {
     "TVS Jupiter 125",
     "TVS Raider 125",
     "Motorcycle Leasing Sri Lanka",
-    "TVS Dealership Colombo",
   ],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://tvssalesplus.lk"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://manthusatvs.lk"),
   openGraph: {
-    title: "TVS SalesPlus Motor Hub — Official TVS Motorcycle Dealer",
+    title: "MANTHUSA TVS — Official TVS Motorcycle Dealer",
     description:
-      "Explore official TVS motorcycles, compare specs, calculate monthly lease installments, and book private test rides.",
+      "Explore official TVS motorcycles, compare specs, calculate monthly lease installments, and book private test rides at MANTHUSA TVS.",
     type: "website",
     locale: "en_LK",
-    siteName: "TVS SalesPlus Motor Hub",
+    siteName: "MANTHUSA TVS",
   },
 };
 

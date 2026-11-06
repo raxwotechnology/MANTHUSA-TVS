@@ -52,6 +52,7 @@ import { LeasingPartnersModule } from './leasing-partners/leasing-partners.modul
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         uri: configService.get<string>('MONGO_URI') || 'mongodb://localhost:27017/salesplus',
+        driverInfo: { name: 'salesplus', version: '1.0.0' },
       }),
       inject: [ConfigService],
     }),

@@ -17,7 +17,7 @@ import * as bcrypt from 'bcrypt';
 async function seed() {
   const mongoUri =
     process.env.MONGO_URI ||
-    'mongodb+srv://sudilthathsara19_db_user:F7nNLU2OCOa6DbTo@cluster0.tjm4rcd.mongodb.net/?appName=Cluster0';
+    'mongodb://localhost:27017/salesplus';
 
   console.log('Connecting to database...');
   await mongoose.connect(mongoUri);
@@ -93,9 +93,9 @@ async function seed() {
     // 3. Dealership Branches
     const branchDefs = [
       {
-        name: 'Colombo Central Flagship Hub',
-        location: 'No. 142/B, Baseline Road, Colombo 09',
-        contactNumber: '+94 11 268 4900',
+        name: 'MANTHUSA TVS - Weliweriya Showroom',
+        location: '386, New Kandy Road, Weliweriya',
+        contactNumber: '075-6000 310 / 076-5710 601',
         isActive: true,
       },
       {
@@ -174,13 +174,13 @@ async function seed() {
       {
         key: 'general',
         value: {
-          dealershipName: 'TVS SalesPlus Motor Hub',
+          dealershipName: 'MANTHUSA TVS',
           tagline: 'Official TVS Motorcycles & Scooters Dealership, Service & Genuine Parts',
           registrationNumber: 'TVS-LK-89214/2026',
           taxNumber: 'VAT-119284729-7000',
-          logoUrl: '',
+          logoUrl: '/manthusa-logo.png',
           faviconUrl: '',
-          footerText: '© 2026 TVS SalesPlus Motor Hub. All rights reserved. Official TVS Warranty & Genuine Spares.',
+          footerText: '© 2026 MANTHUSA TVS. All rights reserved. Official TVS Warranty & Genuine Spares.',
           defaultLanguage: 'en',
           currency: 'LKR',
           currencySymbol: 'Rs.',
@@ -189,16 +189,16 @@ async function seed() {
       {
         key: 'contact',
         value: {
-          address: 'No. 142/B, Baseline Road, Colombo 09, Sri Lanka',
-          city: 'Colombo',
+          address: '386, New Kandy Road, Weliweriya, Sri Lanka',
+          city: 'Weliweriya',
           province: 'Western Province',
-          postalCode: '00900',
-          phone: '+94 11 268 4900',
-          hotline: '+94 77 123 4567',
-          salesEmail: 'sales@tvsmotorhub.lk',
-          supportEmail: 'service@tvsmotorhub.lk',
+          postalCode: '11710',
+          phone: '075-6000 310',
+          hotline: '076-5710 601 / 070-6510 601',
+          salesEmail: 'sales@manthusatvs.lk',
+          supportEmail: 'service@manthusatvs.lk',
           openingHours: 'Mon - Sat: 8:30 AM - 6:30 PM (Sun: 9:00 AM - 2:00 PM)',
-          googleMapsUrl: 'https://maps.google.com/?q=Colombo+Sri+Lanka',
+          googleMapsUrl: 'https://maps.google.com/?q=386+New+Kandy+Road+Weliweriya',
         },
       },
       {
@@ -265,14 +265,14 @@ async function seed() {
           invoiceHeader: 'TVS MOTORCYCLE SALES INVOICE & DELIVERY ORDER',
           quotationHeader: 'OFFICIAL TVS MOTORCYCLE SALES QUOTATION',
           bankName: 'Commercial Bank of Ceylon PLC',
-          bankAccountName: 'TVS SalesPlus Motor Hub (Pvt) Ltd',
+          bankAccountName: 'MANTHUSA TVS',
           bankAccountNumber: '1000 4829 3819',
-          bankBranch: 'Colombo Main Branch',
+          bankBranch: 'Weliweriya Branch',
           bankSwift: 'CCEYLKAX',
           authorizedSignatory: 'Director / Showroom General Manager',
           termsConditions:
             '1. All TVS motorcycles undergo comprehensive Pre-Delivery Inspection (PDI) prior to handover.\n2. Reservation deposits are non-refundable after the reservation hold duration passes.\n3. Full settlement required before revenue license registration and bike delivery.\n4. Standard TVS manufacturer warranty terms apply as detailed in the service booklet.',
-          footerNote: 'Thank you for choosing TVS SalesPlus Motor Hub! Ride safe and enjoy every kilometre.',
+          footerNote: 'Thank you for choosing MANTHUSA TVS! Ride safe and enjoy every kilometre.',
         },
       },
       {
@@ -293,11 +293,11 @@ async function seed() {
       {
         key: 'social',
         value: {
-          whatsapp: '+94771234567',
-          facebook: 'https://facebook.com/tvsmotorhub',
-          instagram: 'https://instagram.com/tvsmotorhub',
-          youtube: 'https://youtube.com/@tvsmotorhub',
-          website: 'https://tvssalesplus.lk',
+          whatsapp: '+94756000310',
+          facebook: 'https://facebook.com/manthusatvs',
+          instagram: 'https://instagram.com/manthusatvs',
+          youtube: 'https://youtube.com/@manthusatvs',
+          website: 'https://manthusatvs.lk',
           tiktok: '',
         },
       },
@@ -319,7 +319,7 @@ async function seed() {
           announcement: {
             enabled: true,
             text: 'Special Season Offer: Get Free Registration, 2 Helmets & 3 Free Periodic Services on all TVS Apache & NTORQ bookings!',
-            phone: '+94 11 268 4900',
+            phone: '075-6000 310 / 076-5710 601',
             hours: 'Mon - Sat: 8:30 AM - 6:30 PM',
           },
           hero: {
@@ -342,7 +342,7 @@ async function seed() {
             showContact: true,
           },
           pages: {
-            about: 'TVS SalesPlus Motor Hub is an authorized TVS dealership providing brand-new TVS motorcycles, scooters, certified maintenance, genuine spare parts, and low-rate financing.',
+            about: 'MANTHUSA TVS is an authorized TVS dealership in Weliweriya providing brand-new TVS motorcycles, scooters, certified maintenance, genuine spare parts, and low-rate financing.',
             finance: 'We offer low-rate motorcycle leasing and installment plans starting from 10% down payment with instant approval.',
             terms: 'All motorcycle bookings are held for up to 7 days upon reservation deposit confirmation.',
             privacy: 'We take customer confidentiality seriously and protect your personal data according to applicable privacy standards.',

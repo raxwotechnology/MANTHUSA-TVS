@@ -2,8 +2,9 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { ArrowLeftRight, Plus, Building2, CheckCircle2, Clock, Truck, X } from 'lucide-react';
+import { ArrowLeftRight, Plus, Building2, CheckCircle2, Clock, Truck, X, FileDown, FileSpreadsheet } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
+import { exportPdf, exportExcel } from '@/lib/exportUtils';
 
 export default function TransfersPage() {
   const [transfers, setTransfers] = useState<any[]>([]);

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId, Model } from 'mongoose';
 import { ReservationDocument } from './schemas/reservation.schema';
@@ -28,8 +28,14 @@ export class ReservationsService {
       throw new BadRequestException('Expiry date must be in the future.');
     }
 
+    const isBranchValidObjId = input.branch && isValidObjectId(input.branch);
+    const branch = isBranchValidObjId ? input.branch : undefined;
+    const branchName = input.branchName || (!isBranchValidObjId && typeof input.branch === 'string' ? input.branch : undefined);
+
     const reservation = await new this.reservationModel({
       ...input,
+      branch,
+      ...(branchName ? { branchName } : {}),
       bookingNumber,
       reservationId: bookingNumber,
       reservationDeposit: deposit,
@@ -46,6 +52,21 @@ export class ReservationsService {
       entityType: 'Reservation',
       entityId: String(reservation._id),
     }).catch(() => undefined);
+
+    // Send SMS notification to customer
+    try {
+      const customer = await this.customerModel.findById(input.customer).exec();
+      if (customer && customer.phone) {
+        const dealershipName = process.env.DEALERSHIP_NAME || 'MANTHUSA TVS';
+        const agreedPrice = Number(input.agreedPrice || 0);
+        const remainingBalance = agreedPrice > 0
+          ? String(agreedPrice - deposit)
+          : 'as per invoice';
+        const expiryDateStr = expiryDate.toLocaleDateString('en-GB');
+        const smsMessage = `Dear ${customer.fullName}, your ${vehicle.model} has been reserved at ${dealershipName}! Booking Ref: ${bookingNumber}. Advance Paid: LKR ${deposit}. Remaining Balance: LKR ${remainingBalance}. Please complete the full payment to confirm delivery. Expires: ${expiryDateStr}. - ${dealershipName}`;
+        this.notifications.sendSms(customer.phone, smsMessage, 'Reservation').catch(() => undefined);
+      }
+    } catch (_) { /* SMS failure must not block reservation */ }
 
     return reservation;
   }
@@ -69,7 +90,7 @@ export class ReservationsService {
       .exec();
   }
 
-  async findOne(id: string) {
+  async findOne(id: string, user?: any) {
     const res = await this.reservationModel
       .findById(id)
       .populate('customer')
@@ -77,13 +98,27 @@ export class ReservationsService {
       .populate('branch')
       .exec();
     if (!res) throw new NotFoundException(`Booking #${id} not found.`);
+    const role = (user?.role || '').toLowerCase();
+    if (role.includes('customer') || role.includes('client')) {
+      const custId = res.customer?._id ? String(res.customer._id) : String(res.customer);
+      if (user.customerId && String(user.customerId) !== custId) {
+        throw new ForbiddenException('You do not have permission to view this reservation.');
+      }
+    }
     return res;
   }
 
   async update(id: string, input: any) {
     const reservation = await this.reservationModel.findById(id).exec();
     if (!reservation) throw new NotFoundException(`Booking ${id} not found.`);
-    Object.assign(reservation, input);
+    const cleanInput = { ...input };
+    if (cleanInput.branch && !isValidObjectId(cleanInput.branch)) {
+      if (!cleanInput.branchName && typeof cleanInput.branch === 'string') {
+        cleanInput.branchName = cleanInput.branch;
+      }
+      delete cleanInput.branch;
+    }
+    Object.assign(reservation, cleanInput);
     return reservation.save();
   }
 

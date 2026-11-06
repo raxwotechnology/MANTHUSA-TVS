@@ -13,9 +13,13 @@ import {
   Trash2,
   ArrowLeftRight,
   Search,
-  X
+  X,
+  FileDown,
+  FileSpreadsheet
 } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
+import { DateFilterControl, isWithinDateRange } from '@/components/dashboard/DateFilterControl';
+import { exportPdf, exportExcel } from '@/lib/exportUtils';
 
 interface Branch {
   _id: string;
@@ -30,6 +34,8 @@ export default function DealershipBranchesPage() {
   const [branches, setBranches] = useState<Branch[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingBranch, setEditingBranch] = useState<Branch | null>(null);
   const [deletingBranch, setDeletingBranch] = useState<Branch | null>(null);
@@ -133,13 +139,16 @@ export default function DealershipBranchesPage() {
   };
 
   const filtered = branches.filter((b) => {
-    if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
-    return (
-      (b.name || '').toLowerCase().includes(q) ||
-      (b.location || '').toLowerCase().includes(q) ||
-      (b.contactNumber || '').toLowerCase().includes(q)
-    );
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const match =
+        (b.name || '').toLowerCase().includes(q) ||
+        (b.location || '').toLowerCase().includes(q) ||
+        (b.contactNumber || '').toLowerCase().includes(q);
+      if (!match) return false;
+    }
+    if (!isWithinDateRange((b as any).createdAt, startDate, endDate)) return false;
+    return true;
   });
 
   return (
@@ -175,16 +184,28 @@ export default function DealershipBranchesPage() {
         </div>
       </div>
 
-      {/* Search Bar */}
-      <div className="mb-4">
-        <div className="relative max-w-sm">
-          <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Search branches by city, name, phone..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-red-500"
+      {/* Search Bar with Date Filter */}
+      <div className="mb-6 bg-white border border-slate-200/80 rounded-2xl p-4 shadow-xs">
+        <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center">
+          <div className="relative w-full sm:max-w-sm">
+            <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search branches by city, name, phone..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-red-500"
+            />
+          </div>
+
+          <DateFilterControl
+            startDate={startDate}
+            endDate={endDate}
+            onDateChange={(start, end) => {
+              setStartDate(start);
+              setEndDate(end);
+            }}
+            label="Created Date:"
           />
         </div>
       </div>

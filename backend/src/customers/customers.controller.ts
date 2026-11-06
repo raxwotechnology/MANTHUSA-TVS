@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Put, Delete, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, Req, Query } from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import { Roles } from '../auth/roles.decorator';
 
@@ -34,6 +34,7 @@ export class CustomersController {
       address: body.address,
       city: body.city,
       nicOrPassport: body.nicOrPassport,
+      dateOfBirth: body.dateOfBirth,
       gender: body.gender,
       occupation: body.occupation,
       company: body.company,
@@ -43,8 +44,8 @@ export class CustomersController {
 
   @Get()
   @Roles('Sales & Operations', 'Accountant / Finance Staff')
-  findAll() {
-    return this.customersService.findAll();
+  findAll(@Query('source') source?: string) {
+    return this.customersService.findAll(source);
   }
 
   @Get(':id')

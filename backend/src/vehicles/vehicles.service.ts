@@ -2,11 +2,15 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId, Model } from 'mongoose';
 import { VehicleDocument } from './schemas/vehicle.schema';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class VehiclesService {
   constructor(
-    @InjectModel('Vehicle') private vehicleModel: Model<VehicleDocument>
+    @InjectModel('Vehicle') private vehicleModel: Model<VehicleDocument>,
+    @InjectModel('Sale') private saleModel: Model<any>,
+    @InjectModel('Customer') private customerModel: Model<any>,
+    private readonly notifications: NotificationsService,
   ) {}
 
   private calculateFinancials(dto: any) {
@@ -53,7 +57,7 @@ export class VehiclesService {
         ],
       })
       .select(
-        'stockNumber make model variant category year manufacturingYear condition fuelType transmission engineCapacity engineType maxPower maxTorque coolingSystem fuelSystem startingSystem topSpeed mileage fuelTankCapacity frontBrake rearBrake brakingSystem frontSuspension rearSuspension wheelType tyreDimensions groundClearance seatHeight kerbWeight smartFeatures color variants colors branchStock sellingPrice images mediaAngles shortDescription description isFeatured status'
+        'stockNumber roundNumber make model variant category year manufacturingYear condition fuelType transmission engineCapacity engineType maxPower maxTorque coolingSystem fuelSystem startingSystem topSpeed mileage fuelTankCapacity frontBrake rearBrake brakingSystem frontSuspension rearSuspension wheelType tyreDimensions groundClearance seatHeight kerbWeight smartFeatures color variants colors branchStock sellingPrice images mediaAngles shortDescription description isFeatured status'
       )
       .sort({ isFeatured: -1, createdAt: -1 })
       .lean()
@@ -103,9 +107,31 @@ export class VehiclesService {
   async update(id: string, updateVehicleDto: any): Promise<VehicleDocument> {
     const vehicle = await this.vehicleModel.findById(id).exec();
     if (!vehicle) throw new NotFoundException(`Motorcycle #${id} not found`);
+
+    const isNewPlate =
+      updateVehicleDto.registrationNumber &&
+      updateVehicleDto.registrationNumber !== vehicle.registrationNumber;
+
     const { _id, createdAt, updatedAt, ...changes } = updateVehicleDto;
     Object.assign(vehicle, this.calculateFinancials({ ...vehicle.toObject(), ...changes }));
-    return vehicle.save();
+    const updatedVehicle = await vehicle.save();
+
+    // Send SMS when a number plate is newly assigned
+    if (isNewPlate) {
+      try {
+        const sale = await this.saleModel.findOne({ vehicle: id }).exec();
+        if (sale) {
+          const customer = await this.customerModel.findById(sale.customer).exec();
+          if (customer && customer.phone) {
+            const dealershipName = process.env.DEALERSHIP_NAME || 'MANTHUSA TVS';
+            const smsMessage = `Dear ${customer.fullName}, great news! Your ${updatedVehicle.model} (Chassis No: ${updatedVehicle.chassisNumber || 'N/A'}) has been registered. Number Plate: ${updatedVehicle.registrationNumber}. Please visit ${dealershipName} to collect your motorcycle. - ${dealershipName}`;
+            this.notifications.sendSms(customer.phone, smsMessage, 'NumberPlate').catch(() => undefined);
+          }
+        }
+      } catch (_) { /* SMS failure must not block vehicle update */ }
+    }
+
+    return updatedVehicle;
   }
 
   redactFinancials(vehicle: any, role?: string) {

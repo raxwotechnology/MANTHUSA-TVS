@@ -499,9 +499,9 @@ export default function HomePage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-3 shadow-sm hover:shadow-md transition-shadow">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Colombo Flagship Hub</h3>
-            <p className="text-xs text-slate-600 dark:text-slate-400">No. 142/B, Baseline Road, Colombo 09</p>
-            <div className="text-xs text-red-600 dark:text-red-400 font-bold pt-1">+94 11 268 4900</div>
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white">MANTHUSA TVS - Weliweriya Showroom</h3>
+            <p className="text-xs text-slate-600 dark:text-slate-400">386, New Kandy Road, Weliweriya</p>
+            <div className="text-xs text-red-600 dark:text-red-400 font-bold pt-1">075-6000 310 / 076-5710 601</div>
             <div className="text-[11px] text-emerald-700 dark:text-emerald-400 font-semibold">In Stock: Apache, NTORQ, Raider, Ronin</div>
           </div>
 

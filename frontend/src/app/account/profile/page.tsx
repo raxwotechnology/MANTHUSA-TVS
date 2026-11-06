@@ -21,6 +21,7 @@ export default function CustomerProfilePage() {
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
   const [nicOrPassport, setNicOrPassport] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState('');
   const [occupation, setOccupation] = useState('');
   const [company, setCompany] = useState('');
 
@@ -48,6 +49,7 @@ export default function CustomerProfilePage() {
           setAddress(data.address || '');
           setCity(data.city || '');
           setNicOrPassport(data.nicOrPassport || '');
+          setDateOfBirth(data.dateOfBirth ? data.dateOfBirth.split('T')[0] : '');
           setOccupation(data.occupation || '');
           setCompany(data.company || '');
         }
@@ -76,6 +78,7 @@ export default function CustomerProfilePage() {
           address,
           city,
           nicOrPassport,
+          dateOfBirth,
           occupation,
           company,
         }),
@@ -177,6 +180,18 @@ export default function CustomerProfilePage() {
               placeholder="e.g. 199012345678 or N1234567"
               value={nicOrPassport}
               onChange={(e) => setNicOrPassport(e.target.value)}
+              className="w-full rounded-xl border border-slate-800 bg-slate-950 py-2.5 px-3.5 text-xs text-white placeholder-slate-500 focus:border-amber-400 focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 mb-1">
+              Date of Birth (DOB)
+            </label>
+            <input
+              type="date"
+              value={dateOfBirth}
+              onChange={(e) => setDateOfBirth(e.target.value)}
               className="w-full rounded-xl border border-slate-800 bg-slate-950 py-2.5 px-3.5 text-xs text-white placeholder-slate-500 focus:border-amber-400 focus:outline-none"
             />
           </div>

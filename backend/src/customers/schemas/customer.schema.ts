@@ -40,6 +40,9 @@ export class Customer {
 
   @Prop({ default: 'Individual' })
   customerType: string; // 'Individual', 'Company', 'Dealer', 'Corporate'
+
+  @Prop({ default: 'Walk-in' })
+  customerSource: string; // 'Walk-in' (Shop Visit / Walk-in Customer), 'Online' (Online Inquiry / Website)
 }
 
 export const CustomerSchema = SchemaFactory.createForClass(Customer);

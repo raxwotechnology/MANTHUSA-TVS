@@ -153,6 +153,9 @@ export class Vehicle {
   chassisNumber: string;
 
   @Prop()
+  roundNumber: string;
+
+  @Prop()
   year: number;
 
   @Prop({ default: true })

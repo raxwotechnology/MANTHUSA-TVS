@@ -14,8 +14,12 @@ import {
   Camera,
   AlertCircle,
   FileText,
-  DollarSign
+  DollarSign,
+  FileDown,
+  FileSpreadsheet
 } from 'lucide-react';
+import { exportPdf, exportExcel } from '@/lib/exportUtils';
+import { DateFilterControl, isWithinDateRange } from '@/components/dashboard/DateFilterControl';
 
 interface EmployeeUser {
   _id: string;
@@ -69,6 +73,8 @@ export default function UsersPermissionsPage() {
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterRole, setFilterRole] = useState('ALL');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   // Modal States
   const [showModal, setShowModal] = useState(false);
@@ -332,9 +338,10 @@ export default function UsersPermissionsPage() {
         branchName.includes(q);
 
       const matchesRole = filterRole === 'ALL' || getRoleName(u) === filterRole;
-      return matchesSearch && matchesRole;
+      const matchesDate = isWithinDateRange(u.createdAt, startDate, endDate);
+      return matchesSearch && matchesRole && matchesDate;
     });
-  }, [usersList, searchQuery, filterRole]);
+  }, [usersList, searchQuery, filterRole, startDate, endDate]);
 
   return (
     <DashboardLayout>
@@ -408,21 +415,33 @@ export default function UsersPermissionsPage() {
         </div>
       </div>
 
-      {/* Filter and Search Bar */}
+      {/* Filter and Search Bar with Date Filter */}
       <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs mb-6">
-        <div className="flex flex-col md:flex-row gap-3 justify-between items-center">
-          <div className="relative w-full md:w-80">
-            <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search name, email, phone, NIC, branch..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-blue-500 placeholder:text-slate-400"
+        <div className="flex flex-col lg:flex-row gap-3 justify-between items-start lg:items-center">
+          <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+            <div className="relative w-full sm:w-72">
+              <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search name, email, phone, NIC, branch..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-blue-500 placeholder:text-slate-400"
+              />
+            </div>
+
+            <DateFilterControl
+              startDate={startDate}
+              endDate={endDate}
+              onDateChange={(start, end) => {
+                setStartDate(start);
+                setEndDate(end);
+              }}
+              label="Joined Date:"
             />
           </div>
 
-          <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto">
+          <div className="flex items-center gap-1.5 overflow-x-auto w-full lg:w-auto">
             {['ALL', 'Admin / Owner', 'Sales & Operations', 'Accountant / Finance Staff', 'Customer'].map((roleKey) => (
               <button
                 key={roleKey}
@@ -482,7 +501,7 @@ export default function UsersPermissionsPage() {
 
                     {/* Contact & NIC */}
                     <td className="py-3 px-4">
-                      <div className="font-medium text-slate-800">{u.phone || '—'}</div>
+                      <div className="font-medium text-slate-800">{u.phone || 'â€”'}</div>
                       <div className="text-[11px] text-slate-400 font-mono">NIC: {u.nic || 'N/A'}</div>
                     </td>
 
@@ -508,7 +527,7 @@ export default function UsersPermissionsPage() {
 
                     {/* Salary */}
                     <td className="py-3 px-4 font-semibold text-slate-900">
-                      {u.salary ? `LKR ${Number(u.salary).toLocaleString()}` : '—'}
+                      {u.salary ? `LKR ${Number(u.salary).toLocaleString()}` : 'â€”'}
                     </td>
 
                     {/* Documents */}
@@ -658,7 +677,7 @@ export default function UsersPermissionsPage() {
                     <input
                       type="password"
                       required={!editingUser}
-                      placeholder={editingUser ? '••••••••••••' : 'Enter login password'}
+                      placeholder={editingUser ? 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢' : 'Enter login password'}
                       value={form.password}
                       onChange={(e) => setForm({ ...form, password: e.target.value })}
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs focus:outline-none focus:border-blue-500 placeholder:text-slate-400"

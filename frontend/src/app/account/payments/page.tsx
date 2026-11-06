@@ -8,10 +8,13 @@ import {
   Printer,
   Receipt,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  FileDown,
+  FileSpreadsheet
 } from 'lucide-react';
 import { getApiUrl } from '@/lib/api';
 import { formatLKR } from '@/lib/publicApi';
+import { exportPdf, exportExcel } from '@/lib/exportUtils';
 
 export default function MyPaymentsPage() {
   const [payments, setPayments] = useState<any[]>([]);
@@ -48,13 +51,53 @@ export default function MyPaymentsPage() {
           </p>
         </div>
 
-        <Link
-          href="/account/invoices"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs uppercase tracking-wider transition-all self-start sm:self-auto border border-slate-700"
-        >
-          <Receipt className="w-3.5 h-3.5 text-red-400" />
-          <span>View Invoices</span>
-        </Link>
+        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+          <button
+            onClick={() => {
+              const cols = [
+                { label: 'Receipt #', value: (r: any) => r.receiptNumber || r.paymentId || r._id },
+                { label: 'Invoice #', value: (r: any) => r.sale?.invoiceNumber || r.invoiceNumber || '—' },
+                { label: 'Date', value: (r: any) => r.paymentDate ? new Date(r.paymentDate).toLocaleDateString() : '—' },
+                { label: 'Payment Method', value: (r: any) => r.paymentMethod || '—' },
+                { label: 'Reference #', value: (r: any) => r.referenceNumber || '—' },
+                { label: 'Amount (LKR)', value: (r: any) => r.amount || 0 },
+                { label: 'Status', value: (r: any) => r.status || 'Verified' }
+              ];
+              exportPdf('Payment Receipts History', 'my-payments.pdf', cols, payments);
+            }}
+            disabled={!payments.length}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-red-600 hover:bg-red-700 disabled:opacity-40 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-xs"
+          >
+            <FileDown className="w-3.5 h-3.5" />
+            <span>PDF</span>
+          </button>
+          <button
+            onClick={() => {
+              const cols = [
+                { label: 'Receipt #', value: (r: any) => r.receiptNumber || r.paymentId || r._id },
+                { label: 'Invoice #', value: (r: any) => r.sale?.invoiceNumber || r.invoiceNumber || '—' },
+                { label: 'Date', value: (r: any) => r.paymentDate ? new Date(r.paymentDate).toLocaleDateString() : '—' },
+                { label: 'Payment Method', value: (r: any) => r.paymentMethod || '—' },
+                { label: 'Reference #', value: (r: any) => r.referenceNumber || '—' },
+                { label: 'Amount (LKR)', value: (r: any) => r.amount || 0 },
+                { label: 'Status', value: (r: any) => r.status || 'Verified' }
+              ];
+              exportExcel('my-payments.xlsx', cols, payments);
+            }}
+            disabled={!payments.length}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 disabled:opacity-40 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-xs"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5" />
+            <span>Excel</span>
+          </button>
+          <Link
+            href="/account/invoices"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs uppercase tracking-wider transition-all border border-slate-700"
+          >
+            <Receipt className="w-3.5 h-3.5 text-red-400" />
+            <span>View Invoices</span>
+          </Link>
+        </div>
       </div>
 
       {loading ? (

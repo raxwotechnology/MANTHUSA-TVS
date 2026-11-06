@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { randomUUID } from 'crypto';
 import { mkdir, readFile, writeFile } from 'fs/promises';
-import { join, resolve } from 'path';
+import { basename, join, resolve } from 'path';
 
 const MAX_BYTES = 10 * 1024 * 1024;
 const TYPES: Record<string, { mime: string; extension: string; signature: (buffer: Buffer) => boolean }> = {
@@ -42,7 +42,11 @@ export class DocumentsService {
   async download(id: string) {
     const doc = await this.model.findById(id).exec();
     if (!doc) throw new NotFoundException('Document not found.');
-    try { return { doc, buffer: await readFile(join(this.directory(), doc.storageName)) }; }
-    catch { throw new NotFoundException('Stored document file is missing.'); }
+    try {
+      const safeName = basename(doc.storageName);
+      return { doc, buffer: await readFile(join(this.directory(), safeName)) };
+    } catch {
+      throw new NotFoundException('Stored document file is missing.');
+    }
   }
 }

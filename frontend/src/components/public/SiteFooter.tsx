@@ -24,13 +24,13 @@ interface Props {
 
 export function SiteFooter({ brand }: Props) {
   const currentYear = new Date().getFullYear();
-  const dealershipName = brand?.dealershipName || 'TVS SalesPlus Motor Hub';
-  const phone = brand?.phone || '+94 11 268 4900';
-  const hotline = brand?.hotline || '+94 77 123 4567';
-  const email = brand?.salesEmail || brand?.email || 'sales@tvsmotorhub.lk';
-  const address = brand?.address || 'No. 142/B, Baseline Road, Colombo 09, Sri Lanka';
+  const dealershipName = brand?.dealershipName || 'MANTHUSA TVS';
+  const phone = brand?.phone || '075-6000 310';
+  const hotline = brand?.hotline || '076-5710 601 / 070-6510 601';
+  const email = brand?.salesEmail || brand?.email || 'sales@manthusatvs.lk';
+  const address = brand?.address || '386, New Kandy Road, Weliweriya, Sri Lanka';
   const hours = brand?.openingHours || 'Mon - Sat: 8:30 AM - 6:30 PM (Sun: 9:00 AM - 2:00 PM)';
-  const whatsapp = brand?.whatsapp || '+94771234567';
+  const whatsapp = brand?.whatsapp || '+94756000310';
 
   const quickLinks = [
     { label: 'Browse TVS Motorcycles', href: '/bikes' },
@@ -72,7 +72,7 @@ export function SiteFooter({ brand }: Props) {
           </div>
           <div className="flex items-center gap-3">
             <a
-              href={`https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}?text=Hello%20TVS%20SalesPlus%2C%20I%20would%20like%20to%20inquire%20about%20motorcycle%20models%20and%20prices`}
+              href={`https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}?text=Hello%20MANTHUSA%20TVS%2C%20I%20would%20like%20to%20inquire%20about%20motorcycle%20models%20and%20prices`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-sm transition-all hover:scale-102 active:scale-98 shadow-sm"
@@ -96,12 +96,22 @@ export function SiteFooter({ brand }: Props) {
           {/* Column 1: Dealership Details */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 to-rose-700 text-white flex items-center justify-center shadow-md shrink-0">
-                <Flame className="w-5 h-5 fill-white" />
-              </div>
+              {brand?.logoUrl ? (
+                <div className="h-10 w-20 rounded-xl bg-white p-1 flex items-center justify-center shadow-md shrink-0 overflow-hidden">
+                  <img
+                    src={brand.logoUrl}
+                    alt={dealershipName}
+                    className="w-full h-full object-contain rounded-lg"
+                  />
+                </div>
+              ) : (
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 to-rose-700 text-white flex items-center justify-center shadow-md shrink-0">
+                  <Flame className="w-5 h-5 fill-white" />
+                </div>
+              )}
               <div className="flex flex-col">
                 <span className="text-base font-black text-white tracking-wider flex items-center gap-1 leading-none">
-                  <span className="text-red-500">TVS</span> SALESPLUS
+                  <span className="text-red-500">MANTHUSA</span> TVS
                 </span>
                 <span className="text-[10px] font-semibold text-slate-400 tracking-wider uppercase mt-1">
                   Motorcycle Sales Management System

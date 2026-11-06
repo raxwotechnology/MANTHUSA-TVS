@@ -8,9 +8,12 @@ import {
   Clock,
   ArrowRight,
   PlusCircle,
-  Tag
+  Tag,
+  FileDown,
+  FileSpreadsheet
 } from 'lucide-react';
 import { getApiUrl } from '@/lib/api';
+import { exportPdf, exportExcel } from '@/lib/exportUtils';
 
 export default function CustomerInquiriesPage() {
   const [inquiries, setInquiries] = useState<any[]>([]);
@@ -62,13 +65,49 @@ export default function CustomerInquiriesPage() {
           </p>
         </div>
 
-        <Link
-          href="/inquiry"
-          className="self-start sm:self-auto inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-all shadow-sm"
-        >
-          <PlusCircle className="w-4 h-4" />
-          <span>New Inquiry</span>
-        </Link>
+        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+          <button
+            onClick={() => {
+              const cols = [
+                { label: 'Vehicle', value: (r: any) => r.vehicle?.make ? `${r.vehicle.make} ${r.vehicle.model}` : r.vehicleInterest || '—' },
+                { label: 'Date', value: (r: any) => r.createdAt ? new Date(r.createdAt).toLocaleDateString() : '—' },
+                { label: 'Source', value: (r: any) => r.source || 'Website' },
+                { label: 'Notes', value: (r: any) => r.notes || '—' },
+                { label: 'Status', value: (r: any) => r.status || 'New' }
+              ];
+              exportPdf('My Inquiries', 'my-inquiries.pdf', cols, inquiries);
+            }}
+            disabled={!inquiries.length}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 disabled:opacity-40 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-xs"
+          >
+            <FileDown className="w-3.5 h-3.5" />
+            <span>PDF</span>
+          </button>
+          <button
+            onClick={() => {
+              const cols = [
+                { label: 'Vehicle', value: (r: any) => r.vehicle?.make ? `${r.vehicle.make} ${r.vehicle.model}` : r.vehicleInterest || '—' },
+                { label: 'Date', value: (r: any) => r.createdAt ? new Date(r.createdAt).toLocaleDateString() : '—' },
+                { label: 'Source', value: (r: any) => r.source || 'Website' },
+                { label: 'Notes', value: (r: any) => r.notes || '—' },
+                { label: 'Status', value: (r: any) => r.status || 'New' }
+              ];
+              exportExcel('my-inquiries.xlsx', cols, inquiries);
+            }}
+            disabled={!inquiries.length}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 disabled:opacity-40 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-xs"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5" />
+            <span>Excel</span>
+          </button>
+          <Link
+            href="/inquiry"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-all shadow-sm"
+          >
+            <PlusCircle className="w-4 h-4" />
+            <span>New Inquiry</span>
+          </Link>
+        </div>
       </div>
 
       {loading ? (

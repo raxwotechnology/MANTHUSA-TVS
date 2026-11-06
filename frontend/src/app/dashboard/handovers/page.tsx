@@ -2,7 +2,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { apiFetch } from '@/lib/api';
-import { CheckCircle2, Clock, FileText, PenTool, Printer, RefreshCw, X, ShieldCheck } from 'lucide-react';
+import { CheckCircle2, Clock, FileText, PenTool, Printer, RefreshCw, X, ShieldCheck, FileDown, FileSpreadsheet } from 'lucide-react';
+import { exportPdf, exportExcel } from '@/lib/exportUtils';
 
 export default function HandoversPage() {
   const [handovers, setHandovers] = useState<any[]>([]);
@@ -194,13 +195,36 @@ export default function HandoversPage() {
             <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Motorcycle Handover & PDI Checklist</h1>
             <p className="text-xs text-slate-500">Pre-delivery inspection verification, key handover & digital customer signature</p>
           </div>
-          <button
-            onClick={() => { setShowModal(true); setSignatureData(''); }}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5"
-          >
-            <PenTool className="w-4 h-4" />
-            <span>Prepare New Handover</span>
-          </button>
+          <div className="flex items-center gap-2 flex-wrap">
+            {(() => {
+              const cols = [
+                { label: 'Invoice #', value: (r: any) => r.sale?.invoiceNumber || '' },
+                { label: 'Customer', value: (r: any) => typeof r.customer === 'object' ? r.customer?.fullName || '' : r.customer || '' },
+                { label: 'Vehicle', value: (r: any) => typeof r.vehicle === 'object' ? `${r.vehicle?.make} ${r.vehicle?.model}` : r.vehicle || '' },
+                { label: 'Handover Date', value: (r: any) => r.handoverDate ? new Date(r.handoverDate).toLocaleDateString() : 'Pending' },
+                { label: 'Checklist Completed', value: (r: any) => `${Object.values(r.checklist || {}).filter(Boolean).length}/10 items` },
+                { label: 'Signature', value: (r: any) => (r.customerSignatureData || r.checklist?.customerSignature) ? 'Signed' : 'Pending' },
+                { label: 'Status', value: (r: any) => r.status },
+              ];
+              return (
+                <>
+                  <button onClick={() => exportPdf('Motorcycle Handover & PDI Checklist', 'handovers.pdf', cols, handovers)} disabled={!handovers.length} className="flex items-center gap-1.5 rounded-lg bg-red-600 hover:bg-red-700 disabled:opacity-40 px-3.5 py-2 text-xs font-semibold text-white shadow-xs">
+                    <FileDown className="w-4 h-4" /><span>PDF</span>
+                  </button>
+                  <button onClick={() => exportExcel('handovers.xlsx', cols, handovers)} disabled={!handovers.length} className="flex items-center gap-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 disabled:opacity-40 px-3.5 py-2 text-xs font-semibold text-white shadow-xs">
+                    <FileSpreadsheet className="w-4 h-4" /><span>Excel</span>
+                  </button>
+                </>
+              );
+            })()}
+            <button
+              onClick={() => { setShowModal(true); setSignatureData(''); }}
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5"
+            >
+              <PenTool className="w-4 h-4" />
+              <span>Prepare New Handover</span>
+            </button>
+          </div>
         </div>
 
         {/* List of Handover Records */}

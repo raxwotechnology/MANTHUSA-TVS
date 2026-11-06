@@ -69,7 +69,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         <main className="flex-1 min-w-0 p-3 sm:p-4 md:p-6 overflow-y-auto flex flex-col justify-between">
           <div className="flex-1">{children}</div>
           <footer className="mt-8 pt-4 pb-2 border-t border-slate-200/80 text-center text-xs text-slate-400 font-medium">
-            {brand.footerText || '© 2026 TVS SalesPlus Motor Hub. All rights reserved.'}
+            {brand.footerText || '© 2026 MANTHUSA TVS. All rights reserved.'}
           </footer>
         </main>
       </div>

@@ -13,8 +13,12 @@ import {
   CreditCard,
   Building,
   CheckCircle2,
-  X
+  X,
+  FileDown,
+  FileSpreadsheet
 } from 'lucide-react';
+import { exportPdf, exportExcel } from '@/lib/exportUtils';
+import { DateFilterControl, isWithinDateRange } from '@/components/dashboard/DateFilterControl';
 
 interface Transaction {
   _id: string;
@@ -38,6 +42,8 @@ export default function ReceiptsVouchersPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterCategory, setFilterCategory] = useState('ALL');
   const [filterMethod, setFilterMethod] = useState('ALL');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState<'IN' | 'OUT'>('OUT');
 
@@ -105,6 +111,7 @@ export default function ReceiptsVouchersPage() {
     }
     if (filterCategory !== 'ALL' && tx.category !== filterCategory) return false;
     if (filterMethod !== 'ALL' && tx.paymentMethod !== filterMethod) return false;
+    if (!isWithinDateRange(tx.transactionDate || (tx as any).createdAt, startDate, endDate)) return false;
     return true;
   });
 
@@ -170,43 +177,57 @@ export default function ReceiptsVouchersPage() {
         </div>
 
         {/* Filter Toolbar matching screenshot */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-          <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search by ref #, name, vehicle, hire #..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-500"
-            />
+        <div className="flex flex-col gap-3 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search by ref #, name, vehicle, hire #..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-500"
+              />
+            </div>
+
+            <select
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
+              className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-medium focus:outline-none focus:border-emerald-500"
+            >
+              <option value="ALL">All Voucher Types</option>
+              <option value="Customer Payment">Customer Payment</option>
+              <option value="Vehicle Repair">Vehicle Repair</option>
+              <option value="Transport Cost">Transport Cost</option>
+              <option value="Supplier Payment">Supplier Payment</option>
+              <option value="Petty Cash">Petty Cash</option>
+            </select>
+
+            <select
+              value={filterMethod}
+              onChange={(e) => setFilterMethod(e.target.value)}
+              className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-medium focus:outline-none focus:border-emerald-500"
+            >
+              <option value="ALL">All Payment Methods</option>
+              <option value="Cash">Cash</option>
+              <option value="Bank Transfer">Bank Transfer</option>
+              <option value="Cheque">Cheque</option>
+              <option value="Card">Card</option>
+              <option value="Online Payment">Online Payment</option>
+            </select>
           </div>
 
-          <select
-            value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
-            className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-700 font-medium focus:outline-none focus:border-emerald-500"
-          >
-            <option value="ALL">All Voucher Types</option>
-            <option value="Customer Payment">Customer Payment</option>
-            <option value="Vehicle Repair">Vehicle Repair</option>
-            <option value="Transport Cost">Transport Cost</option>
-            <option value="Supplier Payment">Supplier Payment</option>
-            <option value="Petty Cash">Petty Cash</option>
-          </select>
-
-          <select
-            value={filterMethod}
-            onChange={(e) => setFilterMethod(e.target.value)}
-            className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-700 font-medium focus:outline-none focus:border-emerald-500"
-          >
-            <option value="ALL">All Payment Methods</option>
-            <option value="Cash">Cash</option>
-            <option value="Bank Transfer">Bank Transfer</option>
-            <option value="Cheque">Cheque</option>
-            <option value="Card">Card</option>
-            <option value="Online Payment">Online Payment</option>
-          </select>
+          <div className="flex items-center justify-between flex-wrap gap-2 pt-1 border-t border-slate-100">
+            <DateFilterControl
+              startDate={startDate}
+              endDate={endDate}
+              onDateChange={(start, end) => {
+                setStartDate(start);
+                setEndDate(end);
+              }}
+              label="Transaction Date:"
+            />
+          </div>
         </div>
 
         {/* Table or Empty State matching screenshot */}

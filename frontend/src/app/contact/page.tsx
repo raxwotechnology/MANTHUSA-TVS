@@ -112,10 +112,10 @@ export default function ContactPage() {
                   <div>
                     <span className="font-bold text-slate-900 dark:text-white block text-sm">Flagship Showroom</span>
                     <p className="text-slate-600 dark:text-slate-400 mt-0.5 leading-relaxed">
-                      {brand.address || 'No. 142/B, Baseline Road, Colombo 09, Sri Lanka'}
+                      {brand.address || '386, New Kandy Road, Weliweriya, Sri Lanka'}
                     </p>
                     <a
-                      href={brand.googleMapsUrl || 'https://maps.google.com/?q=Colombo+Sri+Lanka'}
+                      href={brand.googleMapsUrl || 'https://maps.google.com/?q=386+New+Kandy+Road+Weliweriya'}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400 font-bold hover:underline mt-1.5"
@@ -134,10 +134,10 @@ export default function ContactPage() {
                   <div>
                     <span className="font-bold text-slate-900 dark:text-white block text-sm">Telephone Hotline</span>
                     <p className="text-slate-600 dark:text-slate-400 mt-0.5">
-                      Hotline: <a href={`tel:${(brand.hotline || '+94771234567').replace(/\s+/g, '')}`} className="text-slate-800 hover:text-red-600 dark:text-slate-200 dark:hover:text-white font-medium">{brand.hotline || '+94 77 123 4567'}</a>
+                      Hotline: <a href={`tel:${(brand.hotline || '0765710601').replace(/[\s\-\/]+/g, '')}`} className="text-slate-800 hover:text-red-600 dark:text-slate-200 dark:hover:text-white font-medium">{brand.hotline || '076-5710 601 / 070-6510 601'}</a>
                     </p>
                     <p className="text-slate-600 dark:text-slate-400 mt-0.5">
-                      Direct: <a href={`tel:${(brand.phone || '+94112684900').replace(/\s+/g, '')}`} className="text-slate-800 hover:text-red-600 dark:text-slate-200 dark:hover:text-white font-medium">{brand.phone || '+94 11 268 4900'}</a>
+                      Direct: <a href={`tel:${(brand.phone || '0756000310').replace(/[\s\-\/]+/g, '')}`} className="text-slate-800 hover:text-red-600 dark:text-slate-200 dark:hover:text-white font-medium">{brand.phone || '075-6000 310'}</a>
                     </p>
                   </div>
                 </div>
@@ -150,10 +150,10 @@ export default function ContactPage() {
                   <div>
                     <span className="font-bold text-slate-900 dark:text-white block text-sm">Official Inquiries</span>
                     <p className="text-slate-600 dark:text-slate-400 mt-0.5">
-                      Sales: <a href={`mailto:${brand.salesEmail || 'sales@salesplus.lk'}`} className="text-slate-800 hover:text-red-600 dark:text-slate-200 dark:hover:text-white">{brand.salesEmail || 'sales@salesplus.lk'}</a>
+                      Sales: <a href={`mailto:${brand.salesEmail || 'sales@manthusatvs.lk'}`} className="text-slate-800 hover:text-red-600 dark:text-slate-200 dark:hover:text-white">{brand.salesEmail || 'sales@manthusatvs.lk'}</a>
                     </p>
                     <p className="text-slate-600 dark:text-slate-400 mt-0.5">
-                      Support: <a href={`mailto:${brand.supportEmail || 'support@salesplus.lk'}`} className="text-slate-800 hover:text-red-600 dark:text-slate-200 dark:hover:text-white">{brand.supportEmail || 'support@salesplus.lk'}</a>
+                      Support: <a href={`mailto:${brand.supportEmail || 'service@manthusatvs.lk'}`} className="text-slate-800 hover:text-red-600 dark:text-slate-200 dark:hover:text-white">{brand.supportEmail || 'service@manthusatvs.lk'}</a>
                     </p>
                   </div>
                 </div>

@@ -487,12 +487,12 @@ export default function SettingsPage() {
 
                   {/* Logo Upload Section */}
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 pt-2">
-                    <div className="w-28 h-28 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 flex flex-col items-center justify-center overflow-hidden relative group">
+                    <div className="w-36 h-20 rounded-2xl border-2 border-dashed border-slate-300 bg-white flex flex-col items-center justify-center overflow-hidden relative group p-1">
                       {settings.general?.logoUrl ? (
                         <img
                           src={settings.general.logoUrl}
                           alt="Logo Preview"
-                          className="w-full h-full object-contain p-2"
+                          className="w-full h-full object-contain rounded-xl"
                         />
                       ) : (
                         <div className="flex flex-col items-center text-slate-400">

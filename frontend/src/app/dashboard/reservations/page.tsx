@@ -12,10 +12,15 @@ import {
   Building,
   DollarSign,
   AlertCircle,
-  X
+  X,
+  FileDown,
+  FileSpreadsheet,
+  MessageSquare
 } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { useRouter } from 'next/navigation';
+import { exportPdf, exportExcel } from '@/lib/exportUtils';
+import { DateFilterControl, isWithinDateRange } from '@/components/dashboard/DateFilterControl';
 
 interface Booking {
   _id: string;
@@ -26,13 +31,24 @@ interface Booking {
   modelName?: string;
   variantName?: string;
   selectedColor?: string;
-  branch?: string;
+  branch?: any;
+  branchName?: string;
   reservationDeposit: number;
   paymentMethod?: string;
+  bookingDate?: string;
   expiryDate?: string;
   status: string;
   notes?: string;
   createdAt?: string;
+}
+
+function getBranchLabel(branchVal: any, branchName?: string): string {
+  if (branchName) return branchName;
+  if (!branchVal) return 'Colombo Showroom';
+  if (typeof branchVal === 'object') {
+    return branchVal.name || branchVal.location || 'Colombo Showroom';
+  }
+  return String(branchVal);
 }
 
 export default function TVSBookingsPage() {
@@ -40,12 +56,20 @@ export default function TVSBookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
 
   const [customersList, setCustomersList] = useState<any[]>([]);
   const [vehiclesList, setVehiclesList] = useState<any[]>([]);
+  const [branchesList, setBranchesList] = useState<any[]>([]);
+  const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  const [smsBooking, setSmsBooking] = useState<Booking | null>(null);
+  const [smsMessage, setSmsMessage] = useState('');
+  const [smsSending, setSmsSending] = useState(false);
 
   const [formData, setFormData] = useState({
     customerId: '',
@@ -63,10 +87,11 @@ export default function TVSBookingsPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [resRes, custRes, vehRes] = await Promise.all([
+      const [resRes, custRes, vehRes, branchRes] = await Promise.all([
         apiFetch('/reservations'),
         apiFetch('/customers'),
-        apiFetch('/vehicles')
+        apiFetch('/vehicles'),
+        apiFetch('/branches')
       ]);
 
       if (resRes.ok) {
@@ -75,6 +100,7 @@ export default function TVSBookingsPage() {
       }
       if (custRes.ok) setCustomersList(await custRes.json());
       if (vehRes.ok) setVehiclesList(await vehRes.json());
+      if (branchRes.ok) setBranchesList(await branchRes.json());
     } catch (err) {
       console.error('Error loading bookings:', err);
     } finally {
@@ -90,6 +116,9 @@ export default function TVSBookingsPage() {
     e.preventDefault();
     try {
       const selectedVehicle = vehiclesList.find(v => v._id === formData.vehicleId);
+      const selectedBranch = branchesList.find(b => b._id === formData.branch);
+      const branchName = selectedBranch ? selectedBranch.name : (typeof formData.branch === 'string' ? formData.branch : 'Colombo Showroom');
+
       const payload = {
         customer: formData.customerId,
         vehicle: formData.vehicleId,
@@ -97,6 +126,7 @@ export default function TVSBookingsPage() {
         variantName: formData.variantName || selectedVehicle?.variant || 'Standard',
         selectedColor: formData.selectedColor || 'Racing Red',
         branch: formData.branch,
+        branchName,
         reservationDeposit: Number(formData.reservationDeposit || 0),
         paymentMethod: formData.paymentMethod,
         expiryDate: new Date(formData.expiryDate).toISOString(),
@@ -116,9 +146,12 @@ export default function TVSBookingsPage() {
 
       setShowAddModal(false);
       setEditingBooking(null);
+      setNotification({ type: 'success', message: 'TVS Booking saved successfully!' });
+      setTimeout(() => setNotification(null), 4000);
       loadData();
     } catch (err: any) {
-      alert(err.message || 'Error saving booking');
+      setNotification({ type: 'error', message: err.message || 'Error saving booking' });
+      setTimeout(() => setNotification(null), 5000);
     }
   };
 
@@ -130,19 +163,24 @@ export default function TVSBookingsPage() {
         body: JSON.stringify({ status: newStatus })
       });
       if (res.ok) {
+        setNotification({ type: 'success', message: `Booking status updated to ${newStatus}.` });
+        setTimeout(() => setNotification(null), 3000);
         loadData();
       } else {
-        alert('Could not update status');
+        setNotification({ type: 'error', message: 'Could not update status.' });
+        setTimeout(() => setNotification(null), 4000);
       }
     } catch (e) {
-      alert('Network error updating status');
+      setNotification({ type: 'error', message: 'Network error updating status.' });
+      setTimeout(() => setNotification(null), 4000);
     }
   };
 
   const handleCreateQuotation = (booking: Booking) => {
-    const custId = booking.customer?._id || booking.customer;
-    const vehId = booking.vehicle?._id || booking.vehicle;
-    router.push(`/dashboard/quotations`);
+    const custId = booking.customer?._id || booking.customer || '';
+    const vehId = booking.vehicle?._id || booking.vehicle || '';
+    const deposit = booking.reservationDeposit || 0;
+    router.push(`/dashboard/quotations?customerId=${encodeURIComponent(custId)}&vehicleId=${encodeURIComponent(vehId)}&advancePayment=${encodeURIComponent(String(deposit))}`);
   };
 
   const filtered = bookings.filter((b) => {
@@ -152,12 +190,15 @@ export default function TVSBookingsPage() {
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       const num = (b.bookingNumber || b.reservationId || '').toLowerCase();
-      const cName = (b.customer?.fullName || '').toLowerCase();
+      const cName = (typeof b.customer === 'object' ? b.customer?.fullName || '' : String(b.customer || '')).toLowerCase();
       const mName = (b.modelName || b.vehicle?.model || '').toLowerCase();
-      const bName = (b.branch || '').toLowerCase();
+      const bName = getBranchLabel(b.branch, b.branchName).toLowerCase();
       if (!num.includes(q) && !cName.includes(q) && !mName.includes(q) && !bName.includes(q)) {
         return false;
       }
+    }
+    if (!isWithinDateRange(b.bookingDate || (b as any).createdAt, startDate, endDate)) {
+      return false;
     }
     return true;
   });
@@ -183,6 +224,33 @@ export default function TVSBookingsPage() {
 
   return (
     <DashboardLayout>
+      {/* Toast Notification Banner */}
+      {notification && (
+        <div
+          role="alert"
+          className={`mb-4 p-4 rounded-xl text-xs font-bold flex items-center justify-between shadow-sm transition-all ${
+            notification.type === 'success'
+              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+              : 'bg-rose-50 text-rose-800 border border-rose-200'
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            {notification.type === 'success' ? (
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            ) : (
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+            )}
+            <span>{notification.message}</span>
+          </div>
+          <button
+            onClick={() => setNotification(null)}
+            className="text-slate-400 hover:text-slate-600"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
@@ -194,32 +262,68 @@ export default function TVSBookingsPage() {
           </p>
         </div>
 
-        <button
-          onClick={() => {
-            setEditingBooking(null);
-            setShowAddModal(true);
-          }}
-          className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-xs transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          <span>New Bike Booking</span>
-        </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          {(() => {
+            const cols = [
+              { label: 'Booking Ref', value: (r: any) => r.bookingNumber || r.reservationId || '' },
+              { label: 'Customer', value: (r: any) => r.customer?.fullName || '' },
+              { label: 'TVS Motorcycle Model', value: (r: any) => r.modelName || '' },
+              { label: 'Color', value: (r: any) => r.selectedColor || '' },
+              { label: 'Branch', value: (r: any) => getBranchLabel(r.branch, r.branchName) },
+              { label: 'Deposit Amount (LKR)', value: (r: any) => r.reservationDeposit },
+              { label: 'Expiry', value: (r: any) => r.expiryDate ? new Date(r.expiryDate).toLocaleDateString() : '' },
+              { label: 'Status', value: (r: any) => r.status },
+            ];
+            return (
+              <>
+                <button onClick={() => exportPdf('TVS Motorcycle Bookings', 'reservations.pdf', cols, bookings)} disabled={!bookings.length} className="flex items-center gap-1.5 rounded-lg bg-red-600 hover:bg-red-700 disabled:opacity-40 px-3.5 py-2 text-xs font-semibold text-white shadow-xs">
+                  <FileDown className="w-4 h-4" /><span>PDF</span>
+                </button>
+                <button onClick={() => exportExcel('reservations.xlsx', cols, bookings)} disabled={!bookings.length} className="flex items-center gap-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 disabled:opacity-40 px-3.5 py-2 text-xs font-semibold text-white shadow-xs">
+                  <FileSpreadsheet className="w-4 h-4" /><span>Excel</span>
+                </button>
+              </>
+            );
+          })()}
+          <button
+            onClick={() => {
+              setEditingBooking(null);
+              setShowAddModal(true);
+            }}
+            className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-xs transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            <span>New Bike Booking</span>
+          </button>
+        </div>
       </div>
 
-      {/* Filter / Search Bar */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs mb-6 flex flex-col md:flex-row gap-3 justify-between items-center">
-        <div className="relative w-full md:w-80">
-          <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Search booking #, customer, model, branch..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-emerald-500 text-slate-900 placeholder:text-slate-400"
+      {/* Filter / Search Bar with Date Filter */}
+      <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs mb-6 flex flex-col lg:flex-row gap-3 justify-between items-start lg:items-center">
+        <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+          <div className="relative w-full sm:w-72">
+            <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search booking #, customer, model, branch..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-emerald-500 text-slate-900 placeholder:text-slate-400"
+            />
+          </div>
+
+          <DateFilterControl
+            startDate={startDate}
+            endDate={endDate}
+            onDateChange={(start, end) => {
+              setStartDate(start);
+              setEndDate(end);
+            }}
+            label="Booking Date:"
           />
         </div>
 
-        <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto text-xs font-semibold">
+        <div className="flex items-center gap-2 overflow-x-auto w-full lg:w-auto text-xs font-semibold">
           {['ALL', 'CONFIRMED', 'PENDING', 'COMPLETED', 'CANCELLED'].map((tab) => (
             <button
               key={tab}
@@ -260,7 +364,7 @@ export default function TVSBookingsPage() {
                   </td>
                   <td className="py-3 px-4">
                     <div className="font-bold text-slate-900">{b.customer?.fullName || 'Walk-in Customer'}</div>
-                    <div className="text-[11px] text-slate-500">{b.customer?.phone || b.customer?.email || '—'}</div>
+                    <div className="text-[11px] text-slate-500">{b.customer?.phone || b.customer?.email || 'â€”'}</div>
                   </td>
                   <td className="py-3 px-4">
                     <div className="font-bold text-slate-900">{b.modelName || (b.vehicle ? `${b.vehicle.make} ${b.vehicle.model}` : 'TVS Motorcycle')}</div>
@@ -270,7 +374,7 @@ export default function TVSBookingsPage() {
                     <div className="font-semibold text-slate-800">{b.selectedColor || 'Factory Finish'}</div>
                     <div className="text-[11px] text-emerald-700 flex items-center gap-1">
                       <Building className="w-3 h-3" />
-                      <span>{b.branch || 'Colombo Showroom'}</span>
+                      <span>{getBranchLabel(b.branch, b.branchName)}</span>
                     </div>
                   </td>
                   <td className="py-3 px-4 font-extrabold text-emerald-700">
@@ -278,7 +382,7 @@ export default function TVSBookingsPage() {
                     <span className="block text-[10px] text-slate-400 font-normal">{b.paymentMethod || 'Deposit'}</span>
                   </td>
                   <td className="py-3 px-4 text-slate-600 font-medium">
-                    {b.expiryDate ? new Date(b.expiryDate).toLocaleDateString() : '—'}
+                    {b.expiryDate ? new Date(b.expiryDate).toLocaleDateString() : 'â€”'}
                   </td>
                   <td className="py-3 px-4">
                     {getStatusBadge(b.status || 'Active')}
@@ -311,6 +415,25 @@ export default function TVSBookingsPage() {
                           Cancel
                         </button>
                       )}
+
+                      <button
+                        onClick={() => {
+                          const custName = typeof b.customer === 'object' ? b.customer?.fullName || 'Customer' : 'Customer';
+                          const phone = typeof b.customer === 'object' ? b.customer?.phone || '' : '';
+                          const model = b.modelName || (b.vehicle ? `${b.vehicle.make || 'TVS'} ${b.vehicle.model}` : 'TVS Motorcycle');
+                          const refId = b.bookingNumber || b.reservationId || `TVS-BK-${b._id.slice(-6).toUpperCase()}`;
+                          const deposit = Number(b.reservationDeposit || 0).toLocaleString('en-LK');
+                          const expiry = b.expiryDate ? new Date(b.expiryDate).toLocaleDateString('en-GB') : 'soon';
+                          const defaultMsg = `Dear ${custName}, your ${model} is reserved at TVS SalesPlus Motor Hub! Booking Ref: ${refId}. Advance Paid: LKR ${deposit}. Please complete full payment to confirm handover. Valid until: ${expiry}. - TVS SalesPlus Motor Hub`;
+                          setSmsBooking(b);
+                          setSmsMessage(defaultMsg);
+                        }}
+                        className="px-2 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 font-bold text-[11px] rounded-lg border border-blue-200 flex items-center gap-1"
+                        title="Send SMS update to customer"
+                      >
+                        <MessageSquare className="w-3 h-3" />
+                        <span>Send SMS</span>
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -484,6 +607,90 @@ export default function TVSBookingsPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* SMS Modal */}
+      {smsBooking && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-200 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b pb-3 mb-4">
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-blue-600" />
+                <h3 className="text-base font-extrabold text-slate-900">Send Advance / Booking SMS</h3>
+              </div>
+              <button onClick={() => setSmsBooking(null)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="bg-slate-50 rounded-xl p-3 border border-slate-200 mb-4 text-xs space-y-1">
+              <div className="flex justify-between"><span className="text-slate-500">Customer:</span> <span className="font-bold text-slate-800">{typeof smsBooking.customer === 'object' ? smsBooking.customer?.fullName : 'Customer'}</span></div>
+              <div className="flex justify-between"><span className="text-slate-500">Phone:</span> <span className="font-mono font-bold text-blue-600">{typeof smsBooking.customer === 'object' ? smsBooking.customer?.phone || 'No phone recorded' : 'No phone recorded'}</span></div>
+              <div className="flex justify-between"><span className="text-slate-500">Motorcycle:</span> <span className="font-medium text-slate-700">{smsBooking.modelName || smsBooking.vehicle?.model || 'TVS Motorcycle'}</span></div>
+              <div className="flex justify-between"><span className="text-slate-500">Advance Paid:</span> <span className="font-mono font-bold text-emerald-700">LKR {Number(smsBooking.reservationDeposit || 0).toLocaleString('en-LK')}</span></div>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">SMS Message (Sender: TVSSalesPlus)</label>
+                <textarea
+                  rows={4}
+                  value={smsMessage}
+                  onChange={(e) => setSmsMessage(e.target.value)}
+                  className="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-blue-500 font-sans leading-relaxed"
+                />
+              </div>
+
+              <div className="flex flex-col sm:flex-row justify-end gap-2 pt-3 border-t">
+                <button
+                  type="button"
+                  onClick={() => setSmsBooking(null)}
+                  className="px-4 py-2 border rounded-lg text-slate-600 font-semibold text-xs cursor-pointer hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={smsSending || !smsMessage.trim() || !(typeof smsBooking.customer === 'object' && smsBooking.customer?.phone)}
+                  onClick={async () => {
+                    const phone = typeof smsBooking.customer === 'object' ? smsBooking.customer?.phone : null;
+                    if (!phone) {
+                      setNotification({ type: 'error', message: 'Customer phone number not available for SMS.' });
+                      setTimeout(() => setNotification(null), 4000);
+                      return;
+                    }
+                    setSmsSending(true);
+                    try {
+                      const res = await apiFetch('/notifications/send-sms', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ phone, message: smsMessage.trim() })
+                      });
+                      if (res.ok) {
+                        setNotification({ type: 'success', message: `SMS sent successfully to ${phone}!` });
+                        setTimeout(() => setNotification(null), 4000);
+                        setSmsBooking(null);
+                      } else {
+                        const err = await res.json().catch(() => ({}));
+                        setNotification({ type: 'error', message: err.message || 'Failed to send SMS.' });
+                        setTimeout(() => setNotification(null), 5000);
+                      }
+                    } catch {
+                      setNotification({ type: 'error', message: 'Network error sending SMS.' });
+                      setTimeout(() => setNotification(null), 5000);
+                    } finally {
+                      setSmsSending(false);
+                    }
+                  }}
+                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  <span>{smsSending ? 'Sending SMS...' : 'Send SMS Now'}</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { QuotationDocument } from './schemas/quotation.schema';
@@ -73,7 +73,7 @@ export class QuotationsService {
       .exec();
   }
 
-  async findOne(id: string): Promise<QuotationDocument> {
+  async findOne(id: string, user?: any): Promise<QuotationDocument> {
     const quotation = await this.quotationModel
       .findById(id)
       .populate('customer')
@@ -83,6 +83,13 @@ export class QuotationsService {
       .exec();
     if (!quotation) {
       throw new NotFoundException(`Quotation #${id} not found`);
+    }
+    const role = (user?.role || '').toLowerCase();
+    if (role.includes('customer') || role.includes('client')) {
+      const custId = quotation.customer?._id ? String(quotation.customer._id) : String(quotation.customer);
+      if (user.customerId && String(user.customerId) !== custId) {
+        throw new ForbiddenException('You do not have permission to view this quotation.');
+      }
     }
     return quotation;
   }

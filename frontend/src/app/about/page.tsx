@@ -101,8 +101,8 @@ export default function AboutPage() {
               <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">
                 Flagship Experience
               </span>
-              <p className="text-base font-bold text-white">Baseline Road Showroom Lounge</p>
-              <p className="text-xs text-slate-200">{brand.address || 'No. 142/B, Baseline Road, Colombo 09'}</p>
+              <p className="text-base font-bold text-white">Weliweriya Main Showroom</p>
+              <p className="text-xs text-slate-200">{brand.address || '386, New Kandy Road, Weliweriya'}</p>
             </div>
           </div>
         </div>
@@ -149,7 +149,7 @@ export default function AboutPage() {
             </div>
             <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Showroom Address</h3>
             <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              {brand.address || 'No. 142/B, Baseline Road, Colombo 09, Sri Lanka'}
+              {brand.address || '386, New Kandy Road, Weliweriya, Sri Lanka'}
             </p>
             {brand.registrationNumber && (
               <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
@@ -179,10 +179,10 @@ export default function AboutPage() {
             </div>
             <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Connect With Us</h3>
             <p className="text-xs text-slate-600 dark:text-slate-300">
-              Hotline: <a href={`tel:${(brand.hotline || '+94771234567').replace(/\s+/g, '')}`} className="text-amber-600 dark:text-amber-400 font-bold hover:underline">{brand.hotline || '+94 77 123 4567'}</a>
+              Hotline: <a href={`tel:${(brand.hotline || '0765710601').replace(/[\s\-\/]+/g, '')}`} className="text-amber-600 dark:text-amber-400 font-bold hover:underline">{brand.hotline || '076-5710 601 / 070-6510 601'}</a>
             </p>
             <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
-              Email: {brand.salesEmail || brand.email || 'sales@salesplus.lk'}
+              Email: {brand.salesEmail || brand.email || 'sales@manthusatvs.lk'}
             </p>
           </div>
         </div>

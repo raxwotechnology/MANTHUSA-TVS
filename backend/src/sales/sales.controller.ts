@@ -27,13 +27,13 @@ export class SalesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.salesService.findOne(id);
+  findOne(@Param('id') id: string, @Req() req: any) {
+    return this.salesService.findOne(id, req.user);
   }
 
   @Get(':id/contract')
-  getSalesContract(@Param('id') id: string) {
-    return this.salesService.getSalesContract(id);
+  getSalesContract(@Param('id') id: string, @Req() req: any) {
+    return this.salesService.getSalesContract(id, req.user);
   }
 
   @Put(':id')

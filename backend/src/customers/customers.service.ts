@@ -19,8 +19,9 @@ export class CustomersService {
     return createdCustomer.save();
   }
 
-  async findAll(): Promise<CustomerDocument[]> {
-    return this.customerModel.find().sort({ createdAt: -1 }).exec();
+  async findAll(source?: string): Promise<CustomerDocument[]> {
+    const filter = source ? { customerSource: new RegExp(`^${source}$`, 'i') } : {};
+    return this.customerModel.find(filter).sort({ createdAt: -1 }).exec();
   }
 
   async findOne(id: string): Promise<CustomerDocument> {

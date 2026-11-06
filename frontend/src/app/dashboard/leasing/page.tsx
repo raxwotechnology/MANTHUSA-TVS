@@ -2,7 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { apiFetch } from '@/lib/api';
-import { Building2, Plus, Phone, Mail, Percent, Calendar, Trash2 } from 'lucide-react';
+import { Building2, Plus, Phone, Mail, Percent, Calendar, Trash2, FileDown, FileSpreadsheet } from 'lucide-react';
+import { exportPdf, exportExcel } from '@/lib/exportUtils';
 
 export default function LeasingPartnersPage() {
   const [partners, setPartners] = useState<any[]>([]);

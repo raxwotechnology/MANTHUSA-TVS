@@ -9,10 +9,13 @@ import {
   FileText,
   ArrowRight,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  FileDown,
+  FileSpreadsheet
 } from 'lucide-react';
 import { getApiUrl } from '@/lib/api';
 import { formatLKR } from '@/lib/publicApi';
+import { exportPdf, exportExcel } from '@/lib/exportUtils';
 
 export default function MyBookingsPage() {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -49,12 +52,50 @@ export default function MyBookingsPage() {
           </p>
         </div>
 
-        <Link
-          href="/configure"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs uppercase tracking-wider transition-all self-start sm:self-auto"
-        >
-          <span>Configure Bike</span>
-        </Link>
+        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+          <button
+            onClick={() => {
+              const cols = [
+                { label: 'Booking #', value: (r: any) => r.reservationId || r._id },
+                { label: 'Vehicle', value: (r: any) => r.vehicle?.make ? `${r.vehicle.make} ${r.vehicle.model}` : r.vehicleName || '—' },
+                { label: 'Branch', value: (r: any) => r.branch?.name || r.branchName || '—' },
+                { label: 'Deposit (LKR)', value: (r: any) => r.depositAmount || 0 },
+                { label: 'Expiry Date', value: (r: any) => r.expiryDate ? new Date(r.expiryDate).toLocaleDateString() : '—' },
+                { label: 'Status', value: (r: any) => r.status || 'Confirmed' },
+              ];
+              exportPdf('My Bookings & Reservations', 'my-bookings.pdf', cols, bookings);
+            }}
+            disabled={!bookings.length}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-red-600 hover:bg-red-700 disabled:opacity-40 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-xs"
+          >
+            <FileDown className="w-3.5 h-3.5" />
+            <span>PDF</span>
+          </button>
+          <button
+            onClick={() => {
+              const cols = [
+                { label: 'Booking #', value: (r: any) => r.reservationId || r._id },
+                { label: 'Vehicle', value: (r: any) => r.vehicle?.make ? `${r.vehicle.make} ${r.vehicle.model}` : r.vehicleName || '—' },
+                { label: 'Branch', value: (r: any) => r.branch?.name || r.branchName || '—' },
+                { label: 'Deposit (LKR)', value: (r: any) => r.depositAmount || 0 },
+                { label: 'Expiry Date', value: (r: any) => r.expiryDate ? new Date(r.expiryDate).toLocaleDateString() : '—' },
+                { label: 'Status', value: (r: any) => r.status || 'Confirmed' },
+              ];
+              exportExcel('my-bookings.xlsx', cols, bookings);
+            }}
+            disabled={!bookings.length}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 disabled:opacity-40 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-xs"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5" />
+            <span>Excel</span>
+          </button>
+          <Link
+            href="/configure"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs uppercase tracking-wider transition-all"
+          >
+            <span>Configure Bike</span>
+          </Link>
+        </div>
       </div>
 
       {loading ? (

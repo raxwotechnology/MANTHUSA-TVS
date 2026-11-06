@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { apiFetch } from '@/lib/api';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -12,6 +12,7 @@ export default function NewCustomerPage() {
     phone: '',
     email: '',
     nicOrPassport: '',
+    dateOfBirth: '',
     city: '',
     customerType: 'Individual'
   });
@@ -69,6 +70,10 @@ export default function NewCustomerPage() {
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">NIC / Passport</label>
               <input type="text" name="nicOrPassport" placeholder="e.g. 199212345678 / 921234567V" onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-400" />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Date of Birth (DOB)</label>
+              <input type="date" name="dateOfBirth" onChange={handleChange} className="w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900" />
             </div>
           </div>
           <div className="mt-6 pt-4 border-t flex justify-end gap-3">

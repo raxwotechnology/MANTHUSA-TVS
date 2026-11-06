@@ -705,38 +705,112 @@ span[class*="bg-red-"] *,
   background: rgba(148, 163, 184, 0.5);
 }
 
-/* Dashboard light cards & settings form controls: ALWAYS black/dark text and clear placeholder */
-.bg-white input:not([type="checkbox"]):not([type="radio"]),
-.bg-white textarea,
-.bg-white select,
-.bg-slate-50 input:not([type="checkbox"]):not([type="radio"]),
-.bg-slate-50 textarea,
-.bg-slate-50 select,
-input.bg-slate-50,
-input.bg-white,
-textarea.bg-slate-50,
-textarea.bg-white,
-select.bg-slate-50,
-select.bg-white,
-.settings-form input:not([type="checkbox"]):not([type="radio"]),
-.settings-form textarea,
-.settings-form select {
+/* Dashboard light cards & settings form controls: ALWAYS black/dark text and clear placeholder in light mode */
+:root:not(.dark) .bg-white input:not([type="checkbox"]):not([type="radio"]),
+:root:not(.dark) .bg-white textarea,
+:root:not(.dark) .bg-white select,
+:root:not(.dark) .bg-slate-50 input:not([type="checkbox"]):not([type="radio"]),
+:root:not(.dark) .bg-slate-50 textarea,
+:root:not(.dark) .bg-slate-50 select,
+:root:not(.dark) input.bg-slate-50,
+:root:not(.dark) input.bg-white,
+:root:not(.dark) textarea.bg-slate-50,
+:root:not(.dark) textarea.bg-white,
+:root:not(.dark) select.bg-slate-50,
+:root:not(.dark) select.bg-white,
+:root:not(.dark) .settings-form input:not([type="checkbox"]):not([type="radio"]),
+:root:not(.dark) .settings-form textarea,
+:root:not(.dark) .settings-form select {
   color: #0f172a !important;
   -webkit-text-fill-color: #0f172a !important;
 }
 
-.bg-white input::placeholder,
-.bg-white textarea::placeholder,
-.bg-slate-50 input::placeholder,
-.bg-slate-50 textarea::placeholder,
-input.bg-slate-50::placeholder,
-input.bg-white::placeholder,
-textarea.bg-slate-50::placeholder,
-textarea.bg-white::placeholder,
-.settings-form input::placeholder,
-.settings-form textarea::placeholder {
+:root:not(.dark) .bg-white input::placeholder,
+:root:not(.dark) .bg-white textarea::placeholder,
+:root:not(.dark) .bg-slate-50 input::placeholder,
+:root:not(.dark) .bg-slate-50 textarea::placeholder,
+:root:not(.dark) input.bg-slate-50::placeholder,
+:root:not(.dark) input.bg-white::placeholder,
+:root:not(.dark) textarea.bg-slate-50::placeholder,
+:root:not(.dark) textarea.bg-white::placeholder,
+:root:not(.dark) .settings-form input::placeholder,
+:root:not(.dark) .settings-form textarea::placeholder {
   color: #94a3b8 !important;
   -webkit-text-fill-color: #94a3b8 !important;
+}
+
+/* Auth card inputs in dark mode & crisp autofill handling */
+.dark .auth-card input:not([type="checkbox"]):not([type="radio"]),
+.dark .auth-card textarea,
+.dark .auth-card select {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+.dark .auth-card input::placeholder,
+.dark .auth-card textarea::placeholder,
+.dark .auth-card select::placeholder {
+  color: #94a3b8 !important;
+  -webkit-text-fill-color: #94a3b8 !important;
+}
+
+/* Autofill fixes for dark mode and auth inputs */
+.dark .auth-card input:-webkit-autofill,
+.dark .auth-card input:-webkit-autofill:hover,
+.dark .auth-card input:-webkit-autofill:focus,
+.dark input[class*="dark:bg-"]:-webkit-autofill,
+.dark input[class*="dark:bg-"]:-webkit-autofill:hover,
+.dark input[class*="dark:bg-"]:-webkit-autofill:focus {
+  -webkit-text-fill-color: #ffffff !important;
+  -webkit-box-shadow: 0 0 0px 1000px #0b132b inset !important;
+  box-shadow: 0 0 0px 1000px #0b132b inset !important;
+  caret-color: #ffffff !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+:root:not(.dark) .auth-card input:-webkit-autofill,
+:root:not(.dark) .auth-card input:-webkit-autofill:hover,
+:root:not(.dark) .auth-card input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #0f172a !important;
+  -webkit-box-shadow: 0 0 0px 1000px #f8fafc inset !important;
+  box-shadow: 0 0 0px 1000px #f8fafc inset !important;
+  caret-color: #0f172a !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Modals and panels with explicit bg-white in dark dashboard: ensure labels, text, inputs & buttons are clearly dark and legible */
+.dark .bg-white:not([class*="dark:bg-"]),
+.dark [class~="bg-white"]:not([class*="dark:bg-"]) {
+  color: #0f172a !important;
+}
+
+.dark .bg-white:not([class*="dark:bg-"]) label,
+.dark [class~="bg-white"]:not([class*="dark:bg-"]) label {
+  color: #1e293b !important;
+}
+
+.dark .bg-white:not([class*="dark:bg-"]) input:not([type="checkbox"]):not([type="radio"]),
+.dark .bg-white:not([class*="dark:bg-"]) select,
+.dark .bg-white:not([class*="dark:bg-"]) textarea,
+.dark [class~="bg-white"]:not([class*="dark:bg-"]) input:not([type="checkbox"]):not([type="radio"]),
+.dark [class~="bg-white"]:not([class*="dark:bg-"]) select,
+.dark [class~="bg-white"]:not([class*="dark:bg-"]) textarea {
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+.dark .bg-white:not([class*="dark:bg-"]) input::placeholder,
+.dark .bg-white:not([class*="dark:bg-"]) textarea::placeholder,
+.dark [class~="bg-white"]:not([class*="dark:bg-"]) input::placeholder,
+.dark [class~="bg-white"]:not([class*="dark:bg-"]) textarea::placeholder {
+  color: #94a3b8 !important;
+  -webkit-text-fill-color: #94a3b8 !important;
+}
+
+.dark .bg-white:not([class*="dark:bg-"]) button:not([class*="bg-emerald-"]):not([class*="bg-red-"]):not([class*="bg-rose-"]):not([class*="bg-blue-"]):not([class*="bg-slate-900"]):not([class*="text-"]),
+.dark [class~="bg-white"]:not([class*="dark:bg-"]) button:not([class*="bg-emerald-"]):not([class*="bg-red-"]):not([class*="bg-rose-"]):not([class*="bg-blue-"]):not([class*="bg-slate-900"]):not([class*="text-"]) {
+  color: #334155 !important;
 }
 
 /* Keep the homepage hero and public footer visually identical in both themes. */

@@ -101,16 +101,18 @@ export function SiteHeader({ brand }: Props) {
         <div className="flex items-center justify-between h-18 sm:h-20">
           {/* Left: Brand Identity (Logo + Name + Tagline) */}
           <Link href="/" className="flex items-center gap-3 group shrink-0">
-            {/* Logo Icon Box */}
-            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-slate-100 dark:bg-[#111827] border border-slate-200 dark:border-slate-700/60 p-2 flex items-center justify-center shrink-0 shadow-inner group-hover:border-amber-400/50 group-hover:shadow-amber-400/10 transition-all">
-              {brand?.logoUrl ? (
+            {/* Logo Box */}
+            {brand?.logoUrl ? (
+              <div className="h-10 sm:h-11 w-20 sm:w-22 rounded-xl bg-white p-1 flex items-center justify-center shrink-0 shadow-sm border border-slate-200/80 dark:border-slate-700/60 group-hover:scale-105 transition-all overflow-hidden">
                 <img
                   src={brand.logoUrl}
-                  alt={brand?.dealershipName || 'SalesPlus'}
-                  className="w-full h-full object-contain"
+                  alt={brand?.dealershipName || 'MANTHUSA TVS'}
+                  className="w-full h-full object-contain rounded-lg"
                 />
-              ) : (
-                /* Dynamic swirl/spiral logo matching reference */
+              </div>
+            ) : (
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-slate-100 dark:bg-[#111827] border border-slate-200 dark:border-slate-700/60 p-2 flex items-center justify-center shrink-0 shadow-inner group-hover:border-amber-400/50 group-hover:shadow-amber-400/10 transition-all">
+                {/* Dynamic swirl/spiral logo matching reference */}
                 <svg
                   viewBox="0 0 36 36"
                   fill="none"
@@ -135,8 +137,8 @@ export function SiteHeader({ brand }: Props) {
                     fill="url(#header-logo-orange)"
                   />
                 </svg>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* Brand Titles */}
             <div className="flex flex-col">

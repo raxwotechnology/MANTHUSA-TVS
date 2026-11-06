@@ -10,6 +10,7 @@ export class LeadsController {
   constructor(private readonly leadsService: LeadsService) {}
 
   @Post()
+  @Roles('Admin / Owner', 'Sales & Operations')
   create(@Body() createLeadDto: any) {
     return this.leadsService.create(createLeadDto);
   }
@@ -39,6 +40,24 @@ export class LeadsController {
     return this.leadsService.convertToBooking(id, req.user);
   }
 
+  @Post(':id/convert-to-invoice')
+  @Roles('Admin / Owner', 'Sales & Operations', 'Accountant / Finance Staff')
+  convertToInvoice(@Param('id') id: string, @Body() body: any, @Req() req: any) {
+    return this.leadsService.convertToInvoice(id, body, req.user);
+  }
+
+  @Post(':id/lost-sale')
+  @Roles('Admin / Owner', 'Sales & Operations')
+  markLostSale(@Param('id') id: string, @Body('reason') reason?: string) {
+    return this.leadsService.markLostSale(id, reason);
+  }
+
+  @Put(':id/status')
+  @Roles('Admin / Owner', 'Sales & Operations')
+  updateStatus(@Param('id') id: string, @Body('status') status: string, @Body('reason') reason?: string) {
+    return this.leadsService.updateStatus(id, status, reason);
+  }
+
   @Get()
   @Roles('Admin / Owner', 'Sales & Operations', 'Inventory Manager')
   findAll() {
@@ -46,16 +65,19 @@ export class LeadsController {
   }
 
   @Get(':id')
+  @Roles('Admin / Owner', 'Sales & Operations', 'Inventory Manager')
   findOne(@Param('id') id: string) {
     return this.leadsService.findOne(id);
   }
 
   @Put(':id')
+  @Roles('Admin / Owner', 'Sales & Operations')
   update(@Param('id') id: string, @Body() updateLeadDto: any) {
     return this.leadsService.update(id, updateLeadDto);
   }
 
   @Delete(':id')
+  @Roles('Admin / Owner', 'Sales & Operations')
   remove(@Param('id') id: string) {
     return this.leadsService.remove(id);
   }

@@ -26,6 +26,15 @@ export class Lead {
   @Prop()
   selectedColor: string;
 
+  @Prop()
+  category: string; // 'Scooters', 'Commuter Motorcycles', 'Sport Motorcycles', 'Premium Motorcycles', 'Electric Two-Wheelers'
+
+  @Prop()
+  vehicleType: string; // 'Motorcycle', 'Scooter', 'Moped', 'Electric'
+
+  @Prop()
+  engineCapacity: string; // e.g. '159.7 cc'
+
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Branch' })
   preferredBranch: Types.ObjectId;
 
@@ -54,13 +63,19 @@ export class Lead {
   preferredDate: Date;
 
   @Prop({ default: 'New Request' })
-  status: string; // 'New Request', 'Under Review', 'Availability Checked', 'Converted to Booking', 'Closed'
+  status: string; // 'New Request', 'Under Review', 'Converted to Booking', 'Purchased', 'Lost Sale', 'Closed'
 
   @Prop({ default: 'Medium' })
   priority: string; // High, Medium, Low
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Reservation' })
   bookingId: Types.ObjectId;
+
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Sale' })
+  invoiceId: Types.ObjectId;
+
+  @Prop()
+  lostReason: string;
 }
 
 export const LeadSchema = SchemaFactory.createForClass(Lead);
