@@ -1,10 +1,9 @@
 [build]
-  base = "frontend"
-  command = "npm run build"
-  publish = ".next"
+  command = "npm --prefix frontend run build"
+  publish = "frontend/.next"
 
 [build.environment]
-  NODE_VERSION = "20"
+  NODE_VERSION = "22"
   NEXT_PUBLIC_API_URL = "https://manthusa-tvs.onrender.com"
   BACKEND_URL = "https://manthusa-tvs.onrender.com"
 
