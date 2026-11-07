@@ -29,8 +29,8 @@ async function bootstrap() {
     });
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
-    await app.listen(port);
-    console.log(`Backend is running on port ${port}`);
+    await app.listen(port, '0.0.0.0');
+    console.log(`Backend is running on port ${port} (0.0.0.0)`);
   } catch (err: any) {
     console.error('CRITICAL: NestJS bootstrap failed:', err);
     const fallbackServer = http.createServer((req, res) => {

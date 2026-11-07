@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: manthusa-tvs-backend
+    runtime: node
+    plan: free
+    region: singapore
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: MONGO_URI
+        value: mongodb+srv://raxwotechnology_db_user:0Bk8CNwvPAenfq1y@cluster0.nziv5e7.mongodb.net/?retryWrites=true&w=majority
+      - key: JWT_SECRET
+        value: manthusa-tvs-production-jwt-token-secret-key-2026-auth
+      - key: JWT_EXPIRES_IN
+        value: 1d
