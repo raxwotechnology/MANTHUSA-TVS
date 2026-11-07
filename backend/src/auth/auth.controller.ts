@@ -25,7 +25,16 @@ export class AuthController {
     if (recent.length >= 10) throw new HttpException('Too many login attempts. Try again in one minute.', HttpStatus.TOO_MANY_REQUESTS);
     recent.push(now);
     this.attempts.set(key, recent);
-    const user = await this.authService.validateUser(loginDto.email, loginDto.password);
+    let user;
+    try {
+      user = await this.authService.validateUser(loginDto.email, loginDto.password);
+    } catch (err: any) {
+      console.error('Error during validateUser:', err);
+      throw new HttpException(
+        err?.message || 'Authentication error',
+        err instanceof HttpException ? err.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }

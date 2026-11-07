@@ -33,12 +33,25 @@ async function bootstrap() {
       app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
       await app.init();
       isReady = true;
-    })();
+    })().catch((err) => {
+      initPromise = null;
+      console.error('NestJS initialization failed:', err);
+      throw err;
+    });
   }
   await initPromise;
 }
 
 export default async function handler(req: Request, res: Response) {
-  await bootstrap();
-  server(req, res);
+  try {
+    await bootstrap();
+    server(req, res);
+  } catch (err: any) {
+    console.error('Vercel serverless request handling error:', err);
+    res.status(500).json({
+      statusCode: 500,
+      message: 'Backend serverless initialization failed',
+      error: err?.message || String(err),
+    });
+  }
 }

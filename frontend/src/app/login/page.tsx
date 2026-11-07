@@ -200,7 +200,7 @@ export default function LoginPage() {
                     <input
                       type="email"
                       required
-                      placeholder="e.g. admin@salesplus.com"
+                      placeholder="e.g. admin@manthusatvs.lk"
                       autoComplete="username"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}

@@ -163,28 +163,33 @@ export class SettingsService {
   ) {}
 
   async getAll(): Promise<Record<string, any>> {
-    const docs = await this.settingModel.find().exec();
-    const dbSettings: Record<string, any> = {};
-    for (const doc of docs) {
-      dbSettings[doc.key] = doc.value;
-    }
-
-    // Deep merge defaults with stored DB values
-    const merged: Record<string, any> = {};
-    const allKeys = new Set([...Object.keys(DEFAULT_SETTINGS), ...Object.keys(dbSettings)]);
-
-    for (const key of allKeys) {
-      if (typeof DEFAULT_SETTINGS[key] === 'object' && DEFAULT_SETTINGS[key] !== null && !Array.isArray(DEFAULT_SETTINGS[key])) {
-        merged[key] = {
-          ...DEFAULT_SETTINGS[key],
-          ...(dbSettings[key] || {}),
-        };
-      } else {
-        merged[key] = dbSettings[key] !== undefined ? dbSettings[key] : DEFAULT_SETTINGS[key];
+    try {
+      const docs = await this.settingModel.find().exec();
+      const dbSettings: Record<string, any> = {};
+      for (const doc of docs) {
+        dbSettings[doc.key] = doc.value;
       }
-    }
 
-    return merged;
+      // Deep merge defaults with stored DB values
+      const merged: Record<string, any> = {};
+      const allKeys = new Set([...Object.keys(DEFAULT_SETTINGS), ...Object.keys(dbSettings)]);
+
+      for (const key of allKeys) {
+        if (typeof DEFAULT_SETTINGS[key] === 'object' && DEFAULT_SETTINGS[key] !== null && !Array.isArray(DEFAULT_SETTINGS[key])) {
+          merged[key] = {
+            ...DEFAULT_SETTINGS[key],
+            ...(dbSettings[key] || {}),
+          };
+        } else {
+          merged[key] = dbSettings[key] !== undefined ? dbSettings[key] : DEFAULT_SETTINGS[key];
+        }
+      }
+
+      return merged;
+    } catch (error) {
+      this.logger.error('Failed to load settings from DB, falling back to defaults', error);
+      return DEFAULT_SETTINGS;
+    }
   }
 
   async getPublicSettings(): Promise<Record<string, any>> {
