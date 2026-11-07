@@ -105,7 +105,7 @@ export function SiteHeader({ brand }: Props) {
             <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-700/60 p-1 flex items-center justify-center shrink-0 shadow-inner group-hover:border-amber-400/50 group-hover:shadow-amber-400/10 transition-all overflow-hidden">
               <img
                 src={brand?.logoUrl || '/logo.jpeg'}
-                alt={brand?.dealershipName || 'MANTHUSA TV'}
+                alt={brand?.dealershipName || 'MANTHUSA TVS'}
                 className="w-full h-full object-contain"
               />
             </div>
@@ -113,7 +113,7 @@ export function SiteHeader({ brand }: Props) {
             {/* Brand Titles */}
             <div className="flex flex-col">
               <span className="text-[17px] sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight flex items-center leading-none">
-                <span>{brand?.dealershipName || 'MANTHUSA TV'}</span>
+                <span>{brand?.dealershipName || 'MANTHUSA TVS'}</span>
                 {/* Yellow/Amber Dot from reference */}
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block ml-1 shadow-xs shadow-amber-400/50" />
               </span>

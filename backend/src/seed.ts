@@ -174,13 +174,13 @@ async function seed() {
       {
         key: 'general',
         value: {
-          dealershipName: 'MANTHUSA TV',
+          dealershipName: 'MANTHUSA TVS',
           tagline: 'Official TVS Motorcycles & Scooters Dealership, Service & Genuine Parts',
           registrationNumber: 'TVS-LK-89214/2026',
           taxNumber: 'VAT-119284729-7000',
           logoUrl: '/logo.jpeg',
           faviconUrl: '/logo.jpeg',
-          footerText: '© 2026 MANTHUSA TV. All rights reserved. Official TVS Warranty & Genuine Spares.',
+          footerText: '© 2026 MANTHUSA TVS. All rights reserved. Official TVS Warranty & Genuine Spares.',
           defaultLanguage: 'en',
           currency: 'LKR',
           currencySymbol: 'Rs.',

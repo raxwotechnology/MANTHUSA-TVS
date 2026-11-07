@@ -18,13 +18,12 @@ const interFont = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "MANTHUSA TV — Official TVS Motorcycle Dealership",
-    template: "%s | MANTHUSA TV",
+    default: "MANTHUSA TVS — Official TVS Motorcycle Dealership",
+    template: "%s | MANTHUSA TVS",
   },
   description:
-    "Explore official TVS motorcycles, Apache Racing series, NTORQ smart scooters, Jupiter commuter champions, and electric two-wheelers in Sri Lanka at MANTHUSA TV. Genuine warranty, leasing & service.",
+    "Explore official TVS motorcycles, Apache Racing series, NTORQ smart scooters, Jupiter commuter champions, and electric two-wheelers in Sri Lanka at MANTHUSA TVS. Genuine warranty, leasing & service.",
   keywords: [
-    "MANTHUSA TV",
     "MANTHUSA TVS",
     "TVS Motorcycles Sri Lanka",
     "TVS Apache RTR 160 4V",
@@ -38,12 +37,12 @@ export const metadata: Metadata = {
   ],
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://tvssalesplus.lk"),
   openGraph: {
-    title: "MANTHUSA TV — Official TVS Motorcycle Dealer",
+    title: "MANTHUSA TVS — Official TVS Motorcycle Dealer",
     description:
-      "Explore official TVS motorcycles, compare specs, calculate monthly lease installments, and book private test rides.",
+      "Explore official TVS motorcycles, compare specs, calculate monthly lease installments, and book private test rides at MANTHUSA TVS.",
     type: "website",
     locale: "en_LK",
-    siteName: "MANTHUSA TV",
+    siteName: "MANTHUSA TVS",
   },
 };
 

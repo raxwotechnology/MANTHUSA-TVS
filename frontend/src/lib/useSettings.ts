@@ -69,7 +69,7 @@ export const DEFAULT_WEBSITE_CMS = {
     showContact: true,
   },
   pages: {
-    about: 'MANTHUSA TV is an authorized TVS dealership providing brand-new TVS motorcycles, scooters, certified maintenance, genuine spare parts, and low-rate financing.',
+    about: 'MANTHUSA TVS is an authorized TVS dealership providing brand-new TVS motorcycles, scooters, certified maintenance, genuine spare parts, and low-rate financing.',
     finance: 'We offer low-rate motorcycle leasing and installment plans starting from 10% down payment with instant approval.',
     terms: 'All motorcycle bookings are held for up to 7 days upon reservation deposit confirmation.',
     privacy: 'We take customer confidentiality seriously and protect your personal data according to applicable privacy standards.',
@@ -77,13 +77,13 @@ export const DEFAULT_WEBSITE_CMS = {
 };
 
 export const DEFAULT_BRAND: BrandSettings = {
-  dealershipName: 'MANTHUSA TV',
+  dealershipName: 'MANTHUSA TVS',
   tagline: "Official TVS Motorcycles & Scooters Dealership, Service & Genuine Parts",
   registrationNumber: 'TVS-LK-89214/2026',
   taxNumber: 'VAT-119284729-7000',
   logoUrl: '/logo.jpeg',
   faviconUrl: '/logo.jpeg',
-  footerText: '© 2026 MANTHUSA TV. All rights reserved. Official TVS Warranty & Genuine Spares.',
+  footerText: '© 2026 MANTHUSA TVS. All rights reserved. Official TVS Warranty & Genuine Spares.',
   defaultLanguage: 'en',
   currency: 'LKR',
   currencySymbol: 'Rs.',

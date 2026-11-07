@@ -22,7 +22,7 @@ import { useSettings } from '@/lib/useSettings';
 export default function AboutPage() {
   const { settings: brand } = useSettings();
 
-  const dealershipName = brand.dealershipName || 'MANTHUSA TV';
+  const dealershipName = brand.dealershipName || 'MANTHUSA TVS';
 
   const values = [
     {

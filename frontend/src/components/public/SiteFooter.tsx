@@ -24,7 +24,7 @@ interface Props {
 
 export function SiteFooter({ brand }: Props) {
   const currentYear = new Date().getFullYear();
-  const dealershipName = brand?.dealershipName || 'MANTHUSA TV';
+  const dealershipName = brand?.dealershipName || 'MANTHUSA TVS';
   const phone = brand?.phone || '+94 11 268 4900';
   const hotline = brand?.hotline || '+94 77 123 4567';
   const email = brand?.salesEmail || brand?.email || 'sales@tvsmotorhub.lk';

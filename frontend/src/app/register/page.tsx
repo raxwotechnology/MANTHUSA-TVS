@@ -122,10 +122,10 @@ export default function RegisterPage() {
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         <Link href="/" className="inline-flex items-center gap-3 group mb-4">
           <div className="w-12 h-12 rounded-xl bg-white p-1 flex items-center justify-center shadow-lg border border-slate-700 group-hover:scale-105 transition-transform overflow-hidden">
-            <img src={brand.logoUrl || '/logo.jpeg'} alt={brand.dealershipName || 'MANTHUSA TV'} className="w-full h-full object-contain" />
+            <img src={brand.logoUrl || '/logo.jpeg'} alt={brand.dealershipName || 'MANTHUSA TVS'} className="w-full h-full object-contain" />
           </div>
           <span className="text-2xl font-bold tracking-tight text-white">
-            {brand.dealershipName || 'MANTHUSA TV'}
+            {brand.dealershipName || 'MANTHUSA TVS'}
           </span>
         </Link>
         <h2 className="text-2xl font-extrabold tracking-tight text-white">

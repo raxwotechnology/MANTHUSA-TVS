@@ -1,4 +1,4 @@
-# Vercel Deployment Guide for MANTHUSA TV (Backend + Frontend on Same Link)
+# Vercel Deployment Guide for MANTHUSA TVS (Backend + Frontend on Same Link)
 
 This repository is configured so that **Frontend and Backend run seamlessly on the exact same domain/link** (e.g. `https://your-domain.vercel.app`) with:
 - **0 404 Errors**: Next.js automatically rewrites all `/api/*` and `/uploads/*` requests to the NestJS backend.

@@ -163,10 +163,10 @@ export default function LoginPage() {
     <div className="min-h-screen bg-slate-100 dark:bg-[#0B132B] flex flex-col justify-center py-12 sm:px-6 lg:px-8 text-slate-900 dark:text-slate-100 transition-colors">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center" suppressHydrationWarning>
         <div className="w-16 h-16 rounded-2xl bg-white p-1 flex items-center justify-center mx-auto mb-4 shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-          <img src="/logo.jpeg" alt="MANTHUSA TV" className="w-full h-full object-contain" />
+          <img src="/logo.jpeg" alt="MANTHUSA TVS" className="w-full h-full object-contain" />
         </div>
         <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-wide">
-          <span>MANTHUSA TV</span>
+          <span>MANTHUSA TVS</span>
         </h2>
         <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 font-medium">
           Motorcycle Sales Management System Customer & Staff Portal
