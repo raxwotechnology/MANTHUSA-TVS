@@ -35,7 +35,8 @@ import {
   TVSColor,
   fetchPublicVehicle,
   fetchPublicVehicles,
-  formatLKR
+  formatLKR,
+  submitPublicInquiry
 } from '@/lib/publicApi';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useComparison } from '@/hooks/useComparison';
@@ -185,45 +186,19 @@ export default function BikeDetailPage({ params }: Props) {
     setQuoteSuccess('');
 
     try {
-      const response = await fetch('/api/proxy/leads/public', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          fullName: customerName,
-          phone: customerPhone,
-          email: customerEmail,
-          vehicleId: bike._id,
-          modelName: bike.model,
-          variantName: selectedVariant?.name || bike.variant,
-          selectedColor: selectedColor?.name || bike.color,
-          preferredBranchName: preferredBranch,
-          budget: currentPrice,
-          inquiryType: 'Quotation Request',
-          message: quoteMessage || `Customer requested quotation for ${bike.model} (${selectedVariant?.name || 'Standard'}).`,
-        }),
+      await submitPublicInquiry({
+        fullName: customerName,
+        phone: customerPhone,
+        email: customerEmail,
+        vehicleId: bike._id,
+        modelName: bike.model,
+        variantName: selectedVariant?.name || bike.variant,
+        selectedColor: selectedColor?.name || bike.color,
+        preferredBranchName: preferredBranch,
+        budget: currentPrice,
+        inquiryType: 'Quotation Request',
+        message: quoteMessage || `Customer requested quotation for ${bike.model} (${selectedVariant?.name || 'Standard'}).`,
       });
-
-      // Also try direct backend URL fallback if proxy isn't configured
-      if (!response.ok) {
-        const directRes = await fetch('http://localhost:3001/leads/public', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            fullName: customerName,
-            phone: customerPhone,
-            email: customerEmail,
-            vehicleId: bike._id,
-            modelName: bike.model,
-            variantName: selectedVariant?.name || bike.variant,
-            selectedColor: selectedColor?.name || bike.color,
-            preferredBranchName: preferredBranch,
-            budget: currentPrice,
-            inquiryType: 'Quotation Request',
-            message: quoteMessage || `Customer requested quotation for ${bike.model}.`,
-          }),
-        });
-        if (!directRes.ok) throw new Error('Could not submit quotation request.');
-      }
 
       setQuoteSuccess('Quotation request submitted! Our TVS sales officer will contact you with the official quotation.');
       setTimeout(() => {

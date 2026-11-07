@@ -1,13 +1,28 @@
 export function getApiUrl(path: string): string {
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  const configuredBaseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
-  if (configuredBaseUrl) return `${configuredBaseUrl}${cleanPath}`;
+  const configuredBaseUrl = (
+    process.env.BACKEND_INTERNAL_URL ||
+    process.env.BACKEND_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
+    ''
+  ).replace(/\/$/, '');
+
+  // 1. Client-side in browser (same domain / link):
   if (typeof window !== 'undefined') {
-    const hostname = window.location.hostname || 'localhost';
-    const protocol = window.location.protocol || 'http:';
-    return `${protocol}//${hostname}:3001${cleanPath}`;
+    // If an explicit absolute URL is configured to bypass proxy:
+    if (configuredBaseUrl && /^https?:\/\//i.test(configuredBaseUrl)) {
+      return `${configuredBaseUrl}${cleanPath}`;
+    }
+    // Route via Next.js same-origin rewrite proxy (/api/* -> backend)
+    return `/api${cleanPath}`;
   }
-  return `http://localhost:3001${cleanPath}`;
+
+  // 2. Server-side (during SSR or Next.js build):
+  if (configuredBaseUrl) {
+    return `${configuredBaseUrl}${cleanPath}`;
+  }
+
+  return `http://127.0.0.1:3001${cleanPath}`;
 }
 
 export function apiFetch(path: string, init: RequestInit = {}): Promise<Response> {

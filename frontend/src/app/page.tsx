@@ -116,7 +116,7 @@ export default function HomePage() {
     },
   ];
 
-  const dealershipName = brand?.dealershipName || 'TVS SalesPlus Motor Hub';
+  const dealershipName = brand?.dealershipName || 'MANTHUSA TV';
   const hotline = brand?.hotline || brand?.phone || '+94 11 268 4900';
   const whatsapp = brand?.whatsapp || '+94771234567';
 

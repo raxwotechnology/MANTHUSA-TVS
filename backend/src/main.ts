@@ -19,6 +19,7 @@ async function bootstrap() {
       // Allow requests with no origin (like mobile apps, curl, server-to-server)
       if (!origin) return callback(null, true);
       let isLocalDevelopmentOrigin = false;
+      let isVercelOrigin = false;
       try {
         const url = new URL(origin);
         const hostname = url.hostname;
@@ -29,13 +30,16 @@ async function bootstrap() {
           url.protocol === 'http:' &&
           url.port === '3000' &&
           (hostname === 'localhost' || hostname === '127.0.0.1' || isPrivateIpv4);
+        isVercelOrigin = /\.vercel\.app$/.test(hostname);
       } catch {
         isLocalDevelopmentOrigin = false;
+        isVercelOrigin = false;
       }
       if (
         rawOrigin === '*' ||
         allowedOrigins.includes(origin) ||
-        isLocalDevelopmentOrigin
+        isLocalDevelopmentOrigin ||
+        isVercelOrigin
       ) {
         return callback(null, true);
       }

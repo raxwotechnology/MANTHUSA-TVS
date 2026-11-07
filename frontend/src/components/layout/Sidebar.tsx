@@ -172,13 +172,16 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
         {/* Brand Logo Header */}
         <div className="p-4 border-b border-slate-800/80 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 min-w-0 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 to-rose-700 text-white flex items-center justify-center font-bold shadow-md shadow-red-900/40 flex-shrink-0 group-hover:scale-105 transition-transform">
-              <Flame className="w-5 h-5 fill-white" />
+            <div className="w-10 h-10 rounded-xl bg-white p-1 flex items-center justify-center font-bold shadow-md shadow-slate-900/40 flex-shrink-0 group-hover:scale-105 transition-transform overflow-hidden">
+              <img
+                src={brand?.logoUrl || '/logo.jpeg'}
+                alt={brand?.dealershipName || 'MANTHUSA TV'}
+                className="w-full h-full object-contain"
+              />
             </div>
             <div className="min-w-0">
               <h1 className="font-black text-white text-base tracking-wider truncate flex items-center gap-1">
-                <span className="text-red-500 font-black">TVS</span>
-                <span>SALESPLUS</span>
+                <span>{brand?.dealershipName || 'MANTHUSA TV'}</span>
               </h1>
               <p className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold truncate max-w-[140px]">
                 {isCustomerPortal ? 'Customer Portal' : 'Dealership Hub'}

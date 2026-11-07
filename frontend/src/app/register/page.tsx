@@ -121,11 +121,11 @@ export default function RegisterPage() {
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         <Link href="/" className="inline-flex items-center gap-3 group mb-4">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-300 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform">
-            <Car className="w-7 h-7 stroke-[2.2]" />
+          <div className="w-12 h-12 rounded-xl bg-white p-1 flex items-center justify-center shadow-lg border border-slate-700 group-hover:scale-105 transition-transform overflow-hidden">
+            <img src={brand.logoUrl || '/logo.jpeg'} alt={brand.dealershipName || 'MANTHUSA TV'} className="w-full h-full object-contain" />
           </div>
           <span className="text-2xl font-bold tracking-tight text-white">
-            {brand.dealershipName || 'SalesPlus Auto Mart'}
+            {brand.dealershipName || 'MANTHUSA TV'}
           </span>
         </Link>
         <h2 className="text-2xl font-extrabold tracking-tight text-white">

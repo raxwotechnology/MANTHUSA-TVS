@@ -294,7 +294,7 @@ export default function MyQuotationsPage() {
             {/* Print Header */}
             <div className="flex items-center justify-between border-b pb-4">
               <div>
-                <h2 className="text-xl font-black text-red-600">TVS SALESPLUS MOTOR HUB</h2>
+                <h2 className="text-xl font-black text-red-600">MANTHUSA TV</h2>
                 <p className="text-xs text-slate-500">Official TVS Dealership Sales Quotation</p>
               </div>
               <div className="text-right">

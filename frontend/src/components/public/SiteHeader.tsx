@@ -102,46 +102,18 @@ export function SiteHeader({ brand }: Props) {
           {/* Left: Brand Identity (Logo + Name + Tagline) */}
           <Link href="/" className="flex items-center gap-3 group shrink-0">
             {/* Logo Icon Box */}
-            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-slate-100 dark:bg-[#111827] border border-slate-200 dark:border-slate-700/60 p-2 flex items-center justify-center shrink-0 shadow-inner group-hover:border-amber-400/50 group-hover:shadow-amber-400/10 transition-all">
-              {brand?.logoUrl ? (
-                <img
-                  src={brand.logoUrl}
-                  alt={brand?.dealershipName || 'SalesPlus'}
-                  className="w-full h-full object-contain"
-                />
-              ) : (
-                /* Dynamic swirl/spiral logo matching reference */
-                <svg
-                  viewBox="0 0 36 36"
-                  fill="none"
-                  className="w-6 h-6 shrink-0 group-hover:scale-105 transition-transform"
-                >
-                  <defs>
-                    <linearGradient id="header-logo-blue" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#38bdf8" />
-                      <stop offset="100%" stopColor="#0284c7" />
-                    </linearGradient>
-                    <linearGradient id="header-logo-orange" x1="0%" y1="100%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#f97316" />
-                      <stop offset="100%" stopColor="#fbbf24" />
-                    </linearGradient>
-                  </defs>
-                  <path
-                    d="M18 4C10.268 4 4 10.268 4 18c0 4.28 1.9 8.118 4.908 10.72l4.137-4.137A9.957 9.957 0 0 1 10 18c0-4.418 3.582-8 8-8 2.378 0 4.516 1.037 5.986 2.684l4.24-4.24A13.934 13.934 0 0 0 18 4Z"
-                    fill="url(#header-logo-blue)"
-                  />
-                  <path
-                    d="M18 32c7.732 0 14-6.268 14-14 0-4.28-1.9-8.118-4.908-10.72l-4.137 4.137A9.957 9.957 0 0 1 26 18c0 4.418-3.582 8-8 8-2.378 0-4.516-1.037-5.986-2.684l-4.24 4.24A13.934 13.934 0 0 0 18 32Z"
-                    fill="url(#header-logo-orange)"
-                  />
-                </svg>
-              )}
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-700/60 p-1 flex items-center justify-center shrink-0 shadow-inner group-hover:border-amber-400/50 group-hover:shadow-amber-400/10 transition-all overflow-hidden">
+              <img
+                src={brand?.logoUrl || '/logo.jpeg'}
+                alt={brand?.dealershipName || 'MANTHUSA TV'}
+                className="w-full h-full object-contain"
+              />
             </div>
 
             {/* Brand Titles */}
             <div className="flex flex-col">
               <span className="text-[17px] sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight flex items-center leading-none">
-                <span>{brand?.dealershipName || 'SalesPlus'}</span>
+                <span>{brand?.dealershipName || 'MANTHUSA TV'}</span>
                 {/* Yellow/Amber Dot from reference */}
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block ml-1 shadow-xs shadow-amber-400/50" />
               </span>

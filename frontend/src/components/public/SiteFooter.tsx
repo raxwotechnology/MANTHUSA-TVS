@@ -24,7 +24,7 @@ interface Props {
 
 export function SiteFooter({ brand }: Props) {
   const currentYear = new Date().getFullYear();
-  const dealershipName = brand?.dealershipName || 'TVS SalesPlus Motor Hub';
+  const dealershipName = brand?.dealershipName || 'MANTHUSA TV';
   const phone = brand?.phone || '+94 11 268 4900';
   const hotline = brand?.hotline || '+94 77 123 4567';
   const email = brand?.salesEmail || brand?.email || 'sales@tvsmotorhub.lk';
@@ -96,12 +96,16 @@ export function SiteFooter({ brand }: Props) {
           {/* Column 1: Dealership Details */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 to-rose-700 text-white flex items-center justify-center shadow-md shrink-0">
-                <Flame className="w-5 h-5 fill-white" />
+              <div className="w-10 h-10 rounded-xl bg-white p-1 flex items-center justify-center shadow-md shrink-0 overflow-hidden">
+                <img
+                  src={brand?.logoUrl || '/logo.jpeg'}
+                  alt={dealershipName}
+                  className="w-full h-full object-contain"
+                />
               </div>
               <div className="flex flex-col">
                 <span className="text-base font-black text-white tracking-wider flex items-center gap-1 leading-none">
-                  <span className="text-red-500">TVS</span> SALESPLUS
+                  <span>{dealershipName}</span>
                 </span>
                 <span className="text-[10px] font-semibold text-slate-400 tracking-wider uppercase mt-1">
                   Motorcycle Sales Management System

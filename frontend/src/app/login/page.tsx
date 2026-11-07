@@ -162,11 +162,11 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-[#0B132B] flex flex-col justify-center py-12 sm:px-6 lg:px-8 text-slate-900 dark:text-slate-100 transition-colors">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center" suppressHydrationWarning>
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-600 to-rose-700 text-white flex items-center justify-center mx-auto mb-4 shadow-xl shadow-red-600/30">
-          <Flame className="w-8 h-8 fill-white" />
+        <div className="w-16 h-16 rounded-2xl bg-white p-1 flex items-center justify-center mx-auto mb-4 shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+          <img src="/logo.jpeg" alt="MANTHUSA TV" className="w-full h-full object-contain" />
         </div>
         <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-wide">
-          <span className="text-red-600 font-black">TVS</span> SALESPLUS
+          <span>MANTHUSA TV</span>
         </h2>
         <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 font-medium">
           Motorcycle Sales Management System Customer & Staff Portal

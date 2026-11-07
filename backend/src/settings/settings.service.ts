@@ -5,13 +5,13 @@ import { Setting, SettingDocument } from './schemas/setting.schema';
 
 export const DEFAULT_SETTINGS: Record<string, any> = {
   general: {
-    dealershipName: 'TVS SalesPlus Motor Hub',
+    dealershipName: 'MANTHUSA TV',
     tagline: 'Official TVS Motorcycles & Scooters Dealership, Service & Genuine Parts',
     registrationNumber: 'TVS-LK-89214/2026',
     taxNumber: 'VAT-119284729-7000',
-    logoUrl: '',
-    faviconUrl: '',
-    footerText: '© 2026 TVS SalesPlus Motor Hub. All rights reserved. Official TVS Warranty & Genuine Spares.',
+    logoUrl: '/logo.jpeg',
+    faviconUrl: '/logo.jpeg',
+    footerText: '© 2026 MANTHUSA TV. All rights reserved. Official TVS Warranty & Genuine Spares.',
     defaultLanguage: 'en',
     currency: 'LKR',
     currencySymbol: 'Rs.',
