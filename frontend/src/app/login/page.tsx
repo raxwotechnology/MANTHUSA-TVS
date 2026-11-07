@@ -33,11 +33,6 @@ export default function LoginPage() {
     }
   }, []);
 
-  const loginWithCreds = (em: string, pw: string) => {
-    setEmail(em);
-    setPassword(pw);
-  };
-
   const login = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
@@ -264,68 +259,6 @@ export default function LoginPage() {
                   </button>
                 </div>
               </form>
-
-              {/* QUICK DEMO CREDENTIAL CHIPS (Added as requested) */}
-              <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-2">
-                <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
-                  Quick Sign-In Credentials:
-                </span>
-                <div className="grid grid-cols-2 gap-1.5 text-[11px]">
-                  <button
-                    type="button"
-                    onClick={() => loginWithCreds('admin@manthusatvs.lk', 'admin123')}
-                    className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-800 hover:border-red-500/50 text-left transition-colors text-slate-700 dark:text-slate-300"
-                  >
-                    <strong className="text-slate-900 dark:text-white block font-bold">MANTHUSA Admin</strong>
-                    <span className="text-slate-500 text-[10px]">admin@manthusatvs.lk</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => loginWithCreds('manager@manthusatvs.lk', 'manager123')}
-                    className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-800 hover:border-red-500/50 text-left transition-colors text-slate-700 dark:text-slate-300"
-                  >
-                    <strong className="text-slate-900 dark:text-white block font-bold">Sales Manager</strong>
-                    <span className="text-slate-500 text-[10px]">manager@manthusatvs.lk</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => loginWithCreds('sales@manthusatvs.lk', 'sales123')}
-                    className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-800 hover:border-red-500/50 text-left transition-colors text-slate-700 dark:text-slate-300"
-                  >
-                    <strong className="text-slate-900 dark:text-white block font-bold">Sales Executive</strong>
-                    <span className="text-slate-500 text-[10px]">sales@manthusatvs.lk</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => loginWithCreds('accountant@manthusatvs.lk', 'accountant123')}
-                    className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-800 hover:border-red-500/50 text-left transition-colors text-slate-700 dark:text-slate-300"
-                  >
-                    <strong className="text-slate-900 dark:text-white block font-bold">Finance / Accounts</strong>
-                    <span className="text-slate-500 text-[10px]">accountant@manthusatvs.lk</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => loginWithCreds('admin@raxwotechnology.com', 'admin123')}
-                    className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-800 hover:border-red-500/50 text-left transition-colors text-slate-700 dark:text-slate-300"
-                  >
-                    <strong className="text-slate-900 dark:text-white block font-bold">Raxwo Admin</strong>
-                    <span className="text-slate-500 text-[10px]">admin@raxwotechnology.com</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => loginWithCreds('customer@manthusatvs.lk', 'customer123')}
-                    className="p-2 rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-500/30 hover:border-red-500 text-left transition-colors text-slate-700 dark:text-slate-300"
-                  >
-                    <strong className="text-red-600 dark:text-red-400 block font-bold">Demo Customer</strong>
-                    <span className="text-slate-500 text-[10px]">customer@manthusatvs.lk</span>
-                  </button>
-                </div>
-              </div>
             </div>
           ) : mode === 'signup' ? (
             <form className="space-y-4" onSubmit={register}>
