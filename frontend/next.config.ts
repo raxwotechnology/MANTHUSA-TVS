@@ -8,22 +8,25 @@ const nextConfig: NextConfig = {
     position: 'bottom-right',
   },
   async rewrites() {
-    const rawBackendUrl =
+    const backendUrl =
       process.env.BACKEND_INTERNAL_URL ||
       process.env.BACKEND_URL ||
-      process.env.NEXT_PUBLIC_API_URL ||
-      'http://127.0.0.1:3001';
+      (process.env.NODE_ENV !== 'production' ? (process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3001') : '');
 
-    const backendUrl = rawBackendUrl.replace(/\/$/, '');
+    if (!backendUrl) {
+      return [];
+    }
+
+    const cleanBackendUrl = backendUrl.replace(/\/$/, '');
 
     return [
       {
         source: '/api/:path*',
-        destination: `${backendUrl}/:path*`,
+        destination: `${cleanBackendUrl}/:path*`,
       },
       {
         source: '/uploads/:path*',
-        destination: `${backendUrl}/uploads/:path*`,
+        destination: `${cleanBackendUrl}/uploads/:path*`,
       },
     ];
   },
