@@ -1,28 +1,22 @@
 export function getApiUrl(path: string): string {
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  const configuredBaseUrl = (
-    process.env.BACKEND_INTERNAL_URL ||
-    process.env.BACKEND_URL ||
-    process.env.NEXT_PUBLIC_API_URL ||
-    ''
-  ).replace(/\/$/, '');
 
-  // 1. Client-side in browser (same domain / link):
+  // 1. Client-side in browser (public path):
+  // When running in the browser, all API calls route through the top-level rewrite /api/*
+  // which Vercel Services automatically forwards to the backend service.
   if (typeof window !== 'undefined') {
-    // If an explicit absolute URL is configured to bypass proxy:
-    if (configuredBaseUrl && /^https?:\/\//i.test(configuredBaseUrl)) {
-      return `${configuredBaseUrl}${cleanPath}`;
-    }
-    // Route via Next.js same-origin rewrite proxy (/api/* -> backend)
     return `/api${cleanPath}`;
   }
 
-  // 2. Server-side (during SSR or Next.js build):
-  if (configuredBaseUrl) {
-    return `${configuredBaseUrl}${cleanPath}`;
-  }
+  // 2. Server-side (during SSR or Server runtime functions):
+  // Uses the bound BACKEND_URL injected by Vercel Services binding.
+  const backendBase = (
+    process.env.BACKEND_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
+    'http://127.0.0.1:3001'
+  ).replace(/\/$/, '');
 
-  return `http://127.0.0.1:3001${cleanPath}`;
+  return `${backendBase}${cleanPath}`;
 }
 
 export function apiFetch(path: string, init: RequestInit = {}): Promise<Response> {

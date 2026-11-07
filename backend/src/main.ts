@@ -5,6 +5,16 @@ import { json, urlencoded } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  // Strip /api prefix if forwarded from Vercel Services rewrites (/api/* -> backend)
+  app.use((req: any, res: any, next: any) => {
+    if (req.url && req.url.startsWith('/api/')) {
+      req.url = req.url.substring(4);
+    } else if (req.url === '/api') {
+      req.url = '/';
+    }
+    next();
+  });
+
   // Increase payload limit to 20MB for image uploads and base64 assets
   app.use(json({ limit: '20mb' }));
   app.use(urlencoded({ extended: true, limit: '20mb' }));
