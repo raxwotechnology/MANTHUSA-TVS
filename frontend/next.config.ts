@@ -11,11 +11,8 @@ const nextConfig: NextConfig = {
     const backendUrl =
       process.env.BACKEND_INTERNAL_URL ||
       process.env.BACKEND_URL ||
-      (process.env.NODE_ENV !== 'production' ? (process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3001') : '');
-
-    if (!backendUrl) {
-      return [];
-    }
+      process.env.NEXT_PUBLIC_API_URL ||
+      'https://manthusa-tvs.onrender.com';
 
     const cleanBackendUrl = backendUrl.replace(/\/$/, '');
 

@@ -4,6 +4,20 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  NEXT_PUBLIC_API_URL = "https://manthusa-tvs.onrender.com"
+  BACKEND_URL = "https://manthusa-tvs.onrender.com"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://manthusa-tvs.onrender.com/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/uploads/*"
+  to = "https://manthusa-tvs.onrender.com/uploads/:splat"
+  status = 200
+  force = true
