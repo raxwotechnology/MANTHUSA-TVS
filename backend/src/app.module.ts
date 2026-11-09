@@ -51,7 +51,11 @@ import { LeasingPartnersModule } from './leasing-partners/leasing-partners.modul
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGO_URI') || 'mongodb://localhost:27017/salesplus',
+        uri:
+          configService.get<string>('MONGO_URI') ||
+          process.env.MONGO_URI ||
+          'mongodb+srv://raxwotechnology_db_user:0Bk8CNwvPAenfq1y@cluster0.nziv5e7.mongodb.net/?retryWrites=true&w=majority',
+        serverSelectionTimeoutMS: 10000,
         driverInfo: { name: 'salesplus', version: '1.0.0' },
       }),
       inject: [ConfigService],

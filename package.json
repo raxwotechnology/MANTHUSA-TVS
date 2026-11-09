@@ -1,17 +1,21 @@
 {
-  "name": "vehicle-sales-monorepo",
+  "name": "manthusa-tvs-monorepo",
   "version": "1.0.0",
   "private": true,
   "workspaces": [
-    "frontend",
-    "backend"
+    "backend",
+    "frontend"
   ],
   "scripts": {
-    "build:frontend": "npm --prefix frontend run build",
+    "build": "npm --prefix backend run build && npm --prefix frontend run build",
     "build:backend": "npm --prefix backend run build",
-    "build": "npm --prefix frontend run build"
+    "build:frontend": "npm --prefix frontend run build",
+    "dev": "npm --prefix frontend run dev",
+    "dev:backend": "npm --prefix backend run dev",
+    "start": "npm --prefix frontend start"
   },
   "devDependencies": {
+    "@netlify/plugin-nextjs": "^5.16.6",
     "playwright": "^1.65.0"
   }
 }

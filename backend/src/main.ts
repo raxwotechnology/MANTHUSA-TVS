@@ -2,70 +2,69 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { json, urlencoded } from 'express';
+import * as http from 'http';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  const expressApp = app.getHttpAdapter().getInstance();
-  expressApp.disable('x-powered-by');
-
-  // Security headers middleware
-  app.use((_req: any, res: any, next: any) => {
-    res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-    res.setHeader('X-XSS-Protection', '1; mode=block');
-    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-    next();
-  });
-
-  // Increase payload limit to 20MB for image uploads and base64 assets
-  app.use(json({ limit: '20mb' }));
-  app.use(urlencoded({ extended: true, limit: '20mb' }));
-
-  const rawOrigin = process.env.FRONTEND_ORIGIN;
-  const allowedOrigins = rawOrigin
-    ? rawOrigin.split(',').map((o) => o.trim().replace(/\/$/, ''))
-    : [];
-
-  app.enableCors({
-    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-      // Allow requests with no origin (like mobile apps, curl, server-to-server)
-      if (!origin) return callback(null, true);
-      let isLocalDevelopmentOrigin = false;
-      let isAllowedDomain = false;
-      try {
-        const url = new URL(origin);
-        const hostname = url.hostname.toLowerCase();
-        const isPrivateIpv4 =
-          /^(10|192\.168)\.\d{1,3}\.\d{1,3}$/.test(hostname) ||
-          /^172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}$/.test(hostname);
-        isLocalDevelopmentOrigin =
-          (url.port === '3000' || !url.port) &&
-          (hostname === 'localhost' || hostname === '127.0.0.1' || isPrivateIpv4);
-        isAllowedDomain =
-          hostname.endsWith('.netlify.app') ||
-          hostname === 'netlify.app' ||
-          hostname.endsWith('.onrender.com') ||
-          hostname.endsWith('.vercel.app');
-      } catch {
-        isLocalDevelopmentOrigin = false;
-      }
-      if (
-        !rawOrigin ||
-        rawOrigin === '*' ||
-        allowedOrigins.includes(origin) ||
-        isLocalDevelopmentOrigin ||
-        isAllowedDomain
-      ) {
-        return callback(null, true);
-      }
-      return callback(new Error(`Origin ${origin} is not allowed by CORS.`));
-    },
-    credentials: true,
-  });
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
-
   const port = Number(process.env.PORT) || 3001;
-  await app.listen(port, '0.0.0.0');
-  console.log(`Backend is running on http://0.0.0.0:${port}`);
+  try {
+    const app = await NestFactory.create(AppModule);
+    const expressApp = app.getHttpAdapter().getInstance();
+    expressApp.disable('x-powered-by');
+
+    // Security headers middleware
+    app.use((_req: any, res: any, next: any) => {
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+      res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+      res.setHeader('X-XSS-Protection', '1; mode=block');
+      res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+      next();
+    });
+
+    // Strip /api prefix if forwarded from rewrites/proxies (/api/* -> backend)
+    app.use((req: any, _res: any, next: any) => {
+      if (req.url && req.url.startsWith('/api/')) {
+        req.url = req.url.substring(4);
+      } else if (req.url === '/api') {
+        req.url = '/';
+      }
+      next();
+    });
+
+    // Increase payload limit to 20MB for image uploads and base64 assets
+    app.use(json({ limit: '20mb' }));
+    app.use(urlencoded({ extended: true, limit: '20mb' }));
+
+    // Dynamic CORS to support Netlify, Render, Localhost and Custom Domains with credentials
+    app.enableCors({
+      origin: true,
+      credentials: true,
+    });
+    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+
+    await app.listen(port, '0.0.0.0');
+    console.log(`Backend is running on http://0.0.0.0:${port}`);
+  } catch (err: any) {
+    console.error('CRITICAL: NestJS bootstrap failed:', err);
+    const fallbackServer = http.createServer((_req, res) => {
+      res.writeHead(500, {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      });
+      res.end(
+        JSON.stringify({
+          statusCode: 500,
+          error: 'NestJS Bootstrap Failure',
+          message: err?.message || String(err),
+          stack: err?.stack,
+        }),
+      );
+    });
+    fallbackServer.listen(port, () => {
+      console.log(`Fallback server running on port ${port} reporting error`);
+    });
+  }
 }
-bootstrap();
+
+bootstrap().catch((err) => {
+  console.error('Fatal unhandled bootstrap error:', err);
+});

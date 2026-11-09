@@ -1,13 +1,25 @@
 export function getApiUrl(path: string): string {
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  const configuredBaseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
-  if (configuredBaseUrl) return `${configuredBaseUrl}${cleanPath}`;
+
+  // 1. Client-side in browser (public path):
+  // When running in the browser:
+  // Points directly to the active Render backend URL.
   if (typeof window !== 'undefined') {
-    const hostname = window.location.hostname || 'localhost';
-    const protocol = window.location.protocol || 'http:';
-    return `${protocol}//${hostname}:3001${cleanPath}`;
+    const publicUrl = process.env.NEXT_PUBLIC_API_URL || 'https://manthusa-tvs.onrender.com';
+    const base = publicUrl.replace(/\/$/, '');
+    return `${base}${cleanPath.startsWith('/api') ? cleanPath : `/api${cleanPath}`}`;
   }
-  return `http://localhost:3001${cleanPath}`;
+
+  // 2. Server-side (during SSR or Server runtime functions):
+  const backendBase = (
+    process.env.BACKEND_URL ||
+    process.env.BACKEND_INTERNAL_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
+    'https://manthusa-tvs.onrender.com'
+  ).replace(/\/$/, '');
+
+  const serverPath = cleanPath.startsWith('/api') ? cleanPath.substring(4) : cleanPath;
+  return `${backendBase}${serverPath}`;
 }
 
 export function apiFetch(path: string, init: RequestInit = {}): Promise<Response> {

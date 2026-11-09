@@ -17,7 +17,7 @@ import * as bcrypt from 'bcrypt';
 async function seed() {
   const mongoUri =
     process.env.MONGO_URI ||
-    'mongodb://localhost:27017/salesplus';
+'mongodb+srv://raxwotechnology_db_user:0Bk8CNwvPAenfq1y@cluster0.nziv5e7.mongodb.net/?retryWrites=true&w=majority';
 
   console.log('Connecting to database...');
   await mongoose.connect(mongoUri);
@@ -61,6 +61,14 @@ async function seed() {
 
     // 2. Staff Accounts requested by user:
     const seedUsers = [
+      // MANTHUSA TVS Official Accounts
+      { name: 'MANTHUSA TVS Admin', email: 'admin@manthusatvs.lk', password: 'admin123', role: rolesMap['Admin / Owner'] },
+      { name: 'Raxwo Admin', email: 'admin@raxwotechnology.com', password: 'admin123', role: rolesMap['Admin / Owner'] },
+      { name: 'Dealership Manager', email: 'manager@manthusatvs.lk', password: 'manager123', role: rolesMap['Inventory Manager'] },
+      { name: 'Sales Executive', email: 'sales@manthusatvs.lk', password: 'sales123', role: rolesMap['Sales & Operations'] },
+      { name: 'Finance Accountant', email: 'accountant@manthusatvs.lk', password: 'accountant123', role: rolesMap['Accountant / Finance Staff'] },
+      { name: 'Demo Customer', email: 'customer@manthusatvs.lk', password: 'customer123', role: rolesMap['Customer'] },
+      // Previous Accounts
       { name: 'Admin', email: 'admin@salesplus.com', password: 'admin123', role: rolesMap['Admin / Owner'] },
       { name: 'Manager', email: 'manager@salesplus.com', password: 'manager123', role: rolesMap['Inventory Manager'] },
       { name: 'Sales Executive', email: 'executive@salesplus.com', password: 'ex123', role: rolesMap['Sales & Operations'] },
@@ -178,8 +186,8 @@ async function seed() {
           tagline: 'Official TVS Motorcycles & Scooters Dealership, Service & Genuine Parts',
           registrationNumber: 'TVS-LK-89214/2026',
           taxNumber: 'VAT-119284729-7000',
-          logoUrl: '/manthusa-logo.png',
-          faviconUrl: '',
+logoUrl: '/manthusa-logo.png',
+          faviconUrl: '/favicon.ico',
           footerText: '© 2026 MANTHUSA TVS. All rights reserved. Official TVS Warranty & Genuine Spares.',
           defaultLanguage: 'en',
           currency: 'LKR',
@@ -1190,13 +1198,13 @@ async function seed() {
     console.log('✓ Seeded complete end-to-end TVS workflow records for customer portal testing.');
     console.log('\n======================================================');
     console.log('TVS MOTORCYCLE SALES MANAGEMENT SYSTEM SEED COMPLETED!');
-    console.log('Default Staff Credentials:');
-    console.log('• Admin: admin@salesplus.com / admin123');
-    console.log('• Manager: manager@salesplus.com / manager123');
-    console.log('• Sales Executive: executive@salesplus.com / ex123');
-    console.log('• Accountant: accountant@salesplus.com / accountant123');
-    console.log('• Sales Manager: manager2@salesplus.com / manag123');
-    console.log('• Demo Customer: customer@tvsdealership.lk / customer123');
+    console.log('Official MANTHUSA TVS Credentials:');
+    console.log('• Admin: admin@manthusatvs.lk / admin123');
+    console.log('• Raxwo Admin: admin@raxwotechnology.com / admin123');
+    console.log('• Manager: manager@manthusatvs.lk / manager123');
+    console.log('• Sales Executive: sales@manthusatvs.lk / sales123');
+    console.log('• Accountant: accountant@manthusatvs.lk / accountant123');
+    console.log('• Demo Customer: customer@manthusatvs.lk / customer123');
     console.log('======================================================\n');
   } finally {
     await mongoose.disconnect();

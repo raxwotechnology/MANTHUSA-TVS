@@ -54,13 +54,13 @@ export default function SettingsPage() {
   // Settings state initialized with rich defaults
   const [settings, setSettings] = useState<any>({
     general: {
-      dealershipName: 'TVS SalesPlus Motor Hub',
+      dealershipName: 'MANTHUSA TVS',
       tagline: 'Official TVS Motorcycle Dealer — Sri Lanka',
       registrationNumber: 'PV-89214/2026',
       taxNumber: 'VAT-119284729-7000',
-      logoUrl: '',
-      faviconUrl: '',
-      footerText: '© 2026 TVS SalesPlus Motor Hub. All rights reserved.',
+      logoUrl: '/logo.jpeg',
+      faviconUrl: '/logo.jpeg',
+      footerText: '© 2026 MANTHUSA TVS. All rights reserved.',
       defaultLanguage: 'en',
     },
     contact: {
@@ -546,7 +546,7 @@ export default function SettingsPage() {
                         type="text"
                         value={settings.general?.dealershipName || ''}
                         onChange={(e) => handleNestedChange('general', 'dealershipName', e.target.value)}
-                        placeholder="TVS SalesPlus Motor Hub"
+                        placeholder="MANTHUSA TVS"
                         className="w-full text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:border-blue-500 font-semibold text-slate-900 placeholder:text-slate-400"
                       />
                     </div>
