@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Bell, Search, LogOut, Menu, User, Globe, Settings, Camera } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
+import { uploadToCloudinary } from '@/lib/upload';
 
 interface TopbarProps {
   user: any;
@@ -52,22 +53,24 @@ export function Topbar({ user, onToggleSidebar }: TopbarProps) {
     }
   };
 
-  const handleAvatarUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
-      setAvatarError('Please select an image file.');
+      setAvatarError('Please select an image file (PNG, JPG, WEBP).');
+      event.target.value = '';
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      setAvatarError('Profile image must be smaller than 5 MB.');
+    if (file.size > 10 * 1024 * 1024) {
+      setAvatarError('Profile image must be smaller than 10 MB.');
+      event.target.value = '';
       return;
     }
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const avatar = typeof reader.result === 'string' ? reader.result : '';
-      if (!avatar || !currentUser?.id) return;
+    if (!currentUser?.id) return;
+    try {
       setAvatarError('');
+      const res = await uploadToCloudinary(file, { folder: 'manthusa-tvs/users/avatars' });
+      const avatar = res.secure_url || res.url;
       const response = await apiFetch('/users/profile/avatar', {
         method: 'PATCH',
         body: JSON.stringify({ avatar }),
@@ -81,9 +84,11 @@ export function Topbar({ user, onToggleSidebar }: TopbarProps) {
       setCurrentUser(updatedUser);
       localStorage.setItem('user', JSON.stringify(updatedUser));
       window.dispatchEvent(new CustomEvent('user-profile-updated', { detail: updatedUser }));
-    };
-    reader.readAsDataURL(file);
-    event.target.value = '';
+    } catch (err: any) {
+      setAvatarError(err?.message || 'Failed to upload profile picture to Cloudinary.');
+    } finally {
+      event.target.value = '';
+    }
   };
 
   return (

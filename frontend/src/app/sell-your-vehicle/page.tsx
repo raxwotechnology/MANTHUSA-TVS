@@ -21,6 +21,7 @@ import {
 import { PublicLayout } from '@/components/public/PublicLayout';
 import { Breadcrumbs } from '@/components/public/Breadcrumbs';
 import { submitValuationRequest, formatLKR } from '@/lib/publicApi';
+import { uploadMultipleToCloudinary } from '@/lib/upload';
 
 export default function SellYourVehiclePage() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -59,7 +60,7 @@ export default function SellYourVehiclePage() {
   const [submitError, setSubmitError] = useState('');
   const [submittedValuationId, setSubmittedValuationId] = useState<string | null>(null);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setImageUploadError('');
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -69,20 +70,17 @@ export default function SellYourVehiclePage() {
       return;
     }
 
-    Array.from(files).forEach((file) => {
-      if (file.size > 5 * 1024 * 1024) {
-        setImageUploadError(`File ${file.name} exceeds 5MB limit.`);
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = (uploadEvent) => {
-        const result = uploadEvent.target?.result;
-        if (typeof result === 'string') {
-          setUploadedImages((prev) => [...prev, result]);
-        }
-      };
-      reader.readAsDataURL(file);
-    });
+    try {
+      const results = await uploadMultipleToCloudinary(Array.from(files), {
+        folder: 'manthusa-tvs/customer-vehicles',
+      });
+      const urls = results.map((r) => r.secure_url || r.url);
+      setUploadedImages((prev) => [...prev, ...urls]);
+    } catch (err: any) {
+      setImageUploadError(err?.message || 'Image upload to Cloudinary failed.');
+    } finally {
+      e.target.value = '';
+    }
   };
 
   const removeImage = (index: number) => {

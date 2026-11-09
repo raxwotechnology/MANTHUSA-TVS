@@ -16,7 +16,8 @@ import {
   FileDown,
   FileSpreadsheet,
   AlertTriangle,
-  RotateCcw
+  RotateCcw,
+  Trash2
 } from 'lucide-react';
 import { exportPdf, exportExcel } from '@/lib/exportUtils';
 import { apiFetch } from '@/lib/api';
@@ -64,6 +65,8 @@ export default function LeadsPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [lostSaleModalLead, setLostSaleModalLead] = useState<Lead | null>(null);
   const [lostReasonInput, setLostReasonInput] = useState('');
+  const [deletingLead, setDeletingLead] = useState<Lead | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const [newLead, setNewLead] = useState({
     customerName: '',
@@ -207,6 +210,26 @@ export default function LeadsPage() {
       await loadLeads();
     } catch (err: any) {
       setError(err.message || 'Failed to mark inquiry as lost sale.');
+    }
+  };
+
+  const handleDeleteLead = async () => {
+    if (!deletingLead) return;
+    setDeleting(true);
+    setError('');
+    try {
+      const res = await apiFetch(`/leads/${deletingLead._id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || 'Could not delete inquiry.');
+      }
+      setSuccess(`Inquiry ${deletingLead.leadId} deleted successfully.`);
+      setDeletingLead(null);
+      await loadLeads();
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete inquiry.');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -444,14 +467,14 @@ export default function LeadsPage() {
                   <td className="py-3.5 px-4">
                     <div className="font-bold text-slate-900 text-sm">{l.modelName || l.interestedVehicle}</div>
                     <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-50 text-red-700 border border-red-100">
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-50 text-red-700 border border-red-100 whitespace-nowrap">
                         {l.category || 'Sport Motorcycle'}
                       </span>
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-100">
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-100 whitespace-nowrap">
                         {l.vehicleType || 'Motorcycle'}
                       </span>
                       {l.engineCapacity && (
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-purple-50 text-purple-700 border border-purple-100">
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-purple-50 text-purple-700 border border-purple-100 whitespace-nowrap">
                           {l.engineCapacity}
                         </span>
                       )}
@@ -523,8 +546,30 @@ export default function LeadsPage() {
                               <span>Lost Sale</span>
                             </button>
                           )}
+
+                          <button
+                            type="button"
+                            onClick={() => setDeletingLead(l)}
+                            className="px-2 py-1.5 bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 font-semibold text-[11px] rounded-lg transition-colors flex items-center gap-1"
+                            title="Delete inquiry permanently"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                            <span>Delete</span>
+                          </button>
                         </>
                       )}
+
+                      {l.status === 'Purchased' || l.status === 'Purchasing' ? (
+                        <button
+                          type="button"
+                          onClick={() => setDeletingLead(l)}
+                          className="px-2 py-1.5 bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 font-semibold text-[11px] rounded-lg transition-colors flex items-center gap-1"
+                          title="Delete inquiry permanently"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                          <span>Delete</span>
+                        </button>
+                      ) : null}
                     </div>
                   </td>
                 </tr>
@@ -594,6 +639,46 @@ export default function LeadsPage() {
                   Confirm Lost Sale
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Inquiry Confirmation Modal */}
+      {deletingLead && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-xl border border-slate-200 text-slate-900">
+            <div className="flex items-center justify-between border-b pb-3 mb-4">
+              <div className="flex items-center gap-2 text-rose-600">
+                <Trash2 className="w-5 h-5" />
+                <h3 className="text-base font-bold text-slate-900">Delete Customer Inquiry</h3>
+              </div>
+              <button onClick={() => setDeletingLead(null)} disabled={deleting} className="text-slate-400 hover:text-slate-600 disabled:opacity-50">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-600 mb-5">
+              Delete inquiry <strong>{deletingLead.leadId}</strong> from <strong>{deletingLead.customerName}</strong>? This action cannot be undone.
+            </p>
+
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setDeletingLead(null)}
+                disabled={deleting}
+                className="flex-1 p-2.5 border rounded-xl bg-slate-100 text-slate-700 font-semibold text-xs disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteLead}
+                disabled={deleting}
+                className="flex-1 p-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs disabled:opacity-50"
+              >
+                {deleting ? 'Deleting...' : 'Delete Inquiry'}
+              </button>
             </div>
           </div>
         </div>

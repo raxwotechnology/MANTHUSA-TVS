@@ -30,9 +30,9 @@ async function bootstrap() {
       next();
     });
 
-    // Increase payload limit to 20MB for image uploads and base64 assets
-    app.use(json({ limit: '20mb' }));
-    app.use(urlencoded({ extended: true, limit: '20mb' }));
+    // Increase payload limit to 100MB for media uploads (images and videos)
+    app.use(json({ limit: '100mb' }));
+    app.use(urlencoded({ extended: true, limit: '100mb' }));
 
     // Dynamic CORS to support Netlify, Render, Localhost and Custom Domains with credentials
     app.enableCors({
@@ -52,19 +52,14 @@ async function bootstrap() {
       });
       res.end(
         JSON.stringify({
-          statusCode: 500,
-          error: 'NestJS Bootstrap Failure',
-          message: err?.message || String(err),
-          stack: err?.stack,
+          error: 'Backend failed to start. Check MongoDB connection string and server logs.',
+          details: err?.message || String(err),
         }),
       );
     });
-    fallbackServer.listen(port, () => {
-      console.log(`Fallback server running on port ${port} reporting error`);
+    fallbackServer.listen(port, '0.0.0.0', () => {
+      console.log(`Fallback error server listening on port ${port}`);
     });
   }
 }
-
-bootstrap().catch((err) => {
-  console.error('Fatal unhandled bootstrap error:', err);
-});
+bootstrap();

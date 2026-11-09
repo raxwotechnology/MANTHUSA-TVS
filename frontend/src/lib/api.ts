@@ -2,10 +2,16 @@ export function getApiUrl(path: string): string {
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
 
   // 1. Client-side in browser (public path):
-  // When running in the browser:
-  // Points directly to the active Render backend URL.
+  // When running in the browser on localhost, route to local backend (http://localhost:3001)
+  // Otherwise default to the production backend URL unless overridden.
   if (typeof window !== 'undefined') {
-    const publicUrl = process.env.NEXT_PUBLIC_API_URL || 'https://manthusa-tvs.onrender.com';
+    const isLocalhost =
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1';
+    const defaultUrl = isLocalhost
+      ? 'http://localhost:3001'
+      : 'https://manthusa-tvs.onrender.com';
+    const publicUrl = process.env.NEXT_PUBLIC_API_URL || defaultUrl;
     const base = publicUrl.replace(/\/$/, '');
     return `${base}${cleanPath.startsWith('/api') ? cleanPath : `/api${cleanPath}`}`;
   }

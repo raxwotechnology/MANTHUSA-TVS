@@ -15,7 +15,8 @@ import {
   X,
   FileDown,
   FileSpreadsheet,
-  MessageSquare
+  MessageSquare,
+  Trash2
 } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { useRouter } from 'next/navigation';
@@ -172,6 +173,26 @@ export default function TVSBookingsPage() {
       }
     } catch (e) {
       setNotification({ type: 'error', message: 'Network error updating status.' });
+      setTimeout(() => setNotification(null), 4000);
+    }
+  };
+
+  const deleteBooking = async (booking: Booking) => {
+    const bookingRef = booking.bookingNumber || booking.reservationId || booking._id;
+    if (!window.confirm(`Delete booking ${bookingRef}? This action cannot be undone.`)) return;
+
+    try {
+      const res = await apiFetch(`/reservations/${booking._id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || 'Could not delete booking.');
+      }
+
+      setBookings((prev) => prev.filter((item) => item._id !== booking._id));
+      setNotification({ type: 'success', message: `Booking ${bookingRef} deleted.` });
+      setTimeout(() => setNotification(null), 3000);
+    } catch (err: any) {
+      setNotification({ type: 'error', message: err.message || 'Network error deleting booking.' });
       setTimeout(() => setNotification(null), 4000);
     }
   };
@@ -433,6 +454,15 @@ export default function TVSBookingsPage() {
                       >
                         <MessageSquare className="w-3 h-3" />
                         <span>Send SMS</span>
+                      </button>
+
+                      <button
+                        onClick={() => deleteBooking(b)}
+                        className="px-2 py-1.5 bg-rose-50 text-rose-700 hover:bg-rose-100 font-bold text-[11px] rounded-lg border border-rose-200 flex items-center gap-1"
+                        title="Delete booking permanently"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        <span>Delete</span>
                       </button>
                     </div>
                   </td>

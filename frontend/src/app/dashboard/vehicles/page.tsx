@@ -33,6 +33,7 @@ import {
 import { exportPdf, exportExcel } from '@/lib/exportUtils';
 import { DateFilterControl, isWithinDateRange } from '@/components/dashboard/DateFilterControl';
 import { TVSStockRequisitionPlanner } from '@/components/dashboard/TVSStockRequisitionPlanner';
+import { uploadToCloudinary, uploadMultipleToCloudinary } from '@/lib/upload';
 
 interface MediaAngles {
   front?: string;
@@ -142,6 +143,8 @@ export default function VehicleInventoryPage() {
   const [assignPlateValue, setAssignPlateValue] = useState('');
   const [assignPlateLoading, setAssignPlateLoading] = useState(false);
   const [vehicleNotification, setVehicleNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [uploadingMediaMsg, setUploadingMediaMsg] = useState<string | null>(null);
+  const [modalMediaNotification, setModalMediaNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Form State
   const [newVehicle, setNewVehicle] = useState(defaultVehicleForm);
@@ -243,40 +246,68 @@ export default function VehicleInventoryPage() {
     fetchVehicles();
   }, []);
 
-  const handleFileUpload = (
+  const handleFileUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,
     onSuccess: (url: string) => void
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      if (event.target?.result) {
-        onSuccess(event.target.result as string);
-      }
-    };
-    reader.readAsDataURL(file);
+    try {
+      setUploadingMediaMsg(`Uploading ${file.name} to Cloudinary...`);
+      const isVideo = file.type.startsWith('video/');
+      const result = await uploadToCloudinary(file, {
+        folder: isVideo ? 'manthusa-tvs/vehicles/videos' : 'manthusa-tvs/vehicles/images',
+        resourceType: isVideo ? 'video' : 'image',
+      });
+      onSuccess(result.secure_url || result.url);
+      setVehicleNotification({
+        type: 'success',
+        message: `${file.name} uploaded to Cloudinary successfully!`,
+      });
+      setTimeout(() => setVehicleNotification(null), 4000);
+    } catch (err: any) {
+      setVehicleNotification({
+        type: 'error',
+        message: err?.message || 'Upload to Cloudinary failed.',
+      });
+      setTimeout(() => setVehicleNotification(null), 6000);
+    } finally {
+      setUploadingMediaMsg(null);
+      e.target.value = '';
+    }
   };
 
-  const handleMultiFileUpload = (
+  const handleMultiFileUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,
     currentText: string,
     onSuccess: (combinedText: string) => void
   ) => {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
-    const readPromises = files.map((file) => {
-      return new Promise<string>((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (ev) => resolve((ev.target?.result as string) || '');
-        reader.readAsDataURL(file);
+    try {
+      setUploadingMediaMsg(`Uploading ${files.length} file(s) to Cloudinary...`);
+      const results = await uploadMultipleToCloudinary(files, {
+        folder: 'manthusa-tvs/vehicles/docs',
       });
-    });
-    Promise.all(readPromises).then((newUrls) => {
+      const newUrls = results.map((r) => r.secure_url || r.url);
       const existing = currentText.split(',').map((s) => s.trim()).filter(Boolean);
       const combined = [...existing, ...newUrls].join(', ');
       onSuccess(combined);
-    });
+      setVehicleNotification({
+        type: 'success',
+        message: `${files.length} file(s) uploaded to Cloudinary successfully!`,
+      });
+      setTimeout(() => setVehicleNotification(null), 4000);
+    } catch (err: any) {
+      setVehicleNotification({
+        type: 'error',
+        message: err?.message || 'Multiple file upload to Cloudinary failed.',
+      });
+      setTimeout(() => setVehicleNotification(null), 6000);
+    } finally {
+      setUploadingMediaMsg(null);
+      e.target.value = '';
+    }
   };
 
   const deleteVehicle = async () => {
@@ -589,12 +620,12 @@ export default function VehicleInventoryPage() {
             />
           </div>
 
-          <div className="flex items-center gap-2 w-full lg:w-auto overflow-x-auto text-xs font-semibold">
+          <div className="flex flex-nowrap items-center gap-1 w-full lg:w-auto text-[11px] font-semibold">
             {['ALL', 'AVAILABLE', 'RESERVED', 'SOLD', 'UNDER INSPECTION'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-3 py-1.5 rounded-lg border transition-colors shrink-0 ${
+                className={`px-2 py-1.5 rounded-lg border transition-colors shrink-0 whitespace-nowrap ${
                   activeTab === tab
                     ? 'bg-slate-900 text-white border-slate-900'
                     : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
@@ -699,7 +730,7 @@ export default function VehicleInventoryPage() {
 
             <form onSubmit={handleAddVehicle} className="space-y-4 text-xs">
               <div className="font-bold text-slate-900 border-b pb-1">1. TVS Motorcycle Identification</div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="block font-semibold text-slate-700 mb-1">Brand / Make</label>
                   <input
@@ -722,19 +753,6 @@ export default function VehicleInventoryPage() {
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg placeholder:text-slate-400 font-bold"
                   />
                 </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-3">
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Variant Name</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Disc / SmartXonnect / Race Edition"
-                    value={newVehicle.variant}
-                    onChange={(e) => setNewVehicle({ ...newVehicle, variant: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg placeholder:text-slate-400"
-                  />
-                </div>
                 <div>
                   <label className="block font-semibold text-slate-700 mb-1">Manufacturing Year</label>
                   <input
@@ -745,39 +763,18 @@ export default function VehicleInventoryPage() {
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg placeholder:text-slate-400"
                   />
                 </div>
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Registration Number</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. WP CAB-8912"
-                    value={newVehicle.registrationNumber}
-                    onChange={(e) => setNewVehicle({ ...newVehicle, registrationNumber: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg placeholder:text-slate-400"
-                  />
-                </div>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+              {/* Row 1: Engine Number + Chassis Number */}
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Stock Number</label>
+                  <label className="block font-semibold text-slate-700 mb-1">Engine Number</label>
                   <input
                     type="text"
                     placeholder="Auto-generated if empty"
                     value={newVehicle.stockNumber}
                     onChange={(e) => setNewVehicle({ ...newVehicle, stockNumber: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg placeholder:text-slate-400 font-mono text-[11px]"
-                  />
-                </div>
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">
-                    Round Number <span className="text-[10px] text-indigo-600 font-bold">(Round No)</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. RND-042 / Round 12"
-                    value={newVehicle.roundNumber}
-                    onChange={(e) => setNewVehicle({ ...newVehicle, roundNumber: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 border border-indigo-200 rounded-lg placeholder:text-slate-400 font-mono text-[11px] focus:border-indigo-500 focus:bg-white"
                   />
                 </div>
                 <div>
@@ -788,6 +785,22 @@ export default function VehicleInventoryPage() {
                     value={newVehicle.chassisNumber}
                     onChange={(e) => setNewVehicle({ ...newVehicle, chassisNumber: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg placeholder:text-slate-400 font-mono text-[11px]"
+                  />
+                </div>
+              </div>
+
+              {/* Row 2: Round Number + Mileage + Engine Capacity */}
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block font-semibold text-slate-700 mb-1">
+                    Round Number <span className="text-[10px] text-indigo-600 font-bold">(Round No)</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. RND-042 / Round 12"
+                    value={newVehicle.roundNumber}
+                    onChange={(e) => setNewVehicle({ ...newVehicle, roundNumber: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 border border-indigo-200 rounded-lg placeholder:text-slate-400 font-mono text-[11px] focus:border-indigo-500 focus:bg-white"
                   />
                 </div>
                 <div>
@@ -851,49 +864,7 @@ export default function VehicleInventoryPage() {
               </div>
 
               <div className="border-t pt-3 font-bold text-slate-900">2. Financial Cost Sheet</div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Purchase Price</label>
-                  <input
-                    type="number"
-                    required
-                    placeholder="e.g. 10,000,000"
-                    value={newVehicle.purchasePrice}
-                    onChange={(e) => setNewVehicle({ ...newVehicle, purchasePrice: e.target.value as any })}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg font-bold placeholder:text-slate-400"
-                  />
-                </div>
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Transport Cost</label>
-                  <input
-                    type="number"
-                    placeholder="e.g. 30,000"
-                    value={newVehicle.transportCost}
-                    onChange={(e) => setNewVehicle({ ...newVehicle, transportCost: e.target.value as any })}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg placeholder:text-slate-400"
-                  />
-                </div>
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Repair Cost</label>
-                  <input
-                    type="number"
-                    placeholder="e.g. 50,000"
-                    value={newVehicle.repairCost}
-                    onChange={(e) => setNewVehicle({ ...newVehicle, repairCost: e.target.value as any })}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg placeholder:text-slate-400"
-                  />
-                </div>
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Detailing Cost</label>
-                  <input
-                    type="number"
-                    placeholder="e.g. 20,000"
-                    value={newVehicle.detailingCost}
-                    onChange={(e) => setNewVehicle({ ...newVehicle, detailingCost: e.target.value as any })}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg placeholder:text-slate-400"
-                  />
-                </div>
-              </div>
+
 
               <div className="grid grid-cols-2 gap-3 bg-emerald-50 p-3 rounded-xl border border-emerald-100">
                 <div>

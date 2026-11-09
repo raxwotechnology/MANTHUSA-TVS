@@ -41,8 +41,10 @@ export class UsersService {
   }
 
   async updateAvatar(id: string, avatar: string) {
-    if (!/^data:image\/(?:jpeg|jpg|png|webp|gif);base64,[A-Za-z0-9+/]+={0,2}$/.test(avatar || '')) {
-      throw new BadRequestException('Please upload a valid image.');
+    const isUrl = typeof avatar === 'string' && (avatar.startsWith('http://') || avatar.startsWith('https://'));
+    const isBase64 = /^data:image\/(?:jpeg|jpg|png|webp|gif);base64,[A-Za-z0-9+/]+={0,2}$/.test(avatar || '');
+    if (!isUrl && !isBase64) {
+      throw new BadRequestException('Please upload a valid image or image URL.');
     }
     if (avatar.length > 7 * 1024 * 1024) {
       throw new BadRequestException('Profile image must be smaller than 5 MB.');

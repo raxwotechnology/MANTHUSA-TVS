@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { apiFetch } from '@/lib/api';
+import { uploadToCloudinary } from '@/lib/upload';
 import {
   Users,
   Plus,
@@ -192,37 +193,39 @@ export default function UsersPermissionsPage() {
     });
   };
 
-  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      if (event.target?.result) {
-        setForm((prev) => ({ ...prev, avatar: event.target?.result as string }));
-      }
-    };
-    reader.readAsDataURL(file);
+    try {
+      const res = await uploadToCloudinary(file, { folder: 'manthusa-tvs/users/avatars' });
+      setForm((prev) => ({ ...prev, avatar: res.secure_url || res.url }));
+    } catch (err: any) {
+      setError(err?.message || 'Avatar upload to Cloudinary failed.');
+    } finally {
+      e.target.value = '';
+    }
   };
 
-  const handleDocumentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDocumentUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const fileName = file.name;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      if (event.target?.result) {
-        const docObj: UploadedDoc = {
-          name: fileName,
-          url: event.target?.result as string,
-          uploadedAt: new Date().toISOString()
-        };
-        setForm((prev) => ({
-          ...prev,
-          documents: [...prev.documents, docObj]
-        }));
-      }
-    };
-    reader.readAsDataURL(file);
+    try {
+      const res = await uploadToCloudinary(file, { folder: 'manthusa-tvs/users/documents' });
+      const docObj: UploadedDoc = {
+        name: fileName,
+        url: res.secure_url || res.url,
+        uploadedAt: new Date().toISOString()
+      };
+      setForm((prev) => ({
+        ...prev,
+        documents: [...prev.documents, docObj]
+      }));
+    } catch (err: any) {
+      setError(err?.message || 'Document upload to Cloudinary failed.');
+    } finally {
+      e.target.value = '';
+    }
   };
 
   const removeDocument = (indexToRemove: number) => {

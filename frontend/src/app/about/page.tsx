@@ -92,7 +92,7 @@ export default function AboutPage() {
 
           <div className="relative rounded-3xl overflow-hidden aspect-[4/3] bg-slate-900 border border-slate-800 shadow-2xl dark-panel">
             <img
-              src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80"
+              src="https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1920&q=80"
               alt={`${dealershipName} Flagship Showroom Facility`}
               className="w-full h-full object-cover"
             />

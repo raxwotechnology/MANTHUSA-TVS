@@ -8,7 +8,9 @@ export class DocumentRecord {
   @Prop({ required: true }) entityType: string;
   @Prop({ required: true }) entityId: string;
   @Prop({ required: true }) originalName: string;
-  @Prop({ required: true, unique: true }) storageName: string;
+  @Prop({ required: false }) storageName: string;
+  @Prop({ required: false }) url: string;
+  @Prop({ required: false }) publicId: string;
   @Prop({ required: true }) mimeType: string;
   @Prop({ required: true }) size: number;
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User' }) uploadedBy: Types.ObjectId;

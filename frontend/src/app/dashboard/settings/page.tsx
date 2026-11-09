@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { apiFetch } from '@/lib/api';
+import { uploadToCloudinary } from '@/lib/upload';
 import { buildBrandSettings, DEFAULT_WEBSITE_CMS } from '@/lib/useSettings';
 import {
   Settings,
@@ -233,57 +234,25 @@ export default function SettingsPage() {
     }));
   };
 
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      showNotification('error', 'File size exceeds 5MB limit. Please choose a smaller image.');
+    if (file.size > 10 * 1024 * 1024) {
+      showNotification('error', 'File size exceeds 10MB limit.');
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const src = event.target?.result as string;
-      const img = new Image();
-      img.onload = () => {
-        // Automatically optimize & resize logo to standard crisp dimensions (max 400x400)
-        const canvas = document.createElement('canvas');
-        const MAX_SIZE = 400;
-        let width = img.width;
-        let height = img.height;
-
-        if (width > height) {
-          if (width > MAX_SIZE) {
-            height = Math.round((height * MAX_SIZE) / width);
-            width = MAX_SIZE;
-          }
-        } else {
-          if (height > MAX_SIZE) {
-            width = Math.round((width * MAX_SIZE) / height);
-            height = MAX_SIZE;
-          }
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, width, height);
-          const compressed = canvas.toDataURL(file.type === 'image/png' ? 'image/png' : 'image/jpeg', 0.92);
-          handleNestedChange('general', 'logoUrl', compressed);
-        } else {
-          handleNestedChange('general', 'logoUrl', src);
-        }
-        showNotification('success', 'Logo loaded! Click "Save Changes" to update across the entire system.');
-      };
-      img.onerror = () => {
-        handleNestedChange('general', 'logoUrl', src);
-        showNotification('success', 'Logo loaded! Click "Save Changes" to apply.');
-      };
-      img.src = src;
-    };
-    reader.readAsDataURL(file);
+    try {
+            const result = await uploadToCloudinary(file, { folder: 'manthusa-tvs/branding' });
+      const logoUrl = result.secure_url || result.url;
+      handleNestedChange('general', 'logoUrl', logoUrl);
+      showNotification('success', 'Logo uploaded to Cloudinary! Click "Save Changes" to update across the entire system.');
+    } catch (err: any) {
+      showNotification('error', err?.message || 'Failed to upload logo to Cloudinary.');
+    } finally {
+      e.target.value = '';
+    }
   };
 
   const handleSaveAll = async () => {

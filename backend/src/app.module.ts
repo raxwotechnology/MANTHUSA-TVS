@@ -42,6 +42,7 @@ import { VehicleTransfersModule } from './vehicle-transfers/vehicle-transfers.mo
 import { VehicleValuationsModule } from './vehicle-valuations/vehicle-valuations.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { DocumentsModule } from './documents/documents.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { StockMovementsModule } from './stock-movements/stock-movements.module';
 import { LeasingPartnersModule } from './leasing-partners/leasing-partners.module';
 
@@ -74,6 +75,7 @@ import { LeasingPartnersModule } from './leasing-partners/leasing-partners.modul
     VehicleValuationsModule,
     NotificationsModule,
     DocumentsModule,
+    CloudinaryModule,
     StockMovementsModule,
     LeasingPartnersModule,
     SuppliersModule,
