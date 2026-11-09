@@ -24,34 +24,41 @@ async function bootstrap() {
   const rawOrigin = process.env.FRONTEND_ORIGIN;
   const allowedOrigins = rawOrigin
     ? rawOrigin.split(',').map((o) => o.trim().replace(/\/$/, ''))
-    : ['http://localhost:3000'];
+    : [];
 
   app.enableCors({
     origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
       // Allow requests with no origin (like mobile apps, curl, server-to-server)
       if (!origin) return callback(null, true);
       let isLocalDevelopmentOrigin = false;
+      let isAllowedDomain = false;
       try {
         const url = new URL(origin);
-        const hostname = url.hostname;
+        const hostname = url.hostname.toLowerCase();
         const isPrivateIpv4 =
           /^(10|192\.168)\.\d{1,3}\.\d{1,3}$/.test(hostname) ||
           /^172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}$/.test(hostname);
         isLocalDevelopmentOrigin =
-          url.protocol === 'http:' &&
-          url.port === '3000' &&
+          (url.port === '3000' || !url.port) &&
           (hostname === 'localhost' || hostname === '127.0.0.1' || isPrivateIpv4);
+        isAllowedDomain =
+          hostname.endsWith('.netlify.app') ||
+          hostname === 'netlify.app' ||
+          hostname.endsWith('.onrender.com') ||
+          hostname.endsWith('.vercel.app');
       } catch {
         isLocalDevelopmentOrigin = false;
       }
       if (
+        !rawOrigin ||
         rawOrigin === '*' ||
         allowedOrigins.includes(origin) ||
-        isLocalDevelopmentOrigin
+        isLocalDevelopmentOrigin ||
+        isAllowedDomain
       ) {
         return callback(null, true);
       }
-      return callback(new Error('Origin is not allowed by CORS.'));
+      return callback(new Error(`Origin ${origin} is not allowed by CORS.`));
     },
     credentials: true,
   });

@@ -1,4 +1,16 @@
 {
+  "name": "vehicle-sales-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "build:frontend": "npm --prefix frontend run build",
+    "build:backend": "npm --prefix backend run build",
+    "build": "npm --prefix frontend run build"
+  },
   "devDependencies": {
     "playwright": "^1.65.0"
   }
