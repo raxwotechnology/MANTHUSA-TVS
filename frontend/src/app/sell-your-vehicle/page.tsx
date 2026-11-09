@@ -266,7 +266,7 @@ export default function SellYourVehiclePage() {
 
           {/* Stepper Progress Bar */}
           <div className="mb-8 overflow-x-auto pb-2">
-            <div className="flex items-center justify-between min-w-[300px]">
+            <div className="flex w-full min-w-0 items-center justify-between">
               {steps.map((s, idx) => (
                 <div key={s.num} className="flex-1 flex flex-col items-center relative">
                   <div
