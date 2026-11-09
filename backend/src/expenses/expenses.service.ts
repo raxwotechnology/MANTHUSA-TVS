@@ -13,12 +13,13 @@ export class ExpensesService {
 
   async create(createExpenseDto: any): Promise<ExpenseDocument> {
     const amount = Number(createExpenseDto.amount);
-    if (!Number.isFinite(amount) || amount <= 0 || !createExpenseDto.expenseDate) throw new BadRequestException('A positive amount and expense date are required.');
+    const expenseDate = createExpenseDto.expenseDate || createExpenseDto.date || new Date();
+    if (!Number.isFinite(amount) || amount <= 0) throw new BadRequestException('A positive amount and expense date are required.');
     let category = createExpenseDto.category;
     if (typeof category === 'string' && !/^[a-f\d]{24}$/i.test(category)) {
       category = (await this.categoryModel.findOneAndUpdate({ name: category.trim() }, { $setOnInsert: { name: category.trim() } }, { upsert: true, new: true }))._id;
     }
-    const createdExpense = await new this.expenseModel({ ...createExpenseDto, category, amount, expenseId: createExpenseDto.expenseId || `EXP-${Date.now()}` }).save();
+    const createdExpense = await new this.expenseModel({ ...createExpenseDto, expenseDate, category, amount, expenseId: createExpenseDto.expenseId || `EXP-${Date.now()}` }).save();
     await new this.cashModel({ transactionType: 'OUT', amount, transactionDate: createdExpense.expenseDate, source: 'Expense', referenceId: createdExpense._id, description: createdExpense.description || 'Business expense' }).save();
     return createdExpense;
   }

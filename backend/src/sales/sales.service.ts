@@ -22,14 +22,14 @@ export class SalesService {
     const vehicle = await this.vehicleModel.findById(createSaleDto.vehicle).exec();
     if (!vehicle) throw new NotFoundException('Motorcycle not found.');
 
-    const vehiclePrice = Number(createSaleDto.vehiclePrice ?? vehicle.sellingPrice ?? 0);
-    const discount = Number(createSaleDto.discount || 0);
+    const vehiclePrice = Number(createSaleDto.vehiclePrice ?? createSaleDto.salePrice ?? vehicle.sellingPrice ?? 0);
+    const discount = Number(createSaleDto.discount || createSaleDto.discountAmount || 0);
     const additionalCharges = Number(createSaleDto.additionalCharges || 0);
     const registrationFee = Number(createSaleDto.registrationFee || 0);
     const insuranceFee = Number(createSaleDto.insuranceFee || 0);
     if (vehiclePrice <= 0 || discount < 0 || discount >= vehiclePrice || additionalCharges < 0) throw new BadRequestException('Sale pricing is invalid.');
     const finalAmount = Math.max(0, vehiclePrice - discount + registrationFee + insuranceFee + additionalCharges);
-    const paidAmount = Number(createSaleDto.paidAmount || 0);
+    const paidAmount = Number(createSaleDto.paidAmount ?? createSaleDto.downPayment ?? 0);
     if (paidAmount < 0 || paidAmount > finalAmount) throw new BadRequestException('Paid amount must be between zero and the invoice total.');
 
     const invoiceNumber = createSaleDto.invoiceNumber || `TVS-INV-${Date.now().toString().slice(-6)}`;
@@ -55,6 +55,9 @@ export class SalesService {
       status: createSaleDto.status || (paidAmount >= finalAmount ? 'Paid in Full' : paidAmount > 0 ? 'Partially Paid' : 'Pending'),
       saleDate: createSaleDto.saleDate || new Date(),
     }).save();
+
+    // Mark vehicle as Sold so it no longer appears in available inventory
+    await this.vehicleModel.findByIdAndUpdate(vehicle._id, { status: 'Sold' }).exec();
 
     await this.notifications.create({
       title: 'TVS Sale Recorded',
@@ -195,6 +198,10 @@ export class SalesService {
     const deletedSale = await this.saleModel.findByIdAndDelete(id).exec();
     if (!deletedSale) {
       throw new NotFoundException(`Invoice #${id} not found`);
+    }
+    // Restore vehicle to Available when invoice is deleted
+    if (deletedSale.vehicle) {
+      await this.vehicleModel.findByIdAndUpdate(deletedSale.vehicle, { status: 'Available' }).exec();
     }
     return deletedSale;
   }

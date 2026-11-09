@@ -12,7 +12,7 @@ export class VehicleHandoversService {
     if (!input.sale || !input.vehicle || !input.customer) throw new BadRequestException('Sale, vehicle and customer are required.');
     const sale = await this.sales.findById(input.sale).exec();
     if (!sale) throw new NotFoundException('Sale not found.');
-    if (!['Confirmed', 'Completed'].includes(sale.status)) throw new BadRequestException('Only confirmed sales can be handed over.');
+    if (!['Confirmed', 'Completed', 'Paid in Full', 'Partially Paid'].includes(sale.status)) throw new BadRequestException('Only confirmed or paid sales can be handed over.');
     return new this.handovers(input).save();
   }
   findAll() { return this.handovers.find().populate('sale').populate('vehicle').populate('customer').sort({ createdAt: -1 }).exec(); }

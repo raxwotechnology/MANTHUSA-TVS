@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CustomerDocument } from './schemas/customer.schema';
@@ -15,7 +15,16 @@ export class CustomersService {
   ) {}
 
   async create(createCustomerDto: any): Promise<CustomerDocument> {
-    const createdCustomer = new this.customerModel(createCustomerDto);
+    const fullName = (createCustomerDto.fullName || createCustomerDto.name || '').trim();
+    const phone = (createCustomerDto.phone || '').trim();
+    if (!fullName || !phone) {
+      throw new BadRequestException('Full name and phone number are required.');
+    }
+    const createdCustomer = new this.customerModel({
+      ...createCustomerDto,
+      fullName,
+      phone,
+    });
     return createdCustomer.save();
   }
 

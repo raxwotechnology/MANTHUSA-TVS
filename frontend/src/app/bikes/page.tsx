@@ -418,6 +418,146 @@ function BikesContent() {
           vehicle={inquiryVehicle}
         />
       )}
+
+      {/* Mobile Filters Drawer Modal */}
+      {isMobileFilterOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden flex">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs transition-opacity"
+            onClick={() => setIsMobileFilterOpen(false)}
+          />
+
+          {/* Drawer Panel */}
+          <div className="relative ml-auto w-full max-w-xs sm:max-w-sm bg-white dark:bg-slate-900 h-full p-5 overflow-y-auto shadow-2xl flex flex-col justify-between space-y-6">
+            <div className="space-y-5">
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+                <span className="text-sm font-extrabold uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-2">
+                  <Filter className="w-4 h-4 text-red-500" />
+                  <span>Filters ({activeFilterCount})</span>
+                </span>
+                <button
+                  onClick={() => setIsMobileFilterOpen(false)}
+                  className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
+                  aria-label="Close filters"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Keyword Search */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Model Name</label>
+                <form onSubmit={(e) => { handleSearchSubmit(e); setIsMobileFilterOpen(false); }} className="relative">
+                  <input
+                    type="text"
+                    placeholder="e.g. Apache, NTORQ, Raider..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-red-500"
+                  />
+                  <button
+                    type="submit"
+                    className="absolute right-2.5 top-2.5 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                  >
+                    <Search className="w-4 h-4" />
+                  </button>
+                </form>
+              </div>
+
+              {/* Category */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Category</label>
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => updateParams({ category: e.target.value })}
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-slate-200 focus:outline-none focus:border-red-500"
+                >
+                  <option value="ALL">All Categories</option>
+                  {categories.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Engine Capacity */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Engine Capacity</label>
+                <select
+                  value={selectedEngineCc}
+                  onChange={(e) => updateParams({ engineCc: e.target.value })}
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-slate-200 focus:outline-none focus:border-red-500"
+                >
+                  <option value="ALL">All Capacities</option>
+                  <option value="100">100cc (XL 100)</option>
+                  <option value="125">125cc (NTORQ, Raider, Jupiter)</option>
+                  <option value="160">160cc (Apache RTR 160 4V)</option>
+                  <option value="200">200cc (Apache RTR 200 4V)</option>
+                  <option value="225">225cc - 310cc (Ronin, RR 310)</option>
+                  <option value="electric">Electric (iQube)</option>
+                </select>
+              </div>
+
+              {/* Branch Availability */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Available at Branch</label>
+                <select
+                  value={selectedBranch}
+                  onChange={(e) => updateParams({ branch: e.target.value })}
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-slate-200 focus:outline-none focus:border-red-500"
+                >
+                  <option value="ALL">All Dealership Branches</option>
+                  <option value="Colombo">Colombo Flagship Hub</option>
+                  <option value="Kandy">Kandy City Showroom</option>
+                  <option value="Galle">Galle Coastal Center</option>
+                  <option value="Kurunegala">Kurunegala Sales Hub</option>
+                </select>
+              </div>
+
+              {/* Price Range */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Price Range (LKR)</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    type="number"
+                    placeholder="Min"
+                    value={minPrice}
+                    onChange={(e) => updateParams({ minPrice: e.target.value || null })}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-red-500"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Max"
+                    value={maxPrice}
+                    onChange={(e) => updateParams({ maxPrice: e.target.value || null })}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-red-500"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Actions */}
+            <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-2">
+              <button
+                onClick={() => setIsMobileFilterOpen(false)}
+                className="w-full py-3 min-h-[44px] rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md"
+              >
+                View {sortedBikes.length} Bikes
+              </button>
+              {activeFilterCount > 0 && (
+                <button
+                  onClick={() => { resetFilters(); setIsMobileFilterOpen(false); }}
+                  className="w-full py-2.5 min-h-[44px] rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs transition-colors"
+                >
+                  Reset All Filters
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

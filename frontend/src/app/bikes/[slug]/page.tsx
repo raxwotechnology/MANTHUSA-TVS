@@ -326,7 +326,7 @@ export default function BikeDetailPage({ params }: Props) {
 
           {/* Configuration & Action Card (5 Cols) */}
           <div className="lg:col-span-5 space-y-6">
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-7 space-y-6 shadow-md">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 md:p-7 space-y-6 shadow-md">
               {/* 1. SELECT VARIANT */}
               {bike.variants && bike.variants.length > 0 && (
                 <div className="space-y-3">
@@ -463,6 +463,22 @@ export default function BikeDetailPage({ params }: Props) {
                     <span>WhatsApp</span>
                   </a>
                 </div>
+
+                {/* Compare Button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (bike) toggleVehicle(bike._id);
+                  }}
+                  className={`w-full py-2.5 px-3 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                    bike && isInComparison(bike._id)
+                      ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-300 dark:border-rose-800'
+                      : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700'
+                  }`}
+                >
+                  <Scale className="w-4 h-4 text-amber-500" />
+                  <span>{bike && isInComparison(bike._id) ? '✓ In Comparison (Remove)' : '+ Add to Side-by-Side Compare'}</span>
+                </button>
               </div>
             </div>
           </div>

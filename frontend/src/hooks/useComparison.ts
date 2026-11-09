@@ -4,96 +4,102 @@ import { useState, useEffect, useCallback } from 'react';
 
 const STORAGE_KEY = 'salesplus_comparison_vehicles';
 const MAX_COMPARISON = 4;
+const EVENT_NAME = 'salesplus_comparison_updated';
+
+function getStoredIds(): string[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.map(String).slice(0, MAX_COMPARISON) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveAndNotify(ids: string[]) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
+  } catch (e) {
+    console.warn('Failed to save comparison to localStorage:', e);
+  }
+  window.dispatchEvent(new CustomEvent(EVENT_NAME, { detail: ids }));
+}
 
 export function useComparison() {
   const [comparisonIds, setComparisonIds] = useState<string[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed)) {
-          setComparisonIds(parsed.slice(0, MAX_COMPARISON));
-        }
-      }
-    } catch (e) {
-      console.warn('Failed to parse comparison IDs:', e);
-    }
+    // Initial sync
+    setComparisonIds(getStoredIds());
     setIsLoaded(true);
+
+    const handleUpdate = () => {
+      setComparisonIds(getStoredIds());
+    };
+
+    window.addEventListener(EVENT_NAME, handleUpdate);
+    window.addEventListener('storage', handleUpdate);
+
+    return () => {
+      window.removeEventListener(EVENT_NAME, handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+    };
   }, []);
 
   const addVehicle = useCallback((id: string): { success: boolean; message?: string } => {
-    let result: { success: boolean; message?: string } = { success: true };
-    setComparisonIds((prev) => {
-      if (prev.includes(id)) return prev;
-      if (prev.length >= MAX_COMPARISON) {
-        result = { success: false, message: `You can compare up to ${MAX_COMPARISON} vehicles at a time.` };
-        return prev;
-      }
-      const next = [...prev, id];
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      } catch (e) {
-        console.warn('Failed to save comparison to localStorage:', e);
-      }
-      return next;
-    });
-    return result;
+    const current = getStoredIds();
+    if (current.includes(id)) return { success: true };
+    if (current.length >= MAX_COMPARISON) {
+      return { success: false, message: `You can compare up to ${MAX_COMPARISON} vehicles at a time.` };
+    }
+    const next = [...current, id];
+    saveAndNotify(next);
+    setComparisonIds(next);
+    return { success: true };
   }, []);
 
   const removeVehicle = useCallback((id: string) => {
-    setComparisonIds((prev) => {
-      const next = prev.filter((item) => item !== id);
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      } catch (e) {
-        console.warn('Failed to save comparison to localStorage:', e);
-      }
-      return next;
-    });
+    const current = getStoredIds();
+    const next = current.filter((item) => item !== id);
+    saveAndNotify(next);
+    setComparisonIds(next);
   }, []);
 
   const toggleVehicle = useCallback((id: string): { inComparison: boolean; message?: string } => {
-    let inComparison = false;
-    let message: string | undefined;
-    setComparisonIds((prev) => {
-      if (prev.includes(id)) {
-        inComparison = false;
-        const next = prev.filter((item) => item !== id);
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-        } catch (e) {}
-        return next;
-      } else {
-        if (prev.length >= MAX_COMPARISON) {
-          inComparison = false;
-          message = `You can compare up to ${MAX_COMPARISON} vehicles.`;
-          return prev;
-        }
-        inComparison = true;
-        const next = [...prev, id];
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-        } catch (e) {}
-        return next;
+    const current = getStoredIds();
+    if (current.includes(id)) {
+      const next = current.filter((item) => item !== id);
+      saveAndNotify(next);
+      setComparisonIds(next);
+      return { inComparison: false };
+    } else {
+      if (current.length >= MAX_COMPARISON) {
+        return { inComparison: false, message: `You can compare up to ${MAX_COMPARISON} vehicles.` };
       }
-    });
-    return { inComparison, message };
-  }, []);
-
-  const clearComparison = useCallback(() => {
-    setComparisonIds([]);
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-    } catch (e) {
-      console.warn('Failed to clear comparison:', e);
+      const next = [...current, id];
+      saveAndNotify(next);
+      setComparisonIds(next);
+      return { inComparison: true };
     }
   }, []);
 
+  const clearComparison = useCallback(() => {
+    saveAndNotify([]);
+    setComparisonIds([]);
+  }, []);
+
+  const setComparisonList = useCallback((ids: string[]) => {
+    const cleaned = ids.slice(0, MAX_COMPARISON);
+    saveAndNotify(cleaned);
+    setComparisonIds(cleaned);
+  }, []);
+
   const isInComparison = useCallback(
-    (id: string) => comparisonIds.includes(id),
+    (id: string) => comparisonIds.includes(String(id)),
     [comparisonIds]
   );
 
@@ -106,6 +112,7 @@ export function useComparison() {
     removeVehicle,
     toggleVehicle,
     clearComparison,
+    setComparisonList,
     isInComparison,
   };
 }

@@ -50,7 +50,7 @@ export function FinanceCalculator({
     calculateAmortizedMonthlyPayment(price, downPayment, interestRate, tenureYears);
 
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 md:p-8 shadow-xl">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800">
         <div>
           <div className="flex items-center gap-2 text-red-600 dark:text-amber-400 mb-1">
@@ -130,13 +130,13 @@ export function FinanceCalculator({
                   {tenureYears} Years ({tenureYears * 12} mos)
                 </span>
               </div>
-              <div className="grid grid-cols-4 gap-1.5">
+              <div className="grid grid-cols-4 gap-1.5 sm:gap-2">
                 {[2, 3, 4, 5].map((y) => (
                   <button
                     key={y}
                     type="button"
                     onClick={() => setTenureYears(y)}
-                    className={`py-2 text-xs font-bold rounded-lg border transition-all ${
+                    className={`py-2.5 min-h-[44px] flex items-center justify-center text-xs font-bold rounded-xl border transition-all cursor-pointer ${
                       tenureYears === y
                         ? 'bg-red-600 text-white border-red-600 shadow-sm'
                         : 'bg-slate-100 dark:bg-slate-850 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700/80 hover:bg-slate-200 dark:hover:bg-slate-800'

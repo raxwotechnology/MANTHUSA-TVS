@@ -1,0 +1,1121 @@
+{
+  "auth": [
+    {
+      "role": "Admin",
+      "email": "admin@salesplus.com",
+      "status": "PASS"
+    },
+    {
+      "role": "Inventory Manager",
+      "email": "manager@salesplus.com",
+      "status": "PASS"
+    },
+    {
+      "role": "Sales & Operations",
+      "email": "executive@salesplus.com",
+      "status": "PASS"
+    },
+    {
+      "role": "Accountant",
+      "email": "accountant@salesplus.com",
+      "status": "PASS"
+    },
+    {
+      "role": "Customer",
+      "email": "customer_test_1794194646826@example.com",
+      "status": "PASS"
+    }
+  ],
+  "backendEndpoints": [
+    {
+      "name": "Public Vehicles",
+      "url": "/public/vehicles",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[{\"_id\":\"6aee38ef244ae94d834e01ae\",\"stockNumber\":\"TVS-RTR160-01\",\"brakingSystem\":\"Single Channel Super-Moto ABS\",\"branchStock\":[{\"branchId\":\"6aee38eec"
+    },
+    {
+      "name": "Public Branches",
+      "url": "/branches/public",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[{\"_id\":\"6aee38efc58e8e62e24bf63c\",\"name\":\"Galle Coastal TVS Center\",\"location\":\"No. 215, Colombo Road, Galle\",\"contactNumber\":\"+94 91 224 5600\",\"isAc"
+    },
+    {
+      "name": "Public Settings",
+      "url": "/settings/public",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "{\"general\":{\"dealershipName\":\"MANTHUSA TVS\",\"tagline\":\"TVS Motorcycles Dealership, Service & Genuine Parts\",\"registrationNumber\":\"TVS-LK-89214/2026\",\""
+    },
+    {
+      "name": "Vehicles List",
+      "url": "/vehicles",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[{\"vehicleType\":\"Motorcycle\",\"safetyFeatures\":[],\"entertainmentFeatures\":[],\"comfortFeatures\":[],\"_id\":\"6aee38ef244ae94d834e01ae\",\"stockNumber\":\"TVS-R"
+    },
+    {
+      "name": "Branches List",
+      "url": "/branches",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[{\"_id\":\"6aee38efc58e8e62e24bf63c\",\"name\":\"Galle Coastal TVS Center\",\"location\":\"No. 215, Colombo Road, Galle\",\"contactNumber\":\"+94 91 224 5600\",\"isAc"
+    },
+    {
+      "name": "Users List",
+      "url": "/users",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[{\"documents\":[],\"permissions\":[],\"mfaEnabled\":false,\"mfaBackupCodes\":[],\"_id\":\"6ab60483b3098adf85a7f6ed\",\"name\":\"Admin\",\"email\":\"admin@salesplus.com\""
+    },
+    {
+      "name": "Roles List",
+      "url": "/roles",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[{\"_id\":\"6ab60483b3098adf85a7f6ea\",\"name\":\"Admin / Owner\",\"description\":\"Full system control\",\"__v\":0},{\"_id\":\"6ab60483b3098adf85a7f6eb\",\"name\":\"Sales"
+    },
+    {
+      "name": "Permissions List",
+      "url": "/permissions",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[]"
+    },
+    {
+      "name": "Customers List",
+      "url": "/customers",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[{\"_id\":\"6af13cd670bd1ab1f036e596\",\"fullName\":\"Automated Audit Customer\",\"phone\":\"0779998888\",\"email\":\"customer_test_1794194646826@example.com\",\"custo"
+    },
+    {
+      "name": "Leads List",
+      "url": "/leads",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[{\"_id\":\"6af13826e748bc6a90cc172a\",\"leadId\":\"TVS-REQ-446505\",\"customer\":{\"_id\":\"6af137c9e748bc6a90cc1708\",\"fullName\":\"XSS Test\",\"phone\":\"0770001111\",\""
+    },
+    {
+      "name": "Lead Activities List",
+      "url": "/lead-activities",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[]"
+    },
+    {
+      "name": "Follow-ups List",
+      "url": "/follow-ups",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[]"
+    },
+    {
+      "name": "Quotations List",
+      "url": "/quotations",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[{\"_id\":\"6aee38f0c58e8e62e24bf641\",\"quotationNumber\":\"TVS-QT-44102\",\"customer\":{\"customerSource\":\"Walk-in\",\"_id\":\"6aee38efc58e8e62e24bf63e\",\"fullName\""
+    },
+    {
+      "name": "Reservations List",
+      "url": "/reservations",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[{\"_id\":\"6af13826e748bc6a90cc1717\",\"reservationId\":\"TVS-BK-446332\",\"bookingNumber\":\"TVS-BK-446332\",\"customer\":{\"_id\":\"6af13825e748bc6a90cc1710\",\"fullN"
+    },
+    {
+      "name": "Sales List",
+      "url": "/sales",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[{\"_id\":\"6af13826e748bc6a90cc171b\",\"invoiceNumber\":\"INV-AUDIT-446342\",\"customer\":{\"_id\":\"6af13825e748bc6a90cc1710\",\"fullName\":\"Automated Audit Custome"
+    },
+    {
+      "name": "Payments List",
+      "url": "/payments",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[{\"_id\":\"6af13826e748bc6a90cc171f\",\"sale\":{\"_id\":\"6af13826e748bc6a90cc171b\",\"invoiceNumber\":\"INV-AUDIT-446342\",\"customer\":\"6af13825e748bc6a90cc1710\",\""
+    },
+    {
+      "name": "Installments Agreements",
+      "url": "/installments/agreements",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[]"
+    },
+    {
+      "name": "Discount Requests List",
+      "url": "/discount-requests",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[]"
+    },
+    {
+      "name": "Refunds List",
+      "url": "/refunds",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[]"
+    },
+    {
+      "name": "Test Drives List",
+      "url": "/test-drives",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[]"
+    },
+    {
+      "name": "Vehicle Inspections",
+      "url": "/vehicle-inspections",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[]"
+    },
+    {
+      "name": "Vehicle Purchases",
+      "url": "/vehicle-purchases",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[]"
+    },
+    {
+      "name": "Vehicle Transfers",
+      "url": "/vehicle-transfers",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[]"
+    },
+    {
+      "name": "Vehicle Valuations",
+      "url": "/vehicle-valuations",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[]"
+    },
+    {
+      "name": "Vehicle Handovers",
+      "url": "/vehicle-handovers",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[]"
+    },
+    {
+      "name": "Stock Movements",
+      "url": "/stock-movements",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[]"
+    },
+    {
+      "name": "Leasing Partners",
+      "url": "/leasing-partners",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[]"
+    },
+    {
+      "name": "Suppliers List",
+      "url": "/suppliers",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[{\"_id\":\"6af137c9e748bc6a90cc1705\",\"supplierId\":\"SUP-1794193353764\",\"name\":\"TVS Motor Parts Lanka\",\"contactPerson\":\"Sunil Silva\",\"phone\":\"0112345678\","
+    },
+    {
+      "name": "Supplier Payments",
+      "url": "/supplier-payments",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[{\"_id\":\"6af13826e748bc6a90cc1726\",\"supplier\":{\"_id\":\"6af13826e748bc6a90cc1724\",\"supplierId\":\"SUP-1794193446386\",\"name\":\"TVS Motor Parts Lanka\",\"conta"
+    },
+    {
+      "name": "Expenses List",
+      "url": "/expenses",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[]"
+    },
+    {
+      "name": "Expense Categories",
+      "url": "/expense-categories",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[{\"_id\":\"6af137c9244ae94d834e01b8\",\"name\":\"Utilities - 3806\",\"__v\":0,\"createdAt\":\"2026-11-09T03:02:33.810Z\",\"description\":\"Electricity, Water & Intern"
+    },
+    {
+      "name": "Cash Transactions",
+      "url": "/cash-transactions",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[{\"_id\":\"6af13826e748bc6a90cc1727\",\"transactionType\":\"OUT\",\"amount\":45000,\"transactionDate\":\"2026-11-09T03:04:06.397Z\",\"source\":\"SupplierPayment\",\"ref"
+    },
+    {
+      "name": "Commissions List",
+      "url": "/commissions",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[]"
+    },
+    {
+      "name": "Sales Targets List",
+      "url": "/sales-targets",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[]"
+    },
+    {
+      "name": "Complaints List",
+      "url": "/complaints",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[]"
+    },
+    {
+      "name": "After Sales List",
+      "url": "/after-sales",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[]"
+    },
+    {
+      "name": "Documents List",
+      "url": "/documents",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[]"
+    },
+    {
+      "name": "Notifications List",
+      "url": "/notifications",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[{\"_id\":\"6af13826e748bc6a90cc172b\",\"title\":\"New TVS Motorcycle Request\",\"message\":\"A new customer request TVS-REQ-446505 was received for a motorcycle"
+    },
+    {
+      "name": "Audit Logs List",
+      "url": "/audit-logs",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[{\"_id\":\"6af13cd770bd1ab1f036e598\",\"action\":\"POST_AUTH\",\"entity\":\"auth\",\"newValue\":{\"name\":\"Automated Audit Customer\",\"email\":\"customer_test_179419464"
+    },
+    {
+      "name": "Dashboard Stats",
+      "url": "/dashboard/stats",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "{\"totalVehicles\":11,\"availableVehicles\":11,\"reservedVehicles\":0,\"soldVehicles\":0,\"totalCustomers\":6,\"newLeads\":0,\"todaySales\":2,\"monthlySales\":3,\"mont"
+    },
+    {
+      "name": "Report Summary",
+      "url": "/reports/summary",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "{\"salesCount\":3,\"revenue\":2842000,\"paymentsCollected\":992000,\"outstanding\":1850000,\"expenses\":0,\"costOfGoods\":2390000,\"grossProfit\":452000,\"netAfterEx"
+    },
+    {
+      "name": "Report Profit/Loss",
+      "url": "/reports/profit-loss",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "{\"revenue\":2842000,\"costOfGoods\":2390000,\"grossProfit\":452000,\"operatingExpenses\":0,\"netProfit\":452000}"
+    },
+    {
+      "name": "Report Aging Stock",
+      "url": "/reports/aging-stock",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[{\"_id\":\"6ac879193a2724ac2d65cd49\",\"stockNumber\":\"STK-2026-1791523097269\",\"registrationNumber\":\"\",\"make\":\"Toyota\",\"model\":\"vesal\",\"status\":\"Available\""
+    },
+    {
+      "name": "Report By Branch",
+      "url": "/reports/by-branch",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[{\"branchId\":\"6aee38eec58e8e62e24bf63a\",\"branchName\":\"MANTHUSA TVS - Weliweriya Showroom\",\"salesCount\":3,\"revenue\":2842000,\"costOfGoods\":2390000,\"gros"
+    },
+    {
+      "name": "Report Lead Conversion",
+      "url": "/reports/lead-conversion",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "{\"total\":5,\"converted\":0,\"conversionRate\":0,\"statuses\":[{\"_id\":\"New Request\",\"count\":4},{\"_id\":\"Converted to Booking\",\"count\":1}]}"
+    },
+    {
+      "name": "Report Customer Acquisition",
+      "url": "/reports/customer-acquisition",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "{\"walkIn\":{\"totalCustomers\":5,\"bikesSold\":3,\"totalRevenue\":2842000,\"avgSpend\":947333},\"online\":{\"totalCustomers\":1,\"bikesSold\":0,\"totalRevenue\":0,\"avg"
+    },
+    {
+      "name": "Report Financial Analysis",
+      "url": "/reports/financial-analysis",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "{\"currentMonth\":{\"monthName\":\"November\",\"year\":2026,\"bikesSold\":3,\"revenue\":2842000,\"collected\":992000,\"avgPricePerBike\":947333},\"previousMonth\":{\"mon"
+    },
+    {
+      "name": "Get Sample Vehicle",
+      "url": "/vehicles?limit=1",
+      "method": "GET",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "[{\"vehicleType\":\"Motorcycle\",\"safetyFeatures\":[],\"entertainmentFeatures\":[],\"comfortFeatures\":[],\"_id\":\"6aee38ef244ae94d834e01ae\",\"stockNumber\":\"TVS-R"
+    },
+    {
+      "name": "Public Lead Inquiry",
+      "url": "/leads/public",
+      "method": "POST",
+      "status": 201,
+      "passed": true,
+      "responseSnippet": "{\"leadId\":\"TVS-REQ-647982\",\"customer\":\"6aee38efc58e8e62e24bf63e\",\"interestedVehicle\":\"6aee38ef244ae94d834e01ae\",\"interestedVehicleText\":\"Apache RTR 16"
+    },
+    {
+      "name": "Create CRM Customer",
+      "url": "/customers",
+      "method": "POST",
+      "status": 201,
+      "passed": true,
+      "responseSnippet": "{\"fullName\":\"Kasun Perera\",\"nicOrPassport\":\"199512345678\",\"phone\":\"0771234567\",\"email\":\"kasun.audit@example.com\",\"address\":\"123 Main Street, Gampaha\","
+    },
+    {
+      "name": "Create Lead Activity",
+      "url": "/lead-activities",
+      "method": "POST",
+      "status": 201,
+      "passed": true,
+      "responseSnippet": "{\"lead\":\"6af13cd770bd1ab1f036e599\",\"performedBy\":\"6ab60483b3098adf85a7f6ed\",\"activityType\":\"Phone Call\",\"_id\":\"6af13cd870bd1ab1f036e59e\",\"createdAt\":\""
+    },
+    {
+      "name": "Create Follow-Up",
+      "url": "/follow-ups",
+      "method": "POST",
+      "status": 201,
+      "passed": true,
+      "responseSnippet": "{\"customer\":\"6af13cd770bd1ab1f036e59c\",\"lead\":\"6af13cd770bd1ab1f036e599\",\"followUpDate\":\"2026-11-10T03:24:08.024Z\",\"type\":\"Phone\",\"notes\":\"Follow up r"
+    },
+    {
+      "name": "Create Quotation",
+      "url": "/quotations",
+      "method": "POST",
+      "status": 201,
+      "passed": true,
+      "responseSnippet": "{\"quotationNumber\":\"TVS-QT-648046\",\"customer\":\"6af13cd770bd1ab1f036e59c\",\"vehicle\":\"6aee38ef244ae94d834e01ae\",\"vehiclePrice\":650000,\"discount\":10000,\""
+    },
+    {
+      "name": "Accept Quotation",
+      "url": "/quotations/6af13cd870bd1ab1f036e5a2/accept",
+      "method": "PUT",
+      "status": 200,
+      "passed": true,
+      "responseSnippet": "{\"_id\":\"6af13cd870bd1ab1f036e5a2\",\"quotationNumber\":\"TVS-QT-648046\",\"customer\":\"6af13cd770bd1ab1f036e59c\",\"vehicle\":\"6aee38ef244ae94d834e01ae\",\"vehicl"
+    },
+    {
+      "name": "Create Reservation",
+      "url": "/reservations",
+      "method": "POST",
+      "status": 201,
+      "passed": true,
+      "responseSnippet": "{\"reservationId\":\"TVS-BK-648084\",\"bookingNumber\":\"TVS-BK-648084\",\"customer\":\"6af13cd770bd1ab1f036e59c\",\"vehicle\":\"6aee38ef244ae94d834e01ae\",\"modelName"
+    },
+    {
+      "name": "Create Sale Invoice",
+      "url": "/sales",
+      "method": "POST",
+      "status": 201,
+      "passed": true,
+      "responseSnippet": "{\"invoiceNumber\":\"INV-AUDIT-648103\",\"customer\":\"6af13cd770bd1ab1f036e59c\",\"vehicle\":\"6aee38ef244ae94d834e01ae\",\"salesperson\":\"6ab60483b3098adf85a7f6ed"
+    },
+    {
+      "name": "Record Payment",
+      "url": "/payments",
+      "method": "POST",
+      "status": 201,
+      "passed": true,
+      "responseSnippet": "{\"sale\":\"6af13cd870bd1ab1f036e5ab\",\"customer\":\"6af13cd770bd1ab1f036e59c\",\"amount\":100000,\"paymentDate\":\"2026-11-09T03:24:08.133Z\",\"paymentMethod\":\"Cas"
+    },
+    {
+      "name": "Create Vehicle Handover",
+      "url": "/vehicle-handovers",
+      "method": "POST",
+      "status": 201,
+      "passed": true,
+      "responseSnippet": "{\"sale\":\"6af13cd870bd1ab1f036e5ab\",\"vehicle\":\"6aee38ef244ae94d834e01ae\",\"customer\":\"6af13cd770bd1ab1f036e59c\",\"status\":\"Pending\",\"_id\":\"6af13cd870bd1a"
+    },
+    {
+      "name": "Create After-Sales Service",
+      "url": "/after-sales",
+      "method": "POST",
+      "status": 201,
+      "passed": true,
+      "responseSnippet": "{\"sale\":\"6af13cd870bd1ab1f036e5ab\",\"customer\":\"6af13cd770bd1ab1f036e59c\",\"customerFeedback\":\"Very satisfied with the TVS Apache performance and handov"
+    },
+    {
+      "name": "Create Supplier",
+      "url": "/suppliers",
+      "method": "POST",
+      "status": 201,
+      "passed": true,
+      "responseSnippet": "{\"supplierId\":\"SUP-1794194648245\",\"name\":\"TVS Motor Parts Lanka\",\"contactPerson\":\"Sunil Silva\",\"phone\":\"0112345678\",\"email\":\"tvs.parts@example.com\",\"a"
+    },
+    {
+      "name": "Record Supplier Payment",
+      "url": "/supplier-payments",
+      "method": "POST",
+      "status": 201,
+      "passed": true,
+      "responseSnippet": "{\"supplier\":\"6af13cd870bd1ab1f036e5b8\",\"amount\":45000,\"paymentDate\":\"2026-11-09T03:24:08.258Z\",\"paymentMethod\":\"Bank Transfer\",\"referenceNumber\":\"SUPP"
+    },
+    {
+      "name": "Create Expense Category",
+      "url": "/expense-categories",
+      "method": "POST",
+      "status": 201,
+      "passed": true,
+      "responseSnippet": "{\"_id\":\"6af13cd8244ae94d834e01ba\",\"name\":\"Utilities - 8269\",\"__v\":0,\"createdAt\":\"2026-11-09T03:24:08.275Z\",\"description\":\"Electricity, Water & Interne"
+    },
+    {
+      "name": "Record Operational Expense",
+      "url": "/expenses",
+      "method": "POST",
+      "status": 201,
+      "passed": true,
+      "responseSnippet": "{\"expenseId\":\"EXP-1794194648296\",\"category\":\"6af13cd8244ae94d834e01ba\",\"amount\":18500,\"expenseDate\":\"2026-11-09T03:24:08.291Z\",\"paymentMethod\":\"Cash\","
+    },
+    {
+      "name": "XSS Script Payload Submission",
+      "url": "/leads/public",
+      "method": "POST",
+      "status": 201,
+      "passed": true,
+      "responseSnippet": "{\"leadId\":\"TVS-REQ-648421\",\"customer\":\"6af137c9e748bc6a90cc1708\",\"interestedVehicleText\":\"()\",\"modelName\":\"\",\"variantName\":\"\",\"selectedColor\":\"\",\"cate"
+    }
+  ],
+  "businessWorkflows": [
+    {
+      "step": "Public Inquiry to CRM Lead",
+      "status": "PASS",
+      "leadId": "6af13cd770bd1ab1f036e599"
+    },
+    {
+      "step": "Lead Activity & Follow-up",
+      "status": "PASS"
+    },
+    {
+      "step": "Create Quotation",
+      "status": "PASS",
+      "quoteId": "6af13cd870bd1ab1f036e5a2"
+    },
+    {
+      "step": "Create Reservation",
+      "status": "PASS",
+      "reservationId": "6af13cd870bd1ab1f036e5a7"
+    },
+    {
+      "step": "Create Sale Invoice",
+      "status": "PASS",
+      "saleId": "6af13cd870bd1ab1f036e5ab"
+    },
+    {
+      "step": "Record Customer Payment",
+      "status": "PASS",
+      "paymentId": "6af13cd870bd1ab1f036e5af"
+    },
+    {
+      "step": "Vehicle Handover Delivery Checklist",
+      "status": "PASS"
+    },
+    {
+      "step": "After-Sales Service Log",
+      "status": "PASS"
+    },
+    {
+      "step": "Supplier Acquisition & Payment",
+      "status": "PASS"
+    },
+    {
+      "step": "Finance & Expense Operations",
+      "status": "PASS"
+    }
+  ],
+  "rbac": [
+    {
+      "role": "Customer",
+      "description": "Customer cannot view internal reports summary",
+      "url": "/reports/summary",
+      "expected": 403,
+      "actual": 403,
+      "passed": true
+    },
+    {
+      "role": "Customer",
+      "description": "Customer cannot view audit logs",
+      "url": "/audit-logs",
+      "expected": 403,
+      "actual": 403,
+      "passed": true
+    },
+    {
+      "role": "Customer",
+      "description": "Customer cannot view staff users",
+      "url": "/users",
+      "expected": 403,
+      "actual": 403,
+      "passed": true
+    },
+    {
+      "role": "Customer",
+      "description": "Customer cannot view cash transactions",
+      "url": "/cash-transactions",
+      "expected": 403,
+      "actual": 403,
+      "passed": true
+    },
+    {
+      "role": "Sales & Operations",
+      "description": "Sales Executive cannot delete branches",
+      "url": "/branches/non-existent-id",
+      "expected": 403,
+      "actual": 403,
+      "passed": true
+    },
+    {
+      "role": "Sales & Operations",
+      "description": "Sales Executive cannot view financial analysis report",
+      "url": "/reports/financial-analysis",
+      "expected": 403,
+      "actual": 403,
+      "passed": true
+    },
+    {
+      "role": "Customer",
+      "description": "Customer cannot delete vehicles",
+      "url": "/vehicles/non-existent-id",
+      "expected": 403,
+      "actual": 403,
+      "passed": true
+    },
+    {
+      "role": "Customer",
+      "description": "Customer can view their own reservations",
+      "url": "/reservations/my",
+      "expected": 200,
+      "actual": 200,
+      "passed": true
+    },
+    {
+      "role": "Customer",
+      "description": "Customer can view their own quotations",
+      "url": "/quotations/my",
+      "expected": 200,
+      "actual": 200,
+      "passed": true
+    },
+    {
+      "role": "Customer",
+      "description": "Customer can view their own payments",
+      "url": "/payments/my",
+      "expected": 200,
+      "actual": 200,
+      "passed": true
+    },
+    {
+      "role": "Customer",
+      "description": "Customer can view customer portal stats",
+      "url": "/dashboard/stats",
+      "expected": 200,
+      "actual": 200,
+      "passed": true
+    }
+  ],
+  "frontendRoutes": [
+    {
+      "path": "/",
+      "name": "Public Home Page",
+      "auth": false,
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/bikes",
+      "name": "Bikes Catalog",
+      "auth": false,
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/compare",
+      "name": "Vehicle Comparison",
+      "auth": false,
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership"
+    },
+    {
+      "path": "/configure",
+      "name": "Vehicle Configurator",
+      "auth": false,
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/book-test-drive",
+      "name": "Book Test Drive",
+      "auth": false,
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/finance",
+      "name": "Finance Calculator",
+      "auth": false,
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/inquiry",
+      "name": "Inquiry Page",
+      "auth": false,
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/sell-your-vehicle",
+      "name": "Sell Your Vehicle",
+      "auth": false,
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership"
+    },
+    {
+      "path": "/about",
+      "name": "About Us",
+      "auth": false,
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership"
+    },
+    {
+      "path": "/contact",
+      "name": "Contact Us",
+      "auth": false,
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/login",
+      "name": "Login Page",
+      "auth": false,
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership"
+    },
+    {
+      "path": "/register",
+      "name": "Register Page",
+      "auth": false,
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership"
+    },
+    {
+      "path": "/account",
+      "name": "Customer Account",
+      "auth": "customer",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/account/bookings",
+      "name": "Customer Bookings",
+      "auth": "customer",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/account/quotations",
+      "name": "Customer Quotations",
+      "auth": "customer",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership"
+    },
+    {
+      "path": "/account/invoices",
+      "name": "Customer Invoices",
+      "auth": "customer",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/account/payments",
+      "name": "Customer Payments",
+      "auth": "customer",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership"
+    },
+    {
+      "path": "/account/profile",
+      "name": "Customer Profile",
+      "auth": "customer",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership"
+    },
+    {
+      "path": "/dashboard",
+      "name": "Dashboard Overview",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/vehicles",
+      "name": "Dashboard Vehicles Inventory",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/vehicles/new",
+      "name": "New Vehicle Form",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/customers",
+      "name": "Customers Directory",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/leads",
+      "name": "CRM Leads Pipeline",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/quotations",
+      "name": "Quotations Management",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/reservations",
+      "name": "Reservations Management",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/sales",
+      "name": "Sales Invoices",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/sales/new",
+      "name": "New Sale Form",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/installments",
+      "name": "Installments Management",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/test-drives",
+      "name": "Test Drives Management",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/discount-approvals",
+      "name": "Discount Approvals",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/refunds",
+      "name": "Refunds Management",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/purchases",
+      "name": "Vehicle Purchases",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/inspections",
+      "name": "Inspections Log",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/transfers",
+      "name": "Stock Transfers",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/valuations",
+      "name": "Trade-in Valuations",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/handovers",
+      "name": "Vehicle Handovers",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/after-sales",
+      "name": "After-Sales Service",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/complaints",
+      "name": "Complaints Management",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership"
+    },
+    {
+      "path": "/dashboard/leasing",
+      "name": "Leasing Partners",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/suppliers",
+      "name": "Suppliers Management",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/supplier-payments",
+      "name": "Supplier Payments",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/expenses",
+      "name": "Expenses Ledger",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/finance",
+      "name": "Finance Overview",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/commissions",
+      "name": "Staff Commissions",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/targets",
+      "name": "Sales Targets",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/reports",
+      "name": "Reports & Analytics",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/documents",
+      "name": "Documents Repository",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/audit-logs",
+      "name": "Audit Logs",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/branches",
+      "name": "Dealership Branches",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/users",
+      "name": "Users & Roles Admin",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/settings",
+      "name": "Dealership Settings",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/website",
+      "name": "Website CMS Settings",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    },
+    {
+      "path": "/dashboard/search",
+      "name": "Global Search",
+      "auth": "admin",
+      "status": 200,
+      "passed": true,
+      "title": "MANTHUSA TVS — Official TVS Motorcycle Dealership & Service"
+    }
+  ],
+  "databaseIntegrity": [],
+  "security": [
+    {
+      "test": "NoSQL Injection in Auth Login",
+      "expected": "400 or 401 Unauthorized",
+      "actual": 401,
+      "passed": true
+    },
+    {
+      "test": "XSS Injection in Public Form",
+      "expected": "Handled safely without execution",
+      "actual": 201,
+      "passed": true
+    }
+  ]
+}

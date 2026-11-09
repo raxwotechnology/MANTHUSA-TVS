@@ -57,7 +57,7 @@ export function SiteFooter({ brand }: Props) {
       {/* Top Banner CTA */}
       <div className="site-footer-cta border-b border-slate-900 bg-slate-900/60 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-4 text-center md:text-left">
+          <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
             <div className="w-12 h-12 rounded-xl bg-red-600/10 border border-red-500/20 flex items-center justify-center text-red-500 shrink-0">
               <Award className="w-6 h-6" />
             </div>
@@ -70,19 +70,19 @@ export function SiteFooter({ brand }: Props) {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
             <a
               href={`https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}?text=Hello%20MANTHUSA%20TVS%2C%20I%20would%20like%20to%20inquire%20about%20motorcycle%20models%20and%20prices`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-sm transition-all hover:scale-102 active:scale-98 shadow-sm"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 min-h-[44px] rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-sm transition-all hover:scale-102 active:scale-98 shadow-sm"
             >
               <MessageCircle className="w-4 h-4" />
               <span>WhatsApp Inquiry</span>
             </a>
             <Link
               href="/configure"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-red-600 hover:bg-red-500 text-white font-medium text-sm transition-all hover:scale-102 active:scale-98 shadow-sm"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 min-h-[44px] rounded-lg bg-red-600 hover:bg-red-500 text-white font-medium text-sm transition-all hover:scale-102 active:scale-98 shadow-sm"
             >
               <span>Book Online</span>
             </Link>
@@ -184,9 +184,9 @@ export function SiteFooter({ brand }: Props) {
         </div>
 
         {/* Bottom Legal bar */}
-        <div className="pt-8 mt-12 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+        <div className="pt-8 mt-12 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 text-center sm:text-left">
           <p>{brand?.footerText || `© ${currentYear} TVS SalesPlus Motor Hub. All rights reserved.`}</p>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center sm:justify-end gap-x-4 gap-y-2">
             <Link href="/terms" className="hover:text-slate-300 transition-colors">
               Terms & Booking Policy
             </Link>

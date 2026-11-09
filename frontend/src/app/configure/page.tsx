@@ -250,7 +250,7 @@ function ConfiguratorContent() {
         </div>
 
         {/* Step Progress Pills */}
-        <div className="flex items-center justify-center gap-1 sm:gap-3 overflow-x-auto py-2">
+        <div className="flex items-center justify-start sm:justify-center gap-1.5 sm:gap-3 overflow-x-auto py-2 px-2 pb-3 scrollbar-none">
           {steps.map((st) => {
             const isPassed = currentStep > st.num;
             const isCurrent = currentStep === st.num;
@@ -262,7 +262,7 @@ function ConfiguratorContent() {
                   if (st.num < currentStep && currentStep !== 7) setCurrentStep(st.num);
                 }}
                 disabled={currentStep === 7 || st.num > currentStep}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 min-h-[36px] rounded-full text-xs font-bold transition-all shrink-0 cursor-pointer ${
                   isCurrent
                     ? 'bg-red-600 text-white shadow-md shadow-red-600/20'
                     : isPassed
@@ -282,7 +282,7 @@ function ConfiguratorContent() {
         {/* Main Selection Area */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Column: Live Bike Preview (5 cols) */}
-          <div className="lg:col-span-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-5 sticky top-28 shadow-md">
+          <div className="lg:col-span-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 space-y-5 lg:sticky top-28 shadow-md">
             <div className="relative aspect-[4/3] rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 overflow-hidden flex items-center justify-center p-4">
               <img
                 src={displayedImage}

@@ -18,8 +18,8 @@ export class QuotationsService {
     if (!createQuotationDto.customer || !createQuotationDto.vehicle) {
       throw new BadRequestException('Customer and motorcycle model are required.');
     }
-    const vehiclePrice = Number(createQuotationDto.vehiclePrice || 0);
-    const discount = Number(createQuotationDto.discount || 0);
+    const vehiclePrice = Number(createQuotationDto.vehiclePrice || createQuotationDto.basePrice || 0);
+    const discount = Number(createQuotationDto.discount || createQuotationDto.discountAmount || 0);
     const registrationFee = Number(createQuotationDto.registrationFee || 0);
     const insuranceFee = Number(createQuotationDto.insuranceFee || 0);
     const otherCharges = Number(createQuotationDto.otherCharges || createQuotationDto.additionalCharges || 0);

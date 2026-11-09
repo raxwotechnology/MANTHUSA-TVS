@@ -251,14 +251,14 @@ export default function SellYourVehiclePage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Breadcrumbs items={[{ label: 'Sell / Exchange Your Old Bike' }]} />
 
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl mt-6">
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-4 sm:p-8 md:p-10 shadow-2xl mt-6">
           {/* Header */}
           <div className="mb-8 pb-6 border-b border-slate-800">
             <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider mb-1">
               <BadgeDollarSign className="w-4 h-4" />
               <span>Bike Exchange & Trade-In</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight">
               Sell or Exchange Your Old Motorcycle
             </h1>
             <p className="text-xs sm:text-sm text-slate-400 mt-2 leading-relaxed">
@@ -267,12 +267,12 @@ export default function SellYourVehiclePage() {
           </div>
 
           {/* Stepper Progress Bar */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between">
+          <div className="mb-8 overflow-x-auto pb-2">
+            <div className="flex items-center justify-between min-w-[300px]">
               {steps.map((s, idx) => (
                 <div key={s.num} className="flex-1 flex flex-col items-center relative">
                   <div
-                    className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold transition-all z-10 ${
+                    className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-xs font-bold transition-all z-10 ${
                       currentStep === s.num
                         ? 'bg-amber-400 text-slate-950 shadow-md shadow-amber-400/20'
                         : currentStep > s.num
@@ -283,7 +283,7 @@ export default function SellYourVehiclePage() {
                     {currentStep > s.num ? <CheckCircle2 className="w-4 h-4" /> : s.num}
                   </div>
                   <span
-                    className={`text-[11px] font-semibold uppercase tracking-wider mt-1.5 ${
+                    className={`text-[9px] sm:text-[11px] font-semibold uppercase tracking-wider mt-1 text-center truncate max-w-[55px] sm:max-w-none ${
                       currentStep === s.num ? 'text-amber-400 font-bold' : 'text-slate-400'
                     }`}
                   >

@@ -165,8 +165,8 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
 
       {/* Sidebar Content */}
       <aside
-        className={`fixed lg:sticky top-0 left-0 z-50 lg:z-30 w-64 bg-[#0B132B] text-slate-300 flex flex-col h-screen border-r border-slate-800 flex-shrink-0 transition-transform duration-300 ease-in-out ${
-          mobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'
+        className={`fixed lg:sticky top-0 left-0 z-50 lg:z-30 w-64 bg-[#0B132B] text-slate-300 flex flex-col h-screen border-r border-slate-800 flex-shrink-0 transition-all duration-300 ease-in-out ${
+          mobileOpen ? 'translate-x-0 shadow-2xl opacity-100 visible' : '-translate-x-full opacity-0 invisible lg:opacity-100 lg:visible lg:translate-x-0'
         }`}
       >
         {/* Brand Logo Header */}
@@ -199,7 +199,7 @@ export function Sidebar({ user, mobileOpen, onCloseMobile }: SidebarProps) {
           {/* Close button for Mobile */}
           <button
             onClick={onCloseMobile}
-            className="p-1 text-slate-400 hover:text-white rounded-lg lg:hidden"
+            className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-400 hover:text-white rounded-lg lg:hidden"
             aria-label="Close sidebar"
           >
             <X className="w-5 h-5" />
