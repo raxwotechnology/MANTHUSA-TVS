@@ -33,6 +33,11 @@ export default function LoginPage() {
     }
   }, []);
 
+  const loginWithCreds = (em: string, pw: string) => {
+    setEmail(em);
+    setPassword(pw);
+  };
+
   const login = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
@@ -157,7 +162,21 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-[#0B132B] flex flex-col justify-center py-12 sm:px-6 lg:px-8 text-slate-900 dark:text-slate-100 transition-colors">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center" suppressHydrationWarning>
-
+        {brand?.logoUrl ? (
+          <div className="h-16 w-36 rounded-2xl bg-white p-2 flex items-center justify-center mx-auto mb-4 shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <img
+              src={brand.logoUrl}
+              alt={brand.dealershipName || 'MANTHUSA TVS'}
+              className="w-full h-full object-contain rounded-xl"
+            />
+          </div>
+        ) : (
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-600 to-rose-700 text-white flex items-center justify-center mx-auto mb-4 shadow-xl shadow-red-600/30">
+            <Flame className="w-8 h-8 fill-white" />
+          </div>
+        )}
+        <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-wide">
+          <span className="text-red-600 font-black">MANTHUSA</span> TVS
         </h2>
         <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 font-medium">
           Motorcycle Sales Management System Customer & Staff Portal
@@ -196,7 +215,7 @@ export default function LoginPage() {
                     <input
                       type="email"
                       required
-                      placeholder="e.g. admin@manthusatvs.lk"
+                      placeholder="e.g. admin@salesplus.com"
                       autoComplete="username"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -255,6 +274,68 @@ export default function LoginPage() {
                   </button>
                 </div>
               </form>
+
+              {/* QUICK DEMO CREDENTIAL CHIPS (Added as requested) */}
+              <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-2">
+                <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                  Quick Sign-In Credentials:
+                </span>
+                <div className="grid grid-cols-2 gap-1.5 text-[11px]">
+                  <button
+                    type="button"
+                    onClick={() => loginWithCreds('admin@salesplus.com', 'admin123')}
+                    className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-800 hover:border-red-500/50 text-left transition-colors text-slate-700 dark:text-slate-300"
+                  >
+                    <strong className="text-slate-900 dark:text-white block font-bold">Showroom Admin</strong>
+                    <span className="text-slate-500 text-[10px]">admin@salesplus.com</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => loginWithCreds('manager@salesplus.com', 'manager123')}
+                    className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-800 hover:border-red-500/50 text-left transition-colors text-slate-700 dark:text-slate-300"
+                  >
+                    <strong className="text-slate-900 dark:text-white block font-bold">Sales Manager</strong>
+                    <span className="text-slate-500 text-[10px]">manager@salesplus.com</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => loginWithCreds('executive@salesplus.com', 'ex123')}
+                    className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-800 hover:border-red-500/50 text-left transition-colors text-slate-700 dark:text-slate-300"
+                  >
+                    <strong className="text-slate-900 dark:text-white block font-bold">Sales Executive</strong>
+                    <span className="text-slate-500 text-[10px]">executive@salesplus.com</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => loginWithCreds('accountant@salesplus.com', 'accountant123')}
+                    className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-800 hover:border-red-500/50 text-left transition-colors text-slate-700 dark:text-slate-300"
+                  >
+                    <strong className="text-slate-900 dark:text-white block font-bold">Accountant / Finance</strong>
+                    <span className="text-slate-500 text-[10px]">accountant@salesplus.com</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => loginWithCreds('manager2@salesplus.com', 'manag123')}
+                    className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-800 hover:border-red-500/50 text-left transition-colors text-slate-700 dark:text-slate-300"
+                  >
+                    <strong className="text-slate-900 dark:text-white block font-bold">Branch Manager</strong>
+                    <span className="text-slate-500 text-[10px]">manager2@salesplus.com</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => loginWithCreds('customer@tvsdealership.lk', 'customer123')}
+                    className="p-2 rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-500/30 hover:border-red-500 text-left transition-colors text-slate-700 dark:text-slate-300"
+                  >
+                    <strong className="text-red-600 dark:text-red-400 block font-bold">Demo Customer</strong>
+                    <span className="text-slate-500 text-[10px]">customer@tvsdealership.lk</span>
+                  </button>
+                </div>
+              </div>
             </div>
           ) : mode === 'signup' ? (
             <form className="space-y-4" onSubmit={register}>

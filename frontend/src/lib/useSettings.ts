@@ -69,7 +69,7 @@ export const DEFAULT_WEBSITE_CMS = {
     showContact: true,
   },
   pages: {
-
+    about: 'MANTHUSA TVS is an authorized TVS dealership in Weliweriya providing brand-new TVS motorcycles, scooters, certified maintenance, genuine spare parts, and low-rate financing.',
     finance: 'We offer low-rate motorcycle leasing and installment plans starting from 10% down payment with instant approval.',
     terms: 'All motorcycle bookings are held for up to 7 days upon reservation deposit confirmation.',
     privacy: 'We take customer confidentiality seriously and protect your personal data according to applicable privacy standards.',
@@ -81,7 +81,8 @@ export const DEFAULT_BRAND: BrandSettings = {
   tagline: "Official TVS Motorcycles & Scooters Dealership, Service & Genuine Parts",
   registrationNumber: 'TVS-LK-89214/2026',
   taxNumber: 'VAT-119284729-7000',
-
+  logoUrl: '/manthusa-logo.png',
+  faviconUrl: '',
   footerText: '© 2026 MANTHUSA TVS. All rights reserved. Official TVS Warranty & Genuine Spares.',
   defaultLanguage: 'en',
   currency: 'LKR',
@@ -141,10 +142,10 @@ export function buildBrandSettings(data: any): BrandSettings {
   return {
     ...DEFAULT_BRAND,
     ...general,
-    dealershipName: general.dealershipName?.trim() || data.dealershipName?.trim() || DEFAULT_BRAND.dealershipName,
-    tagline: general.tagline?.trim() || data.tagline?.trim() || DEFAULT_BRAND.tagline,
-    logoUrl: general.logoUrl?.trim() || data.logoUrl?.trim() || DEFAULT_BRAND.logoUrl,
-    faviconUrl: general.faviconUrl?.trim() || data.faviconUrl?.trim() || DEFAULT_BRAND.faviconUrl,
+    dealershipName: general.dealershipName || data.dealershipName || DEFAULT_BRAND.dealershipName,
+    tagline: general.tagline || data.tagline || DEFAULT_BRAND.tagline,
+    logoUrl: general.logoUrl !== undefined ? general.logoUrl : (data.logoUrl !== undefined ? data.logoUrl : DEFAULT_BRAND.logoUrl),
+    faviconUrl: general.faviconUrl !== undefined ? general.faviconUrl : (data.faviconUrl !== undefined ? data.faviconUrl : DEFAULT_BRAND.faviconUrl),
     footerText: general.footerText || data.footerText || DEFAULT_BRAND.footerText,
     registrationNumber: general.registrationNumber || data.registrationNumber || DEFAULT_BRAND.registrationNumber,
     taxNumber: general.taxNumber || data.taxNumber || DEFAULT_BRAND.taxNumber,

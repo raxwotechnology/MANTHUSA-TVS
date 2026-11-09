@@ -22,7 +22,10 @@ export const metadata: Metadata = {
     template: "%s | MANTHUSA TVS",
   },
   description:
-
+    "Explore official TVS motorcycles, Apache Racing series, NTORQ smart scooters, Jupiter commuter champions, and electric two-wheelers at MANTHUSA TVS in Weliweriya, Sri Lanka. Genuine warranty, leasing & service.",
+  keywords: [
+    "MANTHUSA TVS",
+    "TVS Weliweriya",
     "TVS Motorcycles Sri Lanka",
     "TVS Apache RTR 160 4V",
     "TVS Apache RTR 200 4V",
