@@ -908,7 +908,7 @@ export default function VehicleInventoryPage() {
                       type="text"
                       placeholder="Paste Image URL or click Upload button →"
                       value={newVehicle.images[0] || ''}
-                      onChange={(e) => setNewVehicle({ ...newVehicle, images: [e.target.value] })}
+                      onChange={(e) => setNewVehicle({ ...newVehicle, images: [e.target.value, ...newVehicle.images.slice(1)] })}
                       className="flex-1 px-3 py-2 bg-white border border-slate-300 rounded-lg placeholder:text-slate-400"
                     />
                     <label className="cursor-pointer px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg flex items-center gap-1.5 shrink-0 text-xs shadow-xs transition-colors">
@@ -918,7 +918,7 @@ export default function VehicleInventoryPage() {
                         type="file"
                         accept="image/*"
                         className="hidden"
-                        onChange={(e) => handleFileUpload(e, (url) => setNewVehicle({ ...newVehicle, images: [url] }))}
+                        onChange={(e) => handleFileUpload(e, (url) => setNewVehicle({ ...newVehicle, images: [url, ...newVehicle.images.slice(1)] }))}
                       />
                     </label>
                   </div>

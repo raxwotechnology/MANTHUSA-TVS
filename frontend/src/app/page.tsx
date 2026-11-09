@@ -240,7 +240,7 @@ export default function HomePage() {
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-red-500 shrink-0" />
-                <span>3 Free Periodic Services</span>
+                <span>2 Free Periodic Services</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-red-500 shrink-0" />
@@ -516,9 +516,9 @@ export default function HomePage() {
               <div className="w-12 h-12 rounded-xl bg-red-600/10 text-red-500 flex items-center justify-center">
                 <Wrench className="w-6 h-6" />
               </div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">3 Free Periodic Services</h3>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">2 Free Periodic Services</h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Every TVS bike sold comes with 3 free maintenance services executed by factory-certified motorcycle technicians using genuine TVS oil.
+                Every TVS bike sold comes with 2 free maintenance services executed by factory-certified motorcycle technicians using genuine TVS oil.
               </p>
             </div>
 

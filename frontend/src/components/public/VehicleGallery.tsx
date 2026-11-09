@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, Maximize2, X, Image as ImageIcon } from 'lucide-react';
+import { getVehicleImageUrls } from '@/lib/publicApi';
 
 interface Props {
   images: string[];
@@ -10,41 +11,18 @@ interface Props {
 }
 
 export function VehicleGallery({ images = [], title, mediaAngles }: Props) {
-  // Combine general images and mediaAngles into one consolidated list of unique URLs
   const allImages = React.useMemo(() => {
     const list: { url: string; label?: string }[] = [];
-    const addedUrls = new Set<string>();
-
-    // Add media angles with labels first
-    if (mediaAngles) {
-      const angleKeys: { key: string; label: string }[] = [
-        { key: 'front', label: 'Front Exterior' },
-        { key: 'rear', label: 'Rear View' },
-        { key: 'left', label: 'Side Profile' },
-        { key: 'right', label: 'Side Profile' },
-        { key: 'interior', label: 'Interior Cabin' },
-        { key: 'dashboard', label: 'Cockpit & Steering' },
-        { key: 'engine', label: 'Engine Bay' },
-        { key: 'wheels', label: 'Alloy Wheels' },
-      ];
-
-      for (const { key, label } of angleKeys) {
-        const val = mediaAngles[key];
-        if (typeof val === 'string' && val.trim() && !addedUrls.has(val)) {
-          list.push({ url: val, label });
-          addedUrls.add(val);
-        }
-      }
-    }
-
-    // Add standard images
-    for (let i = 0; i < images.length; i++) {
-      const img = images[i];
-      if (img && typeof img === 'string' && !addedUrls.has(img)) {
-        list.push({ url: img, label: `Photo ${list.length + 1}` });
-        addedUrls.add(img);
-      }
-    }
+    const coverAndGalleryUrls = images.filter((img) => typeof img === 'string' && img.trim());
+    const angleUrls = getVehicleImageUrls({ images: [], mediaAngles });
+    const angleLabels = ['Front Exterior', 'Rear View', 'Side Profile', 'Side Profile', 'Interior Cabin', 'Cockpit & Steering', 'Engine Bay', 'Alloy Wheels'];
+    [...coverAndGalleryUrls, ...angleUrls].forEach((url, index) => {
+      const isAngle = index >= coverAndGalleryUrls.length;
+      list.push({
+        url,
+        label: isAngle ? angleLabels[index - coverAndGalleryUrls.length] : index === 0 ? 'Cover Image' : `Photo ${index + 1}`,
+      });
+    });
 
     if (list.length === 0) {
       list.push({

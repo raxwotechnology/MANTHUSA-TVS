@@ -6,6 +6,14 @@ import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class VehiclesService {
+  private publicVehiclesCache: any[] | null = null;
+  private publicCacheExpiry = 0;
+
+  invalidatePublicCache() {
+    this.publicVehiclesCache = null;
+    this.publicCacheExpiry = 0;
+  }
+
   constructor(
     @InjectModel('Vehicle') private vehicleModel: Model<VehicleDocument>,
     @InjectModel('Sale') private saleModel: Model<any>,
@@ -41,15 +49,22 @@ export class VehiclesService {
       payload.make = 'TVS';
     }
     const createdVehicle = new this.vehicleModel(payload);
-    return createdVehicle.save();
+    const saved = await createdVehicle.save();
+    this.invalidatePublicCache();
+    return saved;
   }
 
   async findAll(): Promise<VehicleDocument[]> {
     return this.vehicleModel.find().populate('branch').sort({ createdAt: -1 }).exec();
   }
 
-  findPublicListings() {
-    return this.vehicleModel
+  async findPublicListings() {
+    const now = Date.now();
+    if (this.publicVehiclesCache && now < this.publicCacheExpiry) {
+      return this.publicVehiclesCache;
+    }
+
+    const data = await this.vehicleModel
       .find({
         $or: [
           { status: { $in: [/^available$/i, /^in stock$/i, /^booking pending$/i] } },
@@ -62,6 +77,10 @@ export class VehiclesService {
       .sort({ isFeatured: -1, createdAt: -1 })
       .lean()
       .exec();
+
+    this.publicVehiclesCache = data;
+    this.publicCacheExpiry = now + 60 * 1000;
+    return data;
   }
 
   async findOnePublic(idOrSlug: string): Promise<any> {
@@ -131,6 +150,7 @@ export class VehiclesService {
       } catch (_) { /* SMS failure must not block vehicle update */ }
     }
 
+    this.invalidatePublicCache();
     return updatedVehicle;
   }
 
@@ -188,6 +208,7 @@ export class VehiclesService {
     if (!deletedVehicle) {
       throw new NotFoundException(`Motorcycle #${id} not found`);
     }
+    this.invalidatePublicCache();
     return deletedVehicle;
   }
 }

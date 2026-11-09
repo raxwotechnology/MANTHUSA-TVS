@@ -33,6 +33,7 @@ import {
   PublicVehicle,
   TVSVariant,
   TVSColor,
+  getVehicleImageUrls,
   fetchPublicVehicle,
   fetchPublicVehicles,
   formatLKR,
@@ -96,11 +97,12 @@ export default function BikeDetailPage({ params }: Props) {
           const defColor = bikeData.colors?.[0] || null;
           setSelectedColor(defColor);
 
-          // Set active image
-          if (defColor?.imageUrl) {
+          // Set active image: Always prioritize the bike's updated cover image
+          const coverImage = (bikeData.images && bikeData.images.length > 0) ? bikeData.images[0] : '';
+          if (coverImage) {
+            setActiveImage(coverImage);
+          } else if (defColor?.imageUrl && !defColor.imageUrl.includes('photo-1558981403-c5f9899a28bc')) {
             setActiveImage(defColor.imageUrl);
-          } else if (bikeData.images && bikeData.images.length > 0) {
-            setActiveImage(bikeData.images[0]);
           }
         }
         setAllBikes(bikesList || []);
@@ -160,6 +162,7 @@ export default function BikeDetailPage({ params }: Props) {
   }
 
   const currentPrice = selectedVariant ? selectedVariant.price : bike.sellingPrice;
+  const bikeImages = getVehicleImageUrls(bike);
   const similarBikes = allBikes
     .filter((b) => b._id !== bike._id && (b.category === bike.category || b.make === 'TVS'))
     .slice(0, 3);
@@ -170,8 +173,12 @@ export default function BikeDetailPage({ params }: Props) {
   // When color is changed by user:
   const handleColorSelect = (c: TVSColor) => {
     setSelectedColor(c);
-    if (c.imageUrl) {
+    const coverImage = (bike?.images && bike.images.length > 0) ? bike.images[0] : '';
+    // Use specific color image if available and not the placeholder, otherwise keep the bike cover image
+    if (c.imageUrl && !c.imageUrl.includes('photo-1558981403-c5f9899a28bc')) {
       setActiveImage(c.imageUrl);
+    } else if (coverImage) {
+      setActiveImage(coverImage);
     }
   };
 
@@ -261,7 +268,7 @@ export default function BikeDetailPage({ params }: Props) {
             {/* Active Display Image */}
             <div className="relative aspect-[4/3] rounded-3xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xl flex items-center justify-center p-4">
               <img
-                src={activeImage || bike.images[0]}
+                src={activeImage || (bike.images && bike.images[0]) || bikeImages[0]}
                 alt={`${bike.model} in ${selectedColor?.name || 'Display Color'}`}
                 className="w-full h-full object-contain object-center transition-all duration-300"
               />
@@ -281,9 +288,9 @@ export default function BikeDetailPage({ params }: Props) {
             </div>
 
             {/* Thumbnail Gallery */}
-            {bike.images && bike.images.length > 1 && (
+            {bikeImages.length > 1 && (
               <div className="flex items-center gap-3 overflow-x-auto pb-2">
-                {bike.images.map((img, idx) => (
+                {bikeImages.map((img, idx) => (
                   <button
                     key={idx}
                     type="button"

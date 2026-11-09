@@ -16,7 +16,7 @@ import {
   Clock,
   XCircle
 } from 'lucide-react';
-import { PublicVehicle, getBikeSlug, formatLKR, calculateAmortizedMonthlyPayment } from '@/lib/publicApi';
+import { PublicVehicle, getBikeSlug, getVehicleImageUrls, formatLKR, calculateAmortizedMonthlyPayment } from '@/lib/publicApi';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useComparison } from '@/hooks/useComparison';
 
@@ -67,9 +67,10 @@ export function VehicleCard({ vehicle, viewMode = 'grid', onQuickInquire }: Prop
   const inComparison = isInComparison(vehicle._id);
   const slug = getBikeSlug(vehicle);
 
+  const vehicleImages = getVehicleImageUrls(vehicle);
   const mainImage =
-    !imageError && vehicle.images && vehicle.images.length > 0 && vehicle.images[0]
-      ? vehicle.images[0]
+    !imageError && vehicleImages.length > 0
+      ? vehicleImages[0]
       : 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=800&q=80';
 
   const isList = viewMode === 'list';

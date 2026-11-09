@@ -161,9 +161,11 @@ function ConfiguratorContent() {
 
   // Active display image based on selected color
   const displayedImage =
-    selectedColor?.imageUrl ||
-    selectedBike?.images?.[0] ||
-    'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80';
+    (selectedBike?.images && selectedBike.images.length > 0)
+      ? selectedBike.images[0]
+      : (selectedColor?.imageUrl && !selectedColor.imageUrl.includes('photo-1558981403-c5f9899a28bc'))
+      ? selectedColor.imageUrl
+      : 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1000&q=80';
 
   // Check branch availability
   const isAvailableAtBranch = () => {

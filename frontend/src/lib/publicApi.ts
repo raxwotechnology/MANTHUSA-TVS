@@ -99,6 +99,43 @@ export interface PublicVehicle {
   updatedAt?: string;
 }
 
+/**
+ * Return the vehicle gallery with the explicitly selected cover image first.
+ * Angle images are included after the standard gallery images without duplicates.
+ */
+export function getVehicleImageUrls(vehicle: {
+  images?: string[];
+  mediaAngles?: Record<string, string | string[] | undefined>;
+}): string[] {
+  const urls: string[] = [];
+  const seen = new Set<string>();
+
+  const add = (url: string | undefined) => {
+    if (url && url.trim() && !seen.has(url)) {
+      urls.push(url);
+      seen.add(url);
+    }
+  };
+
+  vehicle.images?.forEach(add);
+  const angleKeys: Array<keyof NonNullable<PublicVehicle['mediaAngles']>> = [
+    'front',
+    'rear',
+    'left',
+    'right',
+    'interior',
+    'dashboard',
+    'engine',
+    'wheels',
+  ];
+  angleKeys.forEach((key) => {
+    const value = vehicle.mediaAngles?.[key];
+    if (typeof value === 'string') add(value);
+  });
+
+  return urls;
+}
+
 export interface MotorcycleRequestSubmission {
   fullName: string;
   phone: string;
@@ -145,7 +182,7 @@ export function getBikeSlug(bike: { _id: string; make?: string; model: string; y
 export async function fetchPublicVehicles(): Promise<PublicVehicle[]> {
   try {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 3500);
+    const timer = setTimeout(() => controller.abort(), 15000);
     const res = await fetch(getApiUrl('/public/vehicles'), {
       cache: 'no-store',
       signal: controller.signal,
@@ -163,7 +200,7 @@ export async function fetchPublicVehicles(): Promise<PublicVehicle[]> {
 export async function fetchPublicVehicle(idOrSlug: string): Promise<PublicVehicle | null> {
   try {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 3500);
+    const timer = setTimeout(() => controller.abort(), 15000);
     const res = await fetch(getApiUrl(`/public/vehicles/${encodeURIComponent(idOrSlug)}`), {
       cache: 'no-store',
       signal: controller.signal,
