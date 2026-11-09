@@ -13,7 +13,12 @@ import {
   FileCheck,
   ArrowRight,
   Sparkles,
-  Phone
+  Phone,
+  Camera,
+  ZoomIn,
+  X,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { PublicLayout } from '@/components/public/PublicLayout';
 import { Breadcrumbs } from '@/components/public/Breadcrumbs';
@@ -23,6 +28,63 @@ export default function AboutPage() {
   const { settings: brand } = useSettings();
 
   const dealershipName = brand.dealershipName || 'MANTHUSA TVS';
+
+  const [activePhotoIndex, setActivePhotoIndex] = useState<number | null>(null);
+
+  // Keyboard navigation for photo lightbox
+  useEffect(() => {
+    if (activePhotoIndex === null) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setActivePhotoIndex(null);
+      if (e.key === 'ArrowLeft') {
+        setActivePhotoIndex((prev) => (prev !== null ? (prev - 1 + showroomGallery.length) % showroomGallery.length : null));
+      }
+      if (e.key === 'ArrowRight') {
+        setActivePhotoIndex((prev) => (prev !== null ? (prev + 1) % showroomGallery.length : null));
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activePhotoIndex]);
+
+  const showroomGallery = [
+    {
+      src: '/images/showroom/manthusa-tvs-front.jpg',
+      title: 'Authorized Showroom Frontage',
+      category: 'Main Dealership Facade',
+      tag: 'Authorized Dealer',
+      desc: 'Our prime sales facility at 386 New Kandy Road, Weliweriya displaying Sri Lanka\'s most loved TVS motorcycles and scooters.'
+    },
+    {
+      src: '/images/showroom/showroom-entrance-arch.jpg',
+      title: 'TVS Welcome Arch & Forecourt',
+      category: 'Customer Welcoming & Delivery Bay',
+      tag: 'Grand Entrance',
+      desc: 'The official TVS entrance welcoming riders, equipped with test ride consultation areas and on-the-spot bank leasing desks.'
+    },
+    {
+      src: '/images/showroom/ntorq-scooters-lineup.jpg',
+      title: 'TVS NTORQ 125 Scooter Collection',
+      category: 'Sport Scooter Fleet',
+      tag: 'Best Seller',
+      desc: 'Top-selling NTORQ 125 smart scooters in Combat Grey, Marine Blue, and Race Edition graphics ready for prompt delivery.'
+    },
+    {
+      src: '/images/showroom/showroom-display-fleet.jpg',
+      title: 'Complete Fleet on Display',
+      category: 'Scooters & Commuters',
+      tag: 'Ready for Delivery',
+      desc: 'Fully inspected and pre-delivery serviced stock lined up under our dealership canopy for customer walk-ins and test rides.'
+    },
+    {
+      src: '/images/showroom/showroom-bikes-angle.jpg',
+      title: 'TVS Raider & Racing Lineup',
+      category: 'Performance Motorcycles',
+      tag: 'TVS Racing DNA',
+      desc: 'High-performance TVS motorbikes backed by 5-year official TVS Lanka warranty and genuine spare parts availability.'
+    }
+  ];
+
 
   const values = [
     {
@@ -70,7 +132,7 @@ export default function AboutPage() {
               )}
             </p>
             <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-              Whether you are acquiring a brand-new electric crossover, an executive sedan, or trading in your existing car, our seasoned automotive specialists provide unbiased guidance tailored to your lifestyle and budget.
+              Whether you are choosing a sporty TVS Apache, an agile NTORQ smart scooter, a durable TVS Raider 125, or an economical daily commuter, our experienced team provides expert guidance and instant leasing options tailored to your needs.
             </p>
 
             <div className="pt-2 flex flex-wrap gap-4">
@@ -90,13 +152,21 @@ export default function AboutPage() {
             </div>
           </div>
 
-          <div className="relative rounded-3xl overflow-hidden aspect-[4/3] bg-slate-900 border border-slate-800 shadow-2xl dark-panel">
+          <div
+            onClick={() => setActivePhotoIndex(0)}
+            className="group relative rounded-3xl overflow-hidden aspect-[4/3] bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl cursor-pointer hover:border-amber-400/60 transition-all duration-300"
+          >
             <img
-              src="https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1920&q=80"
+              src="/images/showroom/manthusa-tvs-front.jpg"
               alt={`${dealershipName} Flagship Showroom Facility`}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none" />
+            <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="p-2 rounded-full bg-black/60 backdrop-blur-md text-white border border-white/20">
+                <ZoomIn className="w-4 h-4 text-amber-400" />
+              </div>
+            </div>
             <div className="absolute bottom-6 left-6 right-6 text-white dark-panel">
               <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">
                 Flagship Experience
@@ -137,6 +207,59 @@ export default function AboutPage() {
                 </div>
               );
             })}
+          </div>
+        </div>
+
+
+        {/* Real Showroom & Fleet Gallery Section */}
+        <div className="space-y-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/10 border border-amber-400/20 text-amber-500 dark:text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">
+                <Camera className="w-3.5 h-3.5" />
+                <span>Showroom Tour • Weliweriya</span>
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+                Inside Our Showroom & Sales Fleet
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-2 max-w-2xl">
+                Explore real moments from our authorized TVS dealership in Weliweriya. Visit us to check out ready bikes, take a test ride, and enjoy personalized customer service.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Link
+                href="/bikes"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs uppercase tracking-wider transition-all shadow-md"
+              >
+                <span>View Inventory</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+
+          {/* Pure Images Showcase Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">
+            {showroomGallery.map((photo, i) => (
+              <div
+                key={photo.src}
+                onClick={() => setActivePhotoIndex(i)}
+                className="group relative rounded-2xl overflow-hidden cursor-pointer bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-amber-400 shadow-md hover:shadow-2xl transition-all duration-300 aspect-[3/4]"
+              >
+                <img
+                  src={photo.src}
+                  alt={photo.title}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                {/* Subtle hover overlay with zoom pill */}
+                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-3">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 text-slate-900 shadow-xl backdrop-blur-sm transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300 text-xs font-bold">
+                    <ZoomIn className="w-3.5 h-3.5 text-amber-500" />
+                    <span>View</span>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -187,6 +310,78 @@ export default function AboutPage() {
           </div>
         </div>
       </div>
+
+      {/* Showroom Image Fullscreen Lightbox Modal */}
+      {activePhotoIndex !== null && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-6"
+          onClick={() => setActivePhotoIndex(null)}
+        >
+          <div
+            className="relative max-w-5xl w-full bg-slate-950 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Top Bar */}
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-800 bg-slate-950/80">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                <span className="text-xs font-bold text-slate-300">
+                  MANTHUSA TVS Showroom & Fleet • {activePhotoIndex + 1} of {showroomGallery.length}
+                </span>
+              </div>
+              <button
+                onClick={() => setActivePhotoIndex(null)}
+                className="p-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-white transition-colors"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Main Image Stage */}
+            <div className="relative flex-1 bg-black flex items-center justify-center min-h-[50vh] max-h-[68vh] p-2 sm:p-4 select-none">
+              <button
+                onClick={() => setActivePhotoIndex((activePhotoIndex - 1 + showroomGallery.length) % showroomGallery.length)}
+                className="absolute left-3 sm:left-5 z-10 p-2.5 sm:p-3 rounded-full bg-black/60 hover:bg-amber-400 hover:text-slate-950 text-white border border-white/20 transition-all hover:scale-110 shadow-lg"
+                aria-label="Previous Photo"
+              >
+                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
+
+              <img
+                src={showroomGallery[activePhotoIndex].src}
+                alt={showroomGallery[activePhotoIndex].title}
+                className="max-h-[64vh] w-auto max-w-full object-contain rounded-xl shadow-2xl"
+              />
+
+              <button
+                onClick={() => setActivePhotoIndex((activePhotoIndex + 1) % showroomGallery.length)}
+                className="absolute right-3 sm:right-5 z-10 p-2.5 sm:p-3 rounded-full bg-black/60 hover:bg-amber-400 hover:text-slate-950 text-white border border-white/20 transition-all hover:scale-110 shadow-lg"
+                aria-label="Next Photo"
+              >
+                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
+            </div>
+
+            {/* Bottom Thumbnails Strip */}
+            <div className="p-3 bg-slate-950 border-t border-slate-800 flex items-center justify-center gap-2 sm:gap-3 overflow-x-auto">
+              {showroomGallery.map((photo, i) => (
+                <button
+                  key={photo.src}
+                  onClick={() => setActivePhotoIndex(i)}
+                  className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden border-2 transition-all shrink-0 ${
+                    activePhotoIndex === i
+                      ? 'border-amber-400 scale-105 shadow-md shadow-amber-400/30'
+                      : 'border-transparent opacity-50 hover:opacity-100'
+                  }`}
+                >
+                  <img src={photo.src} alt={photo.title} className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </PublicLayout>
   );
 }

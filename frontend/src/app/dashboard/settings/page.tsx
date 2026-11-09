@@ -28,7 +28,13 @@ import {
   ExternalLink,
   Plus,
   Trash2,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Calculator,
+  TrendingUp,
+  Coins,
+  Sparkles,
+  Layers,
+  Target
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -174,6 +180,111 @@ export default function SettingsPage() {
 
   const [newChecklistItem, setNewChecklistItem] = useState('');
   const [newPartner, setNewPartner] = useState('');
+  const [testBikeCount, setTestBikeCount] = useState<number>(30);
+
+  const getBikeIncentiveTiers = () => {
+    return settings.leasing?.bikeIncentives?.tiers && settings.leasing.bikeIncentives.tiers.length > 0
+      ? settings.leasing.bikeIncentives.tiers
+      : [
+          {
+            tierNumber: 1,
+            name: 'Tier 1 (Bikes 1 - 15)',
+            minBikes: 1,
+            maxBikes: 15,
+            ratePerBike: 10000,
+            description: 'First 15 motorcycles: Rs. 10,000 each (Total: Rs. 150,000)',
+          },
+          {
+            tierNumber: 2,
+            name: 'Tier 2 (Bikes 16 - 30)',
+            minBikes: 16,
+            maxBikes: 30,
+            ratePerBike: 15000,
+            bonusPerBike: 5000,
+            description: '16th to 30th motorcycle: +Rs. 5,000 bonus added = Rs. 15,000 each (Total: Rs. 225,000)',
+          },
+        ];
+  };
+
+  const handleTierChange = (index: number, field: string, value: any) => {
+    const currentTiers = [...getBikeIncentiveTiers()];
+    currentTiers[index] = {
+      ...currentTiers[index],
+      [field]: value,
+    };
+    handleNestedChange('leasing', 'bikeIncentives', {
+      ...(settings.leasing?.bikeIncentives || { enabled: true, currency: 'Rs.' }),
+      tiers: currentTiers,
+    });
+  };
+
+  const handleAddTier = () => {
+    const currentTiers = [...getBikeIncentiveTiers()];
+    const lastTier = currentTiers[currentTiers.length - 1];
+    const nextMin = lastTier ? (Number(lastTier.maxBikes) || 0) + 1 : 1;
+    const nextMax = nextMin + 14;
+    const newTier = {
+      tierNumber: currentTiers.length + 1,
+      name: `Tier ${currentTiers.length + 1} (Bikes ${nextMin} - ${nextMax})`,
+      minBikes: nextMin,
+      maxBikes: nextMax,
+      ratePerBike: lastTier ? Number(lastTier.ratePerBike) || 15000 : 15000,
+      description: `Motorcycles from ${nextMin} to ${nextMax}`,
+    };
+    handleNestedChange('leasing', 'bikeIncentives', {
+      ...(settings.leasing?.bikeIncentives || { enabled: true, currency: 'Rs.' }),
+      tiers: [...currentTiers, newTier],
+    });
+  };
+
+  const handleRemoveTier = (index: number) => {
+    const currentTiers = getBikeIncentiveTiers().filter((_: any, i: number) => i !== index);
+    handleNestedChange('leasing', 'bikeIncentives', {
+      ...(settings.leasing?.bikeIncentives || { enabled: true, currency: 'Rs.' }),
+      tiers: currentTiers,
+    });
+  };
+
+  const handleToggleIncentive = (enabled: boolean) => {
+    handleNestedChange('leasing', 'bikeIncentives', {
+      ...(settings.leasing?.bikeIncentives || { currency: 'Rs.' }),
+      enabled,
+      tiers: getBikeIncentiveTiers(),
+    });
+  };
+
+  const calculateTiersBreakdown = (bikeCount: number) => {
+    const tiers = getBikeIncentiveTiers();
+    let total = 0;
+    const breakdown = tiers.map((tier: any) => {
+      const min = Number(tier.minBikes) || 1;
+      const max = Number(tier.maxBikes) || min;
+      const rate = Number(tier.ratePerBike) || 0;
+      const capacity = Math.max(0, max - min + 1);
+
+      let countInThisTier = 0;
+      if (bikeCount >= min) {
+        countInThisTier = Math.min(bikeCount, max) - min + 1;
+      }
+      const slabTotal = countInThisTier * rate;
+      const maxPossible = capacity * rate;
+      total += slabTotal;
+
+      return {
+        ...tier,
+        min,
+        max,
+        rate,
+        capacity,
+        countInThisTier,
+        slabTotal,
+        maxPossible,
+        progressPercent: capacity > 0 ? Math.min(100, Math.round((countInThisTier / capacity) * 100)) : 0,
+      };
+    });
+
+    return { total, breakdown };
+  };
 
   // Fetch settings from API
   useEffect(() => {
@@ -336,7 +447,7 @@ export default function SettingsPage() {
     { id: 'contact', label: 'Contact', icon: Phone },
     { id: 'commerce', label: 'Commerce', icon: DollarSign },
     { id: 'vehicles', label: 'Motorcycles & Stock', icon: Car },
-    { id: 'leasing', label: 'Loyalty & Finance', icon: Landmark },
+    { id: 'leasing', label: 'Financial & Commissions', icon: Landmark },
     { id: 'receiptDesigner', label: 'Receipt/A4 Designer', icon: FileText },
     { id: 'templates', label: 'Templates', icon: Mail },
     { id: 'permissions', label: 'Permissions', icon: ShieldCheck },
@@ -982,11 +1093,344 @@ export default function SettingsPage() {
               </div>
             )}
 
-            {/* 5. LOYALTY & FINANCE TAB */}
+            {/* 5. FINANCIAL & COMMISSIONS TAB */}
             {activeTab === 'leasing' && (
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-6">
-                <div>
-                  <h2 className="text-base font-bold text-slate-900">Loyalty, Commissions & Leasing Facilities</h2>
+              <div className="space-y-6">
+                {/* TIERED BIKE INCENTIVE SECTION */}
+                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="p-2 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-sm">
+                          <Coins className="w-5 h-5" />
+                        </span>
+                        <div>
+                          <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                            Motorcycle Sales Incentive & Commission Slabs
+                            <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                              පියවරගත බයික් කොමිස් ක්‍රමය
+                            </span>
+                          </h2>
+                          <p className="text-xs text-slate-500 mt-0.5">
+                            Set volume-based tiered commission per bike. First 15 bikes @ Rs. 10,000 each; 16th to 30th bike @ Rs. 15,000 each (+Rs. 5,000 booster).
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <label className="text-xs font-semibold text-slate-600 cursor-pointer select-none">
+                        Tiered Scheme
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => handleToggleIncentive(!(settings.leasing?.bikeIncentives?.enabled ?? true))}
+                        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                          (settings.leasing?.bikeIncentives?.enabled ?? true) ? 'bg-blue-600' : 'bg-slate-300'
+                        }`}
+                      >
+                        <span
+                          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                            (settings.leasing?.bikeIncentives?.enabled ?? true) ? 'translate-x-5' : 'translate-x-0'
+                          }`}
+                        />
+                      </button>
+                      <span className={`text-xs font-bold ${
+                        (settings.leasing?.bikeIncentives?.enabled ?? true) ? 'text-blue-600' : 'text-slate-400'
+                      }`}>
+                        {(settings.leasing?.bikeIncentives?.enabled ?? true) ? 'Active' : 'Disabled'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Three KPI Cards for Clear Visual Understanding */}
+                  {(() => {
+                    const tiers = getBikeIncentiveTiers();
+                    const tier1 = tiers[0] || { minBikes: 1, maxBikes: 15, ratePerBike: 10000 };
+                    const tier2 = tiers[1] || { minBikes: 16, maxBikes: 30, ratePerBike: 15000 };
+                    const tier1Cap = Math.max(0, (Number(tier1.maxBikes) || 15) - (Number(tier1.minBikes) || 1) + 1);
+                    const tier1Rate = Number(tier1.ratePerBike) || 10000;
+                    const tier1Total = tier1Cap * tier1Rate;
+
+                    const tier2Cap = Math.max(0, (Number(tier2.maxBikes) || 30) - (Number(tier2.minBikes) || 16) + 1);
+                    const tier2Rate = Number(tier2.ratePerBike) || 15000;
+                    const tier2Total = tier2Cap * tier2Rate;
+                    const fullTargetTotal = tier1Total + tier2Total;
+
+                    return (
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {/* Slab 1 */}
+                        <div className="p-4 rounded-xl border border-blue-200 bg-gradient-to-br from-blue-50/70 via-white to-blue-50/30 shadow-xs relative overflow-hidden">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-blue-100 text-blue-800">
+                              Slab 1 · First 15 Bikes
+                            </span>
+                            <span className="text-xs font-bold text-blue-700">1 – 15 Bikes</span>
+                          </div>
+                          <div className="text-2xl font-black text-slate-900 tracking-tight">
+                            Rs. {tier1Total.toLocaleString()}
+                          </div>
+                          <div className="text-xs font-semibold text-blue-600 mt-1 flex items-center gap-1">
+                            <span>{tier1Cap} bikes × Rs. {tier1Rate.toLocaleString()} each</span>
+                          </div>
+                          <p className="text-[11px] text-slate-500 mt-2 leading-relaxed">
+                            මුල් බයික් 15 සඳහා බයික් එකකට රු. {tier1Rate.toLocaleString()} බැගින් කොමිස් මුදල හිමිවේ.
+                          </p>
+                        </div>
+
+                        {/* Slab 2 */}
+                        <div className="p-4 rounded-xl border border-emerald-200 bg-gradient-to-br from-emerald-50/70 via-white to-emerald-50/30 shadow-xs relative overflow-hidden">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800">
+                              Slab 2 · Bikes 16 to 30
+                            </span>
+                            <span className="text-xs font-bold text-emerald-700">16 – 30 Bikes</span>
+                          </div>
+                          <div className="text-2xl font-black text-slate-900 tracking-tight">
+                            Rs. {tier2Total.toLocaleString()}
+                          </div>
+                          <div className="text-xs font-semibold text-emerald-600 mt-1 flex items-center gap-1">
+                            <span>{tier2Cap} bikes × Rs. {tier2Rate.toLocaleString()} each (+Rs. 5,000 booster)</span>
+                          </div>
+                          <p className="text-[11px] text-slate-500 mt-2 leading-relaxed">
+                            15 න් පසු 16 සිට 30 වන බයික් එක දක්වා රු. 5,000 ක් එකතු වී රු. {tier2Rate.toLocaleString()} බැගින් හිමිවේ.
+                          </p>
+                        </div>
+
+                        {/* Combined Milestone Total */}
+                        <div className="p-4 rounded-xl border border-amber-200 bg-gradient-to-br from-amber-50/70 via-white to-amber-50/30 shadow-xs relative overflow-hidden">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 flex items-center gap-1">
+                              <Sparkles className="w-3 h-3 text-amber-600" />
+                              Full 30 Bikes Milestone
+                            </span>
+                            <span className="text-xs font-bold text-amber-700">Combined Goal</span>
+                          </div>
+                          <div className="text-2xl font-black text-amber-950 tracking-tight">
+                            Rs. {fullTargetTotal.toLocaleString()}
+                          </div>
+                          <div className="text-xs font-semibold text-amber-700 mt-1 flex items-center gap-1">
+                            <span>Rs. {tier1Total.toLocaleString()} + Rs. {tier2Total.toLocaleString()}</span>
+                          </div>
+                          <p className="text-[11px] text-slate-500 mt-2 leading-relaxed">
+                            බයික් 30 ක් අලෙවි කළ විට මුළු දිරිදීමනා එකතුව රු. {fullTargetTotal.toLocaleString()} කි.
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Slabs Configuration Table / List */}
+                  <div className="space-y-3 pt-2">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                        <Layers className="w-4 h-4 text-slate-600" />
+                        Configure Slabs & Thresholds (පියවර සකස් කිරීම)
+                      </h3>
+                      <button
+                        type="button"
+                        onClick={handleAddTier}
+                        className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Add Slab / Tier</span>
+                      </button>
+                    </div>
+
+                    <div className="space-y-3">
+                      {getBikeIncentiveTiers().map((tier: any, idx: number) => {
+                        const min = Number(tier.minBikes) || 1;
+                        const max = Number(tier.maxBikes) || min;
+                        const rate = Number(tier.ratePerBike) || 0;
+                        const capacity = Math.max(0, max - min + 1);
+                        const potentialPayout = capacity * rate;
+
+                        return (
+                          <div
+                            key={idx}
+                            className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-slate-50 transition-colors space-y-3"
+                          >
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                              <div className="flex items-center gap-2">
+                                <span className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">
+                                  {idx + 1}
+                                </span>
+                                <input
+                                  type="text"
+                                  value={tier.name || `Tier ${idx + 1}`}
+                                  onChange={(e) => handleTierChange(idx, 'name', e.target.value)}
+                                  className="text-xs font-bold text-slate-900 bg-white border border-slate-200 rounded-lg px-2.5 py-1 focus:outline-none focus:border-blue-500"
+                                />
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs font-semibold text-slate-600 bg-white border border-slate-200 px-2.5 py-1 rounded-lg">
+                                  Capacity: <strong className="text-blue-600">{capacity} Bikes</strong>
+                                </span>
+                                <span className="text-xs font-semibold text-slate-600 bg-white border border-slate-200 px-2.5 py-1 rounded-lg">
+                                  Max Payout: <strong className="text-emerald-600">Rs. {potentialPayout.toLocaleString()}</strong>
+                                </span>
+                                {getBikeIncentiveTiers().length > 2 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRemoveTier(idx)}
+                                    className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg cursor-pointer"
+                                    title="Remove Tier"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                              <div>
+                                <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                                  From Bike (අවම බයික් ගණන)
+                                </label>
+                                <input
+                                  type="number"
+                                  min="1"
+                                  value={tier.minBikes ?? (idx === 0 ? 1 : 16)}
+                                  onChange={(e) => handleTierChange(idx, 'minBikes', Number(e.target.value))}
+                                  className="w-full text-xs bg-white border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                                  Up to Bike (උපරිම බයික් ගණන)
+                                </label>
+                                <input
+                                  type="number"
+                                  min={tier.minBikes || 1}
+                                  value={tier.maxBikes ?? (idx === 0 ? 15 : 30)}
+                                  onChange={(e) => handleTierChange(idx, 'maxBikes', Number(e.target.value))}
+                                  className="w-full text-xs bg-white border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                                  Rate Per Bike (බයික් එකකට මුදල - Rs.)
+                                </label>
+                                <input
+                                  type="number"
+                                  step="500"
+                                  value={tier.ratePerBike ?? (idx === 0 ? 10000 : 15000)}
+                                  onChange={(e) => handleTierChange(idx, 'ratePerBike', Number(e.target.value))}
+                                  className="w-full text-xs bg-white border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500 font-bold text-slate-900"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Live Simulation & Calculator */}
+                  <div className="p-5 rounded-2xl border border-slate-200 bg-slate-900 text-white space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <Calculator className="w-4 h-4 text-emerald-400" />
+                          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">
+                            Live Incentive Simulator (ගණනය කර බැලීම)
+                          </h4>
+                        </div>
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          Test how much commission will be paid for any number of bikes sold.
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-medium text-slate-300">Bikes Sold:</span>
+                        <input
+                          type="number"
+                          min="0"
+                          max="200"
+                          value={testBikeCount}
+                          onChange={(e) => setTestBikeCount(Math.max(0, Number(e.target.value)))}
+                          className="w-20 text-center text-sm font-bold bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-white focus:outline-none focus:border-emerald-400"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Quick Preset Buttons */}
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-[11px] text-slate-400">Quick Test:</span>
+                      {[10, 15, 20, 25, 30, 35].map((cnt) => (
+                        <button
+                          key={cnt}
+                          type="button"
+                          onClick={() => setTestBikeCount(cnt)}
+                          className={`text-xs px-2.5 py-1 rounded-md font-semibold transition-colors cursor-pointer ${
+                            testBikeCount === cnt
+                              ? 'bg-emerald-500 text-slate-950 font-bold'
+                              : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                          }`}
+                        >
+                          {cnt} Bikes
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Breakdown Results */}
+                    {(() => {
+                      const { total, breakdown } = calculateTiersBreakdown(testBikeCount);
+                      return (
+                        <div className="pt-2 border-t border-slate-800 space-y-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            {breakdown.map((item: any, idx: number) => (
+                              <div
+                                key={idx}
+                                className={`p-3 rounded-xl border text-xs space-y-1.5 ${
+                                  item.countInThisTier > 0
+                                    ? 'border-emerald-500/40 bg-emerald-950/20 text-emerald-200'
+                                    : 'border-slate-800 bg-slate-800/50 text-slate-400'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between font-bold">
+                                  <span>{item.name}</span>
+                                  <span className="text-[11px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">
+                                    {item.countInThisTier} / {item.capacity} Bikes
+                                  </span>
+                                </div>
+                                <div className="text-sm font-bold text-white">
+                                  Rs. {item.slabTotal.toLocaleString()}
+                                </div>
+                                <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                                  <div
+                                    className="bg-emerald-400 h-full transition-all duration-300"
+                                    style={{ width: `${item.progressPercent}%` }}
+                                  />
+                                </div>
+                                <p className="text-[10px] text-slate-400">
+                                  {item.countInThisTier} bikes × Rs. {item.rate.toLocaleString()}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+
+                          <div className="p-3.5 rounded-xl bg-gradient-to-r from-emerald-900/60 to-blue-900/60 border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                              <div className="text-[11px] uppercase tracking-wider text-emerald-300 font-semibold">
+                                Total Commission Payout ({testBikeCount} Bikes)
+                              </div>
+                              <div className="text-xs text-slate-300">
+                                මුළු ගෙවිය යුතු දිරිදීමනා මුදල
+                              </div>
+                            </div>
+                            <div className="text-2xl font-black text-emerald-300 tracking-tight">
+                              Rs. {total.toLocaleString()}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                </div>
+
+                {/* EXISTING LEASING & BANK SETTINGS SECTION */}
+                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-6">
+                  <div>
+                    <h2 className="text-base font-bold text-slate-900">Leasing Rates & Banking Facilities</h2>
                   <p className="text-xs text-slate-500 mt-0.5">
                     Leasing benchmark interest rates, staff sales commission defaults, and approved bank partners
                   </p>
@@ -1101,6 +1545,7 @@ export default function SettingsPage() {
                     ))}
                   </div>
                 </div>
+              </div>
               </div>
             )}
 

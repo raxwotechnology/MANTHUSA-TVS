@@ -511,54 +511,56 @@ export default function BikeDetailPage({ params }: Props) {
                   <span className="font-bold text-slate-900 dark:text-white">{bike.startingSystem || 'Electric Start'}</span>
                 </div>
                 <div className="py-2.5 flex justify-between">
-                  <span className="text-slate-400">Fuel Economy / Mileage</span>
-                  <span className="font-bold text-emerald-400">{bike.mileage ? `${bike.mileage} km/l` : 'EcoThrust Efficient'}</span>
+                  <span className="text-slate-600 dark:text-slate-400">{bike.fuelType === 'Electric' ? 'Certified Range' : 'Fuel Economy / Mileage'}</span>
+                  <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                    {bike.mileage ? `${bike.mileage} ${bike.fuelType === 'Electric' ? 'km (IDC/Range)' : 'km/l'}` : (bike.fuelType === 'Electric' ? 'Long Range EV' : 'EcoThrust Efficient')}
+                  </span>
                 </div>
               </div>
             </div>
 
             {/* Brakes, Suspension & Dimensions */}
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
-              <h3 className="text-sm font-extrabold text-white flex items-center gap-2 uppercase tracking-wider">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm">
+              <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2 uppercase tracking-wider">
                 <ShieldCheck className="w-4 h-4 text-red-500" />
                 <span>Brakes, Suspension & Dimensions</span>
               </h3>
-              <div className="divide-y divide-slate-800/80 text-xs">
+              <div className="divide-y divide-slate-200 dark:divide-slate-800/80 text-xs">
                 <div className="py-2.5 flex justify-between">
-                  <span className="text-slate-400">Braking Technology</span>
-                  <span className="font-bold text-red-400">{bike.brakingSystem || 'Super-Moto ABS / SBT'}</span>
+                  <span className="text-slate-600 dark:text-slate-400">Braking Technology</span>
+                  <span className="font-bold text-red-600 dark:text-red-400">{bike.brakingSystem || 'Super-Moto ABS / SBT'}</span>
                 </div>
                 <div className="py-2.5 flex justify-between">
-                  <span className="text-slate-400">Front Brake</span>
-                  <span className="font-bold text-white">{bike.frontBrake || 'Roto Petal Disc'}</span>
+                  <span className="text-slate-600 dark:text-slate-400">Front Brake</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{bike.frontBrake || 'Roto Petal Disc'}</span>
                 </div>
                 <div className="py-2.5 flex justify-between">
-                  <span className="text-slate-400">Rear Brake</span>
-                  <span className="font-bold text-white">{bike.rearBrake || 'Disc / Drum'}</span>
+                  <span className="text-slate-600 dark:text-slate-400">Rear Brake</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{bike.rearBrake || 'Disc / Drum'}</span>
                 </div>
                 <div className="py-2.5 flex justify-between">
-                  <span className="text-slate-400">Front Suspension</span>
-                  <span className="font-bold text-white">{bike.frontSuspension || 'Telescopic Forks'}</span>
+                  <span className="text-slate-600 dark:text-slate-400">Front Suspension</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{bike.frontSuspension || 'Telescopic Forks'}</span>
                 </div>
                 <div className="py-2.5 flex justify-between">
-                  <span className="text-slate-400">Rear Suspension</span>
-                  <span className="font-bold text-white">{bike.rearSuspension || 'Monoshock Damper'}</span>
+                  <span className="text-slate-600 dark:text-slate-400">Rear Suspension</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{bike.rearSuspension || 'Monoshock Damper'}</span>
                 </div>
                 <div className="py-2.5 flex justify-between">
-                  <span className="text-slate-400">Tyre Dimensions</span>
-                  <span className="font-bold text-white">{bike.tyreDimensions || 'Tubeless'}</span>
+                  <span className="text-slate-600 dark:text-slate-400">Tyre Dimensions</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{bike.tyreDimensions || 'Tubeless'}</span>
                 </div>
                 <div className="py-2.5 flex justify-between">
-                  <span className="text-slate-400">Fuel Tank Capacity</span>
-                  <span className="font-bold text-white">{bike.fuelTankCapacity || '12 L'}</span>
+                  <span className="text-slate-600 dark:text-slate-400">Fuel Tank / Battery Capacity</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{bike.fuelTankCapacity || '12 L'}</span>
                 </div>
                 <div className="py-2.5 flex justify-between">
-                  <span className="text-slate-400">Seat Height</span>
-                  <span className="font-bold text-white">{bike.seatHeight || '800 mm'}</span>
+                  <span className="text-slate-600 dark:text-slate-400">Seat Height</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{bike.seatHeight || '800 mm'}</span>
                 </div>
                 <div className="py-2.5 flex justify-between">
-                  <span className="text-slate-400">Kerb Weight</span>
-                  <span className="font-bold text-white">{bike.kerbWeight || '144 kg'}</span>
+                  <span className="text-slate-600 dark:text-slate-400">Kerb Weight</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{bike.kerbWeight || '144 kg'}</span>
                 </div>
               </div>
             </div>

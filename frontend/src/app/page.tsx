@@ -17,13 +17,19 @@ import {
   Clock,
   Phone,
   MessageCircle,
+  ChevronLeft,
   ChevronRight,
   Zap,
   SlidersHorizontal,
   Award,
   Wrench,
   Fuel,
-  Compass
+  Compass,
+  Camera,
+  Eye,
+  X,
+  ZoomIn,
+  Check
 } from 'lucide-react';
 import { PublicLayout } from '@/components/public/PublicLayout';
 import { VehicleCard } from '@/components/public/VehicleCard';
@@ -47,9 +53,66 @@ export default function HomePage() {
   const [searchEngineCc, setSearchEngineCc] = useState('ALL');
   const [searchPriceMax, setSearchPriceMax] = useState('ALL');
 
+  // Showroom gallery lightbox state
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
+  const showroomImages = [
+    {
+      src: '/images/showroom/manthusa-tvs-front.jpg',
+      title: 'MANTHUSA TVS Dealership Frontage',
+      category: 'Official Dealership',
+      caption: 'Direct TVS Lanka authorized sales showroom at 386 New Kandy Road, Weliweriya with complete motorcycle lineup on display.',
+      tag: 'Main Showroom'
+    },
+    {
+      src: '/images/showroom/showroom-entrance-arch.jpg',
+      title: 'Showroom Entrance & Welcome Arch',
+      category: 'Customer Welcoming',
+      caption: 'Official TVS ceremonial arch with dedicated customer handover station and on-site bank leasing partners.',
+      tag: 'Welcome Bay'
+    },
+    {
+      src: '/images/showroom/ntorq-scooters-lineup.jpg',
+      title: 'TVS NTORQ 125 Sport Scooter Fleet',
+      category: 'Scooter Lineup',
+      caption: 'Sri Lanka\'s top-selling performance scooter in Marine Blue, Combat Grey, and Stealth Black ready for test rides.',
+      tag: 'Best Seller'
+    },
+    {
+      src: '/images/showroom/showroom-display-fleet.jpg',
+      title: 'Showroom Fleet & Ready Stock',
+      category: 'Immediate Handover',
+      caption: 'Wide selection of TVS scooters and daily commuters inspected and prepped for immediate ride-away.',
+      tag: 'Ready for Delivery'
+    },
+    {
+      src: '/images/showroom/showroom-bikes-angle.jpg',
+      title: 'TVS Raider & Performance Series',
+      category: 'TVS Racing DNA',
+      caption: 'Factory-fresh TVS motorbikes backed by 5-year official TVS Lanka warranty and 3 free periodic services.',
+      tag: 'Race Tuned'
+    }
+  ];
+
   // Quick inquiry modal state
   const [inquiryVehicle, setInquiryVehicle] = useState<PublicVehicle | null>(null);
   const [isInquiryOpen, setIsInquiryOpen] = useState(false);
+
+  // Keyboard navigation for showroom gallery lightbox
+  useEffect(() => {
+    if (lightboxIndex === null) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setLightboxIndex(null);
+      if (e.key === 'ArrowLeft') {
+        setLightboxIndex((prev) => (prev !== null ? (prev - 1 + showroomImages.length) % showroomImages.length : null));
+      }
+      if (e.key === 'ArrowRight') {
+        setLightboxIndex((prev) => (prev !== null ? (prev + 1) % showroomImages.length : null));
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lightboxIndex, showroomImages.length]);
 
   useEffect(() => {
     async function loadData() {
@@ -416,7 +479,7 @@ export default function HomePage() {
             <div className="relative">
               <div className="w-full h-80 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl bg-slate-950">
                 <img
-                  src="https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1000&q=80"
+                  src="/images/showroom/showroom-bikes-angle.jpg"
                   alt="TVS Apache RTR Configurator"
                   className="w-full h-full object-cover"
                 />
@@ -467,6 +530,87 @@ export default function HomePage() {
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                 Special arrangements with leading commercial banks and leasing companies offering up to 85% financing with same-day pre-approval.
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6.5 OFFICIAL SHOWROOM & SALES FLEET GALLERY */}
+      <section className="py-20 bg-slate-100/80 dark:bg-slate-900/60 border-t border-slate-200 dark:border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-600/15 border border-red-500/30 text-red-600 dark:text-red-400 text-xs font-bold uppercase tracking-wider mb-2">
+                <Camera className="w-3.5 h-3.5" />
+                <span>Real Showroom Experience • Weliweriya</span>
+              </div>
+              <h2 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+                VISIT OUR SALES SHOWROOM & FLEET
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-2xl">
+                Step into MANTHUSA TVS to experience Sri Lanka&apos;s official TVS motorcycle lineup in person. Browse ready stock of TVS NTORQ, Apache, Raider, and commuter models at our Weliweriya dealership.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <Link
+                href="/book-test-drive"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md shadow-red-600/30"
+              >
+                <span>Book a Test Ride</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link
+                href="/contact"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold text-xs uppercase tracking-wider transition-colors border border-slate-300 dark:border-slate-700"
+              >
+                <MapPin className="w-4 h-4 text-red-500" />
+                <span>Showroom Location</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Pure Images Showcase Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">
+            {showroomImages.map((img, idx) => (
+              <div
+                key={img.src}
+                onClick={() => setLightboxIndex(idx)}
+                className="group relative rounded-2xl overflow-hidden cursor-pointer bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-red-500 shadow-md hover:shadow-2xl transition-all duration-300 aspect-[3/4]"
+              >
+                <img
+                  src={img.src}
+                  alt={img.title}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                {/* Subtle hover overlay with zoom pill */}
+                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-3">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 text-slate-900 shadow-xl backdrop-blur-sm transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300 text-xs font-bold">
+                    <ZoomIn className="w-3.5 h-3.5 text-red-600" />
+                    <span>View</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Quick Showroom Highlights Strip */}
+          <div className="mt-6 p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs text-slate-700 dark:text-slate-300 shadow-sm">
+            <div className="flex items-center gap-2.5">
+              <CheckCircle2 className="w-4 h-4 text-red-500 shrink-0" />
+              <span>Direct TVS Lanka Authorised</span>
+            </div>
+            <div className="flex items-center gap-2.5">
+              <CheckCircle2 className="w-4 h-4 text-red-500 shrink-0" />
+              <span>Spot Bank & Leasing Facilities</span>
+            </div>
+            <div className="flex items-center gap-2.5">
+              <CheckCircle2 className="w-4 h-4 text-red-500 shrink-0" />
+              <span>Full Genuine Parts & Service Bay</span>
+            </div>
+            <div className="flex items-center gap-2.5">
+              <CheckCircle2 className="w-4 h-4 text-red-500 shrink-0" />
+              <span>Live Test Rides Available Daily</span>
             </div>
           </div>
         </div>
@@ -535,6 +679,78 @@ export default function HomePage() {
           onClose={() => setIsInquiryOpen(false)}
           vehicle={inquiryVehicle}
         />
+      )}
+
+      {/* Showroom Image Lightbox Modal */}
+      {lightboxIndex !== null && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-6"
+          onClick={() => setLightboxIndex(null)}
+        >
+          <div
+            className="relative max-w-5xl w-full bg-slate-950 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Top Bar */}
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-800 bg-slate-950/80">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                <span className="text-xs font-bold text-slate-300">
+                  MANTHUSA TVS Showroom & Fleet • {lightboxIndex + 1} of {showroomImages.length}
+                </span>
+              </div>
+              <button
+                onClick={() => setLightboxIndex(null)}
+                className="p-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-white transition-colors"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Main Image Stage */}
+            <div className="relative flex-1 bg-black flex items-center justify-center min-h-[50vh] max-h-[68vh] p-2 sm:p-4 select-none">
+              <button
+                onClick={() => setLightboxIndex((lightboxIndex - 1 + showroomImages.length) % showroomImages.length)}
+                className="absolute left-3 sm:left-5 z-10 p-2.5 sm:p-3 rounded-full bg-black/60 hover:bg-red-600 text-white border border-white/20 transition-all hover:scale-110 shadow-lg"
+                aria-label="Previous Photo"
+              >
+                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
+
+              <img
+                src={showroomImages[lightboxIndex].src}
+                alt={showroomImages[lightboxIndex].title}
+                className="max-h-[64vh] w-auto max-w-full object-contain rounded-xl shadow-2xl"
+              />
+
+              <button
+                onClick={() => setLightboxIndex((lightboxIndex + 1) % showroomImages.length)}
+                className="absolute right-3 sm:right-5 z-10 p-2.5 sm:p-3 rounded-full bg-black/60 hover:bg-red-600 text-white border border-white/20 transition-all hover:scale-110 shadow-lg"
+                aria-label="Next Photo"
+              >
+                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
+            </div>
+
+            {/* Bottom Thumbnails Strip */}
+            <div className="p-3 bg-slate-950 border-t border-slate-800 flex items-center justify-center gap-2 sm:gap-3 overflow-x-auto">
+              {showroomImages.map((img, i) => (
+                <button
+                  key={img.src}
+                  onClick={() => setLightboxIndex(i)}
+                  className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden border-2 transition-all shrink-0 ${
+                    lightboxIndex === i
+                      ? 'border-red-500 scale-105 shadow-md shadow-red-500/30'
+                      : 'border-transparent opacity-50 hover:opacity-100'
+                  }`}
+                >
+                  <img src={img.src} alt={img.title} className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
       )}
     </PublicLayout>
   );

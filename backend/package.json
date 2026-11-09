@@ -9,6 +9,7 @@
   "scripts": {
     "build": "nest build",
     "seed": "ts-node src/seed.ts",
+    "seed:bikes": "ts-node src/seed-bikes.ts",
     "migrate:reference-ids": "node scripts/migrate-reference-id-fields.js",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "postinstall": "nest build",

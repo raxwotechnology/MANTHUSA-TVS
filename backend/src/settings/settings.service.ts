@@ -67,6 +67,32 @@ export const DEFAULT_SETTINGS: Record<string, any> = {
     defaultLeasingTenorMonths: 36,
     defaultInterestRate: 14.5,
     minimumDownPaymentPercent: 20,
+    commissionRate: 2.5,
+    referralBonus: 25000,
+    bikeIncentives: {
+      enabled: true,
+      schemeName: 'Standard TVS Tiered Sales Incentive',
+      currency: 'LKR',
+      tiers: [
+        {
+          tierNumber: 1,
+          name: 'Tier 1 (Bikes 1 - 15)',
+          minBikes: 1,
+          maxBikes: 15,
+          ratePerBike: 10000,
+          description: 'Base slab: Rs. 10,000 per motorcycle up to 15 bikes (Total: Rs. 150,000)',
+        },
+        {
+          tierNumber: 2,
+          name: 'Tier 2 (Bikes 16 - 30)',
+          minBikes: 16,
+          maxBikes: 30,
+          ratePerBike: 15000,
+          bonusPerBike: 5000,
+          description: 'Booster slab: +Rs. 5,000 extra added, Rs. 15,000 per motorcycle from 16 to 30 (Total: Rs. 225,000)',
+        },
+      ],
+    },
     preferredPartners: [
       'Commercial Bank of Ceylon',
       'Hatton National Bank (HNB)',
