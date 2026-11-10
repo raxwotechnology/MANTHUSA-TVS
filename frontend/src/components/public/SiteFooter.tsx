@@ -58,7 +58,7 @@ export function SiteFooter({ brand }: Props) {
       <div className="site-footer-cta border-b border-slate-900 bg-slate-900/60 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
-            <div className="w-12 h-12 rounded-xl bg-red-600/10 border border-red-500/20 flex items-center justify-center text-red-500 shrink-0">
+            <div className="w-12 h-12 rounded-xl bg-red-600/10 border border-red-500/20 flex items-center justify-center text-red-600 dark:text-red-400 shrink-0">
               <Award className="w-6 h-6" />
             </div>
             <div>

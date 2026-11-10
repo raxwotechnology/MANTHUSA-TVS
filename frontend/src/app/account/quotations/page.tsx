@@ -159,7 +159,7 @@ export default function MyQuotationsPage() {
           className={`p-4 rounded-2xl text-xs flex items-center gap-2 ${
             actionMessage.type === 'success'
               ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400'
-              : 'bg-red-500/10 border border-red-500/30 text-red-400'
+              : 'bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400'
           }`}
         >
           {actionMessage.type === 'success' ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}

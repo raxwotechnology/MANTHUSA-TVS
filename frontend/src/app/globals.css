@@ -141,17 +141,28 @@
 .site-header .site-header-cta,
 .site-header .site-header-cta *,
 .site-header .site-header-cta:hover,
-.site-header .site-header-cta:hover * {
-  color: #020617 !important;
-  stroke: #020617 !important;
+.site-header .site-header-cta:hover *,
+:root:not(.dark) .site-header .site-header-cta,
+:root:not(.dark) .site-header .site-header-cta *,
+.dark .site-header .site-header-cta,
+.dark .site-header .site-header-cta *,
+.site-header-cta,
+.site-header-cta *,
+.site-header-cta:hover,
+.site-header-cta:hover * {
+  color: #000000 !important;
+  stroke: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
 }
 
-.site-header .site-header-cta {
+.site-header .site-header-cta,
+.site-header-cta {
   background-color: #fbbf24 !important;
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
 }
 
-.site-header .site-header-cta:hover {
+.site-header .site-header-cta:hover,
+.site-header-cta:hover {
   background-color: #f59e0b !important;
 }
 
@@ -475,20 +486,31 @@ html:not(.dark) body,
   background-color: transparent !important;
 }
 
-/* Solid red, emerald, rose, blue, amber buttons & badges: ALWAYS keep bright white text and white icons in both themes */
-button[class*="bg-red-"],
-a[class*="bg-red-"],
-span[class*="bg-red-"],
-:root:not(.dark) button[class*="bg-red-"],
-:root:not(.dark) a[class*="bg-red-"],
-:root:not(.dark) span[class*="bg-red-"],
-:root:not(.dark) [class*="bg-red-600"],
-:root:not(.dark) [class*="bg-red-500"],
+/* Solid saturated buttons & CTAs (red, emerald, rose, blue, gradient): keep bright white text and white icons in both themes */
+button[class~="bg-red-600"],
+button[class~="bg-red-500"],
+a[class~="bg-red-600"],
+a[class~="bg-red-500"],
+span[class~="bg-red-600"]:not([class*="/"]):not([class*="-50"]),
+span[class~="bg-red-500"]:not([class*="/"]):not([class*="-50"]),
+button[class~="bg-emerald-600"],
+button[class~="bg-emerald-500"],
+a[class~="bg-emerald-600"],
+a[class~="bg-emerald-500"],
+button[class~="bg-rose-600"],
+button[class~="bg-rose-500"],
+button[class~="bg-cyan-600"],
+button[class~="bg-blue-600"],
+button[class*="bg-gradient-to"],
+a[class*="bg-gradient-to"],
+:root:not(.dark) button[class~="bg-red-600"],
+:root:not(.dark) button[class~="bg-red-500"],
+:root:not(.dark) a[class~="bg-red-600"],
+:root:not(.dark) a[class~="bg-red-500"],
 .public-site.light-mode button.bg-red-600,
 .public-site.light-mode button.bg-red-500,
 .public-site.light-mode a.bg-red-600,
 .public-site.light-mode a.bg-red-500,
-.public-site.light-mode span.bg-red-600,
 .public-site.light-mode button.bg-emerald-600,
 .public-site.light-mode button.bg-emerald-500,
 .public-site.light-mode button.bg-rose-500,
@@ -502,18 +524,28 @@ span[class*="bg-red-"],
   color: #ffffff !important;
 }
 
-button[class*="bg-red-"] *,
-a[class*="bg-red-"] *,
-span[class*="bg-red-"] *,
-:root:not(.dark) button[class*="bg-red-"] *,
-:root:not(.dark) a[class*="bg-red-"] *,
-:root:not(.dark) [class*="bg-red-600"] *,
-:root:not(.dark) [class*="bg-red-500"] *,
+button[class~="bg-red-600"] *,
+button[class~="bg-red-500"] *,
+a[class~="bg-red-600"] *,
+a[class~="bg-red-500"] *,
+button[class~="bg-emerald-600"] *,
+button[class~="bg-emerald-500"] *,
+a[class~="bg-emerald-600"] *,
+a[class~="bg-emerald-500"] *,
+button[class~="bg-rose-600"] *,
+button[class~="bg-rose-500"] *,
+button[class~="bg-blue-600"] *,
+button[class~="bg-cyan-600"] *,
+button[class*="bg-gradient-to"] *,
+a[class*="bg-gradient-to"] *,
+:root:not(.dark) button[class~="bg-red-600"] *,
+:root:not(.dark) button[class~="bg-red-500"] *,
+:root:not(.dark) a[class~="bg-red-600"] *,
+:root:not(.dark) a[class~="bg-red-500"] *,
 .public-site.light-mode button.bg-red-600 *,
 .public-site.light-mode button.bg-red-500 *,
 .public-site.light-mode a.bg-red-600 *,
 .public-site.light-mode a.bg-red-500 *,
-.public-site.light-mode span.bg-red-600 *,
 .public-site.light-mode button.bg-emerald-600 *,
 .public-site.light-mode button.bg-emerald-500 *,
 .public-site.light-mode button.bg-rose-500 *,
@@ -526,6 +558,71 @@ span[class*="bg-red-"] *,
 .public-site.light-mode a[class*="bg-gradient-to"] * {
   color: #ffffff !important;
   stroke: #ffffff;
+}
+
+/* Tinted Red/Rose badges & icon containers: High-contrast visibility in Light and Dark modes */
+:root:not(.dark) [class*="bg-red-600/10"]:not(button):not(a),
+:root:not(.dark) [class*="bg-red-500/10"]:not(button):not(a),
+:root:not(.dark) [class*="bg-red-500/20"]:not(button):not(a),
+:root:not(.dark) [class*="bg-rose-500/10"]:not(button):not(a),
+:root:not(.dark) .public-site [class*="bg-red-600/10"]:not(button):not(a),
+:root:not(.dark) .public-site [class*="bg-red-500/10"]:not(button):not(a) {
+  color: #dc2626 !important;
+}
+
+:root:not(.dark) [class*="bg-red-600/10"]:not(button):not(a) svg,
+:root:not(.dark) [class*="bg-red-500/10"]:not(button):not(a) svg,
+:root:not(.dark) [class*="bg-red-500/20"]:not(button):not(a) svg,
+:root:not(.dark) [class*="bg-rose-500/10"]:not(button):not(a) svg,
+:root:not(.dark) .public-site [class*="bg-red-600/10"]:not(button):not(a) svg,
+:root:not(.dark) .public-site [class*="bg-red-500/10"]:not(button):not(a) svg {
+  color: #dc2626 !important;
+  stroke: #dc2626 !important;
+}
+
+:root:not(.dark) [class*="bg-red-600/10"]:not(button):not(a) span,
+:root:not(.dark) [class*="bg-red-500/10"]:not(button):not(a) span,
+:root:not(.dark) .public-site [class*="bg-red-600/10"]:not(button):not(a) span,
+:root:not(.dark) .public-site [class*="bg-red-500/10"]:not(button):not(a) span {
+  color: #dc2626 !important;
+}
+
+.dark [class*="bg-red-600/10"]:not(button):not(a),
+.dark [class*="bg-red-500/10"]:not(button):not(a),
+.dark [class*="bg-red-500/20"]:not(button):not(a),
+.dark [class*="bg-rose-500/10"]:not(button):not(a),
+.dark .public-site [class*="bg-red-600/10"]:not(button):not(a),
+.dark .public-site [class*="bg-red-500/10"]:not(button):not(a) {
+  color: #f87171 !important;
+}
+
+.dark [class*="bg-red-600/10"]:not(button):not(a) svg:not([class*="dark:text-amber"]),
+.dark [class*="bg-red-500/10"]:not(button):not(a) svg:not([class*="dark:text-amber"]),
+.dark [class*="bg-red-500/20"]:not(button):not(a) svg:not([class*="dark:text-amber"]),
+.dark [class*="bg-rose-500/10"]:not(button):not(a) svg:not([class*="dark:text-amber"]),
+.dark .public-site [class*="bg-red-600/10"]:not(button):not(a) svg:not([class*="dark:text-amber"]),
+.dark .public-site [class*="bg-red-500/10"]:not(button):not(a) svg:not([class*="dark:text-amber"]) {
+  color: #f87171 !important;
+  stroke: #f87171 !important;
+}
+
+.dark [class*="bg-red-600/10"]:not(button):not(a) span,
+.dark [class*="bg-red-500/10"]:not(button):not(a) span,
+.dark .public-site [class*="bg-red-600/10"]:not(button):not(a) span,
+.dark .public-site [class*="bg-red-500/10"]:not(button):not(a) span {
+  color: #f87171 !important;
+}
+
+.dark [class*="dark:bg-amber-400/10"] svg,
+.dark [class*="dark:text-amber-400"] svg {
+  color: #fbbf24 !important;
+  stroke: #fbbf24 !important;
+}
+
+/* Soft red selected options in light mode: never force white text */
+:root:not(.dark) button[class*="bg-red-50"],
+:root:not(.dark) [class*="bg-red-50"] {
+  color: #0f172a;
 }
 
 /* Dark cyan and dark emerald badges in light mode */
@@ -933,46 +1030,59 @@ span[class*="bg-red-"] *,
    Comprehensive UI Contrast & Visibility Rules (Both Light & Dark Modes)
    ========================================================================== */
 
-/* 1. Amber & Yellow Solid Buttons: ALWAYS high-contrast dark black text and icons */
-.public-site [class*="bg-amber-400"]:not([class*="/"]):not([class*="hover:"]),
-.public-site [class*="bg-amber-500"]:not([class*="/"]):not([class*="hover:"]),
-.public-site [class*="bg-amber-300"]:not([class*="/"]):not([class*="hover:"]),
-.public-site [class*="bg-yellow-400"]:not([class*="/"]):not([class*="hover:"]),
-.dark .public-site [class*="bg-amber-400"]:not([class*="/"]):not([class*="hover:"]),
-.dark .public-site [class*="bg-amber-500"]:not([class*="/"]):not([class*="hover:"]),
-.dark .public-site [class*="bg-amber-300"]:not([class*="/"]):not([class*="hover:"]),
-.dark .public-site [class*="bg-yellow-400"]:not([class*="/"]):not([class*="hover:"]),
-:root:not(.dark) .public-site [class*="bg-amber-400"]:not([class*="/"]):not([class*="hover:"]),
-:root:not(.dark) .public-site [class*="bg-amber-500"]:not([class*="/"]):not([class*="hover:"]),
-:root:not(.dark) .public-site [class*="bg-amber-300"]:not([class*="/"]):not([class*="hover:"]),
-:root:not(.dark) .public-site [class*="bg-yellow-400"]:not([class*="/"]):not([class*="hover:"]) {
-  color: #020617 !important;
+/* 1. Amber & Yellow Solid Buttons: ALWAYS high-contrast pure black text and icons */
+[class~="bg-amber-400"],
+[class~="bg-amber-500"],
+[class~="bg-amber-300"],
+[class~="bg-yellow-400"],
+.public-site [class~="bg-amber-400"],
+.public-site [class~="bg-amber-500"],
+.public-site [class~="bg-amber-300"],
+.public-site [class~="bg-yellow-400"],
+.dark .public-site [class~="bg-amber-400"],
+.dark .public-site [class~="bg-amber-500"],
+.dark .public-site [class~="bg-amber-300"],
+.dark .public-site [class~="bg-yellow-400"],
+:root:not(.dark) .public-site [class~="bg-amber-400"],
+:root:not(.dark) .public-site [class~="bg-amber-500"],
+:root:not(.dark) .public-site [class~="bg-amber-300"],
+:root:not(.dark) .public-site [class~="bg-yellow-400"] {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
 }
 
-.public-site [class*="bg-amber-400"]:not([class*="/"]) *,
-.public-site [class*="bg-amber-500"]:not([class*="/"]) *,
-.public-site [class*="bg-amber-300"]:not([class*="/"]) *,
-.public-site [class*="bg-yellow-400"]:not([class*="/"]) *,
-.dark .public-site [class*="bg-amber-400"]:not([class*="/"]) *,
-.dark .public-site [class*="bg-amber-500"]:not([class*="/"]) *,
-.dark .public-site [class*="bg-amber-300"]:not([class*="/"]) *,
-.dark .public-site [class*="bg-yellow-400"]:not([class*="/"]) *,
-:root:not(.dark) .public-site [class*="bg-amber-400"]:not([class*="/"]) *,
-:root:not(.dark) .public-site [class*="bg-amber-500"]:not([class*="/"]) *,
-:root:not(.dark) .public-site [class*="bg-amber-300"]:not([class*="/"]) *,
-:root:not(.dark) .public-site [class*="bg-yellow-400"]:not([class*="/"]) * {
-  color: #020617 !important;
-  stroke: #020617 !important;
+[class~="bg-amber-400"] *,
+[class~="bg-amber-500"] *,
+[class~="bg-amber-300"] *,
+[class~="bg-yellow-400"] *,
+.public-site [class~="bg-amber-400"] *,
+.public-site [class~="bg-amber-500"] *,
+.public-site [class~="bg-amber-300"] *,
+.public-site [class~="bg-yellow-400"] *,
+.dark .public-site [class~="bg-amber-400"] *,
+.dark .public-site [class~="bg-amber-500"] *,
+.dark .public-site [class~="bg-amber-300"] *,
+.dark .public-site [class~="bg-yellow-400"] *,
+:root:not(.dark) .public-site [class~="bg-amber-400"] *,
+:root:not(.dark) .public-site [class~="bg-amber-500"] *,
+:root:not(.dark) .public-site [class~="bg-amber-300"] *,
+:root:not(.dark) .public-site [class~="bg-yellow-400"] * {
+  color: #000000 !important;
+  stroke: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
 }
 
-.public-site [class*="bg-amber-400"]:hover *,
-.public-site [class*="bg-amber-500"]:hover *,
-.dark .public-site [class*="bg-amber-400"]:hover *,
-.dark .public-site [class*="bg-amber-500"]:hover *,
-:root:not(.dark) .public-site [class*="bg-amber-400"]:hover *,
-:root:not(.dark) .public-site [class*="bg-amber-500"]:hover * {
-  color: #020617 !important;
-  stroke: #020617 !important;
+[class~="bg-amber-400"]:hover *,
+[class~="bg-amber-500"]:hover *,
+.public-site [class~="bg-amber-400"]:hover *,
+.public-site [class~="bg-amber-500"]:hover *,
+.dark .public-site [class~="bg-amber-400"]:hover *,
+.dark .public-site [class~="bg-amber-500"]:hover *,
+:root:not(.dark) .public-site [class~="bg-amber-400"]:hover *,
+:root:not(.dark) .public-site [class~="bg-amber-500"]:hover * {
+  color: #000000 !important;
+  stroke: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
 }
 
 /* 2. Category Cards on Dark Photo Overlays: Always crisp white titles and amber/red subtitles */

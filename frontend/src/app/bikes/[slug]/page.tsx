@@ -235,7 +235,7 @@ export default function BikeDetailPage({ params }: Props) {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-6">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="px-3 py-1 rounded-full bg-red-600/10 text-red-500 text-xs font-bold uppercase tracking-wider">
+              <span className="px-3 py-1 rounded-full bg-red-600/10 text-red-600 dark:text-red-400 text-xs font-bold uppercase tracking-wider border border-red-500/20">
                 {bike.category || 'TVS Motorcycle'}
               </span>
               <AvailabilityBadge status={bike.status} condition={bike.condition} />
@@ -354,12 +354,12 @@ export default function BikeDetailPage({ params }: Props) {
 
               {/* 2. SELECT COLOR */}
               {bike.colors && bike.colors.length > 0 && (
-                <div className="space-y-3 border-t border-slate-800/80 pt-5">
+                <div className="space-y-3 border-t border-slate-200 dark:border-slate-800/80 pt-5">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-extrabold uppercase tracking-wider text-slate-300">
+                    <span className="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                       2. Choose Color
                     </span>
-                    <span className="text-xs font-bold text-red-400">
+                    <span className="text-xs font-bold text-red-600 dark:text-red-400">
                       {selectedColor?.name}
                     </span>
                   </div>
@@ -372,14 +372,14 @@ export default function BikeDetailPage({ params }: Props) {
                           key={i}
                           type="button"
                           onClick={() => handleColorSelect(c)}
-                          className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-semibold transition-all ${
+                          className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
                             isSelected
-                              ? 'border-red-500 bg-red-600/10 text-white'
-                              : 'border-slate-800 bg-slate-950/60 text-slate-300 hover:border-slate-700'
+                              ? 'border-red-500 bg-red-50 dark:bg-red-600/10 text-slate-900 dark:text-white shadow-xs'
+                              : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-700'
                           }`}
                         >
                           <span
-                            className="w-4 h-4 rounded-full border border-slate-600 shrink-0 shadow-sm"
+                            className="w-4 h-4 rounded-full border border-slate-300 dark:border-slate-600 shrink-0 shadow-sm"
                             style={{ backgroundColor: c.hex || '#333' }}
                           />
                           <span>{c.name}</span>

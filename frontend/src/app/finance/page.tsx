@@ -166,7 +166,7 @@ export default function FinancePage() {
                 className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-sm transition-colors space-y-2"
               >
                 <div className="flex items-center justify-between">
-                  <div className="w-8 h-8 rounded-lg bg-red-500/10 dark:bg-amber-400/10 text-red-600 dark:text-amber-400 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-red-500/10 dark:bg-amber-400/10 text-red-600 dark:text-amber-400 border border-red-500/20 dark:border-amber-400/20 flex items-center justify-center">
                     <Building2 className="w-4 h-4" />
                   </div>
                   <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-500/20">

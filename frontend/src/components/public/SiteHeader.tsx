@@ -210,10 +210,10 @@ export function SiteHeader({ brand }: Props) {
             {/* Prominent Golden Yellow BOOK Button */}
             <Link
               href="/book-test-drive"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 active:scale-95 text-slate-950 font-black text-xs uppercase tracking-wider shadow-md shadow-amber-400/20 transition-all cursor-pointer whitespace-nowrap"
+              className="site-header-cta inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 active:scale-95 text-black font-black text-xs uppercase tracking-wider shadow-md shadow-amber-400/20 transition-all cursor-pointer whitespace-nowrap"
             >
-              <CalendarCheck className="w-4 h-4 text-slate-950 stroke-[2.5]" />
-              <span>BOOK</span>
+              <CalendarCheck className="w-4 h-4 text-black stroke-black stroke-[2.5]" />
+              <span className="text-black font-black">BOOK</span>
             </Link>
 
             {/* Theme Toggle Button */}
@@ -273,9 +273,9 @@ export function SiteHeader({ brand }: Props) {
 
             <Link
               href="/book-test-drive"
-              className="px-2.5 sm:px-3 py-1.5 rounded-lg bg-amber-400 text-slate-950 font-black text-[10px] sm:text-[11px] uppercase tracking-wider shadow-sm shrink-0 whitespace-nowrap"
+              className="site-header-cta px-2.5 sm:px-3 py-1.5 rounded-lg bg-amber-400 text-black font-black text-[10px] sm:text-[11px] uppercase tracking-wider shadow-sm shrink-0 whitespace-nowrap"
             >
-              BOOK
+              <span className="text-black font-black">BOOK</span>
             </Link>
             <ThemeToggle />
             <button
@@ -337,10 +337,10 @@ export function SiteHeader({ brand }: Props) {
           <div className="pt-2 flex flex-col gap-2">
             <Link
               href="/book-test-drive"
-              className="w-full flex items-center justify-center gap-2 py-3 min-h-[44px] rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs uppercase tracking-wider shadow-md shadow-amber-400/20"
+              className="site-header-cta w-full flex items-center justify-center gap-2 py-3 min-h-[44px] rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-black text-xs uppercase tracking-wider shadow-md shadow-amber-400/20"
             >
-              <CalendarCheck className="w-4 h-4 stroke-[2.5]" />
-              <span>BOOK TEST DRIVE / APPOINTMENT</span>
+              <CalendarCheck className="w-4 h-4 stroke-[2.5] text-black stroke-black" />
+              <span className="text-black font-black">BOOK TEST DRIVE / APPOINTMENT</span>
             </Link>
 
             {user ? (

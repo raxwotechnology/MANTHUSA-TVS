@@ -248,7 +248,7 @@ export default function AccountOverviewPage() {
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-400">Official Quotations</span>
-            <div className="w-9 h-9 rounded-xl bg-red-500/10 text-red-400 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 flex items-center justify-center">
               <FileText className="w-4 h-4" />
             </div>
           </div>

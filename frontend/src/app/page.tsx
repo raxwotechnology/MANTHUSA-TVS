@@ -335,21 +335,21 @@ export default function HomePage() {
       <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-600/10 text-red-400 text-xs font-bold uppercase tracking-wider mb-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-600/10 text-red-600 dark:text-red-400 text-xs font-bold uppercase tracking-wider mb-2 border border-red-500/20">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Flagship Performance</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
               FEATURED TVS MOTORCYCLES
             </h2>
-            <p className="text-xs sm:text-sm text-slate-400 mt-1">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1">
               Top-selling models equipped with TVS Racing technology and SmartXonnect telemetry.
             </p>
           </div>
 
           <Link
             href="/bikes"
-            className="inline-flex items-center gap-2 text-xs font-bold text-red-400 hover:text-red-300 transition-colors uppercase tracking-wider"
+            className="inline-flex items-center gap-2 text-xs font-bold text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors uppercase tracking-wider"
           >
             <span>View All Bikes ({vehicles.length})</span>
             <ChevronRight className="w-4 h-4" />
@@ -480,7 +480,7 @@ export default function HomePage() {
             <div className="relative">
               <div className="w-full h-80 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl bg-slate-950">
                 <img
-                  src="/images/showroom/showroom-bikes-angle.jpg"
+                  src="https://cdn.bikedekho.com/upload/userfiles/images/69cac34e2807c.jpg"
                   alt="TVS Apache RTR Configurator"
                   className="w-full h-full object-cover"
                 />
@@ -504,7 +504,7 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-3 hover:border-red-500/40 transition-colors shadow-sm hover:shadow-md">
-              <div className="w-12 h-12 rounded-xl bg-red-600/10 text-red-500 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-red-600/10 text-red-600 dark:text-red-400 flex items-center justify-center border border-red-500/20">
                 <Award className="w-6 h-6" />
               </div>
               <h3 className="text-base font-bold text-slate-900 dark:text-white">5-Year Manufacturer Warranty</h3>
@@ -514,7 +514,7 @@ export default function HomePage() {
             </div>
 
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-3 hover:border-red-500/40 transition-colors shadow-sm hover:shadow-md">
-              <div className="w-12 h-12 rounded-xl bg-red-600/10 text-red-500 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-red-600/10 text-red-600 dark:text-red-400 flex items-center justify-center border border-red-500/20">
                 <Wrench className="w-6 h-6" />
               </div>
               <h3 className="text-base font-bold text-slate-900 dark:text-white">2 Free Periodic Services</h3>
@@ -524,7 +524,7 @@ export default function HomePage() {
             </div>
 
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 space-y-3 hover:border-red-500/40 transition-colors shadow-sm hover:shadow-md">
-              <div className="w-12 h-12 rounded-xl bg-red-600/10 text-red-500 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-red-600/10 text-red-600 dark:text-red-400 flex items-center justify-center border border-red-500/20">
                 <BadgeDollarSign className="w-6 h-6" />
               </div>
               <h3 className="text-base font-bold text-slate-900 dark:text-white">Instant Low-Rate Leasing</h3>
@@ -621,7 +621,7 @@ export default function HomePage() {
       <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-600/10 text-red-500 text-xs font-bold uppercase tracking-wider mb-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-600/10 text-red-600 dark:text-red-400 text-xs font-bold uppercase tracking-wider mb-2 border border-red-500/20">
               <MapPin className="w-3.5 h-3.5" />
               <span>Islandwide Presence</span>
             </div>

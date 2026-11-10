@@ -179,8 +179,8 @@ function BikesContent() {
       {/* Header Banner */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-6">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-600/10 text-red-500 text-xs font-bold uppercase tracking-wider mb-2">
-            <Flame className="w-3.5 h-3.5 fill-red-500" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-600/10 text-red-600 dark:text-red-400 text-xs font-bold uppercase tracking-wider mb-2 border border-red-500/20">
+            <Flame className="w-3.5 h-3.5 fill-red-600 dark:fill-red-400" />
             <span>TVS Motorcycle Catalog</span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
