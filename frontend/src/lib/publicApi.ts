@@ -103,6 +103,23 @@ export interface PublicVehicle {
 }
 
 /**
+ * Collapse multiple stock units into one customer-facing catalog listing.
+ */
+export function getUniquePublicVehicles(vehicles: PublicVehicle[]): PublicVehicle[] {
+  const seen = new Set<string>();
+
+  return vehicles.filter((vehicle) => {
+    const listingKey = [vehicle.make, vehicle.model, vehicle.variant, vehicle.color]
+      .map((value) => (value || '').trim().toLowerCase())
+      .join('|');
+
+    if (seen.has(listingKey)) return false;
+    seen.add(listingKey);
+    return true;
+  });
+}
+
+/**
  * Return the vehicle gallery with the explicitly selected cover image first.
  * Angle images are included after the standard gallery images without duplicates.
  */

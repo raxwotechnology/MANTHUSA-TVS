@@ -25,7 +25,7 @@ import { VehicleCardSkeleton } from '@/components/public/VehicleCardSkeleton';
 import { Breadcrumbs } from '@/components/public/Breadcrumbs';
 import { EmptyState } from '@/components/public/EmptyState';
 import { InquiryDialog } from '@/components/public/InquiryDialog';
-import { PublicVehicle, fetchPublicVehicles, formatLKR } from '@/lib/publicApi';
+import { PublicVehicle, fetchPublicVehicles, formatLKR, getUniquePublicVehicles } from '@/lib/publicApi';
 
 function BikesContent() {
   const router = useRouter();
@@ -100,9 +100,13 @@ function BikesContent() {
     return Array.from(set).sort();
   }, [bikes]);
 
+  const uniqueBikes = useMemo(() => {
+    return getUniquePublicVehicles(bikes);
+  }, [bikes]);
+
   // Filter bikes
   const filteredBikes = useMemo(() => {
-    return bikes.filter((b) => {
+    return uniqueBikes.filter((b) => {
       // Keyword search
       if (keyword) {
         const query = keyword.toLowerCase();
@@ -135,7 +139,7 @@ function BikesContent() {
 
       return true;
     });
-  }, [bikes, keyword, selectedCategory, selectedEngineCc, minPrice, maxPrice]);
+  }, [uniqueBikes, keyword, selectedCategory, selectedEngineCc, minPrice, maxPrice]);
 
   // Sort bikes
   const sortedBikes = useMemo(() => {

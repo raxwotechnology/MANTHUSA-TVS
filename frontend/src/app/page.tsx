@@ -38,7 +38,8 @@ import { InquiryDialog } from '@/components/public/InquiryDialog';
 import {
   PublicVehicle,
   fetchPublicVehicles,
-  formatLKR
+  formatLKR,
+  getUniquePublicVehicles
 } from '@/lib/publicApi';
 import { useSettings } from '@/lib/useSettings';
 
@@ -129,12 +130,13 @@ export default function HomePage() {
   }, []);
 
   const featuredBikes = useMemo(() => {
-    const featured = vehicles.filter((v) => v.isFeatured);
-    return featured.length > 0 ? featured : vehicles.slice(0, 4);
+    const uniqueVehicles = getUniquePublicVehicles(vehicles);
+    const featured = uniqueVehicles.filter((v) => v.isFeatured);
+    return featured.length > 0 ? featured : uniqueVehicles.slice(0, 4);
   }, [vehicles]);
 
   const latestArrivals = useMemo(() => {
-    return vehicles.slice(0, 6);
+    return getUniquePublicVehicles(vehicles).slice(0, 6);
   }, [vehicles]);
 
   const handleQuickSearch = (e: React.FormEvent) => {
