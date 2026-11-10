@@ -162,16 +162,23 @@ export function VehicleCard({ vehicle, viewMode = 'grid', onQuickInquire }: Prop
       {/* Motorcycle Info & Details */}
       <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
         <div>
-          {/* Category */}
-          <div className="flex items-center justify-between text-xs mb-1.5">
-            <span className="font-bold tracking-wider uppercase text-red-600 dark:text-red-400 text-[11px]">
+          {/* Category & Round No */}
+          <div className="flex items-center justify-between text-xs mb-1.5 gap-2">
+            <span className="font-bold tracking-wider uppercase text-red-600 dark:text-red-400 text-[11px] truncate">
               {vehicle.category || 'SPORT MOTORCYCLES'}
             </span>
-            {vehicle.year && (
-              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
-                {vehicle.year} Model
-              </span>
-            )}
+            <div className="flex items-center gap-1.5 shrink-0">
+              {vehicle.roundNumber && (
+                <span className="text-[10px] font-mono font-bold text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/60 border border-red-200 dark:border-red-900/60 px-1.5 py-0.5 rounded shadow-2xs">
+                  {vehicle.roundNumber}
+                </span>
+              )}
+              {vehicle.year && (
+                <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                  {vehicle.year}
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Model Name & Variant */}

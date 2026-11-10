@@ -54,6 +54,7 @@ interface MediaAngles {
 interface Vehicle {
   _id: string;
   stockNumber: string;
+  engineNumber?: string;
   registrationNumber: string;
   roundNumber?: string;
   category?: string;
@@ -97,6 +98,7 @@ export default function VehicleInventoryPage() {
 
   const defaultVehicleForm = {
     stockNumber: '',
+    engineNumber: '',
     registrationNumber: '',
     roundNumber: '',
     make: 'TVS',
@@ -159,6 +161,7 @@ export default function VehicleInventoryPage() {
     setEditingVehicle(v);
     setNewVehicle({
       stockNumber: v.stockNumber || '',
+      engineNumber: v.engineNumber || '',
       registrationNumber: v.registrationNumber || '',
       roundNumber: (v as any).roundNumber || '',
       make: v.make || '',
@@ -354,6 +357,7 @@ export default function VehicleInventoryPage() {
     const item: Vehicle = {
       _id: Date.now().toString(),
       stockNumber: newVehicle.stockNumber || `STK-${new Date().getFullYear()}-${Date.now()}`,
+      engineNumber: newVehicle.engineNumber,
       registrationNumber: newVehicle.registrationNumber,
       roundNumber: newVehicle.roundNumber || '',
       category: (newVehicle as any).category || 'Sport Motorcycles',
@@ -786,9 +790,9 @@ export default function VehicleInventoryPage() {
                   <label className="block font-semibold text-slate-700 mb-1">Engine Number</label>
                   <input
                     type="text"
-                    placeholder="Auto-generated if empty"
-                    value={newVehicle.stockNumber}
-                    onChange={(e) => setNewVehicle({ ...newVehicle, stockNumber: e.target.value })}
+                    placeholder="e.g. BG7CT2000610"
+                    value={newVehicle.engineNumber}
+                    onChange={(e) => setNewVehicle({ ...newVehicle, engineNumber: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg placeholder:text-slate-400 font-mono text-[11px]"
                   />
                 </div>
