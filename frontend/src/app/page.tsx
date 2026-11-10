@@ -182,6 +182,7 @@ export default function HomePage() {
   const dealershipName = brand?.dealershipName || 'MANTHUSA TVS';
   const hotline = brand?.hotline || brand?.phone || '+94 11 268 4900';
   const whatsapp = brand?.whatsapp || '+94771234567';
+  const heroBackgroundImage = '/images/hero-tvs-bikes.png';
 
   return (
     <PublicLayout brand={brand}>
@@ -190,7 +191,7 @@ export default function HomePage() {
         <div
           className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 scale-105"
           style={{
-            backgroundImage: `url('https://cdn.bikedekho.com/upload/userfiles/images/69cac34e2807c.jpg')`,
+            backgroundImage: `url('${heroBackgroundImage}')`,
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#020617]/95 via-[#020617]/80 to-[#020617]/40 pointer-events-none" />

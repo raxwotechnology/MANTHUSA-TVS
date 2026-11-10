@@ -56,7 +56,7 @@ export const DEFAULT_WEBSITE_CMS = {
     ctaPrimaryLink: '/bikes',
     ctaSecondaryText: 'Configure & Book Online',
     ctaSecondaryLink: '/configure',
-    backgroundImage: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1920&q=80',
+    backgroundImage: '/images/hero-tvs-bikes.png',
   },
   sections: {
     showFeatured: true,
