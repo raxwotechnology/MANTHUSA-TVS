@@ -72,7 +72,7 @@ export class VehiclesService {
         ],
       })
       .select(
-        'stockNumber roundNumber make model variant category year manufacturingYear condition fuelType transmission engineCapacity engineType maxPower maxTorque coolingSystem fuelSystem startingSystem topSpeed mileage fuelTankCapacity frontBrake rearBrake brakingSystem frontSuspension rearSuspension wheelType tyreDimensions groundClearance seatHeight kerbWeight smartFeatures color variants colors branchStock sellingPrice images mediaAngles shortDescription description isFeatured status'
+        'stockNumber roundNumber chassisNumber engineNumber make model variant category year manufacturingYear condition fuelType transmission engineCapacity engineType maxPower maxTorque coolingSystem fuelSystem startingSystem topSpeed mileage fuelTankCapacity frontBrake rearBrake brakingSystem frontSuspension rearSuspension wheelType tyreDimensions groundClearance seatHeight kerbWeight smartFeatures color variants colors branchStock sellingPrice images mediaAngles shortDescription description isFeatured status'
       )
       .sort({ isFeatured: -1, createdAt: -1 })
       .lean()

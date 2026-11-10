@@ -523,6 +523,12 @@ export default function BikeDetailPage({ params }: Props) {
                     {bike.mileage ? `${bike.mileage} ${bike.fuelType === 'Electric' ? 'km (IDC/Range)' : 'km/l'}` : (bike.fuelType === 'Electric' ? 'Long Range EV' : 'EcoThrust Efficient')}
                   </span>
                 </div>
+                {bike.engineNumber && (
+                  <div className="py-2.5 flex justify-between">
+                    <span className="text-slate-600 dark:text-slate-400">Engine Number</span>
+                    <span className="font-bold text-slate-900 dark:text-white font-mono">{bike.engineNumber}</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -569,6 +575,18 @@ export default function BikeDetailPage({ params }: Props) {
                   <span className="text-slate-600 dark:text-slate-400">Kerb Weight</span>
                   <span className="font-bold text-slate-900 dark:text-white">{bike.kerbWeight || '144 kg'}</span>
                 </div>
+                {bike.chassisNumber && (
+                  <div className="py-2.5 flex justify-between">
+                    <span className="text-slate-600 dark:text-slate-400">Chassis / VIN</span>
+                    <span className="font-bold text-slate-900 dark:text-white font-mono">{bike.chassisNumber}</span>
+                  </div>
+                )}
+                {bike.roundNumber && (
+                  <div className="py-2.5 flex justify-between">
+                    <span className="text-slate-600 dark:text-slate-400">Stock Round No</span>
+                    <span className="font-bold text-red-600 dark:text-red-400 font-mono">{bike.roundNumber}</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>

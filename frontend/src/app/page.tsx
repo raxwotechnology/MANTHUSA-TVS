@@ -245,7 +245,7 @@ export default function HomePage() {
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-red-500 shrink-0" />
-                <span>Islandwide Branches</span>
+                <span>Official Weliweriya Showroom</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-red-500 shrink-0" />
@@ -617,58 +617,29 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 7. DEALERSHIP BRANCH LOCATOR */}
+      {/* 7. DEALERSHIP SHOWROOM */}
       <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-600/10 text-red-600 dark:text-red-400 text-xs font-bold uppercase tracking-wider mb-2 border border-red-500/20">
               <MapPin className="w-3.5 h-3.5" />
-              <span>Islandwide Presence</span>
+              <span>Our Location</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-              OUR SHOWROOMS & SERVICE BRANCHES
+              OUR SHOWROOM & SERVICE CENTER
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1">
-              Visit our fully equipped TVS motorcycle showrooms for test rides, bike handovers, and genuine TVS service.
+              Visit our fully equipped TVS motorcycle showroom for test rides, bike handovers, and genuine TVS service.
             </p>
           </div>
-
-          <Link
-            href="/contact"
-            className="inline-flex items-center gap-2 text-xs font-bold text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors uppercase tracking-wider"
-          >
-            <span>All Branch Details</span>
-            <ChevronRight className="w-4 h-4" />
-          </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-3 shadow-sm hover:shadow-md transition-shadow">
             <h3 className="text-sm font-bold text-slate-900 dark:text-white">MANTHUSA TVS - Weliweriya Showroom</h3>
             <p className="text-xs text-slate-600 dark:text-slate-400">386, New Kandy Road, Weliweriya</p>
             <div className="text-xs text-red-600 dark:text-red-400 font-bold pt-1">075-6000 310 / 076-5710 601</div>
             <div className="text-[11px] text-emerald-700 dark:text-emerald-400 font-semibold">In Stock: Apache, NTORQ, Raider, Ronin</div>
-          </div>
-
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-3 shadow-sm hover:shadow-md transition-shadow">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Kandy City Showroom</h3>
-            <p className="text-xs text-slate-600 dark:text-slate-400">No. 88, Peradeniya Road, Kandy</p>
-            <div className="text-xs text-red-600 dark:text-red-400 font-bold pt-1">+94 81 223 4500</div>
-            <div className="text-[11px] text-emerald-700 dark:text-emerald-400 font-semibold">In Stock: Apache 160/200, NTORQ, Jupiter</div>
-          </div>
-
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-3 shadow-sm hover:shadow-md transition-shadow">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Galle Coastal Center</h3>
-            <p className="text-xs text-slate-600 dark:text-slate-400">No. 215, Colombo Road, Galle</p>
-            <div className="text-xs text-red-600 dark:text-red-400 font-bold pt-1">+94 91 224 5600</div>
-            <div className="text-[11px] text-emerald-700 dark:text-emerald-400 font-semibold">In Stock: NTORQ 125, Jupiter 125, XL 100</div>
-          </div>
-
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-3 shadow-sm hover:shadow-md transition-shadow">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Kurunegala Sales Hub</h3>
-            <p className="text-xs text-slate-600 dark:text-slate-400">No. 54, Negombo Road, Kurunegala</p>
-            <div className="text-xs text-red-600 dark:text-red-400 font-bold pt-1">+94 37 228 9100</div>
-            <div className="text-[11px] text-emerald-700 dark:text-emerald-400 font-semibold">In Stock: Raider 125, XL 100, Apache 160</div>
           </div>
         </div>
       </section>

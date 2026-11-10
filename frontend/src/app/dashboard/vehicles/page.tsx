@@ -1194,6 +1194,7 @@ export default function VehicleInventoryPage() {
                 <div><span className="text-slate-500 block">Mileage:</span> <span className="font-bold">{selectedVehicle.mileage.toLocaleString()} km</span></div>
                 <div><span className="text-slate-500 block">Chassis #:</span> <span className="font-mono text-[11px]">{selectedVehicle.chassisNumber}</span></div>
                 <div><span className="text-slate-500 block">Round #:</span> <span className="font-mono text-[11px] font-bold text-indigo-700">{selectedVehicle.roundNumber || '—'}</span></div>
+                <div><span className="text-slate-500 block">Engine #:</span> <span className="font-mono text-[11px] font-bold text-amber-800">{(selectedVehicle as any).engineNumber || '—'}</span></div>
                 <div><span className="text-slate-500 block">Status:</span> {getStatusBadge(selectedVehicle.status)}</div>
               </div>
 

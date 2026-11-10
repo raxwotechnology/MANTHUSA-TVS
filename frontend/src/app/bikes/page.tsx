@@ -44,7 +44,6 @@ function BikesContent() {
   const keyword = searchParams.get('q') || '';
   const selectedCategory = searchParams.get('category') || 'ALL';
   const selectedEngineCc = searchParams.get('engineCc') || 'ALL';
-  const selectedBranch = searchParams.get('branch') || 'ALL';
   const minPrice = searchParams.get('minPrice') || '';
   const maxPrice = searchParams.get('maxPrice') || '';
   const sortBy = searchParams.get('sort') || 'featured';
@@ -130,21 +129,13 @@ function BikesContent() {
         if (selectedEngineCc === 'electric' && b.fuelType !== 'Electric') return false;
       }
 
-      // Branch filter
-      if (selectedBranch !== 'ALL') {
-        const hasStockAtBranch = b.branchStock?.some(
-          (bs) => bs.branchName.toLowerCase().includes(selectedBranch.toLowerCase()) && bs.quantity > 0
-        );
-        if (!hasStockAtBranch) return false;
-      }
-
       // Price filter
       if (minPrice && b.sellingPrice < Number(minPrice)) return false;
       if (maxPrice && b.sellingPrice > Number(maxPrice)) return false;
 
       return true;
     });
-  }, [bikes, keyword, selectedCategory, selectedEngineCc, selectedBranch, minPrice, maxPrice]);
+  }, [bikes, keyword, selectedCategory, selectedEngineCc, minPrice, maxPrice]);
 
   // Sort bikes
   const sortedBikes = useMemo(() => {
@@ -166,7 +157,6 @@ function BikesContent() {
     keyword,
     selectedCategory !== 'ALL' ? selectedCategory : '',
     selectedEngineCc !== 'ALL' ? selectedEngineCc : '',
-    selectedBranch !== 'ALL' ? selectedBranch : '',
     minPrice,
     maxPrice,
   ].filter(Boolean).length;
@@ -275,22 +265,6 @@ function BikesContent() {
                 <option value="200">200cc (Apache RTR 200 4V)</option>
                 <option value="225">225cc - 310cc (Ronin, RR 310)</option>
                 <option value="electric">Electric (iQube)</option>
-              </select>
-            </div>
-
-            {/* Branch Availability */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Available at Branch</label>
-              <select
-                value={selectedBranch}
-                onChange={(e) => updateParams({ branch: e.target.value })}
-                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-slate-200 focus:outline-none focus:border-red-500 cursor-pointer"
-              >
-                <option value="ALL">All Dealership Branches</option>
-                <option value="Colombo">Colombo Flagship Hub</option>
-                <option value="Kandy">Kandy City Showroom</option>
-                <option value="Galle">Galle Coastal Center</option>
-                <option value="Kurunegala">Kurunegala Sales Hub</option>
               </select>
             </div>
 
@@ -497,22 +471,6 @@ function BikesContent() {
                   <option value="200">200cc (Apache RTR 200 4V)</option>
                   <option value="225">225cc - 310cc (Ronin, RR 310)</option>
                   <option value="electric">Electric (iQube)</option>
-                </select>
-              </div>
-
-              {/* Branch Availability */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Available at Branch</label>
-                <select
-                  value={selectedBranch}
-                  onChange={(e) => updateParams({ branch: e.target.value })}
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-slate-200 focus:outline-none focus:border-red-500"
-                >
-                  <option value="ALL">All Dealership Branches</option>
-                  <option value="Colombo">Colombo Flagship Hub</option>
-                  <option value="Kandy">Kandy City Showroom</option>
-                  <option value="Galle">Galle Coastal Center</option>
-                  <option value="Kurunegala">Kurunegala Sales Hub</option>
                 </select>
               </div>
 

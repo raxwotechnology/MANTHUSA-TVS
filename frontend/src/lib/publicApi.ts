@@ -28,6 +28,9 @@ export interface TVSBranchStock {
 export interface PublicVehicle {
   _id: string;
   stockNumber?: string;
+  roundNumber?: string;
+  chassisNumber?: string;
+  engineNumber?: string;
   registrationNumber?: string;
   make: string;
   model: string;
