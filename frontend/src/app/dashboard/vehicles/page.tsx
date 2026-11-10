@@ -443,6 +443,12 @@ export default function VehicleInventoryPage() {
     return 'LKR ' + (val || 0).toLocaleString('en-LK');
   };
 
+  const getVehiclePreviewImage = (vehicle: Vehicle) => (
+    vehicle.images?.find((image) => typeof image === 'string' && image.trim()) ||
+    vehicle.mediaAngles?.front ||
+    'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=800&q=80'
+  );
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'Available':
@@ -658,7 +664,16 @@ export default function VehicleInventoryPage() {
               {filteredVehicles.map((v) => (
                 <tr key={v._id} className="hover:bg-slate-50/80">
                   <td className="py-3 px-4 font-bold text-slate-900 font-mono">
-                    <div>{v.stockNumber}</div>
+                    <div className="flex items-center gap-2.5">
+                      <img
+                        src={getVehiclePreviewImage(v)}
+                        alt={`${v.make} ${v.model}`}
+                        className="w-14 h-11 rounded-lg object-cover border border-slate-200 bg-slate-100 shrink-0"
+                      />
+                      <span className={v.stockNumber ? '' : 'text-slate-400 italic font-sans text-[11px]'}>
+                        {v.stockNumber || 'Stock # Pending'}
+                      </span>
+                    </div>
                     {(v as any).roundNumber && (
                       <span className="inline-block mt-1 px-1.5 py-0.5 rounded-md bg-indigo-50 border border-indigo-200 text-indigo-700 font-sans text-[10px] font-bold">
                         Round #{(v as any).roundNumber}
@@ -1092,25 +1107,25 @@ export default function VehicleInventoryPage() {
                 <h3 className="text-lg font-extrabold text-slate-900">
                   {selectedVehicle.make} {selectedVehicle.model} ({selectedVehicle.year})
                 </h3>
-                <p className="text-xs text-slate-500 font-mono">Stock #: {selectedVehicle.stockNumber} | Reg #: {selectedVehicle.registrationNumber}</p>
+                <p className="text-xs text-slate-500 font-mono">
+                  Stock #: {selectedVehicle.stockNumber || 'Pending'} | Reg #: {selectedVehicle.registrationNumber || 'Not assigned'}
+                </p>
               </div>
               <button onClick={() => setSelectedVehicle(null)} className="text-slate-400 hover:text-slate-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {selectedVehicle.images && selectedVehicle.images[0] && (
-              <div className="relative h-56 rounded-xl overflow-hidden mb-4 border border-slate-200 bg-slate-950">
-                <img
-                  src={selectedVehicle.images[0]}
-                  alt="Main Vehicle"
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute bottom-3 left-3 bg-slate-900/80 backdrop-blur-md px-3 py-1 rounded-full text-white text-[11px] font-bold">
-                  Main Showroom Image
-                </div>
+            <div className="relative h-56 rounded-xl overflow-hidden mb-4 border border-slate-200 bg-slate-950">
+              <img
+                src={getVehiclePreviewImage(selectedVehicle)}
+                alt={`${selectedVehicle.make} ${selectedVehicle.model}`}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute bottom-3 left-3 bg-slate-900/80 backdrop-blur-md px-3 py-1 rounded-full text-white text-[11px] font-bold">
+                {selectedVehicle.images?.length || selectedVehicle.mediaAngles?.front ? 'Main Showroom Image' : 'Preview Image'}
               </div>
-            )}
+            </div>
 
             {/* Multi-Angle Images Gallery */}
             <div className="mb-4 bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
