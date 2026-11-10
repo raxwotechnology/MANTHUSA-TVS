@@ -190,7 +190,7 @@ export default function HomePage() {
         <div
           className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 scale-105"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=1920&q=80')`,
+            backgroundImage: `url('https://cdn.bikedekho.com/upload/userfiles/images/69cac34e2807c.jpg')`,
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#020617]/95 via-[#020617]/80 to-[#020617]/40 pointer-events-none" />
