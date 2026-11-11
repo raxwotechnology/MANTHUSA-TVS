@@ -163,27 +163,36 @@ export class VehiclesService {
       throw new BadRequestException('Make, model and a valid selling price are required');
     }
 
-    const result = await this.vehicleModel.updateMany(
-      {
-        make: new RegExp(`^${make.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i'),
-        model: new RegExp(`^${model.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i'),
-      },
-      [
-        {
-          $set: {
-            sellingPrice,
-            expectedProfit: { $subtract: [sellingPrice, { $ifNull: ['$totalInvestment', 0] }] },
+    const makePattern = new RegExp(`^${make.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
+    const modelPattern = new RegExp(`^${model.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
+    const matchingVehicles = await this.vehicleModel
+      .find({ make: makePattern, model: modelPattern })
+      .select('_id totalInvestment')
+      .lean()
+      .exec();
+
+    if (matchingVehicles.length > 0) {
+      await this.vehicleModel.bulkWrite(
+        matchingVehicles.map((vehicle) => ({
+          updateOne: {
+            filter: { _id: vehicle._id },
+            update: {
+              $set: {
+                sellingPrice,
+                expectedProfit: sellingPrice - Number(vehicle.totalInvestment || 0),
+              },
+            },
           },
-        },
-      ],
-    );
+        })),
+      );
+    }
 
     this.invalidatePublicCache();
     return {
       make,
       model,
       sellingPrice,
-      updatedCount: result.modifiedCount,
+      updatedCount: matchingVehicles.length,
     };
   }
 
