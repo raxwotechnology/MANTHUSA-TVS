@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId, Model } from 'mongoose';
 import { VehicleDocument } from './schemas/vehicle.schema';
@@ -152,6 +152,39 @@ export class VehiclesService {
 
     this.invalidatePublicCache();
     return updatedVehicle;
+  }
+
+  async updateModelPrice(updateModelPriceDto: any) {
+    const make = String(updateModelPriceDto.make || '').trim();
+    const model = String(updateModelPriceDto.model || '').trim();
+    const sellingPrice = Number(updateModelPriceDto.sellingPrice);
+
+    if (!make || !model || !Number.isFinite(sellingPrice) || sellingPrice < 0) {
+      throw new BadRequestException('Make, model and a valid selling price are required');
+    }
+
+    const result = await this.vehicleModel.updateMany(
+      {
+        make: new RegExp(`^${make.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i'),
+        model: new RegExp(`^${model.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i'),
+      },
+      [
+        {
+          $set: {
+            sellingPrice,
+            expectedProfit: { $subtract: [sellingPrice, { $ifNull: ['$totalInvestment', 0] }] },
+          },
+        },
+      ],
+    );
+
+    this.invalidatePublicCache();
+    return {
+      make,
+      model,
+      sellingPrice,
+      updatedCount: result.modifiedCount,
+    };
   }
 
   redactFinancials(vehicle: any, role?: string) {

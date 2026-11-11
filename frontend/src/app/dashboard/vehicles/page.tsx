@@ -138,6 +138,11 @@ export default function VehicleInventoryPage() {
   };
 
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showModelPriceModal, setShowModelPriceModal] = useState(false);
+  const [modelPriceMake, setModelPriceMake] = useState('');
+  const [modelPriceModel, setModelPriceModel] = useState('');
+  const [modelPriceValue, setModelPriceValue] = useState('');
+  const [modelPriceLoading, setModelPriceLoading] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [deletingVehicle, setDeletingVehicle] = useState<Vehicle | null>(null);
@@ -207,6 +212,71 @@ export default function VehicleInventoryPage() {
     setEditingVehicle(null);
     if (typeof window !== 'undefined' && (window.location.search.includes('edit=') || window.location.search.includes('id='))) {
       window.history.replaceState({}, '', '/dashboard/vehicles');
+    }
+  };
+
+  const modelOptions = Array.from(
+    new Map(
+      vehicles
+        .filter((vehicle) => vehicle.make?.trim() && vehicle.model?.trim())
+        .map((vehicle) => [
+          `${vehicle.make.trim().toLowerCase()}::${vehicle.model.trim().toLowerCase()}`,
+          { make: vehicle.make.trim(), model: vehicle.model.trim() },
+        ]),
+    ).values(),
+  ).sort((a, b) => `${a.make} ${a.model}`.localeCompare(`${b.make} ${b.model}`));
+
+  const openModelPriceModal = () => {
+    const firstOption = modelOptions[0];
+    setModelPriceMake(firstOption?.make || '');
+    setModelPriceModel(firstOption?.model || '');
+    setModelPriceValue('');
+    setShowModelPriceModal(true);
+  };
+
+  const handleModelPriceUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const sellingPrice = Number(modelPriceValue);
+    if (!modelPriceMake || !modelPriceModel || !Number.isFinite(sellingPrice) || sellingPrice < 0) return;
+
+    setModelPriceLoading(true);
+    try {
+      const response = await apiFetch('/vehicles/model-price', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ make: modelPriceMake, model: modelPriceModel, sellingPrice }),
+      });
+      const details = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setApiError(details.message || 'Could not update the model price.');
+        return;
+      }
+
+      setVehicles((current) =>
+        current.map((vehicle) => {
+          if (
+            vehicle.make?.trim().toLowerCase() !== modelPriceMake.trim().toLowerCase() ||
+            vehicle.model?.trim().toLowerCase() !== modelPriceModel.trim().toLowerCase()
+          ) {
+            return vehicle;
+          }
+          return {
+            ...vehicle,
+            sellingPrice,
+            expectedProfit: sellingPrice - (vehicle.totalInvestment || 0),
+          };
+        }),
+      );
+      setShowModelPriceModal(false);
+      setVehicleNotification({
+        type: 'success',
+        message: `${details.updatedCount || 0} ${modelPriceMake} ${modelPriceModel} bike(s) updated to ${formatLKR(sellingPrice)}.`,
+      });
+      setTimeout(() => setVehicleNotification(null), 5000);
+    } catch {
+      setApiError('Cannot connect to the server. Model price was not updated.');
+    } finally {
+      setModelPriceLoading(false);
     }
   };
 
@@ -534,6 +604,15 @@ export default function VehicleInventoryPage() {
 
         <div className="flex flex-wrap items-center gap-2">
           <button
+            onClick={openModelPriceModal}
+            disabled={!modelOptions.length}
+            className="flex items-center gap-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 disabled:opacity-40 px-3.5 py-2 text-xs font-semibold text-white shadow-xs transition-colors"
+            title="Change the selling price for every bike of one model"
+          >
+            <DollarSign className="w-4 h-4" />
+            <span>Quick Model Price</span>
+          </button>
+          <button
             onClick={() => setShowTVSRequisition(true)}
             className="flex items-center gap-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 px-3.5 py-2 text-xs font-semibold text-white shadow-xs transition-colors cursor-pointer"
             title="Category & Model Wise Stock Count & TVS Requisition Generator"
@@ -730,6 +809,77 @@ export default function VehicleInventoryPage() {
       </div>
 
       {/* Add Vehicle Modal with Media Section */}
+      {showModelPriceModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-[55] p-4">
+          <form onSubmit={handleModelPriceUpdate} className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 text-slate-900">
+            <div className="flex items-start justify-between border-b pb-3 mb-4">
+              <div>
+                <h3 className="text-base font-extrabold">Quick Model Price Change</h3>
+                <p className="text-xs text-slate-500 mt-1">Update the selling price for all bikes with the selected model.</p>
+              </div>
+              <button type="button" onClick={() => setShowModelPriceModal(false)} className="text-slate-400 hover:text-slate-600">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="space-y-3 text-xs">
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">Bike Model</label>
+                <select
+                  required
+                  value={`${modelPriceMake}::${modelPriceModel}`}
+                  onChange={(e) => {
+                    const [make, ...modelParts] = e.target.value.split('::');
+                    setModelPriceMake(make);
+                    setModelPriceModel(modelParts.join('::'));
+                  }}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg"
+                >
+                  {modelOptions.map((option) => (
+                    <option key={`${option.make}::${option.model}`} value={`${option.make}::${option.model}`}>
+                      {option.make} {option.model}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-1 text-[11px] text-slate-500">
+                  {vehicles.filter(
+                    (vehicle) =>
+                      vehicle.make?.trim().toLowerCase() === modelPriceMake.trim().toLowerCase() &&
+                      vehicle.model?.trim().toLowerCase() === modelPriceModel.trim().toLowerCase(),
+                  ).length}{' '}
+                  bike(s) will be updated.
+                </p>
+              </div>
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">New Selling Price (LKR)</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  required
+                  autoFocus
+                  value={modelPriceValue}
+                  onChange={(e) => setModelPriceValue(e.target.value)}
+                  placeholder="e.g. 850000"
+                  className="w-full px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-lg font-extrabold text-emerald-700"
+                />
+              </div>
+            </div>
+            <div className="mt-5 flex justify-end gap-2">
+              <button type="button" onClick={() => setShowModelPriceModal(false)} className="px-4 py-2 rounded-lg border text-xs font-semibold">
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={modelPriceLoading || !modelPriceValue}
+                className="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-xs font-bold"
+              >
+                {modelPriceLoading ? 'Updating...' : 'Update Model Price'}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
       {showAddModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl max-w-3xl w-full p-6 shadow-xl border border-slate-200 max-h-[90vh] overflow-y-auto text-slate-900">

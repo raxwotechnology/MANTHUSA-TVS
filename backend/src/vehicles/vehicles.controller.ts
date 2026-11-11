@@ -20,6 +20,12 @@ export class VehiclesController {
     return list.map(v => this.vehiclesService.redactFinancials(v, role));
   }
 
+  @Put('model-price')
+  @Roles('Admin / Owner', 'Inventory Manager', 'Sales & Operations')
+  updateModelPrice(@Body() updateModelPriceDto: any) {
+    return this.vehiclesService.updateModelPrice(updateModelPriceDto);
+  }
+
   @Get(':id/qr-code')
   getQrCode(@Param('id') id: string) {
     return this.vehiclesService.getQrCode(id);
